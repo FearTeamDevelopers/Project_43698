@@ -9,7 +9,8 @@ if(preg_match('#^.*\.dev$#i',$_SERVER['SERVER_NAME'])){
     defined('ENV')? null : define('ENV', 'live');
 }
 
-defined('APP_PATH')? null : define('APP_PATH', __DIR__);
+defined('APP_PATH')? null : define('APP_PATH', realpath(dirname(__FILE__)));
+defined('MODULES_PATH')? null : define('MODULES_PATH', realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'modules'));
 
 if (ENV == 'dev') {
     error_reporting(E_ALL);
@@ -24,11 +25,15 @@ if (version_compare(phpversion(), '5.4', '<')) {
     exit();
 }
 
-// core
-require('./vendors/thcframe/core/core.php');
+//xdebug profiler
+//setcookie('XDEBUG_PROFILE', 1, time()+1800);
+//setcookie('XDEBUG_PROFILE', '', time()-1800);
+
+//core
+require(APP_PATH.'/vendors/thcframe/core/core.php');
 THCFrame\Core\Core::initialize();
 
-// plugins
+//plugins
 $path = APP_PATH . '/application/plugins';
 $iterator = new \DirectoryIterator($path);
 
@@ -38,14 +43,14 @@ foreach ($iterator as $item) {
     }
 }
 
-//module loading
+//register modules
 $modules = array('App', 'Admin');
 THCFrame\Core\Core::registerModules($modules);
 
-$profiler = THCFrame\Profiler\Profiler::getProfiler();
-$profiler->start();
+//internal profiler
+THCFrame\Profiler\Profiler::start();
 
 // load services and run dispatcher
 THCFrame\Core\Core::run();
 
-$profiler->end();
+THCFrame\Profiler\Profiler::stop();
