@@ -1,0 +1,53 @@
+<ul class="maintabmenu multipletabmenu">
+    <li class="current"><a href="#">Bazar</a></li>
+</ul><!--maintabmenu-->
+
+<div class="content">
+    <div class="contenttitle radiusbottom0">
+        <h2 class="image"><span>Inzeráty</span></h2>
+    </div><!--contenttitle-->
+
+    <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+    <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+        <colgroup>
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" />
+        </colgroup>
+        <thead>
+            <tr>
+                <td class="head0">Název</td>
+                <td class="head1">Autor</td>
+                <td class="head0">Typ</td>
+                <td class="head1">Sekce</td>
+                <td class="head0">Platnost do</td>
+                <td class="head1">Počet odpovědí</td>
+                <td class="head0">Status</td>
+                <td class="head1">Vytvořen</td>
+                <td class="head0">&nbsp;</td>
+            </tr>
+        </thead>
+        <tbody>
+            {if !empty($ads)}
+                {foreach $ad in $ads}
+                    <tr>
+                        <td>{echo $ad->getTitle()}</td>
+                        <td>{echo $ad->firstname." ".$ad->lastname}</td>
+                        <td>{if $ad->getType()=="tender"}Nabídka{/if}{else}Poptávka{/else}</td>
+                        <td>{echo $ad->getSection()}</td>
+                        <td>{echo $ad->getExpirationDate()}</td>
+                        <td>{echo $ad->messageCount}</td>
+                        <td>{if ($ad->active)}<span class="labelProduct labelProductGreen">Active</span>{/if}</td>
+                        <td>{echo $ad->getCreated()}</td>
+                        <td>
+                            <a href="/admin/advertisement/detail/{echo $ad->getId()}" class="btn btn3 btn_search" title="Detail"></a>
+                            <a href="/admin/advertisement/delete/{echo $ad->getId()}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>
+                        </td>
+                    </tr>
+                {/foreach}
+            {/if}
+        </tbody>
+    </table>
+</div>

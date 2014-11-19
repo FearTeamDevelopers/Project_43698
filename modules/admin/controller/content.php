@@ -33,9 +33,7 @@ class Admin_Controller_Content extends Controller
      */
     private function _getPhotos()
     {
-        $photos = App_Model_Photo::all(array('galleryId = ?' => 3, 'active = ?' => true));
-
-        return $photos;
+        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
     }
 
     /**
@@ -95,6 +93,14 @@ class Admin_Controller_Content extends Controller
         }
     }
 
+    /**
+     * @before _secured, _admin
+     */
+    public function insertPhotoDialog()
+    {
+        $this->willRenderLayoutView = false;
+    }
+    
     /**
      * @before _secured, _admin
      */

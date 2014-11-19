@@ -169,4 +169,17 @@ class App_Model_Action extends Model
         $this->setModified(date('Y-m-d H:i:s'));
     }
 
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchAll()
+    {
+        $query = self::getQuery(array('ac.*'))
+                ->join('tb_user', 'ac.userId = us.id', 'us',
+                        array('us.firstname', 'us.lastname'));
+        $news = self::initialize($query);
+        
+        return $news;
+    }
 }

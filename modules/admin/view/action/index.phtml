@@ -1,0 +1,82 @@
+<ul class="maintabmenu multipletabmenu">
+    <li class="current"><a href="#">Akce</a></li>
+    <li><a href="/admin/action/add/">Přidat Akci</a></li>
+</ul><!--maintabmenu-->
+
+<div class="content">
+    <div class="contenttitle radiusbottom0">
+        <h2 class="image"><span>Akce</span></h2>
+    </div><!--contenttitle-->
+    
+    <form method="post" class="massActionForm" action="/admin/action/massaction/">
+        <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+            <colgroup>
+                <col class="con0" /> <col class="con1" />
+                <col class="con0" /> <col class="con1" />
+                <col class="con0" /> <col class="con1" />
+                <col class="con0" /> <col class="con1" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <td class="head0 width50"><input type="checkbox" class="checkall" /></td>
+                    <td class="head1">Název</td>
+                    <td class="head0">Autor</td>
+                    <td class="head1">Zobrazovat do</td>
+                    <td class="head0">Vytvořeno</td>
+                    <td class="head1">Status</td>
+                    <td class="head0">V archivu</td>
+                    <td class="head1">&nbsp;</td>
+                </tr>
+            </thead>
+            <tbody>
+                {if !empty($actions)}
+                    {foreach $action in $actions}
+                        <tr>
+                            <td class="center">
+                                <input type="checkbox" name="actionsids[]" value="{echo $action->getId()}" />
+                            </td>
+                            <td>{echo $action->getTitle()}</td>
+                            <td>{echo $action->firstname." ".$action->lastname}</td>
+                            <td>{echo $action->getExpirationDate()}</td>
+                            <td>{echo $action->getCreated()}</td>
+                            <td>
+                                {if ($action->approved == 1)}
+                                    {if $action->active}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
+                                {/if}{elseif $action->approved == 2}
+                                    <span class="labelProduct labelProductRed">Zamítnuto</span>
+                                {/elseif}{else}
+                                    <span class="labelProduct labelProductOrange">Čeká na schválení</span>
+                                {/else}
+                            </td>
+                            <td>
+                                {if $action->archive}<span class="labelProduct labelProductGreen">Ano</span>{/if}
+                                {else}<span class="labelProduct labelProductOrange">Ne</span>{/else}
+                            </td>
+                            <td>
+                                <a href="/admin/action/edit/{echo $action->id}" class="btn btn3 btn_pencil" title="Upravit"></a>
+                                {if $isAdmin}
+                                    <a href="/admin/action/approveaction/{echo $action->id}" class="btn btn3 ajaxBtnReload" title="Schválit">Schválit</a>
+                                    <a href="/admin/action/rejectaction/{echo $action->id}" class="btn btn3 btn_stop ajaxBtnReload" title="Zamítnout"></a>
+                                    <a href="/admin/action/delete/{echo $action->id}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>
+                                {/if}
+                            </td>
+                        </tr>
+                    {/foreach}
+                {/if}
+            </tbody>
+        </table>
+        {if $isAdmin}
+        <div class="tableoptions">
+            Selected:
+            <select class="radius3" name="action">
+                <option value="activate">Aktivovat</option>
+                <option value="deactivate">Deaktivovat</option>
+                <option value="delete">Smazat</option>
+            </select> &nbsp;
+            <input class="radius3" type="submit" name="performActionAction" value="Provést"/>
+        </div><!--tableoptions-->
+        {/if}
+    </form>
+</div>
+<br class="clear-all"/><br />

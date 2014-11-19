@@ -48,9 +48,8 @@ $modules = array('App', 'Admin');
 THCFrame\Core\Core::registerModules($modules);
 
 //internal profiler
-THCFrame\Profiler\Profiler::start();
+$profiler = \THCFrame\Profiler\Profiler::getInstance();
+$profiler->start();
 
 // load services and run dispatcher
 THCFrame\Core\Core::run();
-
-THCFrame\Profiler\Profiler::stop();

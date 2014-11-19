@@ -1,8 +1,78 @@
-<?php
+<script type="text/javascript" src="/public/js/custom/dashboard.js"></script>
+<ul class="maintabmenu">
+    <li class="current"><a href="/admin/">Dashboard</a></li>
+</ul><!--maintabmenu-->
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+<div class="content">
+    <div class="one_half">
+        <div class="contenttitle">
+            <h2 class="button"><span>Přidat</span></h2>
+        </div><!--contenttitle-->
+        <ul class="widgetlist">
+            <li><a href="/admin/news/add/" class="message">Novinku</a></li>
+            <li><a href="/admin/action/add/" class="message">Akci</a></li>
+            <li><a href="/admin/report/add/" class="upload">Reportáž</a></li>
+            <li><a href="/admin/gallery/add/" class="events">Galerii</a></li>
+        </ul>
+    </div>
 
+    <br clear="all" /><br />
+    
+    <div class="one_half">
+        <div class="widgetbox">
+            <div class="title"><h2 class="tabbed"><span>Poslední novinky</span></h2></div>
+            <div class="widgetcontent announcement">
+                {if !empty($latestnews)}
+                    {foreach $news in $latestnews}
+                        <p>
+                            <span class="radius2">Title: {echo $news->getTitle()}</span>
+                            <span class="radius2">Created: {echo $news->getCreated()}</span>
+                            <br/><br/>
+                            {echo $news->shortBody}
+                        </p>
+                        <hr/>
+                    {/foreach}
+                {/if}
+                {else}
+                <p>Žádné aktuality</p>
+                {/else}
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
+
+    </div><!--one_half-->
+
+    <div class="one_half last">
+        <div class="widgetbox">
+            <div class="title"><h2 class="tabbed"><span>Nejnovější Reportáže</span></h2></div>
+            <div class="widgetcontent padding0 statement">
+                <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+                    <colgroup>
+                        <col class="con0" />
+                        <col class="con1" />
+                        <col class="con0" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">Název</th>
+                            <th class="head1">Autor</th>
+                            <th class="head0">Vytvořeno</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($latestrefs)}
+                            {foreach $ref in $latestrefs}
+                                <tr>
+                                    <td>{echo $ref->getTitle()}</td>
+                                    <td>{echo $ref->getAuthor()}</td>
+                                    <td>{echo $ref->getCreated()}</td>
+                                </tr>
+                            {/foreach}
+                        {/if} 
+                    </tbody>
+                </table>
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
+    </div><!--one_half-->
+
+    <br class="clear-all"/><br />
+</div><!--content-->

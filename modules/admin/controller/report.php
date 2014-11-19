@@ -3,6 +3,7 @@
 use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -27,6 +28,24 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * 
+     * @return type
+     */
+    private function _getPhotos()
+    {
+        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    private function _getGalleries()
+    {
+        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
+    }
+
+    /**
      * @before _secured, _participant
      */
     public function index()
@@ -45,7 +64,8 @@ class Admin_Controller_Report extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true)))
+        $view->set('photos', $this->_getPhotos())
+                ->set('galleries', $this->_getGalleries())
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddReport')) {
@@ -61,11 +81,41 @@ class Admin_Controller_Report extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
+            $cfg = Registry::get('configuration');
+
+            $fileManager = new FileManager(array(
+                'thumbWidth' => $cfg->thumb_width,
+                'thumbHeight' => $cfg->thumb_height,
+                'thumbResizeBy' => $cfg->thumb_resizeby,
+                'maxImageWidth' => $cfg->photo_maxwidth,
+                'maxImageHeight' => $cfg->photo_maxheight
+            ));
+
+            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
+
+            if (!empty($fileErrors)) {
+                $errors['croppedimage'] = $fileErrors;
+            }
+
+            if (!empty($files)) {
+                foreach ($files as $i => $file) {
+                    if ($file instanceof \THCFrame\Filesystem\Image) {
+                        $imgMain = trim($file->getFilename(), '.');
+                        $imgThumb = trim($file->getThumbname(), '.');
+                        break;
+                    }
+                }
+            } else {
+                $imgMain = '';
+                $imgThumb = '';
+            }
+
             $report = new App_Model_Report(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
                 'urlKey' => $urlKey,
-                'approved' => 0,
+                'approved' => $cfg->report_autopublish,
                 'archive' => 0,
                 'shortBody' => RequestMethods::post('shorttext'),
                 'body' => RequestMethods::post('text'),
@@ -74,7 +124,10 @@ class Admin_Controller_Report extends Controller
                 'keywords' => RequestMethods::post('keywords'),
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
                 'metaDescription' => RequestMethods::post('metadescription', RequestMethods::post('shorttext')),
-                'metaImage' => RequestMethods::post('metaimage')
+                'metaImage' => RequestMethods::post('metaimage'),
+                'photoName' => $urlKey,
+                'imgMain' => $imgMain,
+                'imgThumb' => $imgThumb
             ));
 
             if (empty($errors) && $report->validate()) {
@@ -113,7 +166,8 @@ class Admin_Controller_Report extends Controller
         }
 
         $view->set('report', $report)
-                ->set('photos', App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true)));
+                ->set('photos', $this->_getPhotos())
+                ->set('galleries', $this->_getGalleries());
 
         if (RequestMethods::post('submitEditReport')) {
             if ($this->checkCSRFToken() !== true) {
@@ -127,6 +181,39 @@ class Admin_Controller_Report extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
+            $cfg = Registry::get('configuration');
+
+            $fileManager = new FileManager(array(
+                'thumbWidth' => $cfg->thumb_width,
+                'thumbHeight' => $cfg->thumb_height,
+                'thumbResizeBy' => $cfg->thumb_resizeby,
+                'maxImageWidth' => $cfg->photo_maxwidth,
+                'maxImageHeight' => $cfg->photo_maxheight
+            ));
+
+            $imgMain = $imgThumb = '';
+            if ($report->imgMain == '') {
+                $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
+                $files = $fileManager->getUploadedFiles();
+
+                if (!empty($fileErrors)) {
+                    $errors['croppedimage'] = $fileErrors;
+                }
+
+                if (!empty($files)) {
+                    foreach ($files as $i => $file) {
+                        if ($file instanceof \THCFrame\Filesystem\Image) {
+                            $imgMain = trim($file->getFilename(), '.');
+                            $imgThumb = trim($file->getThumbname(), '.');
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $imgMain = $report->imgMain;
+                $imgThumb = $report->imgThumb;
+            }
+
             $report->title = RequestMethods::post('title');
             $report->urlKey = $urlKey;
             $report->expirationDate = RequestMethods::post('expiration');
@@ -134,10 +221,15 @@ class Admin_Controller_Report extends Controller
             $report->shortBody = RequestMethods::post('shorttext');
             $report->rank = RequestMethods::post('rank', 1);
             $report->active = RequestMethods::post('active');
+            $report->approved = RequestMethods::post('approve');
+            $report->archive = RequestMethods::post('archive');
             $report->keywords = RequestMethods::post('keywords');
             $report->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
             $report->metaDescription = RequestMethods::post('metadescription', RequestMethods::post('shorttext'));
             $report->metaImage = RequestMethods::post('metaimage');
+            $report->photoName = $urlKey;
+            $report->imgMain = $imgMain;
+            $report->imgThumb = $imgThumb;
 
             if (empty($errors) && $report->validate()) {
                 $report->save();
@@ -165,19 +257,59 @@ class Admin_Controller_Report extends Controller
                             array('id = ?' => (int) $id), array('id', 'userId')
             );
 
-            if ($this->_security->isGranted('role_admin') !== true ||
-                    $report->getUserId() !== $this->getUser()->getId()) {
-                echo self::ERROR_MESSAGE_4;
+            if (NULL === $report) {
+                echo self::ERROR_MESSAGE_2;
+            } else {
+                if ($this->_security->isGranted('role_admin') === true ||
+                        $report->getUserId() == $this->getUser()->getId()) {
+                    if ($report->delete()) {
+                        Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                        echo 'success';
+                    } else {
+                        Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                        echo self::ERROR_MESSAGE_1;
+                    }
+                } else {
+                    echo self::ERROR_MESSAGE_4;
+                }
             }
+        } else {
+            echo self::ERROR_MESSAGE_1;
+        }
+    }
+
+    /**
+     * @before _secured, _participant
+     * @param type $id
+     */
+    public function deleteMainPhoto($id)
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
+        if ($this->checkCSRFToken()) {
+            $report = App_Model_Report::first(array('id = ?' => (int) $id));
 
             if (NULL === $report) {
                 echo self::ERROR_MESSAGE_2;
             } else {
-                if ($report->delete()) {
-                    Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                if ($this->_security->isGranted('role_admin') !== true ||
+                        $report->getUserId() !== $this->getUser()->getId()) {
+                    echo self::ERROR_MESSAGE_4;
+                }
+
+                @unlink($report->getUnlinkPath());
+                @unlink($report->getUnlinkThumbPath());
+                $report->imgMain = '';
+                $report->imgThumb = '';
+
+                if ($report->validate()) {
+                    $report->save();
+
+                    Event::fire('admin.log', array('success', 'Report Id: ' . $id));
                     echo 'success';
                 } else {
-                    Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                    Event::fire('admin.log', array('fail', 'Report Id: ' . $id));
                     echo self::ERROR_MESSAGE_1;
                 }
             }

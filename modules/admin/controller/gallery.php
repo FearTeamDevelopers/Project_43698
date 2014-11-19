@@ -11,7 +11,7 @@ use THCFrame\Registry\Registry;
  */
 class Admin_Controller_Gallery extends Controller
 {
-    
+
     /**
      * 
      * @param type $key
@@ -37,7 +37,7 @@ class Admin_Controller_Gallery extends Controller
     {
         $view = $this->getActionView();
 
-        $galleries = App_Model_Gallery::all();
+        $galleries = App_Model_Gallery::fetchAll();
 
         $view->set('galleries', $galleries);
     }
@@ -50,15 +50,15 @@ class Admin_Controller_Gallery extends Controller
     public function add()
     {
         $view = $this->getActionView();
-        
+
         $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddGallery')) {
-            if($this->checkCSRFToken() !== true && 
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true){
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/gallery/');
             }
-            
+
             $errors = array();
             $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
@@ -80,7 +80,7 @@ class Admin_Controller_Gallery extends Controller
                 $id = $gallery->save();
 
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                $view->successMessage('Gallery'.self::SUCCESS_MESSAGE_1);
+                $view->successMessage('Gallery' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/gallery/');
             } else {
                 Event::fire('admin.log', array('fail'));
@@ -108,7 +108,7 @@ class Admin_Controller_Gallery extends Controller
             $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/admin/gallery/');
         }
-        
+
         if ($this->_security->isGranted('role_admin') !== true ||
                 $gallery->getUserId() !== $this->getUser()->getId()) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
@@ -141,14 +141,14 @@ class Admin_Controller_Gallery extends Controller
             $view->warningMessage(self::ERROR_MESSAGE_4);
             self::redirect('/admin/gallery/');
         }
-        
+
         $view->set('gallery', $gallery);
 
         if (RequestMethods::post('submitEditGallery')) {
-            if($this->checkCSRFToken() !== true){
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
-            
+
             $errors = array();
             $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
@@ -190,70 +190,60 @@ class Admin_Controller_Gallery extends Controller
         $view = $this->getActionView();
 
         $gallery = App_Model_Gallery::first(
-                        array('id = ?' => (int)$id), 
-                        array('id', 'title', 'created')
+                        array('id = ?' => (int) $id), array('id', 'title', 'created')
         );
 
         if (NULL === $gallery) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/admin/gallery/');
         }
-        
+
         if ($this->_security->isGranted('role_admin') !== true ||
                 $gallery->getUserId() !== $this->getUser()->getId()) {
-            echo self::ERROR_MESSAGE_4;
+            $view->warningMessage(self::ERROR_MESSAGE_4);
+            self::redirect('/admin/gallery/');
         }
 
         $view->set('gallery', $gallery);
 
         if (RequestMethods::post('submitDeleteGallery')) {
-            if($this->checkCSRFToken() !== true){
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
-            if (RequestMethods::post('action') == 1) {
-                $fm = new FileManager();
-                $configuration = Registry::get('config');
+            $fm = new FileManager();
+            $configuration = Registry::get('config');
 
-                if (!empty($configuration->files)) {
-                    $pathToImages = trim($configuration->files->pathToImages, '/');
-                    $pathToThumbs = trim($configuration->files->pathToThumbs, '/');
-                } else {
-                    $pathToImages = 'public/uploads/images';
-                    $pathToThumbs = 'public/uploads/images';
-                }
+            if (!empty($configuration->files)) {
+                $pathToImages = trim($configuration->files->pathToImages, '/');
+                $pathToThumbs = trim($configuration->files->pathToThumbs, '/');
+            } else {
+                $pathToImages = 'public/uploads/images';
+                $pathToThumbs = 'public/uploads/images';
+            }
 
-                $photos = App_Model_Photo::all(array('galleryId = ?' => (int)$id));
-                
-                $ids = array();
-                foreach ($photos as $colPhoto) {
-                    $ids[] = $colPhoto->getId();
-                }
+            $photos = App_Model_Photo::all(array('galleryId = ?' => (int) $id), array('id'));
 
-                App_Model_Photo::deleteAll(array('id IN ?' => $ids));
+            $ids = array();
+            foreach ($photos as $colPhoto) {
+                $ids[] = $colPhoto->getId();
+            }
 
-                $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getId();
-                $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getId();
+            App_Model_Photo::deleteAll(array('id IN ?' => $ids));
 
-                if ($path == $pathThumbs) {
-                    $fm->remove($path);
-                } else {
-                    $fm->remove($path);
-                    $fm->remove($pathThumbs);
-                }
-            } elseif (RequestMethods::post('action') == 2) {
-                $photos = App_Model_Photo::all(array('galleryId = ?' => $id));
-                $ids = array();
-                foreach ($photos as $colPhoto) {
-                    $ids[] = $colPhoto->getId();
-                }
+            $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getId();
+            $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getId();
 
-                App_Model_Photo::deleteAll(array('id IN ?' => $ids));
+            if ($path == $pathThumbs) {
+                $fm->remove($path);
+            } else {
+                $fm->remove($path);
+                $fm->remove($pathThumbs);
             }
 
             if ($gallery->delete()) {
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                $view->successMessage('Galerie'.self::SUCCESS_MESSAGE_3);
+                $view->successMessage('Galerie' . self::SUCCESS_MESSAGE_3);
                 self::redirect('/admin/gallery/');
             } else {
                 Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
@@ -285,7 +275,7 @@ class Admin_Controller_Gallery extends Controller
             $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/admin/gallery/');
         }
-        
+
         if ($this->_security->isGranted('role_admin') !== true ||
                 $gallery->getUserId() !== $this->getUser()->getId()) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
@@ -296,21 +286,23 @@ class Admin_Controller_Gallery extends Controller
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddPhoto')) {
-            if($this->checkCSRFToken() !== true && 
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true){
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/gallery/');
             }
             $errors = array();
 
+            $cfg = Registry::get('configuration');
+            
             $fileManager = new FileManager(array(
-                'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
-                'thumbHeight' => $this->loadConfigFromDb('thumb_height'),
-                'thumbResizeBy' => $this->loadConfigFromDb('thumb_resizeby'),
-                'maxImageWidth' => $this->loadConfigFromDb('photo_maxwidth'),
-                'maxImageHeight' => $this->loadConfigFromDb('photo_maxheight')
+                'thumbWidth' => $cfg->thumb_width,
+                'thumbHeight' => $cfg->thumb_height,
+                'thumbResizeBy' => $cfg->thumb_resizeby,
+                'maxImageWidth' => $cfg->photo_maxwidth,
+                'maxImageHeight' => $cfg->photo_maxheight
             ));
 
-            $fileErrors = $fileManager->upload('secondfile', 'gallery/' . $gallery->getId(), time().'_')->getUploadErrors();
+            $fileErrors = $fileManager->upload('secondfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($files)) {

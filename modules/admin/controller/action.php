@@ -3,6 +3,7 @@
 use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -27,13 +28,31 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * 
+     * @return type
+     */
+    private function _getPhotos()
+    {
+        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    private function _getGalleries()
+    {
+        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
+    }
+
+    /**
      * @before _secured, _participant
      */
     public function index()
     {
         $view = $this->getActionView();
 
-        $actions = App_Model_Action::all();
+        $actions = App_Model_Action::fetchAll();
 
         $view->set('actions', $actions);
     }
@@ -45,7 +64,8 @@ class Admin_Controller_Action extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true)))
+        $view->set('photos', $this->_getPhotos())
+                ->set('galleries', $this->_getGalleries())
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddAction')) {
@@ -61,11 +81,13 @@ class Admin_Controller_Action extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
+            $autoApprove = Registry::get('configuration')->action_autopublish;
+
             $action = new App_Model_Action(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
                 'urlKey' => $urlKey,
-                'approved' => 0,
+                'approved' => $autoApprove,
                 'archive' => 0,
                 'shortBody' => RequestMethods::post('shorttext'),
                 'body' => RequestMethods::post('text'),
@@ -110,7 +132,8 @@ class Admin_Controller_Action extends Controller
         }
 
         $view->set('action', $action)
-                ->set('photos', App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true)));
+                ->set('photos', $this->_getPhotos())
+                ->set('galleries', $this->_getGalleries());
 
         if (RequestMethods::post('submitEditAction')) {
             if ($this->checkCSRFToken() !== true) {
@@ -131,6 +154,8 @@ class Admin_Controller_Action extends Controller
             $action->shortBody = RequestMethods::post('shorttext');
             $action->rank = RequestMethods::post('rank', 1);
             $action->active = RequestMethods::post('active');
+            $action->approved = RequestMethods::post('approve');
+            $action->archive = RequestMethods::post('archive');
             $action->keywords = RequestMethods::post('keywords');
 
             if (empty($errors) && $action->validate()) {
@@ -159,14 +184,22 @@ class Admin_Controller_Action extends Controller
                             array('id = ?' => (int) $id), array('id', 'userId')
             );
 
-            if ($this->_security->isGranted('role_admin') !== true ||
-                    $action->getUserId() !== $this->getUser()->getId()) {
-                echo self::ERROR_MESSAGE_4;
-            }
-
             if (NULL === $action) {
                 echo self::ERROR_MESSAGE_2;
             } else {
+                if ($this->_security->isGranted('role_admin') === true ||
+                        $action->getUserId() == $this->getUser()->getId()) {
+                    if ($action->delete()) {
+                        Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                        echo 'success';
+                    } else {
+                        Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                        echo self::ERROR_MESSAGE_1;
+                    }
+                } else {
+                    echo self::ERROR_MESSAGE_4;
+                }
+
                 if ($action->delete()) {
                     Event::fire('admin.log', array('success', 'Action id: ' . $id));
                     echo 'success';

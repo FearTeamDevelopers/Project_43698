@@ -1,6 +1,7 @@
 <?php
 
 use Admin\Etc\Controller;
+use THCFrame\Events\Events as Event;
 
 /**
  * 
@@ -50,12 +51,17 @@ class Admin_Controller_Advertisement extends Controller
             if (NULL === $ad) {
                 echo self::ERROR_MESSAGE_2;
             } else {
-                if ($ad->delete()) {
-                    Event::fire('admin.log', array('success', 'Ad id: ' . $id));
-                    echo 'success';
+                if ($this->_security->isGranted('role_admin') === true ||
+                        $ad->getUserId() == $this->getUser()->getId()) {
+                    if ($ad->delete()) {
+                        Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                        echo 'success';
+                    } else {
+                        Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
+                        echo self::ERROR_MESSAGE_1;
+                    }
                 } else {
-                    Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
+                    echo self::ERROR_MESSAGE_4;
                 }
             }
         } else {
@@ -108,8 +114,7 @@ class Admin_Controller_Advertisement extends Controller
 
         if ($this->checkCSRFToken()) {
             $photo = App_Model_AdImage::first(
-                            array('id = ?' => (int) $imageId), 
-                            array('id', 'adId', 'imgMain', 'imgThumb')
+                            array('id = ?' => (int) $imageId), array('id', 'adId', 'imgMain', 'imgThumb')
             );
 
             if (null === $photo) {
@@ -121,7 +126,7 @@ class Admin_Controller_Advertisement extends Controller
                 if ($photo->delete()) {
                     @unlink($mainPath);
                     @unlink($thumbPath);
-                    
+
                     Event::fire('admin.log', array('success', 'Ad image id: ' . $imageId
                         . ' from ad: ' . $photo->getAdId()));
                     echo 'success';

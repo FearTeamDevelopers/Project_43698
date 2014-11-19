@@ -132,6 +132,20 @@ class App_Model_Gallery extends Model
 
     /**
      * 
+     * @return array
+     */
+    public static function fetchAll()
+    {
+        $query = self::getQuery(array('gl.*'))
+                ->join('tb_user', 'gl.userId = us.id', 'us',
+                        array('us.firstname', 'us.lastname'));
+        $news = self::initialize($query);
+        
+        return $news;
+    }
+    
+    /**
+     * 
      * @param type $id
      * @return type
      */

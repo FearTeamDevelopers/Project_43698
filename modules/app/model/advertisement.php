@@ -131,7 +131,13 @@ class App_Model_Advertisement extends Model
     /**
      * @readwrite
      */
+    protected $_messages;
+    
+    /**
+     * @readwrite
+     */
     protected $_images;
+
 
     /**
      * 
@@ -154,16 +160,19 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchAll()
     {
-        $ads = self::all();
-
+        $query = self::getQuery(array('adv.*'))
+                ->join('tb_user', 'adv.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'));
+        
+        $ads = self::initialize($query);
+        
         if ($ads !== null) {
             foreach ($ads as $key => $ad) {
                 $ad->messageCount = App_Model_AdMessage::count(array('adId = ?' => $ad->getId()));
-                $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
                 $ads[$key] = $ad;
             }
         }
-
+        
         return $ads;
     }
 
@@ -174,14 +183,28 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchById($id)
     {
-        $ad = self::first(array('id = ?' => (int) $id));
+        $query = self::getQuery(array('adv.*'))
+                ->join('tb_user', 'adv.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->where('adv.id = ?', (int) $id);
+        
+        $adArr = self::initialize($query);
+        $ad = array_shift($adArr);
 
         if ($ad !== null) {
-            $ad->messageCount = App_Model_AdMessage::count(array('adId = ?' => $ad->getId()));
+            $ad->messages = App_Model_AdMessage::all(array('adId = ?' => $ad->getId()));
             $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
         }
 
         return $ad;
     }
 
+    /**
+     * 
+     * @param type $type
+     */
+    public static function fetchActiveByType($type = 'tender')
+    {
+        
+    }
 }

@@ -69,6 +69,17 @@ class App_Model_Partner extends Model
     /**
      * @column
      * @readwrite
+     * @type text
+     * @length 30
+     * 
+     * @validate alpha, max(30)
+     * @label sekce
+     */
+    protected $_section;
+    
+    /**
+     * @column
+     * @readwrite
      * @type datetime
      */
     protected $_created;

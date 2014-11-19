@@ -1,0 +1,189 @@
+<ul class="maintabmenu multipletabmenu">
+    <li><a href="/admin/report/">Reportáže</a></li>
+    <li class="current"><a href="#">Přidat Reportáž</a></li>
+</ul><!--maintabmenu-->
+
+<div class="content">
+    <div class="two_third">
+        <div class="widgetbox">
+            <div class="contenttitle radiusbottom0">
+                <h2 class="table"><span>Základní info</span></h2>
+            </div><!--contenttitle-->
+
+            <form class="stdform stdform2 cropit-form" method="post" action="#" enctype="multipart/form-data">
+                <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+                <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
+                <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
+
+                <p>
+                    <label>Název*</label>
+                    <span class="field">
+                        <input type="text" name="title" class="longinput" value="{echo isset($report)? $report->title: ""}" />
+                        {if isset($errors["title"])}
+                        <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                        {/if}
+                    </span>
+                </p>
+                <p>
+                    <label>Pořadí<small>Max. 99</small></label>
+                    <span class="field">
+                        <input type="text" name="rank" class="longinput" value="{echo isset($report)? $report->rank: 1}"/>
+                        {if isset($errors["rank"])}
+                        <label class="error">{echo join("<br/>", $errors["rank"])}</label>
+                        {/if}
+                    </span>
+                </p>
+                <p>
+                    <label>Zobrazovat do*</label>
+                    <span class="field">
+                        <input type="text" name="expiration" class="longinput datepicker" 
+                               value="{echo isset($report)? $report->expirationDate: ""}"/>
+                        {if isset($errors["expirationDate"])}
+                        <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
+                        {/if}
+                    </span>
+                </p>
+                <p>
+                    <label>Text*<small>Max. 30 000 znaků</small></label>
+                    <span class="field">
+                        <textarea rows="20" name="text" id="ckeditor">{echo isset($report)? $report->body: ""}</textarea>
+                        {if isset($errors["body"])}
+                        <label class="error">{echo join("<br/>", $errors["body"])}</label>
+                        {/if}
+                        <br/>
+                        <button id="news-clear-text">Smazat</button>
+                        <button id="news-text-new-paragraph">Nový odstavec</button>
+                        <button id="news-text-to-teaser">Zkopírovat do Teaser</button>
+                    </span>
+                </p>
+                <p>
+                    <label>Teaser*<small>Max. 5000 znaků</small></label>
+                    <span class="field">
+                        <textarea rows="20" name="shorttext" id="ckeditor2">{echo isset($report)? $report->shortBody: ""}</textarea>
+                        {if isset($errors["shortBody"])}
+                        <label class="error">{echo join("<br/>", $errors["shortBody"])}</label>
+                        {/if}
+                        <br/>
+                        <button id="news-clear-teaser">Smazat</button>
+                        <button id="news-teaser-new-paragraph">Nový odstavec</button>
+                        <button id="news-readmore-link">Přidat odkaz na celý článek</button>
+                        <button id="news-teaser-to-meta">Zkopírovat do Meta-popis</button>
+                    </span>
+                </p>
+
+                <br/>
+                <div class="contenttitle radiusbottom0">
+                    <h2 class="table"><span>Metadata</span></h2>
+                </div><!--contenttitle-->
+                <p>
+                    <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
+                    <span class="field">
+                        <input type="text" name="keywords" value="{echo isset($report)? $report->keywords: ""}" 
+                               class="longinput" placeholder="Oddělovač: ,"/>
+                        {if isset($errors["keywords"])}
+                            <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
+                        {/if}
+                    </span>
+                </p>
+                <p>
+                    <label>Meta-název<small>Vyplnit pokud se liší od Název</small></label>
+                    <span class="field">
+                        <input type="text" name="metatitle" class="longinput" value="{echo isset($report)? $report->metaTitle: ""}" />
+                        {if isset($errors["metaTitle"])}
+                        <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
+                        {/if}
+                    </span>
+                </p>
+                <p>
+                    <label>Meta-popis<small>Max. 250 znaků<br/>Pouze text<br/>Vyplnit pokud se liší od Teaser</small></label>
+                    <span class="field">
+                        <textarea rows="5" name="metadescription" class="longinput" >{echo isset($report)? $report->metaDescription: ""}</textarea>
+                        {if isset($errors["metaDescription"])}
+                        <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
+                        {/if}
+                        <br/>
+                    </span>
+                </p>
+                <p>
+                    <label>Meta-image<small>FB používá tento obrázek při sdílení</small></label>
+                    <span class="field">
+                        <input type="text" name="metaimage" value="{echo isset($report)? $report->metaImage: ""}" />
+                        {if isset($errors["metaImage"])}
+                        <label class="error">{echo join("<br/>", $errors["metaImage"])}</label>
+                        {/if}
+                    </span>
+                </p>
+
+                <br/>
+                <div class="contenttitle radiusbottom0">
+                    <h2 class="table"><span>Pozadí pro slider</span></h2>
+                </div><!--contenttitle-->
+
+                <div class="par">
+                    <label>Hlavní fotka*<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
+                    <div id="image-cropper" class="field">
+                        <input type="file" class="cropit-image-input" accept="image/*"/>
+                        <div class="cropit-image-preview-container">
+                            <div class="cropit-image-background-container">
+                                <img class="cropit-image-background" />
+                            </div>
+                            <div class="cropit-image-preview"></div>
+                        </div>
+
+                        <input type="range" class="cropit-image-zoom-input" />
+                        {if isset($errors["croppedimage"])}
+                        <label class="error">
+                            {echo join("<br/>", $errors["croppedimage"])}
+                        </label>
+                        {/if}
+                    </div>
+                </div>
+
+                <p class="stdformbutton">
+                    <input name="submitAddReport" type="submit" value="Uložit" class="submit radius2" />
+                    <input type="reset" class="reset radius2" value="Reset" />
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <div class="one_third last">
+        <div class="widgetbox">
+            <div class="contenttitle radiusbottom0">
+                <h2 class="table"><span>Foto</span></h2>
+            </div><!--contenttitle-->
+            <div class="news-photos">
+                {if ($photos && !empty($photos))}
+                {foreach $photo in $photos}
+                <span class="news-photo">
+                    <img src="{echo $photo->getImgThumb()}" alt="{echo $photo->getPhotoName()}" width="160px"/>
+                    <button class="stdbtn img-to-text" value="{echo $photo->getId()}">Txt</button>
+                    <button class="stdbtn img-to-teaser" value="{echo $photo->getId()}">Teaser</button>
+                    <button class="stdbtn img-to-meta" value="{echo $photo->getImgMain()}">Meta</button>
+                </span>
+                {/foreach}
+                {/if}
+            </div>
+        </div>
+        <br class="clear-all"/>
+        <div class="widgetbox">
+            <div class="contenttitle radiusbottom0">
+                <h2 class="table"><span>Odkaz na galerii</span></h2>
+            </div><!--contenttitle-->
+            <div class="news-photos">
+                {if ($galleries && !empty($galleries))}
+                {foreach $gallery in $galleries}
+                <span>{echo $gallery->getTitle()}
+                    <button class="stdbtn gal-to-text" value="{echo $gallery->getId()}">Txt</button>
+                    <button class="stdbtn gal-to-teaser" value="{echo $gallery->getId()}">Teaser</button>
+                </span><br/>
+                {/foreach}
+                {/if}
+            </div>
+        </div>
+    </div>
+    <br class="clear-all"/>
+</div>
+<br class="clear-all"/>
+<div id="insert-photo-dialog"><p></p></div>
+<script type="text/javascript" src="/public/js/custom/news.js"></script>

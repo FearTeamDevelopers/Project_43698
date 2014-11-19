@@ -52,7 +52,7 @@ class App_Model_Report extends Model
      * @validate max(3)
      */
     protected $_approved;
-    
+
     /**
      * @column
      * @readwrite
@@ -133,6 +133,39 @@ class App_Model_Report extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 60
+     * 
+     * @validate alphanumeric, max(60)
+     * @label název fotky
+     */
+    protected $_photoName;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 250
+     * 
+     * @validate required, path, max(250)
+     * @label photo path
+     */
+    protected $_imgMain;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 250
+     * 
+     * @validate required, path, max(250)
+     * @label thumb path
+     */
+    protected $_imgThumb;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 250
      * 
      * @validate alphanumeric, max(250)
@@ -205,6 +238,44 @@ class App_Model_Report extends Model
             $this->setActive(true);
         }
         $this->setModified(date('Y-m-d H:i:s'));
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    public function getUnlinkPath($type = true)
+    {
+        if ($type) {
+            if (file_exists(APP_PATH . $this->_imgMain)) {
+                return APP_PATH . $this->_imgMain;
+            } elseif (file_exists('.' . $this->_imgMain)) {
+                return '.' . $this->_imgMain;
+            } elseif (file_exists('./' . $this->_imgMain)) {
+                return './' . $this->_imgMain;
+            }
+        } else {
+            return $this->_imgMain;
+        }
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    public function getUnlinkThumbPath($type = true)
+    {
+        if ($type) {
+            if (file_exists(APP_PATH . $this->_imgThumb)) {
+                return APP_PATH . $this->_imgThumb;
+            } elseif (file_exists('.' . $this->_imgThumb)) {
+                return '.' . $this->_imgThumb;
+            } elseif (file_exists('./' . $this->_imgThumb)) {
+                return './' . $this->_imgThumb;
+            }
+        } else {
+            return $this->_imgThumb;
+        }
     }
 
 }

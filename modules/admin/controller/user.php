@@ -81,9 +81,7 @@ class Admin_Controller_User extends Controller
         $superAdmin = $security->isGranted('role_superadmin');
 
         $users = App_Model_User::all(
-                        array('role <> ?' => 'role_superadmin'), 
-                        array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), 
-                        array('id' => 'asc')
+                        array('role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), array('id' => 'asc')
         );
 
         $view->set('users', $users)
@@ -120,12 +118,14 @@ class Admin_Controller_User extends Controller
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
 
+            $cfg = Registry::get('configuration');
+
             $fileManager = new FileManager(array(
-                'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
-                'thumbHeight' => $this->loadConfigFromDb('thumb_height'),
-                'thumbResizeBy' => $this->loadConfigFromDb('thumb_resizeby'),
-                'maxImageWidth' => $this->loadConfigFromDb('photo_maxwidth'),
-                'maxImageHeight' => $this->loadConfigFromDb('photo_maxheight')
+                'thumbWidth' => $cfg->thumb_width,
+                'thumbHeight' => $cfg->thumb_height,
+                'thumbResizeBy' => $cfg->thumb_resizeby,
+                'maxImageWidth' => $cfg->photo_maxwidth,
+                'maxImageHeight' => $cfg->photo_maxheight
             ));
 
             $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
@@ -220,12 +220,14 @@ class Admin_Controller_User extends Controller
             }
 
             if ($user->imgMain == '') {
+                $cfg = Registry::get('configuration');
+
                 $fileManager = new FileManager(array(
-                    'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
-                    'thumbHeight' => $this->loadConfigFromDb('thumb_height'),
-                    'thumbResizeBy' => $this->loadConfigFromDb('thumb_resizeby'),
-                    'maxImageWidth' => $this->loadConfigFromDb('photo_maxwidth'),
-                    'maxImageHeight' => $this->loadConfigFromDb('photo_maxheight')
+                    'thumbWidth' => $cfg->thumb_width,
+                    'thumbHeight' => $cfg->thumb_height,
+                    'thumbResizeBy' => $cfg->thumb_resizeby,
+                    'maxImageWidth' => $cfg->photo_maxwidth,
+                    'maxImageHeight' => $cfg->photo_maxheight
                 ));
 
                 $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
@@ -324,12 +326,14 @@ class Admin_Controller_User extends Controller
             }
 
             if ($user->imgMain == '') {
+                $cfg = Registry::get('configuration');
+
                 $fileManager = new FileManager(array(
-                    'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
-                    'thumbHeight' => $this->loadConfigFromDb('thumb_height'),
-                    'thumbResizeBy' => $this->loadConfigFromDb('thumb_resizeby'),
-                    'maxImageWidth' => $this->loadConfigFromDb('photo_maxwidth'),
-                    'maxImageHeight' => $this->loadConfigFromDb('photo_maxheight')
+                    'thumbWidth' => $cfg->thumb_width,
+                    'thumbHeight' => $cfg->thumb_height,
+                    'thumbResizeBy' => $cfg->thumb_resizeby,
+                    'maxImageWidth' => $cfg->photo_maxwidth,
+                    'maxImageHeight' => $cfg->photo_maxheight
                 ));
 
                 $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
@@ -396,7 +400,7 @@ class Admin_Controller_User extends Controller
             } else {
                 $pathMain = $user->getUnlinkPath();
                 $pathThumb = $user->getUnlinkThumbPath();
-
+                
                 if ($user->delete()) {
                     @unlink($pathMain);
                     @unlink($pathThumb);
@@ -421,9 +425,9 @@ class Admin_Controller_User extends Controller
         $this->willRenderLayoutView = false;
 
         if ($this->checkCSRFToken()) {
-            if($this->_security->isGranted('role_admin')){
+            if ($this->_security->isGranted('role_admin')) {
                 $user = App_Model_User::first(array('id = ?' => (int) $id));
-            }else{
+            } else {
                 $user = App_Model_User::first(array('id = ?' => $this->getUser()->getId()));
             }
 

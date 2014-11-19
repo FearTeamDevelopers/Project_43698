@@ -41,12 +41,14 @@ class Admin_Controller_Partner extends Controller
 
             $errors = array();
 
+            $cfg = Registry::get('configuration');
+
             $fileManager = new FileManager(array(
-                'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
-                'thumbHeight' => $this->loadConfigFromDb('thumb_height'),
-                'thumbResizeBy' => $this->loadConfigFromDb('thumb_resizeby'),
-                'maxImageWidth' => $this->loadConfigFromDb('photo_maxwidth'),
-                'maxImageHeight' => $this->loadConfigFromDb('photo_maxheight')
+                'thumbWidth' => $cfg->thumb_width,
+                'thumbHeight' => $cfg->thumb_height,
+                'thumbResizeBy' => $cfg->thumb_resizeby,
+                'maxImageWidth' => $cfg->photo_maxwidth,
+                'maxImageHeight' => $cfg->photo_maxheight
             ));
 
             $fileErrors = $fileManager->upload('logo', 'partners', time() . '_', false)->getUploadErrors();
@@ -59,6 +61,7 @@ class Admin_Controller_Partner extends Controller
                             'title' => RequestMethods::post('title'),
                             'web' => RequestMethods::post('web'),
                             'logo' => trim($file->getFilename(), '.'),
+                            'section' => RequestMethods::post('section')
                         ));
 
                         if ($partner->validate()) {
@@ -110,12 +113,14 @@ class Admin_Controller_Partner extends Controller
             }
 
             if ($partner->logo == '') {
+                $cfg = Registry::get('configuration');
+
                 $fileManager = new FileManager(array(
-                    'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
-                    'thumbHeight' => $this->loadConfigFromDb('thumb_height'),
-                    'thumbResizeBy' => $this->loadConfigFromDb('thumb_resizeby'),
-                    'maxImageWidth' => $this->loadConfigFromDb('photo_maxwidth'),
-                    'maxImageHeight' => $this->loadConfigFromDb('photo_maxheight')
+                    'thumbWidth' => $cfg->thumb_width,
+                    'thumbHeight' => $cfg->thumb_height,
+                    'thumbResizeBy' => $cfg->thumb_resizeby,
+                    'maxImageWidth' => $cfg->photo_maxwidth,
+                    'maxImageHeight' => $cfg->photo_maxheight
                 ));
 
                 $fileErrors = $fileManager->upload('logo', 'partners', time() . '_', false)->getUploadErrors();
@@ -139,6 +144,7 @@ class Admin_Controller_Partner extends Controller
 
             $partner->title = RequestMethods::post('title');
             $partner->web = RequestMethods::post('web');
+            $partner->section = RequestMethods::post('section');
             $partner->logo = $logo;
             $partner->active = RequestMethods::post('active');
 
@@ -178,7 +184,7 @@ class Admin_Controller_Partner extends Controller
                 if ($partner->delete()) {
                     @unlink($path);
                     Event::fire('admin.log', array('success', 'Partner id: ' . $id));
-                    echo 'ok';
+                    echo 'success';
                 } else {
                     Event::fire('admin.log', array('fail', 'Partner id: ' . $id));
                     echo self::ERROR_MESSAGE_1;
@@ -206,10 +212,12 @@ class Admin_Controller_Partner extends Controller
             $path = $partner->getUnlinkLogoPath();
             $partner->logo = '';
 
-            if ($partner->validate() && unlink($path)) {
+            if ($partner->validate()) {
+                @unlink($path);
                 $partner->save();
+
                 Event::fire('admin.log', array('success', 'Partner id: ' . $id));
-                echo 'ok';
+                echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'Partner id: ' . $id));
                 echo self::ERROR_MESSAGE_5;

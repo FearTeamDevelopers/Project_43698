@@ -1,0 +1,207 @@
+<ul class="maintabmenu multipletabmenu">
+    <li><a href="/admin/user/">Uživatelé</a></li>
+    <li><a href="/admin/user/add/">Nový uživatel</a></li>
+    <li class="current"><a href="#">Editovat uživatele</a></li>
+</ul>
+
+<div class="content">
+    <form class="stdform stdform2 cropit-form" method="post" action="#">
+        <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+        <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
+
+        <div class="contenttitle radiusbottom0">
+            <h2 class="form"><span>Osobní údaje</span></h2>
+        </div>
+        <p>
+            <label>Jméno*</label>
+            <span class="field">
+                <input required type="text" name="firstname" class="longinput" value="{echo $user->firstname}" />
+                {if isset($errors["firstname"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["firstname"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        <p>
+            <label>Příjmení*</label>
+            <span class="field">
+                <input required type="text" name="lastname" class="longinput" value="{echo $user->lastname}" />
+                {if isset($errors["lastname"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["lastname"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        <div class="par">
+            <label>Profilová fotka*<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
+            {if $user->imgMain != ""}
+            <span class="field" id="currentLogo">
+                <img src="{echo $user->imgThumb}" alt="" height="100" />
+                <a href="/admin/user/deleteusermainphoto/{echo $user->id}" class="btn btn3 btn_trash deleteImg" title="Smazat"></a>
+            </span>
+
+            <div id="image-cropper" class="uploadNewImage nodisplay field">
+                <input type="file" class="cropit-image-input" accept="image/*"/>
+                <div class="cropit-image-preview-container">
+                    <div class="cropit-image-background-container">
+                        <img class="cropit-image-background" />
+                    </div>
+                    <div class="cropit-image-preview"></div>
+                </div>
+
+                <input type="range" class="cropit-image-zoom-input" />
+                {if isset($errors["croppedimage"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["croppedimage"])}
+                </label>
+                {/if}
+            </div>
+            {/if}{else}
+            <div id="image-cropper" class="uploadNewImage field">
+                <input type="file" class="cropit-image-input" accept="image/*"/>
+                <div class="cropit-image-preview-container">
+                    <div class="cropit-image-background-container">
+                        <img class="cropit-image-background" />
+                    </div>
+                    <div class="cropit-image-preview"></div>
+                </div>
+
+                <input type="range" class="cropit-image-zoom-input" />
+                {if isset($errors["croppedimage"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["croppedimage"])}
+                </label>
+                {/if}
+            </div>
+            {/else}
+        </div>
+
+        <br/>
+        <div class="contenttitle radiusbottom0">
+            <h2 class="form"><span>Přihlašovací údaje</span></h2>
+        </div>
+        <p>
+            <label>Email*</label>
+            <span class="field">
+                <input required type="email" name="email" class="longinput" value="{echo $user->email}" />
+                {if isset($errors["email"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["email"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        <p>
+            <label>Heslo*</label>
+            <span class="field">
+                <input type="password" name="password" class="longinput" value=""/>
+                {if isset($errors["password"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["password"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        <p>
+            <label>Potvrdit heslo*</label>
+            <span class="field">
+                <input type="password" name="password2" class="longinput" value=""/>
+                {if isset($errors["password2"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["password2"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        <p>
+            <label>Aktivní</label>
+            <span class="field">
+                <select name="active" class="longinput">
+                    {if $user->active == 1}
+                    <option value="0">Neaktivní</option>
+                    <option value="1" selected>Aktivní</option>
+                    {/if}
+                    {else}
+                    <option value="0" selected>Neaktivní</option>
+                    <option value="1">Aktivní</option>
+                    {/else}
+                </select>
+            </span>
+        </p>
+
+        {if $isSuperAdmin}
+        <p>
+            <label>Role</label>
+            <span class="field">
+                <select name="role" class="longinput">
+                    {if $user->role == "role_superadmin"}
+                    <option value="role_member">Člen</option>
+                    <option value="role_admin">Admin</option>
+                    <option value="role_superadmin" selected>Super Admin</option>
+                    {/if}
+                    {elseif $user->role == "role_admin"}
+                    <option value="role_member">Člen</option>
+                    <option value="role_admin" selected>Admin</option>
+                    <option value="role_superadmin">Super Admin</option>
+                    {/elseif}{else}
+                    <option value="role_member" selected>Člen</option>
+                    <option value="role_admin">Admin</option>
+                    <option value="role_superadmin">Super Admin</option>
+                    {/else}
+                </select>
+                {if isset($errors["role"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["role"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        {/if}
+
+        <br/>
+        <div class="contenttitle radiusbottom0">
+            <h2 class="table"><span>Psi</span></h2>
+        </div>
+        <table cellpadding="0" cellspacing="0" border="0" class="stdtable" >
+            <colgroup>
+                <col class="con0" /><col class="con1" />
+                <col class="con0" /><col class="con1" />
+                <col class="con0" /><col class="con1" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="head0">Jméno</th><th class="head1">Foto</th>
+                    <th class="head0">Rasa</th><th class="head1">Narozen</th>
+                    <th class="head0">Status</th><th class="head1">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {if (!empty($dogs))}
+                    {foreach $dog in $dogs}
+                        <tr>
+                            <td>{echo $dog->getDogName()}</td>
+                            <td><img src="{echo $dog->getImgThumb()}" alt="" height="180px"/></td>
+                            <td>{echo $dog->getRace()}</td>
+                            <td>{echo $dog->getDob()}</td>
+                            <td>
+                                {if $dog->active}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
+                                {if $dog->isActive == 1}<span class="labelProduct labelProductBlue">Primární</span>{/if}
+                            </td>
+
+                            <td>
+                                <a href="/admin/dog/edit/{echo $dog->id}" class="btn btn3 btn_pencil"></a> 
+                                <a href="/admin/dog/delete/{echo $dog->id}" class="btn btn3 btn_trash deleteRow"></a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                {/if}
+            </tbody>
+        </table>
+
+        <p class="stdformbutton">
+            <input type="submit" name="submitEditUser" value="Uložit" class="submit radius2"/>
+        </p>
+    </form>
+</div>

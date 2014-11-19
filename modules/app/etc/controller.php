@@ -20,21 +20,23 @@ class Controller extends BaseController
      */
     private $_security;
 
-    const SUCCESS_MESSAGE_1 = ' byl(a) úspìšnì vytovøen(a)';
-    const SUCCESS_MESSAGE_2 = 'Všechny zmìny byly úspìšnì uloženy';
-    const SUCCESS_MESSAGE_3 = ' byl(a) úspìšnì smazán(a)';
-    const SUCCESS_MESSAGE_4 = 'Vše bylo úspìšnì aktivováno';
-    const SUCCESS_MESSAGE_5 = 'Vše bylo úspìšnì deaktivováno';
-    const SUCCESS_MESSAGE_6 = 'Vše bylo úspìšnì smazáno';
-    const SUCCESS_MESSAGE_7 = 'Vše bylo úspìšnì nahráno';
-    const SUCCESS_MESSAGE_8 = 'Vše bylo úspìšnì uloženo';
-    const SUCCESS_MESSAGE_9 = 'Vše bylo úspìšnì pøidáno';
-    const ERROR_MESSAGE_1 = 'Oops, nìco se pokazilo';
+    const SUCCESS_MESSAGE_1 = ' byl(a) ÃºspÄ›Å¡nÄ› vytovÅ™en(a)';
+    const SUCCESS_MESSAGE_2 = 'VÅ¡echny zmÄ›ny byly ÃºspÄ›Å¡nÄ› uloÅ¾eny';
+    const SUCCESS_MESSAGE_3 = ' byl(a) ÃºspÄ›Å¡nÄ› smazÃ¡n(a)';
+    const SUCCESS_MESSAGE_4 = 'VÅ¡e bylo ÃºspÄ›Å¡nÄ› aktivovÃ¡no';
+    const SUCCESS_MESSAGE_5 = 'VÅ¡e bylo ÃºspÄ›Å¡nÄ› deaktivovÃ¡no';
+    const SUCCESS_MESSAGE_6 = 'VÅ¡e bylo ÃºspÄ›Å¡nÄ› smazÃ¡no';
+    const SUCCESS_MESSAGE_7 = 'VÅ¡e bylo ÃºspÄ›Å¡nÄ› nahrÃ¡no';
+    const SUCCESS_MESSAGE_8 = 'VÅ¡e bylo ÃºspÄ›Å¡nÄ› uloÅ¾eno';
+    const SUCCESS_MESSAGE_9 = 'VÅ¡e bylo ÃºspÄ›Å¡nÄ› pÅ™idÃ¡no';
+    
+    const ERROR_MESSAGE_1 = 'Oops, nÄ›co se pokazilo';
     const ERROR_MESSAGE_2 = 'Nenalezeno';
-    const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
-    const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnìní';
-    const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
-    const ERROR_MESSAGE_6 = 'Pøísput odepøen';
+    const ERROR_MESSAGE_3 = 'Nastala neznÃ¡mÃ¡ chyby';
+    const ERROR_MESSAGE_4 = 'Na tuto operaci nemÃ¡te oprÃ¡vnÄ›nÃ­';
+    const ERROR_MESSAGE_5 = 'PovinnÃ¡ pole nejsou validnÃ­';
+    const ERROR_MESSAGE_6 = 'PÅ™Ã­sput odepÅ™en';
+    
 
     /**
      * 
@@ -62,7 +64,7 @@ class Controller extends BaseController
     {
         $string = StringMethods::removeDiacriticalMarks($string);
         $string = str_replace(array('.', ',', '_', '(', ')', '[', ']', '|', ' '), '-', $string);
-        $string = str_replace(array('?', '!', '@', '&', '*', ':', '+', '=', '~', '°', '´', '`', '%', "'", '"'), '', $string);
+        $string = str_replace(array('?', '!', '@', '&', '*', ':', '+', '=', '~', 'Â°', 'Â´', '`', '%', "'", '"'), '', $string);
         $string = trim($string);
         $string = trim($string, '-');
         return strtolower($string);
@@ -87,7 +89,7 @@ class Controller extends BaseController
         } else {
             $view = $this->getActionView();
 
-            $view->infoMessage('Byl jste odhlášen z dùvodu dlouhé neaktivity');
+            $view->infoMessage('Byl jste odhlÃ¡Å¡en z dÅ¯vodu dlouhÃ© neaktivity');
             $this->_security->logout();
             self::redirect('/login');
         }

@@ -207,4 +207,17 @@ class App_Model_News extends Model
         $this->setModified(date('Y-m-d H:i:s'));
     }
 
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchAll()
+    {
+        $query = self::getQuery(array('nw.*'))
+                ->join('tb_user', 'nw.userId = us.id', 'us',
+                        array('us.firstname', 'us.lastname'));
+        $news = self::initialize($query);
+        
+        return $news;
+    }
 }

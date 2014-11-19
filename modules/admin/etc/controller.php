@@ -75,7 +75,7 @@ class Controller extends BaseController
         $user = $this->_security->getUser();
 
         if (!$user) {
-            self::redirect('/login');
+            self::redirect('/admin/login');
         }
 
         //30min inactivity till logout

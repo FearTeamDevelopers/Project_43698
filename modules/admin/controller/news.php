@@ -3,6 +3,7 @@
 use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -27,13 +28,31 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * 
+     * @return type
+     */
+    private function _getPhotos()
+    {
+        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    private function _getGalleries()
+    {
+        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
+    }
+
+    /**
      * @before _secured, _participant
      */
     public function index()
     {
         $view = $this->getActionView();
 
-        $news = App_Model_News::all();
+        $news = App_Model_News::fetchAll();
 
         $view->set('news', $news);
     }
@@ -45,7 +64,8 @@ class Admin_Controller_News extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true)))
+        $view->set('photos', $this->_getPhotos())
+                ->set('galleries', $this->_getGalleries())
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddNews')) {
@@ -61,11 +81,13 @@ class Admin_Controller_News extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
+            $autoApprove = Registry::get('configuration')->news_autopublish;
+
             $news = new App_Model_News(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
                 'urlKey' => $urlKey,
-                'approved' => 0,
+                'approved' => $autoApprove,
                 'archive' => 0,
                 'shortBody' => RequestMethods::post('shorttext'),
                 'body' => RequestMethods::post('text'),
@@ -74,7 +96,6 @@ class Admin_Controller_News extends Controller
                 'keywords' => RequestMethods::post('keywords'),
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
                 'metaDescription' => RequestMethods::post('metadescription', RequestMethods::post('shorttext')),
-                'metaImage' => RequestMethods::post('metaimage')
             ));
 
             if (empty($errors) && $news->validate()) {
@@ -113,7 +134,8 @@ class Admin_Controller_News extends Controller
         }
 
         $view->set('news', $news)
-                ->set('photos', App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true)));
+                ->set('photos', $this->_getPhotos())
+                ->set('galleries', $this->_getGalleries());
 
         if (RequestMethods::post('submitEditNews')) {
             if ($this->checkCSRFToken() !== true) {
@@ -134,10 +156,11 @@ class Admin_Controller_News extends Controller
             $news->shortBody = RequestMethods::post('shorttext');
             $news->rank = RequestMethods::post('rank', 1);
             $news->active = RequestMethods::post('active');
+            $news->approved = RequestMethods::post('approve');
+            $news->archive = RequestMethods::post('archive');
             $news->keywords = RequestMethods::post('keywords');
             $news->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
             $news->metaDescription = RequestMethods::post('metadescription', RequestMethods::post('shorttext'));
-            $news->metaImage = RequestMethods::post('metaimage');
 
             if (empty($errors) && $news->validate()) {
                 $news->save();
@@ -165,20 +188,20 @@ class Admin_Controller_News extends Controller
                             array('id = ?' => (int) $id), array('id', 'userId')
             );
 
-            if ($this->_security->isGranted('role_admin') !== true ||
-                    $news->getUserId() !== $this->getUser()->getId()) {
-                echo self::ERROR_MESSAGE_4;
-            }
-
             if (NULL === $news) {
                 echo self::ERROR_MESSAGE_2;
             } else {
-                if ($news->delete()) {
-                    Event::fire('admin.log', array('success', 'News id: ' . $id));
-                    echo 'success';
+                if ($this->_security->isGranted('role_admin') === true ||
+                        $news->getUserId() == $this->getUser()->getId()) {
+                    if ($news->delete()) {
+                        Event::fire('admin.log', array('success', 'News id: ' . $id));
+                        echo 'success';
+                    } else {
+                        Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                        echo self::ERROR_MESSAGE_1;
+                    }
                 } else {
-                    Event::fire('admin.log', array('fail', 'News id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
+                    echo self::ERROR_MESSAGE_4;
                 }
             }
         } else {

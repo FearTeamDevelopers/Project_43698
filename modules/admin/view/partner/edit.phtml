@@ -1,0 +1,77 @@
+<ul class="maintabmenu multipletabmenu">
+    <li><a href="/admin/sponsor/">Partneři</a></li>
+    <li><a href="/admin/sponsor/add/">Přidat Partnera</a></li>
+    <li class="current"><a href="#">Upravit Partnera</a></li>
+</ul>
+
+<div class="content">
+    <div class="contenttitle">
+        <h2 class="form"><span>Základní info</span></h2>
+    </div>
+    
+    <form class="stdform stdform2" method="post" action="#" enctype="multipart/form-data">
+        <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
+
+        <p>
+            <label>Parner*</label>
+            <span class="field">
+                <input required type="text" name="title" class="longinput" value="{echo $partner->title}"/>
+                {if isset($errors["title"])}
+                    <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                {/if}
+            </span>
+        </p>
+        <p>
+            <label>Logo*</label>
+            {if $partner->logo != ""}
+            <span class="field" id="currentLogo">
+                <img src="{echo $partner->logo}" alt="" height="100px" />
+                <a href="/admin/partner/deletelogo/{echo $partner->id}" id="delImg" class="btn btn3 btn_trash" title="Delete logo"></a>
+            </span> 
+            
+            <span class="field nodisplay" id="uploadLogo" >
+                <input type="file" name="logo" />
+                {if isset($errors["logo"])}
+                    <label class="error">{echo join("<br/>", $errors["logo"])}</label>
+                {/if}
+            </span>
+            {/if}{else}
+            <span class="field" id="uploadLogo">
+                <input type="file" name="logo" />
+                {if isset($errors["logo"])}
+                    <label class="error">{echo join("<br/>", $errors["logo"])}</label>
+                {/if}
+            </span> 
+            {/else}
+        </p>
+        <p>
+            <label>WWW*</label>
+            <span class="field">
+                <input required type="text" name="web" class="longinput" value="{echo $partner->web}"/>
+                {if isset($errors["web"])}
+                    <label class="error">{echo join("<br/>", $errors["web"])}</label>
+                {/if}
+            </span>
+        </p>
+       
+        <p>
+            <label>Aktivní</label>
+            <span class="field">
+                <select name="active" class="longinput">
+                    {if $partner->active}
+                    <option value="0">Inactive</option>
+                    <option value="1" selected>Active</option>
+                    {/if}{else}
+                    <option value="0" selected>Inactive</option>
+                    <option value="1">Active</option>
+                    {/else}
+                </select>
+            </span>
+        </p>
+
+        <p class="stdformbutton">
+            <input name="submitEditPartner" type="submit" value="Save" class="submit radius2" />
+        </p>
+    </form>
+</div>

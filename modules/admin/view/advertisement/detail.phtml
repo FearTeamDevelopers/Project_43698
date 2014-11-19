@@ -1,0 +1,103 @@
+<ul class="maintabmenu multipletabmenu">
+    <li><a href="/admin/advertisement/">Bazar</a></li>
+    <li class="current"><a href="#">Detail Inzerátu</a></li>
+</ul><!--maintabmenu-->
+
+<div class="content">
+    <div class="contenttitle radiusbottom0">
+        <h2 class="table"><span>Základní info</span></h2>
+    </div><!--contenttitle-->
+
+    <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+    <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+        <colgroup>
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" />
+        </colgroup>
+        <thead>
+            <tr>
+                <td class="head0">Název</td>
+                <td class="head1">Autor</td>
+                <td class="head0">Typ</td>
+                <td class="head1">Sekce</td>
+                <td class="head0">Platnost do</td>
+                <td class="head1">Status</td>
+                <td class="head0">Vytvořen</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{echo $ad->getTitle()}</td>
+                <td>{echo $ad->firstname." ".$ad->lastname}</td>
+                <td>{if $ad->getType()=="tender"}Nabídka{/if}{else}Poptávka{/else}</td>
+                <td>{echo $ad->getSection()}</td>
+                <td>{echo $ad->getExpirationDate()}</td>
+                <td>{if ($ad->active)}<span class="labelProduct labelProductGreen">Active</span>{/if}</td>
+                <td>{echo $ad->getCreated()}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <br/>
+    <div class="contenttitle radiusbottom0">
+        <h2 class="image"><span>Připojené fotky</span></h2>
+    </div><!--contenttitle-->
+    <div>
+        {script $photos = $ad->images}
+        {if !empty($photos)}
+        <div style="overflow:hidden;">
+            <ul class="imagelist">
+                {foreach $photo in $photos}
+                    {if $photo->active}
+                        <li class="photoactive">
+                    {/if}{else}
+                        <li class="photoinactive">
+                    {/else}
+                        <img src="{echo $photo->imgThumb}" alt="" height="120px" />
+                        <span>
+                            <a href="{echo $photo->imgMain}" class="view"></a>
+                            <a href="/admin/advertisement/deleteadimage/{echo $photo->id}" class="delete" value="Smazat"></a>
+                        </span>
+                    </li>
+                {/foreach}
+            </ul>
+        </div>
+        {/if}{else}
+        <div class="notification msginfo"><a class="close"></a><p>Žádné foto</p></div>
+        {/else}
+    </div>
+    
+    <div class="contenttitle radiusbottom0">
+        <h2 class="table"><span>Odpovědi na inzerát</span></h2>
+    </div><!--contenttitle-->
+    <table class="stdtable">
+        <colgroup>
+            <col class="con0" /> <col class="con1" />
+            <col class="con0" /> <col class="con1" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th class="head0">Odesilatel</th>
+                <th class="head1">Email</th>
+                <th class="head0">Zpráva</th>
+                <th class="head1">Vytvořeno</th>
+            </tr> 
+        </thead>
+
+        <tbody>
+            {script $messages = $ad->messages}
+            {if !empty($messages)}
+                {foreach $message in $messages}
+                    <tr>
+                        <td>{echo $message->getFromName()}</td>
+                        <td>{echo $message->getFromEmail()}</td>
+                        <td>{echo $message->getMessage()}</td>
+                        <td>{echo $message->getCreated()}</td>
+                    </tr>
+                {/foreach}
+            {/if}
+        </tbody>
+    </table>
+</div>
