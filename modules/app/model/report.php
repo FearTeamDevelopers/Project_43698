@@ -79,6 +79,17 @@ class App_Model_Report extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 80
+     * 
+     * @validate alphanumeric, max(80)
+     * @label alias autora
+     */
+    protected $_userAlias;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 150
      * 
      * @validate required, alphanumeric, max(150)
@@ -238,6 +249,37 @@ class App_Model_Report extends Model
             $this->setActive(true);
         }
         $this->setModified(date('Y-m-d H:i:s'));
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchAll()
+    {
+        $query = self::getQuery(array('rp.*'))
+                ->join('tb_user', 'rp.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'));
+        $reports = self::initialize($query);
+
+        return $reports;
+    }
+
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchLastTen()
+    {
+        $query = self::getQuery(array('rp.*'))
+                ->join('tb_user', 'rp.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->order('rp.created', 'desc')
+                ->limit(10);
+
+        $reports = self::initialize($query);
+
+        return $reports;
     }
 
     /**

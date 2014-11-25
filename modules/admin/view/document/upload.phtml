@@ -1,25 +1,22 @@
 <ul class="maintabmenu multipletabmenu">
-    <li><a href="/admin/gallery/">Galerie</a></li>
-    <li><a href="/admin/gallery/add/">Nová Galerie</a></li>
-    <li><a href="/admin/gallery/detail/{echo $gallery->id}">Detail Galerie</a></li>
-    <li class="current"><a href="#">Nahrát foto</a></li>
+    <li><a href="/admin/document/">Dokumenty</a></li>
+    <li class="current"><a href="#">Nahrát Dokument</a></li>
 </ul><!--maintabmenu-->
 
 <div class="content">
     <div class="contenttitle radiusbottom0">
-        <h2 class="table"><span>Nahrát foto do galerie</span></h2>
+        <h2 class="table"><span>Nahrát Dokument</span></h2>
     </div><!--contenttitle-->
 
     <form class="stdform stdform2 uploadForm" method="post" action="#" enctype="multipart/form-data">
         <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
         <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
-        <input type="hidden" name="galleryid" class="collid" value="{echo $gallery->id}" />
         <input type="hidden" name="csrf" value="{echo $token}" />
-        
+
         <p>
             <label>Popis</label>
             <span class="field">
-                <textarea rows="5" name="description" class="longinput">{echo isset($photo)? $photo->description: ""}</textarea>
+                <textarea rows="5" name="description" class="longinput">{echo isset($file)? $file->description: ""}</textarea>
                 {if isset($errors["description"])}
                 <label class="error">{echo join("<br/>", $errors["description"])}</label>
                 {/if}
@@ -28,30 +25,31 @@
         <p>
             <label>Pořadí<small>Max. 99</small></label>
             <span class="field">
-                <input type="text" name="rank" class="longinput" value="{echo isset($photo)? $photo->rank: 1}"/>
+                <input type="text" name="rank" class="longinput" value="{echo isset($file)? $file->rank: 1}"/>
                 {if isset($errors["rank"])}
                 <label class="error">{echo join("<br/>", $errors["rank"])}</label>
                 {/if}
             </span>
         </p>
         <p>
-            <label>Foto<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
+            <label>Dokument</label>
             <span class="field">
+                Povolené typy: *.rtf, *.txt, *.doc, *.docx, *.xls, *.xlsx, *.pdf, *.ppt, *.pptx, *.zip, *.rar<br/>
                 <a href="#" class="btn btn_folder multi_upload"><span>+</span></a>
                 <a href="#" class="btn btn_folder multi_upload_dec"><span>-</span></a>
             </span>
             <span class="field file_inputs">
-                <input type="file" name="secondfile[]" accept="image/*"/>
+                <input type="file" name="secondfile[]"/>
+                {if isset($errors["secondfile"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["secondfile"])}
+                </label>
+                {/if}
             </span> 
-            {if isset($errors["secondfile"])}
-            <label class="error">
-                {echo join("<br/>", $errors["secondfile"])}
-            </label>
-            {/if}
         </p>
 
         <p class="stdformbutton">
-            <input name="submitAddPhoto" type="submit" value="Uložit" class="submit radius2" />
+            <input name="submitAddDocument" type="submit" value="Uložit" class="submit radius2" />
         </p>
     </form>
 </div>

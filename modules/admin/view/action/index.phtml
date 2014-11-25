@@ -24,7 +24,7 @@
                     <td class="head0">Autor</td>
                     <td class="head1">Zobrazovat do</td>
                     <td class="head0">Vytvořeno</td>
-                    <td class="head1">Status</td>
+                    <td class="head1">Stav</td>
                     <td class="head0">V archivu</td>
                     <td class="head1">&nbsp;</td>
                 </tr>
@@ -37,7 +37,7 @@
                                 <input type="checkbox" name="actionsids[]" value="{echo $action->getId()}" />
                             </td>
                             <td>{echo $action->getTitle()}</td>
-                            <td>{echo $action->firstname." ".$action->lastname}</td>
+                            <td>{echo $action->getUserAlias()}</td>
                             <td>{echo $action->getExpirationDate()}</td>
                             <td>{echo $action->getCreated()}</td>
                             <td>
@@ -51,14 +51,16 @@
                             </td>
                             <td>
                                 {if $action->archive}<span class="labelProduct labelProductGreen">Ano</span>{/if}
-                                {else}<span class="labelProduct labelProductOrange">Ne</span>{/else}
+                                {else}<span class="labelProduct labelProductGray">Ne</span>{/else}
                             </td>
                             <td>
                                 <a href="/admin/action/edit/{echo $action->id}" class="btn btn3 btn_pencil" title="Upravit"></a>
-                                {if $isAdmin}
-                                    <a href="/admin/action/approveaction/{echo $action->id}" class="btn btn3 ajaxBtnReload" title="Schválit">Schválit</a>
-                                    <a href="/admin/action/rejectaction/{echo $action->id}" class="btn btn3 btn_stop ajaxBtnReload" title="Zamítnout"></a>
+                                {if $isAdmin || $action->userId == $authUser->id}
                                     <a href="/admin/action/delete/{echo $action->id}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>
+                                {/if}
+                                {if $isAdmin && $action->approved == 0}
+                                <a href="/admin/action/approveaction/{echo $action->id}" class="btn btn3 btn_info ajaxBtnReload" title="Schválit"></a>
+                                <a href="/admin/action/rejectaction/{echo $action->id}" class="btn btn3 btn_stop ajaxBtnReload" title="Zamítnout"></a>
                                 {/if}
                             </td>
                         </tr>

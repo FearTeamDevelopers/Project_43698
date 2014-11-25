@@ -24,7 +24,7 @@
                 <td class="head1">Sekce</td>
                 <td class="head0">Platnost do</td>
                 <td class="head1">Počet odpovědí</td>
-                <td class="head0">Status</td>
+                <td class="head0">Stav</td>
                 <td class="head1">Vytvořen</td>
                 <td class="head0">&nbsp;</td>
             </tr>
@@ -43,7 +43,7 @@
                         <td>{echo $ad->getCreated()}</td>
                         <td>
                             <a href="/admin/advertisement/detail/{echo $ad->getId()}" class="btn btn3 btn_search" title="Detail"></a>
-                            <a href="/admin/advertisement/delete/{echo $ad->getId()}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>
+                            {if $isAdmin}<a href="/admin/advertisement/delete/{echo $ad->getId()}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>{/if}
                         </td>
                     </tr>
                 {/foreach}

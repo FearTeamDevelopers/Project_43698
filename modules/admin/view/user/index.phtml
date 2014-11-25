@@ -17,9 +17,9 @@
         </colgroup>
         <thead>
             <tr>
-                <th class="head0">Jméno</th><th class="head1">Příjmení</th>
-                <th class="head0">Email</th><th class="head1">Vytvořeno</th>
-                <th class="head0">Status</th><th class="head1">&nbsp;</th>
+                <td class="head0">Jméno</td><td class="head1">Příjmení</td>
+                <td class="head0">Email</td><td class="head1">Vytvořeno</td>
+                <td class="head0">Stav</td><td class="head1">&nbsp;</td>
             </tr>
         </thead>
         <tbody>
@@ -33,7 +33,6 @@
                         <td>{echo $user->getCreated()}</td>
                         <td>
                             {if ($user->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
-                            {if $user->getRole() == "role_member"}<span class="labelProduct labelProductBlue">Člen</span>{/if}
                             {if $user->getRole() == "role_admin"}<span class="labelProduct labelProductBlue">Admin</span>{/if}
                         </td>
 

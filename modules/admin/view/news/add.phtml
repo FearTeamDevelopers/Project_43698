@@ -130,6 +130,22 @@
         <br class="clear-all"/>
         <div class="widgetbox">
             <div class="contenttitle radiusbottom0">
+                <h2 class="table"><span>Dokumenty</span></h2>
+            </div><!--contenttitle-->
+            <div class="news-photos">
+                {if ($documents && !empty($documents))}
+                    {foreach $document in $documents}
+                        <span>{echo $document->getFilename()}
+                            <button class="stdbtn doc-to-text" value="{echo $document->getId()}">Txt</button>
+                            <button class="stdbtn doc-to-teaser" value="{echo $document->getId()}">Teaser</button>
+                        </span><br/>
+                    {/foreach}
+                {/if}
+            </div>
+        </div>
+        <br class="clear-all"/>
+        <div class="widgetbox">
+            <div class="contenttitle radiusbottom0">
                 <h2 class="table"><span>Odkaz na galerii</span></h2>
             </div><!--contenttitle-->
             <div class="news-photos">

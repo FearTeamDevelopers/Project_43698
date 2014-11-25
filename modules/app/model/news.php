@@ -52,7 +52,7 @@ class App_Model_News extends Model
      * @validate max(3)
      */
     protected $_approved;
-    
+
     /**
      * @column
      * @readwrite
@@ -74,6 +74,17 @@ class App_Model_News extends Model
      * @label url key
      */
     protected $_urlKey;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 80
+     * 
+     * @validate alphanumeric, max(80)
+     * @label alias autora
+     */
+    protected $_userAlias;
 
     /**
      * @column
@@ -165,17 +176,6 @@ class App_Model_News extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 255
-     * 
-     * @validate alphanumeric, max(255)
-     * @label meta-image
-     */
-    protected $_metaImage;
-
-    /**
-     * @column
-     * @readwrite
      * @type datetime
      */
     protected $_created;
@@ -214,10 +214,26 @@ class App_Model_News extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('nw.*'))
-                ->join('tb_user', 'nw.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                ->join('tb_user', 'nw.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
         $news = self::initialize($query);
-        
+
         return $news;
     }
+
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchLastTen()
+    {
+        $query = self::getQuery(array('nw.*'))
+                ->join('tb_user', 'nw.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+                ->order('nw.created', 'desc')
+                ->limit(10);
+
+        $news = self::initialize($query);
+
+        return $news;
+    }
+
 }

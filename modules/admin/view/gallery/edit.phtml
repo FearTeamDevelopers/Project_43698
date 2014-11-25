@@ -55,6 +55,20 @@
             </span>
         </p>
         <p>
+            <label>Systémová</label>
+            <span class="field">
+                <select class="longinput" name="system">
+                    {if $gallery->isSystem == 0}
+                    <option value="0" selected>Ne</option>
+                    <option value="1">Ano</option>
+                    {/if}{else}
+                    <option value="0">Ne</option>
+                    <option value="1" selected>Ano</option>
+                    {/else}
+                </select>
+            </span>
+        </p>
+        <p>
             <label>Popis*<small>Max. 15 000 znaků</small></label>
             <span class="field">
                 <textarea class="longinput" name="description" id="ckeditor">{echo $gallery->description}</textarea>

@@ -35,6 +35,15 @@
                 {/if}
             </span>
         </p>
+        <p>
+            <label>Profil<small>Max. 10 000 znaků</small></label>
+            <span class="field">
+                <textarea rows="20" name="text" id="ckeditor">{echo isset($user)? $user->profile: ""}</textarea>
+                {if isset($errors["profile"])}
+                <label class="error">{echo join("<br/>", $errors["profile"])}</label>
+                {/if}
+            </span>
+        </p>
         <div class="par">
             <label>Profilová fotka*<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
             <div id="image-cropper" class="field">
@@ -43,7 +52,7 @@
                     <div class="cropit-image-background-container">
                         <img class="cropit-image-background" />
                     </div>
-                    <div class="cropit-image-preview"></div>
+                    <div class="cropit-image-preview-portrait"></div>
                 </div>
 
                 <input type="range" class="cropit-image-zoom-input" />
@@ -97,6 +106,7 @@
             <span class="field">
                 <select name="role" class="longinput">
                     <option value="role_member">Člen</option>
+                    <option value="role_participant">Člen s přístupem do administrace</option>
                     <option value="role_admin">Admin</option>
                     <option value="role_superadmin">Super Admin</option>
                 </select>

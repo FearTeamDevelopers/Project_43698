@@ -17,7 +17,7 @@ class App_Model_User extends BasicUser
      * @length 40
      *
      * @validate required, alpha, min(3), max(40)
-     * @label first name
+     * @label jméno
      */
     protected $_firstname;
 
@@ -28,7 +28,7 @@ class App_Model_User extends BasicUser
      * @length 40
      *
      * @validate required, alpha, min(3), max(40)
-     * @label last name
+     * @label příjmení
      */
     protected $_lastname;
 
@@ -61,8 +61,8 @@ class App_Model_User extends BasicUser
      * @type text
      * @length 256
      * 
-     * @validate html, max(6500)
-     * @label profile
+     * @validate html, max(10000)
+     * @label profil
      */
     protected $_profile;
 
@@ -74,7 +74,7 @@ class App_Model_User extends BasicUser
      */
     public function getWholeName()
     {
-        return $this->_firstname . " " . $this->_lastname;
+        return $this->_firstname . ' ' . $this->_lastname;
     }
 
     /**

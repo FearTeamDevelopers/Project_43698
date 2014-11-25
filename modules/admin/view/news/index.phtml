@@ -24,7 +24,7 @@
                     <td class="head0">Autor</td>
                     <td class="head1">Zobrazovat do</td>
                     <td class="head0">Vytvořeno</td>
-                    <td class="head1">Status</td>
+                    <td class="head1">Stav</td>
                     <td class="head0">V archivu</td>
                     <td class="head1">&nbsp;</td>
                 </tr>
@@ -37,7 +37,7 @@
                                 <input type="checkbox" name="newsids[]" value="{echo $_news->getId()}" />
                             </td>
                             <td>{echo $_news->getTitle()}</td>
-                            <td>{echo $_news->firstname." ".$action->lastname}</td>
+                            <td>{echo $_news->getUserAlias()}</td>
                             <td>{echo $_news->getExpirationDate()}</td>
                             <td>{echo $_news->getCreated()}</td>
                             <td>
@@ -51,14 +51,16 @@
                             </td>
                             <td>
                                 {if $_news->archive}<span class="labelProduct labelProductGreen">Ano</span>{/if}
-                                {else}<span class="labelProduct labelProductOrange">Ne</span>{/else}
+                                {else}<span class="labelProduct labelProductGray">Ne</span>{/else}
                             </td>
                             <td>
                                 <a href="/admin/news/edit/{echo $_news->id}" class="btn btn3 btn_pencil" title="Upravit"></a>
-                                {if $isAdmin}
-                                    <a href="/admin/news/approvenews/{echo $_news->id}" class="btn btn3 ajaxBtnReload" title="Schválit">Schválit</a>
-                                    <a href="/admin/news/rejectnews/{echo $_news->id}" class="btn btn3 btn_stop ajaxBtnReload" title="Zamítnout"></a>
+                                {if $isAdmin || $_news->userId == $authUser->id}
                                     <a href="/admin/news/delete/{echo $_news->id}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>
+                                {/if}
+                                {if $isAdmin && $_news->approved == 0}
+                                    <a href="/admin/news/approvenews/{echo $_news->id}" class="btn btn3 btn_info ajaxBtnReload" title="Schválit"></a>
+                                    <a href="/admin/news/rejectnews/{echo $_news->id}" class="btn btn3 btn_stop ajaxBtnReload" title="Zamítnout"></a>
                                 {/if}
                             </td>
                         </tr>

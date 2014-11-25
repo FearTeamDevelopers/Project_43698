@@ -1,6 +1,6 @@
 <ul class="maintabmenu multipletabmenu">
-    <li><a href="/admin/sponsor/">Partneři</a></li>
-    <li><a href="/admin/sponsor/add/">Přidat Partnera</a></li>
+    <li><a href="/admin/partner/">Partneři</a></li>
+    <li><a href="/admin/partner/add/">Přidat Partnera</a></li>
     <li class="current"><a href="#">Upravit Partnera</a></li>
 </ul>
 
@@ -27,17 +27,17 @@
             {if $partner->logo != ""}
             <span class="field" id="currentLogo">
                 <img src="{echo $partner->logo}" alt="" height="100px" />
-                <a href="/admin/partner/deletelogo/{echo $partner->id}" id="delImg" class="btn btn3 btn_trash" title="Delete logo"></a>
+                <a href="/admin/partner/deletelogo/{echo $partner->id}" class="btn btn3 btn_trash deleteImg" title="Delete logo"></a>
             </span> 
             
-            <span class="field nodisplay" id="uploadLogo" >
+            <span class="field nodisplay uploadNewImage">
                 <input type="file" name="logo" />
                 {if isset($errors["logo"])}
                     <label class="error">{echo join("<br/>", $errors["logo"])}</label>
                 {/if}
             </span>
             {/if}{else}
-            <span class="field" id="uploadLogo">
+            <span class="field">
                 <input type="file" name="logo" />
                 {if isset($errors["logo"])}
                     <label class="error">{echo join("<br/>", $errors["logo"])}</label>

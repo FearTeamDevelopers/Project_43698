@@ -365,7 +365,7 @@ class BasicUser extends Model
     {
         if (RequestMethods::cookie('AUTHID') != '') {
             Authtoken::deleteAll(array('token = ?' => RequestMethods::cookie('AUTHID')));
-            \setcookie('AUTHID', '');
+            \setcookie('AUTHID', '', time()-1800);
         }
     }
 

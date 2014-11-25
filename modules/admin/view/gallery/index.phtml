@@ -16,12 +16,12 @@
         </colgroup>
         <thead>
             <tr>
-                <th class="head0">Název</th>
-                <th class="head1">Typ</th>
-                <th class="head0">Autor</th>
-                <th class="head1">Vytvořeno</th>
-                <th class="head0">Status</th>
-                <th class="head1">&nbsp;</th>
+                <td class="head0">Název</td>
+                <td class="head1">Typ</td>
+                <td class="head0">Autor</td>
+                <td class="head1">Vytvořeno</td>
+                <td class="head0">Stav</td>
+                <td class="head1">&nbsp;</td>
             </tr> 
         </thead>
 
@@ -37,10 +37,11 @@
                                 Veřejná
                             {/else}
                         </td>
-                        <td>{echo $gallery->firstname." ".$gallery->lastname}</td>
+                        <td>{echo $gallery->getUserAlias()}</td>
                         <td>{echo $gallery->getCreated()}</td>
                         <td>
                             {if ($gallery->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
+                            {if ($gallery->isSystem)}<span class="labelProduct labelProductBlue">Systémová</span>{/if}
                         </td>
                         <td>
                             <a href="/admin/gallery/detail/{echo $gallery->id}" class="btn btn_image2">

@@ -58,6 +58,17 @@ class App_Model_Advertisement extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 80
+     * 
+     * @validate alphanumeric, max(80)
+     * @label alias autora
+     */
+    protected $_userAlias;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 150
      * 
      * @validate alpha, max(150)

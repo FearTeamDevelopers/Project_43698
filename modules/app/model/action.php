@@ -52,7 +52,7 @@ class App_Model_Action extends Model
      * @validate max(3)
      */
     protected $_approved;
-    
+
     /**
      * @column
      * @readwrite
@@ -74,6 +74,17 @@ class App_Model_Action extends Model
      * @label url key
      */
     protected $_urlKey;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 80
+     * 
+     * @validate alphanumeric, max(80)
+     * @label alias autora
+     */
+    protected $_userAlias;
 
     /**
      * @column
@@ -176,10 +187,26 @@ class App_Model_Action extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
-        $news = self::initialize($query);
-        
-        return $news;
+                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $actions = self::initialize($query);
+
+        return $actions;
     }
+
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchLastTen()
+    {
+        $query = self::getQuery(array('ac.*'))
+                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+                ->order('ac.created', 'desc')
+                ->limit(10);
+
+        $actions = self::initialize($query);
+
+        return $actions;
+    }
+
 }

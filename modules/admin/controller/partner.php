@@ -4,6 +4,7 @@ use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
 
 /**
  * Description of UserController
@@ -14,7 +15,7 @@ class Admin_Controller_Partner extends Controller
 {
 
     /**
-     * @before _secured, _participant
+     * @before _secured, _admin
      */
     public function index()
     {

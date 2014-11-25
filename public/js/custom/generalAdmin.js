@@ -527,21 +527,21 @@ jQuery(document).ready(function () {
     }
 
     /* ---------------------- UPLOAD FORMS --------------------------------*/
-    jQuery('.uploadPhotoForm .multi_upload').click(function () {
-        if (jQuery('.uploadPhotoForm .file_inputs input[type=file]').length < 7) {
-            jQuery('.uploadPhotoForm .file_inputs input[type=file]')
+    jQuery('.uploadForm .multi_upload').click(function () {
+        if (jQuery('.uploadForm .file_inputs input[type=file]').length < 7) {
+            jQuery('.uploadForm .file_inputs input[type=file]')
                     .last()
                     .after('<input type="file" name="secondfile[]" />');
         }
     });
 
-    jQuery('.uploadPhotoForm .multi_upload_dec').click(function () {
-        if (jQuery('.uploadPhotoForm .file_inputs input[type=file]').length > 1) {
-            jQuery('.uploadPhotoForm .file_inputs input[type=file]').last().remove();
+    jQuery('.uploadForm .multi_upload_dec').click(function () {
+        if (jQuery('.uploadForm .file_inputs input[type=file]').length > 1) {
+            jQuery('.uploadForm .file_inputs input[type=file]').last().remove();
         }
     });
 
-    jQuery('.uploadPhotoForm').submit(function () {
+    jQuery('.uploadForm').submit(function () {
         jQuery('#loader').show();
     });
 
@@ -553,7 +553,7 @@ jQuery(document).ready(function () {
 
         jQuery.post(url, {csrf: csrf}, function (msg) {
             if (msg == 'success') {
-                jQuery('#currentLogo').hide(500);
+                jQuery('#currentLogo, #currentImage').hide(500);
                 jQuery('.uploadNewImage').removeClass('nodisplay');
             } else {
                 jQuery('#currentLogo').append("<label class='error'>" + msg + "</label>")
@@ -641,20 +641,24 @@ jQuery(document).ready(function () {
         }
         return false;
     });
-    
-    /* ------------------ ADD PRODUCT CUSTOM SCRIPT --------------------------*/
-    jQuery('.product-select').change(function () {
-        var selected = jQuery(this).children('option:selected').val();
 
-        if (selected == 'bez variant') {
-            jQuery('.check-size').addClass('nodisplay');
-            jQuery('.select-size').removeClass('nodisplay');
-            jQuery('.product-quantity').show();
-        } else if (selected == 's variantami') {
-            jQuery('.product-quantity').hide();
-            jQuery('.select-size').addClass('nodisplay');
-            jQuery('.check-size').removeClass('nodisplay');
+    //activate/deactivate
+    jQuery('.ajaxChangestate').click(function (event) {
+        var c = confirm('Opravdu chcete pokračovat?');
+
+        if (c) {
+            var url = jQuery(this).attr('href');
+            var csrf = jQuery('#csrf').val();
+
+            jQuery.post(url, {csrf: csrf}, function (msg) {
+                if (msg == 'active' || msg == 'inactive') {
+                    location.reload();
+                } else {
+                    alert(msg);
+                }
+            });
         }
+        return false;
     });
 
     /* ------------ MEDIA ---------------*/

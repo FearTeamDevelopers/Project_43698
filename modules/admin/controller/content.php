@@ -35,9 +35,27 @@ class Admin_Controller_Content extends Controller
     {
         return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
     }
+    
+    /**
+     * 
+     * @return type
+     */
+    private function _getGalleries()
+    {
+        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
+    }
 
     /**
-     * @before _secured, _admin
+     * 
+     * @return array
+     */
+    private function _getDocuments()
+    {
+        return App_Model_Document::all(array('active = ?' => true));
+    }
+    
+    /**
+     * @before _secured, _participant
      */
     public function index()
     {
@@ -55,7 +73,9 @@ class Admin_Controller_Content extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', $this->_getPhotos());
+        $view->set('photos', $this->_getPhotos())
+                ->set('documents', $this->_getDocuments())
+                ->set('galleries', $this->_getGalleries());
 
         if (RequestMethods::post('submitAddContent')) {
             if($this->checkCSRFToken() !== true){
@@ -116,6 +136,8 @@ class Admin_Controller_Content extends Controller
         }
 
         $view->set('photos', $this->_getPhotos())
+                ->set('galleries', $this->_getGalleries())
+                ->set('documents', $this->_getDocuments())
                 ->set('content', $content);
 
         if (RequestMethods::post('submitEditContent')) {

@@ -29,6 +29,33 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
+     * 
+     * @param App_Model_Gallery $gallery
+     * @param type $access
+     * @param type $edit
+     * @return boolean
+     */
+    private function hasAccessToGallery(App_Model_Gallery $gallery, $access = true, $edit = false)
+    {
+        if($gallery->getId() == 1 && $access && !$edit){
+            return true;
+        }elseif($gallery->getId() == 1 && $edit){
+            return false;
+        }elseif($gallery->isSystem == 1 && $access && !$edit){
+            return true;
+        }elseif($gallery->isSystem == 1 && $edit && 
+                ($this->_security->isGranted('role_admin') === true ||
+                $gallery->getUserId() == $this->getUser()->getId())){
+            return true;
+        }elseif($this->_security->isGranted('role_admin') == true ||
+                $gallery->getUserId() == $this->getUser()->getId()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    /**
      * Action method returns list of all galleries
      * 
      * @before _secured, _participant
@@ -37,7 +64,7 @@ class Admin_Controller_Gallery extends Controller
     {
         $view = $this->getActionView();
 
-        $galleries = App_Model_Gallery::fetchAll();
+        $galleries = App_Model_Gallery::all();
 
         $view->set('galleries', $galleries);
     }
@@ -69,7 +96,9 @@ class Admin_Controller_Gallery extends Controller
             $gallery = new App_Model_Gallery(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
+                'userAlias' => $this->getUser()->getWholeName(),
                 'isPublic' => RequestMethods::post('public', 1),
+                'isSystem' => RequestMethods::post('system', 0),
                 'urlKey' => $urlKey,
                 'avatarPhotoId' => 0,
                 'description' => RequestMethods::post('description'),
@@ -109,12 +138,11 @@ class Admin_Controller_Gallery extends Controller
             self::redirect('/admin/gallery/');
         }
 
-        if ($this->_security->isGranted('role_admin') !== true ||
-                $gallery->getUserId() !== $this->getUser()->getId()) {
+        if(!$this->hasAccessToGallery($gallery)){
             $view->warningMessage(self::ERROR_MESSAGE_4);
             self::redirect('/admin/gallery/');
         }
-
+        
         $view->set('gallery', $gallery);
     }
 
@@ -136,8 +164,7 @@ class Admin_Controller_Gallery extends Controller
             self::redirect('/admin/gallery/');
         }
 
-        if ($this->_security->isGranted('role_admin') !== true ||
-                $gallery->getUserId() !== $this->getUser()->getId()) {
+        if(!$this->hasAccessToGallery($gallery, true, true)){
             $view->warningMessage(self::ERROR_MESSAGE_4);
             self::redirect('/admin/gallery/');
         }
@@ -156,8 +183,14 @@ class Admin_Controller_Gallery extends Controller
                 $errors['title'] = array('Gallery with this title already exists');
             }
 
+            if ($gallery->userId === null) {
+                $gallery->userId = $this->getUser()->getId();
+                $gallery->userAlias = $this->getUser()->getWholeName();
+            }
+
             $gallery->title = RequestMethods::post('title');
             $gallery->isPublic = RequestMethods::post('public');
+            $gallery->isSystem = RequestMethods::post('system');
             $gallery->active = RequestMethods::post('active');
             $gallery->urlKey = $urlKey;
             $gallery->rank = RequestMethods::post('rank', 1);
@@ -190,7 +223,7 @@ class Admin_Controller_Gallery extends Controller
         $view = $this->getActionView();
 
         $gallery = App_Model_Gallery::first(
-                        array('id = ?' => (int) $id), array('id', 'title', 'created')
+                        array('id = ?' => (int) $id), array('id', 'title', 'created', 'userId')
         );
 
         if (NULL === $gallery) {
@@ -198,8 +231,7 @@ class Admin_Controller_Gallery extends Controller
             self::redirect('/admin/gallery/');
         }
 
-        if ($this->_security->isGranted('role_admin') !== true ||
-                $gallery->getUserId() !== $this->getUser()->getId()) {
+        if(!$this->hasAccessToGallery($gallery, true, true)){
             $view->warningMessage(self::ERROR_MESSAGE_4);
             self::redirect('/admin/gallery/');
         }
@@ -276,8 +308,7 @@ class Admin_Controller_Gallery extends Controller
             self::redirect('/admin/gallery/');
         }
 
-        if ($this->_security->isGranted('role_admin') !== true ||
-                $gallery->getUserId() !== $this->getUser()->getId()) {
+        if(!$this->hasAccessToGallery($gallery, true)){
             $view->warningMessage(self::ERROR_MESSAGE_4);
             self::redirect('/admin/gallery/');
         }
@@ -293,7 +324,7 @@ class Admin_Controller_Gallery extends Controller
             $errors = array();
 
             $cfg = Registry::get('configuration');
-            
+
             $fileManager = new FileManager(array(
                 'thumbWidth' => $cfg->thumb_width,
                 'thumbHeight' => $cfg->thumb_height,
@@ -414,6 +445,7 @@ class Admin_Controller_Gallery extends Controller
                     }
                 } elseif ($photo->active) {
                     $photo->active = false;
+
                     if ($photo->validate()) {
                         $photo->save();
                         Event::fire('admin.log', array('success', 'Photo id: ' . $id));

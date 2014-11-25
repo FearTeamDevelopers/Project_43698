@@ -26,7 +26,7 @@
         <p>
             <label>Logo*</label>
             <span class="field">
-                <input type="file" name="logo" />
+                <input type="file" name="logo" accept="image/*"/>
                 {if isset($errors["logo"])}
                     <label class="error">{echo join("<br/>", $errors["logo"])}</label>
                 {/if}

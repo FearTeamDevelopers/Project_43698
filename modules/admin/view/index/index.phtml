@@ -10,9 +10,10 @@
         </div><!--contenttitle-->
         <ul class="widgetlist">
             <li><a href="/admin/news/add/" class="message">Novinku</a></li>
-            <li><a href="/admin/action/add/" class="message">Akci</a></li>
-            <li><a href="/admin/report/add/" class="upload">Reportáž</a></li>
-            <li><a href="/admin/gallery/add/" class="events">Galerii</a></li>
+            <li><a href="/admin/action/add/" class="events">Akci</a></li>
+            <li><a href="/admin/report/add/" class="message">Reportáž</a></li>
+            <li><a href="/admin/gallery/add/" class="upload">Galerii</a></li>
+            <li><a href="/admin/document/upload/" class="upload">Dokument</a></li>
         </ul>
     </div>
 
@@ -25,46 +26,56 @@
                 {if !empty($latestnews)}
                     {foreach $news in $latestnews}
                         <p>
-                            <span class="radius2">Title: {echo $news->getTitle()}</span>
-                            <span class="radius2">Created: {echo $news->getCreated()}</span>
+                            <span class="radius2">Název: {echo $news->getTitle()}</span>
+                            <span class="radius2">Vytvořeno: {echo $news->getCreated()}</span>
+                            <span class="radius2">Stav: 
+                                {if $news->getApproved() == 0}Čeká na schválení{/if}
+                                {elseif $news->getApproved() == 1}Schváleno{/elseif}
+                                {else}Zamítnuto{/else}
+                            </span>
                             <br/><br/>
                             {echo $news->shortBody}
                         </p>
                         <hr/>
                     {/foreach}
-                {/if}
-                {else}
+                {/if}{else}
                 <p>Žádné aktuality</p>
                 {/else}
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
-
     </div><!--one_half-->
 
-    <div class="one_half last">
+    <br class="clear-all"/><br />
+    
+    <div class="one_half ">
         <div class="widgetbox">
             <div class="title"><h2 class="tabbed"><span>Nejnovější Reportáže</span></h2></div>
             <div class="widgetcontent padding0 statement">
                 <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
                     <colgroup>
-                        <col class="con0" />
-                        <col class="con1" />
-                        <col class="con0" />
+                        <col class="con0" /><col class="con1" />
+                        <col class="con0" /><col class="con1" />
                     </colgroup>
                     <thead>
                         <tr>
                             <th class="head0">Název</th>
                             <th class="head1">Autor</th>
                             <th class="head0">Vytvořeno</th>
+                            <th class="head1">Stav</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {if !empty($latestrefs)}
-                            {foreach $ref in $latestrefs}
+                        {if !empty($latestreports)}
+                            {foreach $report in $latestreports}
                                 <tr>
-                                    <td>{echo $ref->getTitle()}</td>
-                                    <td>{echo $ref->getAuthor()}</td>
-                                    <td>{echo $ref->getCreated()}</td>
+                                    <td>{echo $report->getTitle()}</td>
+                                    <td>{echo $report->firstname." ".$action->lastname}</td>
+                                    <td>{echo $report->getCreated()}</td>
+                                    <td>
+                                        {if $report->getApproved() == 0}Čeká na schválení{/if}
+                                        {elseif $report->getApproved() == 1}Schváleno{/elseif}
+                                        {else}Zamítnuto{/else}
+                                    </td>
                                 </tr>
                             {/foreach}
                         {/if} 
@@ -73,6 +84,42 @@
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
     </div><!--one_half-->
-
-    <br class="clear-all"/><br />
+    
+    <div class="one_half last">
+        <div class="widgetbox">
+            <div class="title"><h2 class="tabbed"><span>Nejnovější Akce</span></h2></div>
+            <div class="widgetcontent padding0 statement">
+                <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+                    <colgroup>
+                        <col class="con0" /><col class="con1" />
+                        <col class="con0" /><col class="con1" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">Název</th>
+                            <th class="head1">Autor</th>
+                            <th class="head0">Vytvořeno</th>
+                            <th class="head1">Stav</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($latestactions)}
+                            {foreach $action in $latestactions}
+                                <tr>
+                                    <td>{echo $action->getTitle()}</td>
+                                    <td>{echo $action->firstname." ".$action->lastname}</td>
+                                    <td>{echo $action->getCreated()}</td>
+                                    <td>
+                                        {if $action->getApproved() == 0}Čeká na schválení{/if}
+                                        {elseif $action->getApproved() == 1}Schváleno{/elseif}
+                                        {else}Zamítnuto{/else}
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {/if} 
+                    </tbody>
+                </table>
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
+    </div><!--one_half-->
 </div><!--content-->

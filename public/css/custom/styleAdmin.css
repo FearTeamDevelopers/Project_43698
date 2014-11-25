@@ -893,7 +893,7 @@ a.btn_table { background-position: -82px -480px; }
 
 .check-size input[type=text]{float: right; margin-right: 65%; width: 150px !important;}
 
-.news-photos, .news-videos{height: 600px; overflow-y: auto; overflow-x: no-content;}
+.news-photos, .news-videos{max-height: 600px; overflow-y: auto; overflow-x: no-content;}
 .news-photo, .news-video{width: 200px; margin: 10px; border: 1px solid #ccc; display: block; float: left;}
 
 .category-tree {list-style: none;}

@@ -11,13 +11,18 @@
         <colgroup>
             <col class="con0" /><col class="con1" />
             <col class="con0" /><col class="con1" />
+            <col class="con0" /><col class="con1" />
+            <col class="con0" />
         </colgroup>
         <thead>
             <tr>
-                <th class="head0">Název stránky</th>
-                <th class="head1">Poslední změna</th>
-                <th class="head0">Text</th>
-                <th class="head1">&nbsp;</th>
+                <td class="head0">Název stránky</td>
+                <td class="head1">Klíčová slova</td>
+                <td class="head0">Meta-title</td>
+                <td class="head1">Poslední změna</td>
+                <td class="head0">Vytvořeno</td>
+                <td class="head1">Stav</td>
+                <td class="head0">&nbsp;</td>
             </tr>
         </thead>
         <tbody>
@@ -25,8 +30,13 @@
                 {foreach $page in $content}
                     <tr>
                         <td>{echo $page->pageName}</td>
+                        <td>{echo $page->keywords}</td>
+                        <td>{echo $page->metaTitle}</td>
                         <td>{echo $page->modified}</td>
-                        <td>{echo $page->body}</td>
+                        <td>{echo $page->created}</td>
+                        <td>
+                            {if ($page->active)}<span class="labelProduct labelProductGreen">Publikováno</span>{/if}
+                        </td>
                         <td>
                             {if $isAdmin}<a href="/admin/content/edit/{echo $page->id}" class="btn btn3 btn_pencil" title="Upravit"></a>{/if}
                         </td>

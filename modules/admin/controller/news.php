@@ -38,6 +38,15 @@ class Admin_Controller_News extends Controller
 
     /**
      * 
+     * @return array
+     */
+    private function _getDocuments()
+    {
+        return App_Model_Document::all(array('active = ?' => true));
+    }
+
+    /**
+     * 
      * @return type
      */
     private function _getGalleries()
@@ -52,7 +61,7 @@ class Admin_Controller_News extends Controller
     {
         $view = $this->getActionView();
 
-        $news = App_Model_News::fetchAll();
+        $news = App_Model_News::all();
 
         $view->set('news', $news);
     }
@@ -66,6 +75,7 @@ class Admin_Controller_News extends Controller
 
         $view->set('photos', $this->_getPhotos())
                 ->set('galleries', $this->_getGalleries())
+                ->set('documents', $this->_getDocuments())
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddNews')) {
@@ -86,6 +96,7 @@ class Admin_Controller_News extends Controller
             $news = new App_Model_News(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
+                'userAlias' => $this->getUser()->getWholeName(),
                 'urlKey' => $urlKey,
                 'approved' => $autoApprove,
                 'archive' => 0,
@@ -95,7 +106,7 @@ class Admin_Controller_News extends Controller
                 'rank' => RequestMethods::post('rank', 1),
                 'keywords' => RequestMethods::post('keywords'),
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-                'metaDescription' => RequestMethods::post('metadescription', RequestMethods::post('shorttext')),
+                'metaDescription' => RequestMethods::post('metadescription'),
             ));
 
             if (empty($errors) && $news->validate()) {
@@ -135,6 +146,7 @@ class Admin_Controller_News extends Controller
 
         $view->set('news', $news)
                 ->set('photos', $this->_getPhotos())
+                ->set('documents', $this->_getDocuments())
                 ->set('galleries', $this->_getGalleries());
 
         if (RequestMethods::post('submitEditNews')) {
@@ -149,6 +161,11 @@ class Admin_Controller_News extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
+            if ($news->userId === null) {
+                $news->userId = $this->getUser()->getId();
+                $news->userAlias = $this->getUser()->getWholeName();
+            }
+
             $news->title = RequestMethods::post('title');
             $news->urlKey = $urlKey;
             $news->expirationDate = RequestMethods::post('expiration');
@@ -160,7 +177,7 @@ class Admin_Controller_News extends Controller
             $news->archive = RequestMethods::post('archive');
             $news->keywords = RequestMethods::post('keywords');
             $news->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-            $news->metaDescription = RequestMethods::post('metadescription', RequestMethods::post('shorttext'));
+            $news->metaDescription = RequestMethods::post('metadescription');
 
             if (empty($errors) && $news->validate()) {
                 $news->save();
@@ -225,6 +242,11 @@ class Admin_Controller_News extends Controller
             } else {
                 $news->approved = 1;
 
+                if ($news->userId === null) {
+                    $news->userId = $this->getUser()->getId();
+                    $news->userAlias = $this->getUser()->getWholeName();
+                }
+
                 if ($news->validate()) {
                     $news->save();
 
@@ -255,6 +277,11 @@ class Admin_Controller_News extends Controller
                 echo self::ERROR_MESSAGE_2;
             } else {
                 $news->approved = 2;
+
+                if ($news->userId === null) {
+                    $news->userId = $this->getUser()->getId();
+                    $news->userAlias = $this->getUser()->getWholeName();
+                }
 
                 if ($news->validate()) {
                     $news->save();
@@ -328,6 +355,11 @@ class Admin_Controller_News extends Controller
                         foreach ($news as $_news) {
                             $_news->active = true;
 
+                            if ($_news->userId === null) {
+                                $_news->userId = $this->getUser()->getId();
+                                $_news->userAlias = $this->getUser()->getWholeName();
+                            }
+
                             if ($_news->validate()) {
                                 $_news->save();
                             } else {
@@ -356,6 +388,11 @@ class Admin_Controller_News extends Controller
                     if (NULL !== $news) {
                         foreach ($news as $_news) {
                             $_news->active = false;
+
+                            if ($_news->userId === null) {
+                                $_news->userId = $this->getUser()->getId();
+                                $_news->userAlias = $this->getUser()->getWholeName();
+                            }
 
                             if ($_news->validate()) {
                                 $_news->save();

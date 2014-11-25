@@ -91,12 +91,18 @@
                     <label>Schváleno</label>
                     <span class="field">
                         <select name="approve" class="longinput">
-                            {if $action->approved == 1}
-                            <option value="1" selected>Schváleno</option>
-                            <option value="2">Zamítnuto</option>
-                            {/if}{else}
-                            <option value="1">Schváleno</option>
-                            <option value="2" selected>Zamítnuto</option>
+                            {if $action->approved == 0}
+                                <option value="0" selected>Čeká na shválení</option>
+                                <option value="1">Schváleno</option>
+                                <option value="2">Zamítnuto</option>
+                            {/if}{elseif $action->approved == 1}
+                                <option value="0">Čeká na shválení</option>
+                                <option value="1" selected>Schváleno</option>
+                                <option value="2">Zamítnuto</option>
+                            {/elseif}{else}
+                                <option value="0">Čeká na shválení</option>
+                                <option value="1">Schváleno</option>
+                                <option value="2" selected>Zamítnuto</option>
                             {/else}
                         </select>
                     </span>
@@ -147,11 +153,27 @@
                 {if ($photos && !empty($photos))}
                 {foreach $photo in $photos}
                 <span class="news-photo">
-                    <img src="{echo $photo->getImgThumb()}" alt="{echo $photo->getPhotoName()}" width="150px"/>
+                    <img src="{echo $photo->getImgThumb()}" alt="{echo $photo->getPhotoName()}" width="160px"/>
                     <button class="stdbtn img-to-text" value="{echo $photo->getId()}">Txt</button>
                     <button class="stdbtn img-to-teaser" value="{echo $photo->getId()}">Teaser</button>
                 </span>
                 {/foreach}
+                {/if}
+            </div>
+        </div>
+        <br class="clear-all"/>
+        <div class="widgetbox">
+            <div class="contenttitle radiusbottom0">
+                <h2 class="table"><span>Dokumenty</span></h2>
+            </div><!--contenttitle-->
+            <div class="news-photos">
+                {if ($documents && !empty($documents))}
+                    {foreach $document in $documents}
+                        <span>{echo $document->getFilename()}
+                            <button class="stdbtn doc-to-text" value="{echo $document->getId()}">Txt</button>
+                            <button class="stdbtn doc-to-teaser" value="{echo $document->getId()}">Teaser</button>
+                        </span><br/>
+                    {/foreach}
                 {/if}
             </div>
         </div>

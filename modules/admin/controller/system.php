@@ -89,14 +89,15 @@ class Admin_Controller_System extends Controller
 
             foreach ($config as $conf) {
                 $oldVal = $conf->getValue();
-                $conf->value = RequestMethods::post($conf->getXkey(), '');
+                $conf->value = RequestMethods::post($conf->getXkey());
 
                 if ($conf->validate()) {
                     Event::fire('admin.log', array('success', $conf->getXkey() . ': ' . $oldVal . ' - ' . $conf->getValue()));
                     $conf->save();
                 } else {
                     Event::fire('admin.log', array('fail', $conf->getXkey() . ': ' . $conf->getValue()));
-                    $errors[$conf->xkey] = array_shift($conf->getErrors());
+                    $error = $conf->getErrors();
+                    $errors[$conf->xkey] = array_shift($error);
                 }
             }
 
@@ -110,7 +111,7 @@ class Admin_Controller_System extends Controller
     }
 
     /**
-     * @before _secured, _admin
+     * @before _secured
      */
     public function showProfiler()
     {

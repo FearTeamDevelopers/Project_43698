@@ -38,6 +38,15 @@ class Admin_Controller_Action extends Controller
 
     /**
      * 
+     * @return array
+     */
+    private function _getDocuments()
+    {
+        return App_Model_Document::all(array('active = ?' => true));
+    }
+
+    /**
+     * 
      * @return type
      */
     private function _getGalleries()
@@ -52,7 +61,7 @@ class Admin_Controller_Action extends Controller
     {
         $view = $this->getActionView();
 
-        $actions = App_Model_Action::fetchAll();
+        $actions = App_Model_Action::all();
 
         $view->set('actions', $actions);
     }
@@ -66,6 +75,7 @@ class Admin_Controller_Action extends Controller
 
         $view->set('photos', $this->_getPhotos())
                 ->set('galleries', $this->_getGalleries())
+                ->set('documents', $this->_getDocuments())
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddAction')) {
@@ -86,6 +96,7 @@ class Admin_Controller_Action extends Controller
             $action = new App_Model_Action(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
+                'userAlias' => $this->getUser()->getWholeName(),
                 'urlKey' => $urlKey,
                 'approved' => $autoApprove,
                 'archive' => 0,
@@ -133,6 +144,7 @@ class Admin_Controller_Action extends Controller
 
         $view->set('action', $action)
                 ->set('photos', $this->_getPhotos())
+                ->set('documents', $this->_getDocuments())
                 ->set('galleries', $this->_getGalleries());
 
         if (RequestMethods::post('submitEditAction')) {
@@ -145,6 +157,11 @@ class Admin_Controller_Action extends Controller
 
             if ($action->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array('This title is already used');
+            }
+
+            if ($action->userId === null) {
+                $action->userId = $this->getUser()->getId();
+                $action->userAlias = $this->getUser()->getWholeName();
             }
 
             $action->title = RequestMethods::post('title');
@@ -199,14 +216,6 @@ class Admin_Controller_Action extends Controller
                 } else {
                     echo self::ERROR_MESSAGE_4;
                 }
-
-                if ($action->delete()) {
-                    Event::fire('admin.log', array('success', 'Action id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Action id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
             }
         } else {
             echo self::ERROR_MESSAGE_1;
@@ -228,6 +237,11 @@ class Admin_Controller_Action extends Controller
                 echo self::ERROR_MESSAGE_2;
             } else {
                 $action->approved = 1;
+
+                if ($action->userId === null) {
+                    $action->userId = $this->getUser()->getId();
+                    $action->userAlias = $this->getUser()->getWholeName();
+                }
 
                 if ($action->validate()) {
                     $action->save();
@@ -259,6 +273,11 @@ class Admin_Controller_Action extends Controller
                 echo self::ERROR_MESSAGE_2;
             } else {
                 $action->approved = 2;
+
+                if ($action->userId === null) {
+                    $action->userId = $this->getUser()->getId();
+                    $action->userAlias = $this->getUser()->getWholeName();
+                }
 
                 if ($action->validate()) {
                     $action->save();
@@ -305,9 +324,9 @@ class Admin_Controller_Action extends Controller
                                 'id IN ?' => $ids
                     ));
                     if (NULL !== $action) {
-                        foreach ($action as $_report) {
-                            if (!$_report->delete()) {
-                                $errors[] = 'An error occured while deleting ' . $_report->getTitle();
+                        foreach ($action as $_action) {
+                            if (!$_action->delete()) {
+                                $errors[] = 'An error occured while deleting ' . $_action->getTitle();
                             }
                         }
                     }
@@ -329,14 +348,19 @@ class Admin_Controller_Action extends Controller
                                 'id IN ?' => $ids
                     ));
                     if (NULL !== $action) {
-                        foreach ($action as $_report) {
-                            $_report->active = true;
+                        foreach ($action as $_action) {
+                            $_action->active = true;
 
-                            if ($_report->validate()) {
-                                $_report->save();
+                            if ($_action->userId === null) {
+                                $_action->userId = $this->getUser()->getId();
+                                $_action->userAlias = $this->getUser()->getWholeName();
+                            }
+
+                            if ($_action->validate()) {
+                                $_action->save();
                             } else {
-                                $errors[] = "Action id {$_report->getId()} - {$_report->getTitle()} errors: "
-                                        . join(', ', $_report->getErrors());
+                                $errors[] = "Action id {$_action->getId()} - {$_action->getTitle()} errors: "
+                                        . join(', ', $_action->getErrors());
                             }
                         }
                     }
@@ -358,14 +382,19 @@ class Admin_Controller_Action extends Controller
                                 'id IN ?' => $ids
                     ));
                     if (NULL !== $action) {
-                        foreach ($action as $_report) {
-                            $_report->active = false;
+                        foreach ($action as $_action) {
+                            $_action->active = false;
 
-                            if ($_report->validate()) {
-                                $_report->save();
+                            if ($_action->userId === null) {
+                                $_action->userId = $this->getUser()->getId();
+                                $_action->userAlias = $this->getUser()->getWholeName();
+                            }
+
+                            if ($_action->validate()) {
+                                $_action->save();
                             } else {
-                                $errors[] = "Action id {$_report->getId()} - {$_report->getTitle()} errors: "
-                                        . join(', ', $_report->getErrors());
+                                $errors[] = "Action id {$_action->getId()} - {$_action->getTitle()} errors: "
+                                        . join(', ', $_action->getErrors());
                             }
                         }
                     }

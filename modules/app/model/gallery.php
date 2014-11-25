@@ -68,6 +68,17 @@ class App_Model_Gallery extends Model
     /**
      * @column
      * @readwrite
+     * @type text
+     * @length 80
+     * 
+     * @validate alphanumeric, max(80)
+     * @label alias autora
+     */
+    protected $_userAlias;
+
+    /**
+     * @column
+     * @readwrite
      * @type tinyint
      * 
      * @validate numeric, max(2)
@@ -92,10 +103,20 @@ class App_Model_Gallery extends Model
      * @type boolean
      * 
      * @validate max(2)
-     * @lable přístupnost
+     * @lable veřejná-soukromá
      */
     protected $_isPublic;
 
+    /**
+     * @column
+     * @readwrite
+     * @type boolean
+     * 
+     * @validate max(2)
+     * @lable systémová
+     */
+    protected $_isSystem;
+    
     /**
      * @column
      * @readwrite
@@ -137,13 +158,13 @@ class App_Model_Gallery extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('gl.*'))
-                ->join('tb_user', 'gl.userId = us.id', 'us',
+                ->join('tb_user', 'gl.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'));
         $news = self::initialize($query);
-        
+
         return $news;
     }
-    
+
     /**
      * 
      * @param type $id
@@ -152,7 +173,8 @@ class App_Model_Gallery extends Model
     public static function fetchGalleryById($id)
     {
         $galleryQuery = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', array('ph.imgMain', 'ph.imgThumb'))
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', 
+                        array('ph.imgMain', 'ph.imgThumb'))
                 ->where('gl.id = ?', (int) $id);
         $galleryArr = self::initialize($galleryQuery);
 

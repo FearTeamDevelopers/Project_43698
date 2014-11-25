@@ -103,7 +103,7 @@ jQuery(document).ready(function () {
         var path = jQuery(this).attr('value');
         jQuery('input[name=metaimage]').val(path);
     });
-    
+
     jQuery('.gal-to-text').click(function (event) {
         event.preventDefault();
         var id = jQuery(this).attr('value');
@@ -113,6 +113,17 @@ jQuery(document).ready(function () {
         event.preventDefault();
         var id = jQuery(this).attr('value');
         CKEDITOR.instances['ckeditor2'].insertText('(!gallery_' + id + '!)');
+    });
+
+    jQuery('.doc-to-text').click(function (event) {
+        event.preventDefault();
+        var id = jQuery(this).attr('value');
+        CKEDITOR.instances['ckeditor'].insertText('(!document_' + id + '!)');
+    });
+    jQuery('.doc-to-teaser').click(function (event) {
+        event.preventDefault();
+        var id = jQuery(this).attr('value');
+        CKEDITOR.instances['ckeditor2'].insertText('(!document_' + id + '!)');
     });
 
     jQuery('.video-to-text').click(function (event) {

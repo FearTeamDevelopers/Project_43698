@@ -4,6 +4,7 @@ use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
+use THCFrame\Filesystem\FileManager;
 
 /**
  * 
@@ -38,6 +39,15 @@ class Admin_Controller_Report extends Controller
 
     /**
      * 
+     * @return array
+     */
+    private function _getDocuments()
+    {
+        return App_Model_Document::all(array('active = ?' => true));
+    }
+
+    /**
+     * 
      * @return type
      */
     private function _getGalleries()
@@ -66,6 +76,7 @@ class Admin_Controller_Report extends Controller
 
         $view->set('photos', $this->_getPhotos())
                 ->set('galleries', $this->_getGalleries())
+                ->set('documents', $this->_getDocuments())
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddReport')) {
@@ -114,6 +125,7 @@ class Admin_Controller_Report extends Controller
             $report = new App_Model_Report(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
+                'userAlias' => $this->getUser()->getWholeName(),
                 'urlKey' => $urlKey,
                 'approved' => $cfg->report_autopublish,
                 'archive' => 0,
@@ -123,7 +135,7 @@ class Admin_Controller_Report extends Controller
                 'rank' => RequestMethods::post('rank', 1),
                 'keywords' => RequestMethods::post('keywords'),
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-                'metaDescription' => RequestMethods::post('metadescription', RequestMethods::post('shorttext')),
+                'metaDescription' => RequestMethods::post('metadescription'),
                 'metaImage' => RequestMethods::post('metaimage'),
                 'photoName' => $urlKey,
                 'imgMain' => $imgMain,
@@ -167,6 +179,7 @@ class Admin_Controller_Report extends Controller
 
         $view->set('report', $report)
                 ->set('photos', $this->_getPhotos())
+                ->set('documents', $this->_getDocuments())
                 ->set('galleries', $this->_getGalleries());
 
         if (RequestMethods::post('submitEditReport')) {
@@ -214,6 +227,11 @@ class Admin_Controller_Report extends Controller
                 $imgThumb = $report->imgThumb;
             }
 
+            if ($report->userId === null) {
+                $report->userId = $this->getUser()->getId();
+                $report->userAlias = $this->getUser()->getWholeName();
+            }
+
             $report->title = RequestMethods::post('title');
             $report->urlKey = $urlKey;
             $report->expirationDate = RequestMethods::post('expiration');
@@ -225,7 +243,7 @@ class Admin_Controller_Report extends Controller
             $report->archive = RequestMethods::post('archive');
             $report->keywords = RequestMethods::post('keywords');
             $report->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-            $report->metaDescription = RequestMethods::post('metadescription', RequestMethods::post('shorttext'));
+            $report->metaDescription = RequestMethods::post('metadescription');
             $report->metaImage = RequestMethods::post('metaimage');
             $report->photoName = $urlKey;
             $report->imgMain = $imgMain;
@@ -334,6 +352,11 @@ class Admin_Controller_Report extends Controller
             } else {
                 $report->approved = 1;
 
+                if ($report->userId === null) {
+                    $report->userId = $this->getUser()->getId();
+                    $report->userAlias = $this->getUser()->getWholeName();
+                }
+
                 if ($report->validate()) {
                     $report->save();
 
@@ -364,6 +387,11 @@ class Admin_Controller_Report extends Controller
                 echo self::ERROR_MESSAGE_2;
             } else {
                 $report->approved = 2;
+
+                if ($report->userId === null) {
+                    $report->userId = $this->getUser()->getId();
+                    $report->userAlias = $this->getUser()->getWholeName();
+                }
 
                 if ($report->validate()) {
                     $report->save();
@@ -437,6 +465,11 @@ class Admin_Controller_Report extends Controller
                         foreach ($report as $_report) {
                             $_report->active = true;
 
+                            if ($_report->userId === null) {
+                                $_report->userId = $this->getUser()->getId();
+                                $_report->userAlias = $this->getUser()->getWholeName();
+                            }
+
                             if ($_report->validate()) {
                                 $_report->save();
                             } else {
@@ -465,6 +498,11 @@ class Admin_Controller_Report extends Controller
                     if (NULL !== $report) {
                         foreach ($report as $_report) {
                             $_report->active = false;
+                            
+                            if ($_report->userId === null) {
+                                $_report->userId = $this->getUser()->getId();
+                                $_report->userAlias = $this->getUser()->getWholeName();
+                            }
 
                             if ($_report->validate()) {
                                 $_report->save();
