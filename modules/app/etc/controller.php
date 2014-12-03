@@ -3,8 +3,9 @@
 namespace App\Etc;
 
 use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
+use THCFrame\Registry\Registry;
+use THCFrame\Request\RequestMethods;
 
 /**
  * Module specific controller class extending framework controller class
@@ -15,11 +16,26 @@ class Controller extends BaseController
 {
 
     /**
-     *
+     * Store security context object
      * @var type 
+     * @read
      */
-    private $_security;
-
+    protected $_security;
+    
+    /**
+     * Store initialized cache object
+     * @var type 
+     * @read
+     */
+    protected $_cache;
+    
+    /**
+     * Store server host name
+     * @var type 
+     * @read
+     */
+    protected $_serverHost;
+    
     const SUCCESS_MESSAGE_1 = ' byl(a) úspěšně vytovřen(a)';
     const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
     const SUCCESS_MESSAGE_3 = ' byl(a) úspěšně smazán(a)';
@@ -47,12 +63,42 @@ class Controller extends BaseController
         parent::__construct($options);
 
         $this->_security = Registry::get('security');
+        $this->_serverHost = RequestMethods::server('HTTP_HOST');
+        $this->_cache = Registry::get('cache');
+        $cfg = Registry::get('configuration');
 
         // schedule disconnect from database 
         Events::add('framework.controller.destruct.after', function($name) {
             $database = Registry::get('database');
             $database->disconnect();
         });
+        
+        $metaData = $this->getCache()->get('global_meta_data');
+
+        if ($metaData !== null) {
+            $metaData = $metaData;
+        } else {
+            $metaData = array(
+                'metadescription' => $cfg->meta_description,
+                'metarobots' => $cfg->meta_robots,
+                'metatitle' => $cfg->meta_title,
+                'metaogurl' => $cfg->meta_og_url,
+                'metaogtype' => $cfg->meta_og_type,
+                'metaogimage' => $cfg->meta_og_image,
+                'metaogsitename' => $cfg->meta_og_site_name
+            );
+
+            $this->getCache()->set('global_meta_data', $metaData);
+        }
+        
+        $this->getLayoutView()
+                ->set('metatitle', $metaData['metatitle'])
+                ->set('metarobots', $metaData['metarobots'])
+                ->set('metadescription', $metaData['metadescription'])
+                ->set('metaogurl', $metaData['metaogurl'])
+                ->set('metaogtype', $metaData['metaogtype'])
+                ->set('metaogimage', $metaData['metaogimage'])
+                ->set('metaogsitename', $metaData['metaogsitename']);
     }
 
     /**

@@ -30,6 +30,15 @@ class App_Model_Gallery extends Model
      * 
      * @validate numeric, max(8)
      */
+    protected $_userId;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     */
     protected $_avatarPhotoId;
 
     /**
@@ -160,12 +169,13 @@ class App_Model_Gallery extends Model
         $query = self::getQuery(array('gl.*'))
                 ->join('tb_user', 'gl.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'));
-        $news = self::initialize($query);
+        $galleries = self::initialize($query);
 
-        return $news;
+        return $galleries;
     }
 
     /**
+     * Called from admin module
      * 
      * @param type $id
      * @return type
@@ -180,21 +190,23 @@ class App_Model_Gallery extends Model
 
         if (!empty($galleryArr)) {
             $gallery = array_shift($galleryArr);
-            return $gallery->getGalleryById();
+            return $gallery->getAllPhotosForGallery();
         } else {
             return null;
         }
     }
 
     /**
+     * Called from app module
      * 
      * @param type $id
      * @return type
      */
-    public static function fetchActivePublicGalleryByUrlkey($urlkey)
+    public static function fetchPublicActiveGalleryByUrlkey($urlkey)
     {
         $galleryQuery = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', array('ph.imgMain', 'ph.imgThumb'))
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', 
+                        array('ph.imgMain', 'ph.imgThumb'))
                 ->where('gl.urlKey = ?', $urlkey)
                 ->where('gl.active = ?', true)
                 ->where('gl.isPublic = ?', true);
@@ -202,44 +214,37 @@ class App_Model_Gallery extends Model
 
         if (!empty($galleryArr)) {
             $gallery = array_shift($galleryArr);
-            return $gallery->getGalleryById();
+            return $gallery->getActPhotosForGallery();
         } else {
             return null;
         }
     }
 
     /**
+     * Called from app module
      * 
      * @param type $year
      */
-    public static function fetchGalleriesByYear($year)
+    public static function fetchPublicActiveGalleries()
     {
-        $startDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year));
-        $endDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $year + 1));
+        $query = self::getQuery(array('gl.*'))
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', 
+                        array('ph.imgMain', 'ph.imgThumb'))
+                ->where('gl.active = ?', true)
+                ->where('gl.isPublic = ?', true)
+                ->order('gl.rank', 'desc')
+                ->order('gl.created', 'desc');
 
-        $galleryQuery = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', array('ph.imgMain', 'ph.imgThumb'))
-                ->wheresql('gl.active=1 AND gl.isPublic=1 AND gl.showDate BETWEEN \'' . $startDate . '\' AND \'' . $endDate . '\'')
-                ->order('gl.showDate', 'DESC');
+        $galleries = self::initialize($query);
 
-        $galleries = self::initialize($galleryQuery);
-
-        if (!empty($galleries)) {
-            foreach ($galleries as $i => $gallery) {
-                $galleries[$i] = $gallery->getGalleryById();
-            }
-
-            return $galleries;
-        } else {
-            return null;
-        }
+        return $galleries;
     }
 
     /**
      * 
      * @return \App_Model_Gallery
      */
-    public function getGalleryById()
+    public function getAllPhotosForGallery()
     {
         $photos = App_Model_Photo::all(array('galleryId = ?' => $this->getId()));
 
@@ -248,4 +253,20 @@ class App_Model_Gallery extends Model
         return $this;
     }
 
+    /**
+     * 
+     * @return \App_Model_Gallery
+     */
+    public function getActPhotosForGallery()
+    {
+        $photos = App_Model_Photo::all(
+                array('galleryId = ?' => $this->getId(), 'active = ?' => true), 
+                array('*'),
+                array('rank' => 'desc', 'created' => 'desc')
+        );
+
+        $this->_photos = $photos;
+
+        return $this;
+    }
 }

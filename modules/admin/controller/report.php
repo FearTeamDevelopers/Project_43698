@@ -145,6 +145,7 @@ class Admin_Controller_Report extends Controller
             if (empty($errors) && $report->validate()) {
                 $id = $report->save();
 
+                Registry::get('cache')->invalidate();
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 $view->successMessage('Report' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/report/');
@@ -252,6 +253,7 @@ class Admin_Controller_Report extends Controller
             if (empty($errors) && $report->validate()) {
                 $report->save();
 
+                Registry::get('cache')->invalidate();
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/report/');
@@ -270,29 +272,26 @@ class Admin_Controller_Report extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $report = App_Model_Report::first(
-                            array('id = ?' => (int) $id), array('id', 'userId')
-            );
+        $report = App_Model_Report::first(
+                        array('id = ?' => (int) $id), array('id', 'userId')
+        );
 
-            if (NULL === $report) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                if ($this->_security->isGranted('role_admin') === true ||
-                        $report->getUserId() == $this->getUser()->getId()) {
-                    if ($report->delete()) {
-                        Event::fire('admin.log', array('success', 'Report id: ' . $id));
-                        echo 'success';
-                    } else {
-                        Event::fire('admin.log', array('fail', 'Report id: ' . $id));
-                        echo self::ERROR_MESSAGE_1;
-                    }
-                } else {
-                    echo self::ERROR_MESSAGE_4;
-                }
-            }
+        if (NULL === $report) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            if ($this->_security->isGranted('role_admin') === true ||
+                    $report->getUserId() == $this->getUser()->getId()) {
+                if ($report->delete()) {
+                    Registry::get('cache')->invalidate();
+                    Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                    echo 'success';
+                } else {
+                    Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                    echo self::ERROR_MESSAGE_1;
+                }
+            } else {
+                echo self::ERROR_MESSAGE_4;
+            }
         }
     }
 
@@ -344,31 +343,27 @@ class Admin_Controller_Report extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $report = App_Model_Report::first(array('id = ?' => (int) $id));
+        $report = App_Model_Report::first(array('id = ?' => (int) $id));
 
-            if (NULL === $report) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $report->approved = 1;
-
-                if ($report->userId === null) {
-                    $report->userId = $this->getUser()->getId();
-                    $report->userAlias = $this->getUser()->getWholeName();
-                }
-
-                if ($report->validate()) {
-                    $report->save();
-
-                    Event::fire('admin.log', array('success', 'Report id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Report id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
+        if (NULL === $report) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            $report->approved = 1;
+
+            if ($report->userId === null) {
+                $report->userId = $this->getUser()->getId();
+                $report->userAlias = $this->getUser()->getWholeName();
+            }
+
+            if ($report->validate()) {
+                $report->save();
+
+                Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
         }
     }
 
@@ -380,31 +375,27 @@ class Admin_Controller_Report extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $report = App_Model_Report::first(array('id = ?' => (int) $id));
+        $report = App_Model_Report::first(array('id = ?' => (int) $id));
 
-            if (NULL === $report) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $report->approved = 2;
-
-                if ($report->userId === null) {
-                    $report->userId = $this->getUser()->getId();
-                    $report->userAlias = $this->getUser()->getWholeName();
-                }
-
-                if ($report->validate()) {
-                    $report->save();
-
-                    Event::fire('admin.log', array('success', 'Report id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Report id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
+        if (NULL === $report) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            $report->approved = 2;
+
+            if ($report->userId === null) {
+                $report->userId = $this->getUser()->getId();
+                $report->userAlias = $this->getUser()->getWholeName();
+            }
+
+            if ($report->validate()) {
+                $report->save();
+
+                Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
         }
     }
 
@@ -446,6 +437,7 @@ class Admin_Controller_Report extends Controller
                     }
 
                     if (empty($errors)) {
+                        Registry::get('cache')->invalidate();
                         Event::fire('admin.log', array('delete success', 'Report ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_6);
                     } else {
@@ -480,6 +472,7 @@ class Admin_Controller_Report extends Controller
                     }
 
                     if (empty($errors)) {
+                        Registry::get('cache')->invalidate();
                         Event::fire('admin.log', array('activate success', 'Report ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_4);
                     } else {
@@ -498,7 +491,7 @@ class Admin_Controller_Report extends Controller
                     if (NULL !== $report) {
                         foreach ($report as $_report) {
                             $_report->active = false;
-                            
+
                             if ($_report->userId === null) {
                                 $_report->userId = $this->getUser()->getId();
                                 $_report->userAlias = $this->getUser()->getWholeName();
@@ -514,6 +507,7 @@ class Admin_Controller_Report extends Controller
                     }
 
                     if (empty($errors)) {
+                        Registry::get('cache')->invalidate();
                         Event::fire('admin.log', array('deactivate success', 'Report ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_5);
                     } else {

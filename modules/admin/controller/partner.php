@@ -172,27 +172,23 @@ class Admin_Controller_Partner extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $partner = App_Model_Partner::first(
-                            array('id = ?' => (int) $id), array('id', 'logo')
-            );
+        $partner = App_Model_Partner::first(
+                        array('id = ?' => (int) $id), array('id', 'logo')
+        );
 
-            if (NULL === $partner) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $path = $partner->getUnlinkLogoPath();
-
-                if ($partner->delete()) {
-                    @unlink($path);
-                    Event::fire('admin.log', array('success', 'Partner id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Partner id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
+        if (NULL === $partner) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            $path = $partner->getUnlinkLogoPath();
+
+            if ($partner->delete()) {
+                @unlink($path);
+                Event::fire('admin.log', array('success', 'Partner id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'Partner id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
         }
     }
 

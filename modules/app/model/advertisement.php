@@ -32,6 +32,16 @@ class App_Model_Advertisement extends Model
      * @label autor
      */
     protected $_userId;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     * @label sekce
+     */
+    protected $_sectionId;
 
     /**
      * @column
@@ -47,12 +57,23 @@ class App_Model_Advertisement extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 40
+     * 
+     * @validate required, alphanumeric, max(40)
+     * @label jedinečný identifikátor
+     */
+    protected $_uniqueKey;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 15
      * 
      * @validate required, alpha, max(15)
      * @label typ
      */
-    protected $_type;
+    protected $_adtype;
 
     /**
      * @column
@@ -64,17 +85,6 @@ class App_Model_Advertisement extends Model
      * @label alias autora
      */
     protected $_userAlias;
-    
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate alpha, max(150)
-     * @label typ
-     */
-    protected $_section;
 
     /**
      * @column
@@ -166,28 +176,25 @@ class App_Model_Advertisement extends Model
     }
 
     /**
+     * Called from admin module
      * 
      * @return array
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('adv.*'))
+        $query = self::getQuery(array('adv.*', '(SELECT COUNT(adm.id) FROM `tb_admessage` adm where adm.adId = adv.id)' => 'messageCount'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
-                        array('us.firstname', 'us.lastname'));
+                        array('us.firstname', 'us.lastname'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'));
         
         $ads = self::initialize($query);
-        
-        if ($ads !== null) {
-            foreach ($ads as $key => $ad) {
-                $ad->messageCount = App_Model_AdMessage::count(array('adId = ?' => $ad->getId()));
-                $ads[$key] = $ad;
-            }
-        }
         
         return $ads;
     }
 
     /**
+     * Called from admin module
      * 
      * @param type $id
      * @return type
@@ -197,6 +204,8 @@ class App_Model_Advertisement extends Model
         $query = self::getQuery(array('adv.*'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'))
                 ->where('adv.id = ?', (int) $id);
         
         $adArr = self::initialize($query);
@@ -211,11 +220,124 @@ class App_Model_Advertisement extends Model
     }
 
     /**
+     * Called from app module
+     * 
+     * @return type
+     */
+    public static function fetchLatestFive()
+    {
+        $query = self::getQuery(array('adv.*'))
+                ->join('tb_user', 'adv.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'))
+                ->order('adv.created', 'desc')
+                ->limit(5);
+        
+        $ads = self::initialize($query);
+        
+        return $ads;
+    }
+    
+    /**
+     * Called from app module
      * 
      * @param type $type
+     * @param type $page
+     * @return type
      */
-    public static function fetchActiveByType($type = 'tender')
+    
+    public static function fetchActiveByType($type, $page = 1)
     {
+        if($type != 'tender' || $type != 'demand'){
+            return null;
+        }
         
+        $query = self::getQuery(array('adv.*'))
+                ->join('tb_user', 'adv.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'))
+                ->order('adv.created', 'desc')
+                ->where('adv.active = ?', true)
+                ->where('adv.type = ?', $type)
+                ->limit(15, $page);
+        
+        $ads = self::initialize($query);
+        
+        return $ads;
+    }
+    
+    /**
+     * Called from app module
+     * 
+     * @param type $type
+     * @param type $page
+     * @return type
+     */
+    
+    public static function fetchActiveByTypeSection($type, $section, $page = 1)
+    {
+        if($type != 'tender' || $type != 'demand'){
+            return null;
+        }
+        
+        $query = self::getQuery(array('adv.*'))
+                ->join('tb_user', 'adv.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'))
+                ->where('ads.urlKey = ?', $section)
+                ->where('adv.active = ?', true)
+                ->where('adv.type = ?', $type)
+                ->order('adv.created', 'desc')
+                ->limit(15, $page);
+        
+        $ads = self::initialize($query);
+        
+        return $ads;
+    }
+    
+    /**
+     * Called from app module
+     * 
+     * @param type $urlkey
+     * @return type
+     */
+    public static function fetchActiveByKey($urlkey)
+    {
+        $query = self::getQuery(array('adv.*'))
+                ->join('tb_user', 'adv.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'))
+                ->where('adv.uniqueKey = ?', $urlkey)
+                ->where('adv.active = ?', true);
+        
+        $adArr = self::initialize($query);
+        $ad = array_shift($adArr);
+        
+        return $ad;
+    }
+    
+    /**
+     * Called from app module
+     * 
+     * @param type $userId
+     * @return type
+     */
+    public static function fetchActiveByUser($userId)
+    {
+        $query = self::getQuery(array('adv.*'))
+                ->join('tb_user', 'adv.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'))
+                ->where('adv.userId = ?', $userId)
+                ->where('adv.active = ?', true);
+        
+        $ads = self::initialize($query);
+        
+        return $ads;
     }
 }

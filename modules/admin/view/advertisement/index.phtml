@@ -1,5 +1,6 @@
 <ul class="maintabmenu multipletabmenu">
     <li class="current"><a href="#">Bazar</a></li>
+    <li><a href="/admin/advertisement/sections/">Kategorie</a></li>
 </ul><!--maintabmenu-->
 
 <div class="content">
@@ -36,14 +37,14 @@
                         <td>{echo $ad->getTitle()}</td>
                         <td>{echo $ad->firstname." ".$ad->lastname}</td>
                         <td>{if $ad->getType()=="tender"}Nabídka{/if}{else}Poptávka{/else}</td>
-                        <td>{echo $ad->getSection()}</td>
+                        <td>{echo $ad->sectionTitle}</td>
                         <td>{echo $ad->getExpirationDate()}</td>
                         <td>{echo $ad->messageCount}</td>
                         <td>{if ($ad->active)}<span class="labelProduct labelProductGreen">Active</span>{/if}</td>
                         <td>{echo $ad->getCreated()}</td>
                         <td>
                             <a href="/admin/advertisement/detail/{echo $ad->getId()}" class="btn btn3 btn_search" title="Detail"></a>
-                            {if $isAdmin}<a href="/admin/advertisement/delete/{echo $ad->getId()}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>{/if}
+                            {if $isAdmin}<a href="/admin/advertisement/delete/{echo $ad->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>{/if}
                         </td>
                     </tr>
                 {/foreach}

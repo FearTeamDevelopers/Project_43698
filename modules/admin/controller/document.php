@@ -29,33 +29,29 @@ class Admin_Controller_Document extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $doc = App_Model_Document::first(
-                            array('id = ?' => $id), array('id', 'filepath', 'userId')
-            );
+        $doc = App_Model_Document::first(
+                        array('id = ?' => $id), array('id', 'filepath', 'userId')
+        );
 
-            if (NULL === $doc) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                if ($this->_security->isGranted('role_admin') === true ||
-                        $doc->getUserId() == $this->getUser()->getId()) {
-
-                    $filepath = $doc->getUnlinkPath();
-
-                    if ($doc->delete()) {
-                        @unlink($filepath);
-                        Event::fire('admin.log', array('success', 'Document id: ' . $id));
-                        echo 'success';
-                    } else {
-                        Event::fire('admin.log', array('fail', 'Document id: ' . $id));
-                        echo self::ERROR_MESSAGE_1;
-                    }
-                } else {
-                    echo self::ERROR_MESSAGE_4;
-                }
-            }
+        if (NULL === $doc) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            if ($this->_security->isGranted('role_admin') === true ||
+                    $doc->getUserId() == $this->getUser()->getId()) {
+
+                $filepath = $doc->getUnlinkPath();
+
+                if ($doc->delete()) {
+                    @unlink($filepath);
+                    Event::fire('admin.log', array('success', 'Document id: ' . $id));
+                    echo 'success';
+                } else {
+                    Event::fire('admin.log', array('fail', 'Document id: ' . $id));
+                    echo self::ERROR_MESSAGE_1;
+                }
+            } else {
+                echo self::ERROR_MESSAGE_4;
+            }
         }
     }
 
@@ -67,36 +63,32 @@ class Admin_Controller_Document extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        if ($this->checkCSRFToken()) {
-            $doc = App_Model_Document::first(array('id = ?' => $id));
+        $doc = App_Model_Document::first(array('id = ?' => $id));
 
-            if (null === $doc) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                if (!$doc->active) {
-                    $doc->active = true;
+        if (null === $doc) {
+            echo self::ERROR_MESSAGE_2;
+        } else {
+            if (!$doc->active) {
+                $doc->active = true;
 
-                    if ($doc->validate()) {
-                        $doc->save();
-                        Event::fire('admin.log', array('success', 'Document id: ' . $id));
-                        echo 'active';
-                    } else {
-                        echo join('<br/>', $doc->getErrors());
-                    }
-                } elseif ($doc->active) {
-                    $doc->active = false;
+                if ($doc->validate()) {
+                    $doc->save();
+                    Event::fire('admin.log', array('success', 'Document id: ' . $id));
+                    echo 'active';
+                } else {
+                    echo join('<br/>', $doc->getErrors());
+                }
+            } elseif ($doc->active) {
+                $doc->active = false;
 
-                    if ($doc->validate()) {
-                        $doc->save();
-                        Event::fire('admin.log', array('success', 'Document id: ' . $id));
-                        echo 'inactive';
-                    } else {
-                        echo join('<br/>', $doc->getErrors());
-                    }
+                if ($doc->validate()) {
+                    $doc->save();
+                    Event::fire('admin.log', array('success', 'Document id: ' . $id));
+                    echo 'inactive';
+                } else {
+                    echo join('<br/>', $doc->getErrors());
                 }
             }
-        } else {
-            echo self::ERROR_MESSAGE_1;
         }
     }
 

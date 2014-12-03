@@ -112,6 +112,7 @@ class Admin_Controller_News extends Controller
             if (empty($errors) && $news->validate()) {
                 $id = $news->save();
 
+                Registry::get('cache')->invalidate();
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/news/');
@@ -182,6 +183,7 @@ class Admin_Controller_News extends Controller
             if (empty($errors) && $news->validate()) {
                 $news->save();
 
+                Registry::get('cache')->invalidate();
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/news/');
@@ -200,29 +202,26 @@ class Admin_Controller_News extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $news = App_Model_News::first(
-                            array('id = ?' => (int) $id), array('id', 'userId')
-            );
+        $news = App_Model_News::first(
+                        array('id = ?' => (int) $id), array('id', 'userId')
+        );
 
-            if (NULL === $news) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                if ($this->_security->isGranted('role_admin') === true ||
-                        $news->getUserId() == $this->getUser()->getId()) {
-                    if ($news->delete()) {
-                        Event::fire('admin.log', array('success', 'News id: ' . $id));
-                        echo 'success';
-                    } else {
-                        Event::fire('admin.log', array('fail', 'News id: ' . $id));
-                        echo self::ERROR_MESSAGE_1;
-                    }
-                } else {
-                    echo self::ERROR_MESSAGE_4;
-                }
-            }
+        if (NULL === $news) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            if ($this->_security->isGranted('role_admin') === true ||
+                    $news->getUserId() == $this->getUser()->getId()) {
+                if ($news->delete()) {
+                    Registry::get('cache')->invalidate();
+                    Event::fire('admin.log', array('success', 'News id: ' . $id));
+                    echo 'success';
+                } else {
+                    Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                    echo self::ERROR_MESSAGE_1;
+                }
+            } else {
+                echo self::ERROR_MESSAGE_4;
+            }
         }
     }
 
@@ -234,31 +233,27 @@ class Admin_Controller_News extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $news = App_Model_News::first(array('id = ?' => (int) $id));
+        $news = App_Model_News::first(array('id = ?' => (int) $id));
 
-            if (NULL === $news) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $news->approved = 1;
-
-                if ($news->userId === null) {
-                    $news->userId = $this->getUser()->getId();
-                    $news->userAlias = $this->getUser()->getWholeName();
-                }
-
-                if ($news->validate()) {
-                    $news->save();
-
-                    Event::fire('admin.log', array('success', 'News id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'News id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
+        if (NULL === $news) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            $news->approved = 1;
+
+            if ($news->userId === null) {
+                $news->userId = $this->getUser()->getId();
+                $news->userAlias = $this->getUser()->getWholeName();
+            }
+
+            if ($news->validate()) {
+                $news->save();
+
+                Event::fire('admin.log', array('success', 'News id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
         }
     }
 
@@ -270,31 +265,27 @@ class Admin_Controller_News extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $news = App_Model_News::first(array('id = ?' => (int) $id));
+        $news = App_Model_News::first(array('id = ?' => (int) $id));
 
-            if (NULL === $news) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $news->approved = 2;
-
-                if ($news->userId === null) {
-                    $news->userId = $this->getUser()->getId();
-                    $news->userAlias = $this->getUser()->getWholeName();
-                }
-
-                if ($news->validate()) {
-                    $news->save();
-
-                    Event::fire('admin.log', array('success', 'News id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'News id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
+        if (NULL === $news) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            $news->approved = 2;
+
+            if ($news->userId === null) {
+                $news->userId = $this->getUser()->getId();
+                $news->userAlias = $this->getUser()->getWholeName();
+            }
+
+            if ($news->validate()) {
+                $news->save();
+
+                Event::fire('admin.log', array('success', 'News id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
         }
     }
 
@@ -336,6 +327,7 @@ class Admin_Controller_News extends Controller
                     }
 
                     if (empty($errors)) {
+                        Registry::get('cache')->invalidate();
                         Event::fire('admin.log', array('delete success', 'News ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_6);
                     } else {
@@ -370,6 +362,7 @@ class Admin_Controller_News extends Controller
                     }
 
                     if (empty($errors)) {
+                        Registry::get('cache')->invalidate();
                         Event::fire('admin.log', array('activate success', 'News ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_4);
                     } else {
@@ -404,6 +397,7 @@ class Admin_Controller_News extends Controller
                     }
 
                     if (empty($errors)) {
+                        Registry::get('cache')->invalidate();
                         Event::fire('admin.log', array('deactivate success', 'News ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_5);
                     } else {

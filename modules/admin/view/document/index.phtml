@@ -41,7 +41,7 @@
                             <a href="/admin/document/changestatus/{echo $document->id}" class="btn btn3 btn_refresh ajaxChangestate" title="Změna stavu"></a>
                             
                             {if $isAdmin || $document->userId == $authUser->id}
-                                <a href="/admin/document/delete/{echo $document->id}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>
+                                <a href="/admin/document/delete/{echo $document->id}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>
                             {/if}
                         </td>
                     </tr>

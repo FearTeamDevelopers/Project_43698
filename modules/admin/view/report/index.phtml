@@ -56,11 +56,11 @@
                             <td>
                                 <a href="/admin/report/edit/{echo $report->id}" class="btn btn3 btn_pencil" title="Upravit"></a>
                                 {if $isAdmin || $report->userId == $authUser->id}
-                                    <a href="/admin/report/delete/{echo $report->id}" class="btn btn3 btn_trash ajaxBtn" title="Smazat"></a>
+                                    <a href="/admin/report/delete/{echo $report->id}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>
                                 {/if}
                                 {if $isAdmin && $report->approved == 0}
-                                    <a href="/admin/report/approvereport/{echo $report->id}" class="btn btn3 btn_info ajaxBtnReload" title="Schválit"></a>
-                                    <a href="/admin/report/rejectreport/{echo $report->id}" class="btn btn3 btn_stop ajaxBtnReload" title="Zamítnout"></a>
+                                    <a href="/admin/report/approvereport/{echo $report->id}" class="btn btn3 btn_info ajaxReload" title="Schválit"></a>
+                                    <a href="/admin/report/rejectreport/{echo $report->id}" class="btn btn3 btn_stop ajaxReload" title="Zamítnout"></a>
                                 {/if}
                             </td>
                         </tr>

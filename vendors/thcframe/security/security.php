@@ -37,19 +37,22 @@ class Security extends Base implements SecurityInterface
      * Cross-site request forgery protection
      * 
      * @read
-     * @var string
+     * @var THCFrame\Security\CSRF
      */
     protected $_csrf;
 
     /**
+     * Instance of PasswordManager class
+     * 
      * @read
-     * @var type 
+     * @var THCFrame\Security\PasswordManager 
      */
     protected $_passwordManager;
 
     /**
+     * Authenticated user object
      * @readwrite
-     * @var type 
+     * @var \THCFrame\Security\Model\BasicUser or null
      */
     protected $_user = null;
 

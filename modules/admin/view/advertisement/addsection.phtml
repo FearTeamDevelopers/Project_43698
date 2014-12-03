@@ -1,0 +1,29 @@
+<ul class="maintabmenu multipletabmenu">
+    <li><a href="/admin/advertisement/">Bazar</a></li>
+    <li><a href="/admin/advertisement/sections/">Kategorie</a></li>
+    <li class="current"><a href="#">Přidat kategorii</a></li>
+</ul><!--maintabmenu-->
+
+<div class="content">
+    <div class="contenttitle radiusbottom0">
+        <h2 class="table"><span>Nová Kategorie</span></h2>
+    </div><!--contenttitle-->
+
+    <form class="stdform stdform2" method="post" action="#" >
+        <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+        <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
+        <p>
+            <label>Název*</label>
+            <span class="field">
+                <input class="longinput" type="text" name="title" value="{echo isset($adsection)? $adsection->title: ""}" />
+                {if isset($errors["title"])}
+                <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                {/if}
+            </span>
+        </p>
+        <p class="stdformbutton">
+            <input name="submitAddAdSection" type="submit" value="Uložit" class="submit radius2" />
+            <input type="reset" class="reset radius2" value="Reset" />
+        </p>
+    </form>
+</div>

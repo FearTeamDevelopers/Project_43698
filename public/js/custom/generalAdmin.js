@@ -159,71 +159,31 @@ jQuery(document).ready(function () {
         }
     });
 
-    jQuery('.tableoptions select[name=action]').change(function () {
-        var selected = jQuery(this).children('option:selected').val();
-
-        if (selected == 'overprice') {
-            jQuery('.overprice-option').removeClass('nodisplay');
-            jQuery('.overprice-option input[name=price]').blur(function () {
-                var price = jQuery(this).val();
-                jQuery('.overprice-option input[name=price]').val(price);
-            });
-        } else {
-            jQuery('.overprice-option').addClass('nodisplay');
-        }
-    });
-
-    jQuery('a.ajax-massaction').click(function (event) {
+    jQuery('.ajaxMassAction').click(function (event) {
         event.preventDefault();
 
         var url = jQuery(this).attr('href');
         var action = jQuery('.tableoptions select[name=action]').children('option:selected').val();
         var csrf = jQuery('#csrf').val();
 
-        if (action == 'overprice') {
-            var operation = jQuery('.overprice-option select').children('option:selected').val();
-            var price = jQuery('.overprice-option').children('input.microinput').val();
+        jQuery.post(url, {csrf: csrf, action: action, ids: selected}, function (msg) {
+            jQuery('#dialog p').text(msg);
 
-            jQuery.post(url, {csrf: csrf, action: action, productsids: selected, price: price, operation: operation}, function (msg) {
-                jQuery('#dialog p').text(msg);
-
-                jQuery('#dialog').dialog({
-                    title: 'Výsledek',
-                    width: 600,
-                    modal: true,
-                    position: {my: 'center', at: 'top', of: window},
-                    buttons: {
-                        Close: function () {
-                            jQuery(this).dialog('close');
-                            jQuery('.stdtable2 tbody tr.togglerow').removeClass('togglerow');
-                            jQuery('.tableoptions select[name=selection]').val('1');
-                            selected = [];
-                            table.ajax.reload();
-                        }
+            jQuery('#dialog').dialog({
+                title: 'Výsledek',
+                width: 600,
+                modal: true,
+                buttons: {
+                    Close: function () {
+                        jQuery(this).dialog('close');
+                        jQuery('.stdtable2 tbody tr.togglerow').removeClass('togglerow');
+                        jQuery('.tableoptions select[name=selection]').val('1');
+                        selected = [];
+                        table.ajax.reload();
                     }
-                });
+                }
             });
-        } else {
-            jQuery.post(url, {csrf: csrf, action: action, productsids: selected}, function (msg) {
-                jQuery('#dialog p').text(msg);
-
-                jQuery('#dialog').dialog({
-                    title: 'Výsledek',
-                    width: 600,
-                    modal: true,
-                    position: {my: 'center', at: 'top', of: window},
-                    buttons: {
-                        Close: function () {
-                            jQuery(this).dialog('close');
-                            jQuery('.stdtable2 tbody tr.togglerow').removeClass('togglerow');
-                            jQuery('.tableoptions select[name=selection]').val('1');
-                            selected = [];
-                            table.ajax.reload();
-                        }
-                    }
-                });
-            });
-        }
+        });
 
         return false;
     });
@@ -546,7 +506,7 @@ jQuery(document).ready(function () {
     });
 
     /* ---------------------- AJAX OPERATIONS --------------------------------*/
-    jQuery('.deleteImg').click(function () {
+    jQuery('.deleteImg').click(function (event) {
         event.preventDefault();
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
@@ -567,20 +527,32 @@ jQuery(document).ready(function () {
     jQuery('.imagelist a.delete').click(function (event) {
         event.preventDefault();
         var parent = jQuery(this).parents('li');
-        var c = confirm('Delete this image?');
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
 
-        if (c) {
-            var url = jQuery(this).attr('href');
-            var csrf = jQuery('#csrf').val();
+        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat v mazání?');
 
-            jQuery.post(url, {csrf: csrf}, function (msg) {
-                if (msg == 'success') {
-                    parent.hide('explode', 500);
-                } else {
-                    alert(msg);
+        jQuery('#deleteDialog').dialog({
+            resizable: false,
+            width: 300,
+            height: 150,
+            modal: true,
+            buttons: {
+                "Smazat": function () {
+                    jQuery.post(url, {csrf: csrf}, function (msg) {
+                        if (msg == 'success') {
+                            parent.hide('explode', 500);
+                        } else {
+                            alert(msg);
+                        }
+                    });
+                    jQuery(this).dialog("close");
+                },
+                "Zrušit": function () {
+                    jQuery(this).dialog("close");
                 }
-            });
-        }
+            }
+        });
         return false;
     });
 
@@ -605,59 +577,83 @@ jQuery(document).ready(function () {
     });
 
     //delete individual row
-    jQuery('.btn_trash.ajaxBtn').click(function () {
-        var c = confirm('Opravdu chcete pokračovat?');
+    jQuery('.ajaxDelete').click(function (event) {
+        event.preventDefault();
         var parentTr = jQuery(this).parents('tr');
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
 
-        if (c) {
-            var url = jQuery(this).attr('href');
-            var csrf = jQuery('#csrf').val();
+        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat v mazání?');
 
-            jQuery.post(url, {csrf: csrf}, function (msg) {
-                if (msg == 'success') {
-                    parentTr.fadeOut();
-                } else {
-                    alert(msg);
+        jQuery('#deleteDialog').dialog({
+            resizable: false,
+            width: 300,
+            height: 150,
+            modal: true,
+            buttons: {
+                "Smazat": function () {
+                    jQuery.post(url, {csrf: csrf}, function (msg) {
+                        if (msg == 'success') {
+                            parentTr.fadeOut();
+                        } else {
+                            alert(msg);
+                        }
+                    });
+                    jQuery(this).dialog("close");
+                },
+                "Zrušit": function () {
+                    jQuery(this).dialog("close");
                 }
-            });
-        }
+            }
+        });
+        
+        
         return false;
     });
 
-    jQuery('.ajaxBtnReload').click(function () {
-        var c = confirm('Opravdu chcete pokračovat?');
+    jQuery('.ajaxReload').click(function () {
+        event.preventDefault();
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
 
-        if (c) {
-            var url = jQuery(this).attr('href');
-            var csrf = jQuery('#csrf').val();
+        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat?');
 
-            jQuery.post(url, {csrf: csrf}, function (msg) {
-                if (msg == 'success') {
-                    location.reload();
-                } else {
-                    alert(msg);
+        jQuery('#deleteDialog').dialog({
+            resizable: false,
+            width: 300,
+            height: 150,
+            modal: true,
+            buttons: {
+                "Ano": function () {
+                    jQuery.post(url, {csrf: csrf}, function (msg) {
+                        if (msg == 'success') {
+                            location.reload();
+                        } else {
+                            alert(msg);
+                        }
+                    });
+                },
+                "Ne": function () {
+                    jQuery(this).dialog("close");
                 }
-            });
-        }
+            }
+        });
         return false;
     });
 
     //activate/deactivate
-    jQuery('.ajaxChangestate').click(function (event) {
-        var c = confirm('Opravdu chcete pokračovat?');
+    jQuery('.ajaxChangestate').click(function () {
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
 
-        if (c) {
-            var url = jQuery(this).attr('href');
-            var csrf = jQuery('#csrf').val();
+        jQuery.post(url, {csrf: csrf}, function (msg) {
+            if (msg == 'active' || msg == 'inactive') {
+                location.reload();
+            } else {
+                alert(msg);
+            }
+        });
 
-            jQuery.post(url, {csrf: csrf}, function (msg) {
-                if (msg == 'active' || msg == 'inactive') {
-                    location.reload();
-                } else {
-                    alert(msg);
-                }
-            });
-        }
         return false;
     });
 

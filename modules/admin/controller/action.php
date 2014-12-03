@@ -109,6 +109,7 @@ class Admin_Controller_Action extends Controller
 
             if (empty($errors) && $action->validate()) {
                 $id = $action->save();
+                Registry::get('cache')->invalidate();
 
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 $view->successMessage('Action' . self::SUCCESS_MESSAGE_1);
@@ -177,6 +178,7 @@ class Admin_Controller_Action extends Controller
 
             if (empty($errors) && $action->validate()) {
                 $action->save();
+                Registry::get('cache')->invalidate();
 
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
@@ -196,29 +198,26 @@ class Admin_Controller_Action extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $action = App_Model_Action::first(
-                            array('id = ?' => (int) $id), array('id', 'userId')
-            );
+        $action = App_Model_Action::first(
+                        array('id = ?' => (int) $id), array('id', 'userId')
+        );
 
-            if (NULL === $action) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                if ($this->_security->isGranted('role_admin') === true ||
-                        $action->getUserId() == $this->getUser()->getId()) {
-                    if ($action->delete()) {
-                        Event::fire('admin.log', array('success', 'Action id: ' . $id));
-                        echo 'success';
-                    } else {
-                        Event::fire('admin.log', array('fail', 'Action id: ' . $id));
-                        echo self::ERROR_MESSAGE_1;
-                    }
-                } else {
-                    echo self::ERROR_MESSAGE_4;
-                }
-            }
+        if (NULL === $action) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            if ($this->_security->isGranted('role_admin') === true ||
+                    $action->getUserId() == $this->getUser()->getId()) {
+                if ($action->delete()) {
+                    Registry::get('cache')->invalidate();
+                    Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                    echo 'success';
+                } else {
+                    Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                    echo self::ERROR_MESSAGE_1;
+                }
+            } else {
+                echo self::ERROR_MESSAGE_4;
+            }
         }
     }
 
@@ -230,31 +229,27 @@ class Admin_Controller_Action extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $action = App_Model_Action::first(array('id = ?' => (int) $id));
+        $action = App_Model_Action::first(array('id = ?' => (int) $id));
 
-            if (NULL === $action) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $action->approved = 1;
-
-                if ($action->userId === null) {
-                    $action->userId = $this->getUser()->getId();
-                    $action->userAlias = $this->getUser()->getWholeName();
-                }
-
-                if ($action->validate()) {
-                    $action->save();
-
-                    Event::fire('admin.log', array('success', 'Action id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Action id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
+        if (NULL === $action) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            $action->approved = 1;
+
+            if ($action->userId === null) {
+                $action->userId = $this->getUser()->getId();
+                $action->userAlias = $this->getUser()->getWholeName();
+            }
+
+            if ($action->validate()) {
+                $action->save();
+
+                Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
         }
     }
 
@@ -266,31 +261,27 @@ class Admin_Controller_Action extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $action = App_Model_Action::first(array('id = ?' => (int) $id));
+        $action = App_Model_Action::first(array('id = ?' => (int) $id));
 
-            if (NULL === $action) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $action->approved = 2;
-
-                if ($action->userId === null) {
-                    $action->userId = $this->getUser()->getId();
-                    $action->userAlias = $this->getUser()->getWholeName();
-                }
-
-                if ($action->validate()) {
-                    $action->save();
-
-                    Event::fire('admin.log', array('success', 'Action id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Action id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
+        if (NULL === $action) {
+            echo self::ERROR_MESSAGE_2;
         } else {
-            echo self::ERROR_MESSAGE_1;
+            $action->approved = 2;
+
+            if ($action->userId === null) {
+                $action->userId = $this->getUser()->getId();
+                $action->userAlias = $this->getUser()->getWholeName();
+            }
+
+            if ($action->validate()) {
+                $action->save();
+
+                Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
         }
     }
 
@@ -333,6 +324,7 @@ class Admin_Controller_Action extends Controller
 
                     if (empty($errors)) {
                         Event::fire('admin.log', array('delete success', 'Action ids: ' . join(',', $ids)));
+                        Registry::get('cache')->invalidate();
                         $view->successMessage(self::SUCCESS_MESSAGE_6);
                     } else {
                         Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
@@ -367,6 +359,7 @@ class Admin_Controller_Action extends Controller
 
                     if (empty($errors)) {
                         Event::fire('admin.log', array('activate success', 'Action ids: ' . join(',', $ids)));
+                        Registry::get('cache')->invalidate();
                         $view->successMessage(self::SUCCESS_MESSAGE_4);
                     } else {
                         Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
@@ -401,6 +394,7 @@ class Admin_Controller_Action extends Controller
 
                     if (empty($errors)) {
                         Event::fire('admin.log', array('deactivate success', 'Action ids: ' . join(',', $ids)));
+                        Registry::get('cache')->invalidate();
                         $view->successMessage(self::SUCCESS_MESSAGE_5);
                     } else {
                         Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
