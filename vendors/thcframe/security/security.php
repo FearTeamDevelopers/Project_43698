@@ -72,7 +72,7 @@ class Security extends Base implements SecurityInterface
      */
     public function initialize()
     {
-        Event::fire('framework.security.initialize.before', array($this->accessControll));
+        Event::fire('framework.security.initialize.before', array());
 
         $configuration = Registry::get('configuration');
 
@@ -109,7 +109,7 @@ class Security extends Base implements SecurityInterface
             });
         }
 
-        Event::fire('framework.security.initialize.after', array($this->accessControll));
+        Event::fire('framework.security.initialize.after', array());
 
         return $this;
     }

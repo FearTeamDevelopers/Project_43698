@@ -3,9 +3,7 @@
 use THCFrame\Model\Model;
 
 /**
- * Description of App_Model_Partner
- *
- * @author Tomy
+ * 
  */
 class App_Model_Partner extends Model
 {
@@ -112,7 +110,7 @@ class App_Model_Partner extends Model
      */
     public function getUnlinkLogoPath($type = true)
     {
-        if ($type) {
+        if ($type && !empty($this->_logo)) {
             if (file_exists('./' . $this->_logo)) {
                 return './' . $this->_logo;
             } elseif (file_exists('.' . $this->_logo)) {

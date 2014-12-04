@@ -119,6 +119,6 @@ class App_Controller_Index extends Controller
      */
     public function search()
     {
-        $searchString = StringMethods::sanitize(RequestMethods::get('hledat'), "()[],.<>*$@/\\\'\";:");
+        $searchString = StringMethods::fastClean(RequestMethods::get('hledat'));
     }
 }

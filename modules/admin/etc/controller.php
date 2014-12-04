@@ -10,11 +10,16 @@ use THCFrame\Core\StringMethods;
 /**
  * Module specific controller class extending framework controller class
  *
- * @author Tomy
+ * 
  */
 class Controller extends BaseController
 {
 
+    /**
+     * Store security context object
+     * @var type 
+     * @read
+     */
     protected $_security;
 
     const SUCCESS_MESSAGE_1 = ' has been successfully created';
@@ -40,12 +45,11 @@ class Controller extends BaseController
      */
     protected function _createUrlKey($string)
     {
-        $string = StringMethods::removeDiacriticalMarks($string);
-        $string = str_replace(array('.', ',', '_', '(', ')', '[', ']', '|', ' '), '-', $string);
-        $string = str_replace(array('?', '!', '@', '&', '*', ':', '+', '=', '~', '°', '´', '`', '%', "'", '"'), '', $string);
-        $string = trim($string);
-        $string = trim($string, '-');
-        return strtolower($string);
+        $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
+        $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
+        $cleaned = StringMethods::fastClean($preCleaned);
+        $return = trim(trim($cleaned), '-');
+        return strtolower($return);
     }
 
     /**
@@ -71,7 +75,10 @@ class Controller extends BaseController
     public function _secured()
     {
         $session = Registry::get('session');
-
+        
+        //This line should be present only for DEV env
+        //$this->_security->forceLogin(1);
+        
         $user = $this->_security->getUser();
 
         if (!$user) {

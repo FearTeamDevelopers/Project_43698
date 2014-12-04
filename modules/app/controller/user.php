@@ -9,7 +9,7 @@ use THCFrame\Security\PasswordManager;
 /**
  * Description of App_Controller_User
  *
- * @author Tomy
+ * 
  */
 class App_Controller_User extends Controller
 {

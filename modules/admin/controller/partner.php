@@ -9,7 +9,7 @@ use THCFrame\Registry\Registry;
 /**
  * Description of UserController
  *
- * @author Tomy
+ * 
  */
 class Admin_Controller_Partner extends Controller
 {

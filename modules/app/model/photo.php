@@ -3,9 +3,7 @@
 use THCFrame\Model\Model;
 
 /**
- * Description of App_Model_Photo
- *
- * @author Tomy
+ * 
  */
 class App_Model_Photo extends Model
 {
@@ -205,7 +203,7 @@ class App_Model_Photo extends Model
      */
     public function getUnlinkPath($type = true)
     {
-        if ($type) {
+        if ($type && !empty($this->_imgMain)) {
             if (file_exists(APP_PATH . $this->_imgMain)) {
                 return APP_PATH . $this->_imgMain;
             } elseif (file_exists('.' . $this->_imgMain)) {
@@ -224,7 +222,7 @@ class App_Model_Photo extends Model
      */
     public function getUnlinkThumbPath($type = true)
     {
-        if ($type) {
+        if ($type && !empty($this->_imgThumb)) {
             if (file_exists(APP_PATH . $this->_imgThumb)) {
                 return APP_PATH . $this->_imgThumb;
             } elseif (file_exists('.' . $this->_imgThumb)) {

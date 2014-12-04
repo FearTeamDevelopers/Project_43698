@@ -3,9 +3,7 @@
 use THCFrame\Model\Model;
 
 /**
- * Description of App_Model_AdSection
- *
- * @author Tomy
+ * 
  */
 class App_Model_AdSection extends Model
 {

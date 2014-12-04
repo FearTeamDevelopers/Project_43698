@@ -10,7 +10,7 @@ use THCFrame\Security\PasswordManager;
 /**
  * Description of Admin_Controller_User
  *
- * @author Tomy
+ * 
  */
 class Admin_Controller_User extends Controller
 {

@@ -3,9 +3,7 @@
 use THCFrame\Model\Model;
 
 /**
- * Description of App_Model_Report
- *
- * @author Tomy
+ * 
  */
 class App_Model_Report extends Model
 {
