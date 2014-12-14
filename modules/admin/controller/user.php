@@ -81,7 +81,9 @@ class Admin_Controller_User extends Controller
         $superAdmin = $security->isGranted('role_superadmin');
 
         $users = App_Model_User::all(
-                        array('role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), array('id' => 'asc')
+                        array('role <> ?' => 'role_superadmin'), 
+                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), 
+                array('id' => 'asc')
         );
 
         $view->set('users', $users)

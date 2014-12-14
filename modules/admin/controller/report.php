@@ -29,33 +29,6 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
-     * 
-     * @return type
-     */
-    private function _getPhotos()
-    {
-        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
-    }
-
-    /**
-     * 
-     * @return array
-     */
-    private function _getDocuments()
-    {
-        return App_Model_Document::all(array('active = ?' => true));
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    private function _getGalleries()
-    {
-        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
-    }
-
-    /**
      * @before _secured, _participant
      */
     public function index()
@@ -74,10 +47,7 @@ class Admin_Controller_Report extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', $this->_getPhotos())
-                ->set('galleries', $this->_getGalleries())
-                ->set('documents', $this->_getDocuments())
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddReport')) {
             if ($this->checkCSRFToken() !== true &&
@@ -121,6 +91,11 @@ class Admin_Controller_Report extends Controller
                 $imgMain = '';
                 $imgThumb = '';
             }
+            
+            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
+                    array('/reportaz/r/'.$urlKey, '[Celý článek]'), 
+                    RequestMethods::post('shorttext')
+            );
 
             $report = new App_Model_Report(array(
                 'title' => RequestMethods::post('title'),
@@ -129,7 +104,7 @@ class Admin_Controller_Report extends Controller
                 'urlKey' => $urlKey,
                 'approved' => $cfg->report_autopublish,
                 'archive' => 0,
-                'shortBody' => RequestMethods::post('shorttext'),
+                'shortBody' => $shortText,
                 'body' => RequestMethods::post('text'),
                 'expirationDate' => RequestMethods::post('expiration'),
                 'rank' => RequestMethods::post('rank', 1),
@@ -232,12 +207,17 @@ class Admin_Controller_Report extends Controller
                 $report->userId = $this->getUser()->getId();
                 $report->userAlias = $this->getUser()->getWholeName();
             }
+            
+            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
+                    array('/reportaz/r/'.$urlKey, '[Celý článek]'), 
+                    RequestMethods::post('shorttext')
+            );
 
             $report->title = RequestMethods::post('title');
             $report->urlKey = $urlKey;
             $report->expirationDate = RequestMethods::post('expiration');
             $report->body = RequestMethods::post('text');
-            $report->shortBody = RequestMethods::post('shorttext');
+            $report->shortBody = $shortText;
             $report->rank = RequestMethods::post('rank', 1);
             $report->active = RequestMethods::post('active');
             $report->approved = RequestMethods::post('approve');
@@ -399,12 +379,19 @@ class Admin_Controller_Report extends Controller
         }
     }
 
-    /**
+/**
      * @before _secured, _participant
      */
-    public function insertPhotoDialog()
+    public function insertToContent()
     {
+        $view = $this->getActionView();
         $this->willRenderLayoutView = false;
+        
+        $reports = App_Model_Report::all(
+                array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
+        );
+        
+        $view->set('reports', $reports);
     }
 
     /**

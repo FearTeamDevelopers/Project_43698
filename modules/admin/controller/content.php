@@ -26,33 +26,6 @@ class Admin_Controller_Content extends Controller
             return false;
         }
     }
-
-    /**
-     * 
-     * @return array
-     */
-    private function _getPhotos()
-    {
-        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
-    }
-    
-    /**
-     * 
-     * @return type
-     */
-    private function _getGalleries()
-    {
-        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
-    }
-
-    /**
-     * 
-     * @return array
-     */
-    private function _getDocuments()
-    {
-        return App_Model_Document::all(array('active = ?' => true));
-    }
     
     /**
      * @before _secured, _participant
@@ -73,12 +46,11 @@ class Admin_Controller_Content extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', $this->_getPhotos())
-                ->set('documents', $this->_getDocuments())
-                ->set('galleries', $this->_getGalleries());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddContent')) {
-            if($this->checkCSRFToken() !== true){
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/content/');
             }
             
@@ -113,14 +85,6 @@ class Admin_Controller_Content extends Controller
             }
         }
     }
-
-    /**
-     * @before _secured, _admin
-     */
-    public function insertPhotoDialog()
-    {
-        $this->willRenderLayoutView = false;
-    }
     
     /**
      * @before _secured, _admin
@@ -136,10 +100,7 @@ class Admin_Controller_Content extends Controller
             self::redirect('/admin/content/');
         }
 
-        $view->set('photos', $this->_getPhotos())
-                ->set('galleries', $this->_getGalleries())
-                ->set('documents', $this->_getDocuments())
-                ->set('content', $content);
+        $view->set('content', $content);
 
         if (RequestMethods::post('submitEditContent')) {
             if($this->checkCSRFToken() !== true){

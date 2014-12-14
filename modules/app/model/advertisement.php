@@ -186,9 +186,7 @@ class App_Model_Advertisement extends Model
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
                         array('ads.title' => 'sectionTitle'));
         
-        $ads = self::initialize($query);
-        
-        return $ads;
+        return self::initialize($query);
     }
 
     /**
@@ -232,9 +230,7 @@ class App_Model_Advertisement extends Model
                 ->order('adv.created', 'desc')
                 ->limit(5);
         
-        $ads = self::initialize($query);
-        
-        return $ads;
+        return self::initialize($query);
     }
     
     /**
@@ -261,9 +257,7 @@ class App_Model_Advertisement extends Model
                 ->where('adv.type = ?', $type)
                 ->limit(15, $page);
         
-        $ads = self::initialize($query);
-        
-        return $ads;
+        return self::initialize($query);
     }
     
     /**
@@ -291,9 +285,7 @@ class App_Model_Advertisement extends Model
                 ->order('adv.created', 'desc')
                 ->limit(15, $page);
         
-        $ads = self::initialize($query);
-        
-        return $ads;
+        return self::initialize($query);
     }
     
     /**
@@ -334,8 +326,6 @@ class App_Model_Advertisement extends Model
                 ->where('adv.userId = ?', $userId)
                 ->where('adv.active = ?', true);
         
-        $ads = self::initialize($query);
-        
-        return $ads;
+        return self::initialize($query);
     }
 }

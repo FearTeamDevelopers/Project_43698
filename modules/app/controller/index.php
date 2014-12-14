@@ -48,7 +48,7 @@ class App_Controller_Index extends Controller
             $news = $cachedNews;
             unset($cachedNews);
         }else{
-            $news = App_Model_News::fetchWithLimitParsed(5);
+            $news = App_Model_News::fetchActiveWithLimit(5);
             $this->getCache()->set('index-news', $news);
         }
         
@@ -58,7 +58,7 @@ class App_Controller_Index extends Controller
             $actions = $cachedActions;
             unset($cachedActions);
         }else{
-            $actions = App_Model_Action::fetchWithLimitParsed(5);
+            $actions = App_Model_Action::fetchActiveWithLimit(5);
             $this->getCache()->set('index-actions', $actions);
         }
         
@@ -68,7 +68,7 @@ class App_Controller_Index extends Controller
             $reports = $cachedReports;
             unset($cachedReports);
         }else{
-            $reports = App_Model_Report::fetchWithLimitParsed(10);
+            $reports = App_Model_Report::fetchActiveWithLimit(10);
             $this->getCache()->set('index-reports', $reports);
         }
             
@@ -92,7 +92,7 @@ class App_Controller_Index extends Controller
         if ($content !== null) {
             $content = $content;
         } else {
-            $content = App_Model_PageContent::fetchByUrlKeyParsed($urlKey);
+            $content = App_Model_PageContent::fetchByUrlKey($urlKey);
 
             if ($content === null) {
                 self::redirect('/nenalezeno');

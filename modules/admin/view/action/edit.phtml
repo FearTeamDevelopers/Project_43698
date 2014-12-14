@@ -5,197 +5,150 @@
 </ul><!--maintabmenu-->
 
 <div class="content">
-    <div class="two_third">
-        <div class="widgetbox">
-            <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Základní info</span></h2>
-            </div><!--contenttitle-->
+    <div class="widgetbox">
+        <div class="contenttitle radiusbottom0">
+            <h2 class="table"><span>Základní info</span></h2>
+        </div><!--contenttitle-->
 
-            <form class="stdform stdform2" method="post" action="#" >
-                <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
-                <p>
-                    <label>Název*</label>
-                    <span class="field">
-                        <input type="text" name="title" class="longinput" value="{echo $action->title}" />
-                        {if isset($errors["title"])}
-                        <label class="error">{echo join("<br/>", $errors["title"])}</label>
-                        {/if}
-                    </span>
-                </p>
-                <p>
-                    <label>Pořadí<small>Max. 99</small></label>
-                    <span class="field">
-                        <input type="text" name="rank" class="longinput" value="{echo $action->rank}"/>
-                        {if isset($errors["rank"])}
-                        <label class="error">{echo join("<br/>", $errors["rank"])}</label>
-                        {/if}
-                    </span>
-                </p>
-                <p>
-                    <label>Zobrazovat do*</label>
-                    <span class="field">
-                        <input type="text" name="expiration" class="longinput datepicker" 
-                               value="{echo $action->expirationDate}"/>
-                        {if isset($errors["expirationDate"])}
-                        <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
-                        {/if}
-                    </span>
-                </p>
-                <p>
-                    <label>Text*<small>Max. 30 000 znaků</small></label>
-                    <span class="field">
-                        <textarea rows="20" name="text" id="ckeditor">{echo $action->body}</textarea>
-                        {if isset($errors["body"])}
-                        <label class="error">{echo join("<br/>", $errors["body"])}</label>
-                        {/if}
-                        <br/>
-                        <button id="news-clear-text">Smazat</button>
-                        <button id="news-text-new-paragraph">Nový odstavec</button>
-                        <button id="news-text-to-teaser">Zkopírovat do Teaser</button>
-                    </span>
-                </p>
-                <p>
-                    <label>Teaser*<small>Max. 5000 znaků</small></label>
-                    <span class="field">
-                        <textarea rows="20" name="shorttext" id="ckeditor2">{echo $action->shortBody}</textarea>
-                        {if isset($errors["shortBody"])}
-                        <label class="error">{echo join("<br/>", $errors["shortBody"])}</label>
-                        {/if}
-                        <br/>
-                        <button id="news-clear-teaser">Smazat</button>
-                        <button id="news-teaser-new-paragraph">Nový odstavec</button>
-                        <button id="news-readmore-link">Přidat odkaz na celý článek</button>
-                        <button id="news-teaser-to-meta">Zkopírovat do Meta-popis</button>
-                    </span>
-                </p>
-                
-                <br/>
-                <div class="contenttitle radiusbottom0">
-                    <h2 class="table"><span>Systémové info</span></h2>
-                </div><!--contenttitle-->
-                <p>
-                    <label>Aktivní</label>
-                    <span class="field">
-                        <select name="active" class="longinput">
-                            {if $action->active}
-                            <option value="0">Neaktivní</option>
-                            <option value="1" selected>Aktivní</option>
-                            {/if}{else}
-                            <option value="0" selected>Neaktivní</option>
-                            <option value="1">Aktivní</option>
-                            {/else}
-                        </select>
-                    </span>
-                </p>
-                <p>
-                    <label>Schváleno</label>
-                    <span class="field">
-                        <select name="approve" class="longinput">
-                            {if $action->approved == 0}
-                                <option value="0" selected>Čeká na shválení</option>
-                                <option value="1">Schváleno</option>
-                                <option value="2">Zamítnuto</option>
-                            {/if}{elseif $action->approved == 1}
-                                <option value="0">Čeká na shválení</option>
-                                <option value="1" selected>Schváleno</option>
-                                <option value="2">Zamítnuto</option>
-                            {/elseif}{else}
-                                <option value="0">Čeká na shválení</option>
-                                <option value="1">Schváleno</option>
-                                <option value="2" selected>Zamítnuto</option>
-                            {/else}
-                        </select>
-                    </span>
-                </p>
-                <p>
-                    <label>V archivu</label>
-                    <span class="field">
-                        <select name="archive" class="longinput">
-                            {if $action->archive}
-                            <option value="0">Ne</option>
-                            <option value="1" selected>Ano</option>
-                            {/if}{else}
-                            <option value="0" selected>Ne</option>
-                            <option value="1">Ano</option>
-                            {/else}
-                        </select>
-                    </span>
-                </p>
-
-                <br/>
-                <div class="contenttitle radiusbottom0">
-                    <h2 class="table"><span>Metadata</span></h2>
-                </div><!--contenttitle-->
-                <p>
-                    <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
-                    <span class="field">
-                        <input type="text" name="keywords" class="longinput" value="{echo $action->keywords}" 
-                               placeholder="Oddělovač: ,"/>
-                        {if isset($errors["keywords"])}
-                        <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
-                        {/if}
-                    </span>
-                </p>
-
-                <p class="stdformbutton">
-                    <input name="submitEditAction" type="submit" value="Uložit" class="submit radius2" />
-                </p>
-            </form>
-        </div>
-    </div>
-
-    <div class="one_third last">
-        <div class="widgetbox">
-            <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Foto</span></h2>
-            </div><!--contenttitle-->
-            <div class="news-photos">
-                {if ($photos && !empty($photos))}
-                {foreach $photo in $photos}
-                <span class="news-photo">
-                    <img src="{echo $photo->getImgThumb()}" alt="{echo $photo->getPhotoName()}" width="160px"/>
-                    <button class="stdbtn img-to-text" value="{echo $photo->getId()}">Txt</button>
-                    <button class="stdbtn img-to-teaser" value="{echo $photo->getId()}">Teaser</button>
+        <form class="stdform stdform2" method="post" action="#" >
+            <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+            <p>
+                <label>Název*</label>
+                <span class="field">
+                    <input type="text" name="title" class="longinput" value="{echo $action->title}" />
+                    {if isset($errors["title"])}
+                    <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                    {/if}
                 </span>
-                {/foreach}
-                {/if}
-            </div>
-        </div>
-        <br class="clear-all"/>
-        <div class="widgetbox">
+            </p>
+            <p>
+                <label>Pořadí<small>Max. 99</small></label>
+                <span class="field">
+                    <input type="text" name="rank" class="longinput" value="{echo $action->rank}"/>
+                    {if isset($errors["rank"])}
+                    <label class="error">{echo join("<br/>", $errors["rank"])}</label>
+                    {/if}
+                </span>
+            </p>
+            <p>
+                <label>Zobrazovat do*</label>
+                <span class="field">
+                    <input type="text" name="expiration" class="longinput datepicker" 
+                           value="{echo $action->expirationDate}"/>
+                    {if isset($errors["expirationDate"])}
+                    <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
+                    {/if}
+                </span>
+            </p>
+            <p>
+                <label>Text*</label>
+                <span class="field">
+                    <textarea rows="20" name="text" id="ckeditor">{echo $action->body}</textarea>
+                    {if isset($errors["body"])}
+                    <label class="error">{echo join("<br/>", $errors["body"])}</label>
+                    {/if}
+                    <br/>
+                    <button id="clear-text">Smazat</button>
+                    <button id="text-new-paragraph">Nový odstavec</button>
+                    <button id="text-link-to-gallery">Odkaz na galerii</button>
+                    <button id="text-link-to-action">Odkaz na akci</button>
+                    <button id="text-link-to-news">Odkaz na novinku</button>
+                    <button id="text-link-to-report">Odkaz na reportáž</button>
+                    <button id="text-to-teaser">Zkopírovat do Teaser</button>
+                </span>
+            </p>
+            <p>
+                <label>Teaser*<small>Max. 5000 znaků</small></label>
+                <span class="field">
+                    <textarea rows="20" name="shorttext" id="ckeditor2">{echo $action->shortBody}</textarea>
+                    {if isset($errors["shortBody"])}
+                    <label class="error">{echo join("<br/>", $errors["shortBody"])}</label>
+                    {/if}
+                    <br/>
+                    <button id="clear-teaser">Smazat</button>
+                    <button id="teaser-new-paragraph">Nový odstavec</button>
+                    <button id="teaser-readmore-link">Přidat odkaz na celý článek</button>
+                    <button id="teaser-link-to-gallery">Odkaz na galerii</button>
+                    <button id="teaser-link-to-action">Odkaz na akci</button>
+                    <button id="teaser-link-to-news">Odkaz na novinku</button>
+                    <button id="teaser-link-to-report">Odkaz na reportáž</button>
+                </span>
+            </p>
+
+            <br/>
             <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Dokumenty</span></h2>
+                <h2 class="table"><span>Systémové info</span></h2>
             </div><!--contenttitle-->
-            <div class="news-photos">
-                {if ($documents && !empty($documents))}
-                    {foreach $document in $documents}
-                        <span>{echo $document->getFilename()}
-                            <button class="stdbtn doc-to-text" value="{echo $document->getId()}">Txt</button>
-                            <button class="stdbtn doc-to-teaser" value="{echo $document->getId()}">Teaser</button>
-                        </span><br/>
-                    {/foreach}
-                {/if}
-            </div>
-        </div>
-        <br class="clear-all"/>
-        <div class="widgetbox">
+            <p>
+                <label>Aktivní</label>
+                <span class="field">
+                    <select name="active" class="longinput">
+                        {if $action->active}
+                        <option value="0">Neaktivní</option>
+                        <option value="1" selected>Aktivní</option>
+                        {/if}{else}
+                        <option value="0" selected>Neaktivní</option>
+                        <option value="1">Aktivní</option>
+                        {/else}
+                    </select>
+                </span>
+            </p>
+            <p>
+                <label>Schváleno</label>
+                <span class="field">
+                    <select name="approve" class="longinput">
+                        {if $action->approved == 0}
+                        <option value="0" selected>Čeká na shválení</option>
+                        <option value="1">Schváleno</option>
+                        <option value="2">Zamítnuto</option>
+                        {/if}{elseif $action->approved == 1}
+                        <option value="0">Čeká na shválení</option>
+                        <option value="1" selected>Schváleno</option>
+                        <option value="2">Zamítnuto</option>
+                        {/elseif}{else}
+                        <option value="0">Čeká na shválení</option>
+                        <option value="1">Schváleno</option>
+                        <option value="2" selected>Zamítnuto</option>
+                        {/else}
+                    </select>
+                </span>
+            </p>
+            <p>
+                <label>V archivu</label>
+                <span class="field">
+                    <select name="archive" class="longinput">
+                        {if $action->archive}
+                        <option value="0">Ne</option>
+                        <option value="1" selected>Ano</option>
+                        {/if}{else}
+                        <option value="0" selected>Ne</option>
+                        <option value="1">Ano</option>
+                        {/else}
+                    </select>
+                </span>
+            </p>
+
+            <br/>
             <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Odkaz na galerii</span></h2>
+                <h2 class="table"><span>Metadata</span></h2>
             </div><!--contenttitle-->
-            <div class="news-photos">
-                {if ($galleries && !empty($galleries))}
-                {foreach $gallery in $galleries}
-                <span>{echo $gallery->getTitle()}
-                    <button class="stdbtn gal-to-text" value="{echo $gallery->getId()}">Txt</button>
-                    <button class="stdbtn gal-to-teaser" value="{echo $gallery->getId()}">Teaser</button>
-                </span><br/>
-                {/foreach}
-                {/if}
-            </div>
-        </div>
+            <p>
+                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
+                <span class="field">
+                    <input type="text" name="keywords" class="longinput" value="{echo $action->keywords}" 
+                           placeholder="Oddělovač: ,"/>
+                    {if isset($errors["keywords"])}
+                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
+                    {/if}
+                </span>
+            </p>
+
+            <p class="stdformbutton">
+                <input name="submitEditAction" type="submit" value="Uložit" class="submit radius2" />
+            </p>
+        </form>
     </div>
-    <br class="clear-all"/>
 </div>
 <br class="clear-all"/>
-<div id="insert-photo-dialog"><p></p></div>
+<div id="insert-dialog"><p></p></div>
 <script type="text/javascript" src="/public/js/custom/news.js"></script>

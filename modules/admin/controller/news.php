@@ -28,33 +28,6 @@ class Admin_Controller_News extends Controller
     }
 
     /**
-     * 
-     * @return type
-     */
-    private function _getPhotos()
-    {
-        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
-    }
-
-    /**
-     * 
-     * @return array
-     */
-    private function _getDocuments()
-    {
-        return App_Model_Document::all(array('active = ?' => true));
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    private function _getGalleries()
-    {
-        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
-    }
-
-    /**
      * @before _secured, _participant
      */
     public function index()
@@ -73,10 +46,7 @@ class Admin_Controller_News extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', $this->_getPhotos())
-                ->set('galleries', $this->_getGalleries())
-                ->set('documents', $this->_getDocuments())
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddNews')) {
             if ($this->checkCSRFToken() !== true &&
@@ -93,6 +63,11 @@ class Admin_Controller_News extends Controller
 
             $autoApprove = Registry::get('configuration')->news_autopublish;
 
+            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
+                    array('/novinky/r/'.$urlKey, '[Celý článek]'), 
+                    RequestMethods::post('shorttext')
+            );
+            
             $news = new App_Model_News(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
@@ -100,13 +75,13 @@ class Admin_Controller_News extends Controller
                 'urlKey' => $urlKey,
                 'approved' => $autoApprove,
                 'archive' => 0,
-                'shortBody' => RequestMethods::post('shorttext'),
+                'shortBody' => $shortText,
                 'body' => RequestMethods::post('text'),
                 'expirationDate' => RequestMethods::post('expiration'),
                 'rank' => RequestMethods::post('rank', 1),
                 'keywords' => RequestMethods::post('keywords'),
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-                'metaDescription' => RequestMethods::post('metadescription'),
+                'metaDescription' => RequestMethods::post('metadescription')
             ));
 
             if (empty($errors) && $news->validate()) {
@@ -145,10 +120,7 @@ class Admin_Controller_News extends Controller
             self::redirect('/admin/news/');
         }
 
-        $view->set('news', $news)
-                ->set('photos', $this->_getPhotos())
-                ->set('documents', $this->_getDocuments())
-                ->set('galleries', $this->_getGalleries());
+        $view->set('news', $news);
 
         if (RequestMethods::post('submitEditNews')) {
             if ($this->checkCSRFToken() !== true) {
@@ -166,12 +138,17 @@ class Admin_Controller_News extends Controller
                 $news->userId = $this->getUser()->getId();
                 $news->userAlias = $this->getUser()->getWholeName();
             }
+            
+            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
+                    array('/novinky/r/'.$urlKey, '[Celý článek]'), 
+                    RequestMethods::post('shorttext')
+            );
 
             $news->title = RequestMethods::post('title');
             $news->urlKey = $urlKey;
             $news->expirationDate = RequestMethods::post('expiration');
             $news->body = RequestMethods::post('text');
-            $news->shortBody = RequestMethods::post('shorttext');
+            $news->shortBody = $shortText;
             $news->rank = RequestMethods::post('rank', 1);
             $news->active = RequestMethods::post('active');
             $news->approved = RequestMethods::post('approve');
@@ -292,9 +269,16 @@ class Admin_Controller_News extends Controller
     /**
      * @before _secured, _participant
      */
-    public function insertPhotoDialog()
+    public function insertToContent()
     {
+        $view = $this->getActionView();
         $this->willRenderLayoutView = false;
+        
+        $news = App_Model_News::all(
+                array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
+        );
+        
+        $view->set('news', $news);
     }
 
     /**

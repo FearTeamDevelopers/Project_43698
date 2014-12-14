@@ -94,7 +94,6 @@ class Query extends Base
         $connector = $this->getConnector();
 
         if (is_string($value)) {
-
             $escaped = $connector->escape($value);
             return "'{$escaped}'";
         }
@@ -364,7 +363,7 @@ class Query extends Base
         if ($result === false) {
             if (ENV == 'dev') {
                 Core::getLogger()->log($sql);
-                throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
+                throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $this->connector->getLastError($result)));
             } else {
                 Core::getLogger()->log($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
@@ -391,14 +390,14 @@ class Query extends Base
         if ($result === false) {
             if (ENV == 'dev') {
                 Core::getLogger()->log($sql);
-                throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
+                throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $this->connector->getLastError($result)));
             } else {
                 Core::getLogger()->log($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }
 
-        return $this->connector->getAffectedRows();
+        return $this->connector->getAffectedRows($result);
     }
     
     /**
@@ -414,14 +413,14 @@ class Query extends Base
         if ($result === false) {
             if (ENV == 'dev') {
                 Core::getLogger()->log($sql);
-                throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
+                throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $this->connector->getLastError($result)));
             } else {
                 Core::getLogger()->log($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }
 
-        return $this->connector->getAffectedRows();
+        return $this->connector->getAffectedRows($result);
     }
 
     /**

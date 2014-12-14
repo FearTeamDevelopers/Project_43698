@@ -99,7 +99,7 @@ class App_Model_Gallery extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html, max(30000)
+     * @validate required, html
      * @label popis
      */
     protected $_description;
@@ -167,9 +167,8 @@ class App_Model_Gallery extends Model
         $query = self::getQuery(array('gl.*'))
                 ->join('tb_user', 'gl.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'));
-        $galleries = self::initialize($query);
-
-        return $galleries;
+        
+        return self::initialize($query);
     }
 
     /**
@@ -197,7 +196,7 @@ class App_Model_Gallery extends Model
     /**
      * Called from app module
      * 
-     * @param type $id
+     * @param type $urlkey
      * @return type
      */
     public static function fetchPublicActiveGalleryByUrlkey($urlkey)
@@ -233,9 +232,7 @@ class App_Model_Gallery extends Model
                 ->order('gl.rank', 'desc')
                 ->order('gl.created', 'desc');
 
-        $galleries = self::initialize($query);
-
-        return $galleries;
+        return self::initialize($query);
     }
 
     /**

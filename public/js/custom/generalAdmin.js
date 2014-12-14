@@ -796,5 +796,19 @@ jQuery(document).ready(function () {
 
 });
 
-CKEDITOR.replace('ckeditor');
-CKEDITOR.replace('ckeditor2');
+CKEDITOR.replace('ckeditor', {
+    filebrowserBrowseUrl:'/public/js/plugins/filemanager/index.html',
+    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/index.html?type=image',
+    filebrowserFlashBrowseUrl: null,
+    filebrowserUploadUrl: null,
+    filebrowserImageUploadUrl: null,
+    filebrowserFlashUploadUrl: null
+});
+CKEDITOR.replace('ckeditor2', {
+    filebrowserBrowseUrl:'/public/js/plugins/filemanager/index.html',
+    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/index.html?type=image',
+    filebrowserFlashBrowseUrl: null,
+    filebrowserUploadUrl: null,
+    filebrowserImageUploadUrl: null,
+    filebrowserFlashUploadUrl: null
+});

@@ -33,7 +33,7 @@ class App_Controller_Action extends Controller
         if ($content !== null) {
             $actions = $content;
         } else {
-            $actions = App_Model_Action::fetchOldWithLimitParsed($articlesPerPage, $page);
+            $actions = App_Model_Action::fetchOldWithLimit($articlesPerPage, $page);
 
             $this->getCache()->set('akce-' . $page, $actions);
         }
@@ -76,7 +76,7 @@ class App_Controller_Action extends Controller
         $layoutView = $this->getLayoutView();
         $uri = RequestMethods::server('REQUEST_URI');
 
-        $action = App_Model_Action::fetchByUrlKeyParsed($urlKey);
+        $action = App_Model_Action::fetchByUrlKey($urlKey);
 
         if ($action === null) {
             self::redirect('/nenalezeno');

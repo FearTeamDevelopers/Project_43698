@@ -14,6 +14,7 @@ defined('MODULES_PATH')? null : define('MODULES_PATH', realpath(dirname(__FILE__
 
 if (ENV == 'dev') {
     error_reporting(E_ALL);
+    ini_set('opcache.enable', '0');
 } else {
     error_reporting(0);
 }
@@ -48,7 +49,7 @@ $modules = array('App', 'Admin');
 THCFrame\Core\Core::registerModules($modules);
 
 //internal profiler
-$profiler = \THCFrame\Profiler\Profiler::getInstance();
+$profiler = THCFrame\Profiler\Profiler::getInstance();
 $profiler->start();
 
 // load services and run dispatcher

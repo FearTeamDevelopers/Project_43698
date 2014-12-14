@@ -289,6 +289,21 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
+     * @before _secured, _participant
+     */
+    public function insertToContent()
+    {
+        $view = $this->getActionView();
+        $this->willRenderLayoutView = false;
+        
+        $galleries = App_Model_Gallery::all(
+                array('isPublic = ?' => 1, 'active = ?' => true)
+        );
+        
+        $view->set('galleries', $galleries);
+    }
+    
+    /**
      * Action method shows and processes form used for uploading photos into
      * collection specified by param id
      * 
@@ -336,7 +351,7 @@ class Admin_Controller_Gallery extends Controller
                 'maxImageHeight' => $cfg->photo_maxheight
             ));
 
-            $fileErrors = $fileManager->upload('secondfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('secondfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($files)) {

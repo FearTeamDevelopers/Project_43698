@@ -61,7 +61,7 @@ class App_Controller_Report extends Controller
         if ($content !== null) {
             $reports = $content;
         } else {
-            $reports = App_Model_Report::fetchOldWithLimitParsed($articlesPerPage, $page);
+            $reports = App_Model_Report::fetchOldWithLimit($articlesPerPage, $page);
 
             $this->getCache()->set('report-' . $page, $reports);
         }
@@ -103,7 +103,7 @@ class App_Controller_Report extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         
-        $report = App_Model_Report::fetchByUrlKeyParsed($urlKey);
+        $report = App_Model_Report::fetchByUrlKey($urlKey);
         
         if($report === null){
             self::redirect('/nenalezeno');

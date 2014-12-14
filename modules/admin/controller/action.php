@@ -28,33 +28,6 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
-     * 
-     * @return type
-     */
-    private function _getPhotos()
-    {
-        return App_Model_Photo::all(array('galleryId = ?' => 1, 'active = ?' => true));
-    }
-
-    /**
-     * 
-     * @return array
-     */
-    private function _getDocuments()
-    {
-        return App_Model_Document::all(array('active = ?' => true));
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    private function _getGalleries()
-    {
-        return App_Model_Gallery::all(array('active = ?' => true, 'isPublic = ?' => true));
-    }
-
-    /**
      * @before _secured, _participant
      */
     public function index()
@@ -73,10 +46,7 @@ class Admin_Controller_Action extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('photos', $this->_getPhotos())
-                ->set('galleries', $this->_getGalleries())
-                ->set('documents', $this->_getDocuments())
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddAction')) {
             if ($this->checkCSRFToken() !== true &&
@@ -93,6 +63,11 @@ class Admin_Controller_Action extends Controller
 
             $autoApprove = Registry::get('configuration')->action_autopublish;
 
+            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
+                    array('/akce/r/'.$urlKey, '[Celý článek]'), 
+                    RequestMethods::post('shorttext')
+            );
+            
             $action = new App_Model_Action(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
@@ -100,7 +75,7 @@ class Admin_Controller_Action extends Controller
                 'urlKey' => $urlKey,
                 'approved' => $autoApprove,
                 'archive' => 0,
-                'shortBody' => RequestMethods::post('shorttext'),
+                'shortBody' => $shortText,
                 'body' => RequestMethods::post('text'),
                 'expirationDate' => RequestMethods::post('expiration'),
                 'rank' => RequestMethods::post('rank', 1),
@@ -143,10 +118,7 @@ class Admin_Controller_Action extends Controller
             self::redirect('/admin/action/');
         }
 
-        $view->set('action', $action)
-                ->set('photos', $this->_getPhotos())
-                ->set('documents', $this->_getDocuments())
-                ->set('galleries', $this->_getGalleries());
+        $view->set('action', $action);
 
         if (RequestMethods::post('submitEditAction')) {
             if ($this->checkCSRFToken() !== true) {
@@ -164,12 +136,17 @@ class Admin_Controller_Action extends Controller
                 $action->userId = $this->getUser()->getId();
                 $action->userAlias = $this->getUser()->getWholeName();
             }
+            
+            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
+                    array('/akce/r/'.$urlKey, '[Celý článek]'), 
+                    RequestMethods::post('shorttext')
+            );
 
             $action->title = RequestMethods::post('title');
             $action->urlKey = $urlKey;
             $action->expirationDate = RequestMethods::post('expiration');
             $action->body = RequestMethods::post('text');
-            $action->shortBody = RequestMethods::post('shorttext');
+            $action->shortBody = $shortText;
             $action->rank = RequestMethods::post('rank', 1);
             $action->active = RequestMethods::post('active');
             $action->approved = RequestMethods::post('approve');
@@ -288,9 +265,16 @@ class Admin_Controller_Action extends Controller
     /**
      * @before _secured, _participant
      */
-    public function insertPhotoDialog()
+    public function insertToContent()
     {
+        $view = $this->getActionView();
         $this->willRenderLayoutView = false;
+        
+        $actions = App_Model_Action::all(
+                array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
+        );
+        
+        $view->set('actions', $actions);
     }
 
     /**

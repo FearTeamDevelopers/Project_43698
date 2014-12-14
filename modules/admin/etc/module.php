@@ -3,9 +3,7 @@
 use THCFrame\Module\Module;
 
 /**
- * Description of Module
- *
- * 
+ * Class for module specific settings
  */
 class Admin_Etc_Module extends Module
 {
@@ -19,6 +17,10 @@ class Admin_Etc_Module extends Module
      * @read
      */
     protected $_observerClass = 'Admin_Etc_Observer';
+    
+    /**
+     * @read
+     */
     protected $_routes = array(
         array(
             'pattern' => '/admin/login',

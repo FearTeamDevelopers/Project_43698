@@ -9,8 +9,6 @@ use THCFrame\Core\StringMethods;
 
 /**
  * Module specific controller class extending framework controller class
- *
- * 
  */
 class Controller extends BaseController
 {
@@ -77,7 +75,7 @@ class Controller extends BaseController
         $session = Registry::get('session');
         
         //This line should be present only for DEV env
-        //$this->_security->forceLogin(1);
+        $this->_security->forceLogin(1);
         
         $user = $this->_security->getUser();
 

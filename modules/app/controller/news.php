@@ -57,7 +57,7 @@ class App_Controller_News extends Controller
         if ($content !== null) {
             $news = $content;
         } else {
-            $news = App_Model_News::fetchOldWithLimitParsed($articlesPerPage, $page);
+            $news = App_Model_News::fetchOldWithLimit($articlesPerPage, $page);
 
             $this->getCache()->set('news-' . $page, $news);
         }
@@ -99,7 +99,7 @@ class App_Controller_News extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         
-        $news = App_Model_News::fetchByUrlKeyParsed($urlKey);
+        $news = App_Model_News::fetchByUrlKey($urlKey);
         
         if($news === null){
             self::redirect('/nenalezeno');

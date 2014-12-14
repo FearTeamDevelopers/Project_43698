@@ -9,8 +9,6 @@ use THCFrame\Request\RequestMethods;
 
 /**
  * Module specific controller class extending framework controller class
- *
- * 
  */
 class Controller extends BaseController
 {

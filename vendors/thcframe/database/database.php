@@ -8,10 +8,9 @@ use THCFrame\Registry\Registry;
 use THCFrame\Database\Exception;
 
 /**
- * Factory class returns a Database\Connector subclass 
- * (in this case Database\Connector\Mysql). 
+ * Factory class returns a Database\Connector subclass.
  * Connectors are the classes that do the actual interfacing with the 
- * specific database engine. They execute queries and return metadata
+ * specific database engine. They execute queries and return data
  */
 class Database extends Base
 {
@@ -35,13 +34,13 @@ class Database extends Base
     {
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
-    
+
     /**
      * Factory method
      * It accepts initialization options and selects the type of returned object, 
      * based on the internal $_type property.
      * 
-     * @return \THCFrame\Database\Database\Connector\Mysql
+     * @return \THCFrame\Database\Database\Connector
      * @throws Exception\Argument
      */
     public function initialize()
@@ -60,7 +59,7 @@ class Database extends Base
         }
 
         Event::fire('framework.database.initialize.after', array($this->type, $this->options));
-        
+
         switch ($this->type) {
             case 'mysql': {
                     return new Connector\Mysql($this->options);

@@ -154,4 +154,59 @@ class Admin_Controller_System extends Controller
         self::redirect('/admin/system/');
     }
 
+    /**
+     * 
+     */
+    public function fillDatabase()
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+        
+        $NEWS_ROW_COUNT = 750;
+        $ACTIONS_ROW_COUNT = 600;
+        $REPORTS_ROW_COUNT = 900;
+        $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
+        $LARGE_TEXT = $content->getBody();
+        $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
+                . 'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
+        
+        for($i = 0; $i<$NEWS_ROW_COUNT; $i++){
+            $news = new App_Model_News(array(
+                'title' => 'News-'.$i.'-'.time(),
+                'userId' => 1,
+                'userAlias' => 'System',
+                'urlKey' => 'News-'.$i.'-'.time(),
+                'approved' => 1,
+                'archive' => 0,
+                'shortBody' => $LARGE_TEXT,
+                'body' => $LARGE_TEXT,
+                'expirationDate' => '2016-01-01',
+                'rank' => 1,
+                'keywords' => 'bla,bla,bla,bla',
+                'metaTitle' => 'News-'.$i.'-'.time(),
+                'metaDescription' => $META_DESC
+            ));
+            
+            $news->save();
+        }
+        
+        for($i = 0; $i<$NEWS_ROW_COUNT; $i++){
+            $action = new App_Model_Action(array(
+                'title' => 'Actions-'.$i.'-'.time(),
+                'userId' => 1,
+                'userAlias' => 'System',
+                'urlKey' => 'Actions-'.$i.'-'.time(),
+                'approved' => 1,
+                'archive' => 0,
+                'shortBody' => $LARGE_TEXT,
+                'body' => $LARGE_TEXT,
+                'expirationDate' => '2016-01-01',
+                'rank' => 1,
+                'keywords' => 'action,bla,bla'
+            ));
+            
+            $action->save();
+        }
+    }
+
 }
