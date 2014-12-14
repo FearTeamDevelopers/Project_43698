@@ -145,8 +145,6 @@ class Admin_Controller_System extends Controller
                 . "<url><loc>http://{$host}/kontakty</loc></url>"
                 . "<url><loc>http://{$host}/reference</loc></url>" . PHP_EOL;
 
-
-
         file_put_contents('./sitemap.xml', $xml . $pageContentXml . $xmlEnd);
 
         Event::fire('admin.log', array('success'));
@@ -156,6 +154,10 @@ class Admin_Controller_System extends Controller
 
     /**
      * Fill database tables tb_action, tb_news and tb_report with testing data
+     * For database filling use these urls:
+     *      /admin/system/filldatabase/1    - for tb_news
+     *      /admin/system/filldatabase/2    - for tb_action
+     *      /admin/system/filldatabase/3    - for tb_report
      * 
      * @before _secured, _superadmin
      */
@@ -171,10 +173,11 @@ class Admin_Controller_System extends Controller
 
         $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
         $contentShort = App_Model_PageContent::first(array('urlKey = ?' => 'technika'), array('body'));
-        
+
         $SHORT_TEXT = $contentShort->getBody();
         $LARGE_TEXT = $content->getBody();
-        unset($content);unset($contentShort);
+        unset($content);
+        unset($contentShort);
 
         $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
                 . 'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
@@ -202,7 +205,7 @@ class Admin_Controller_System extends Controller
             }
             self::redirect('/admin/system/');
         }
-        
+
         if ((int) $type == 2) {
             for ($i = 0; $i < $ROW_COUNT; $i++) {
                 $action = new App_Model_Action(array(
@@ -224,7 +227,7 @@ class Admin_Controller_System extends Controller
             }
             self::redirect('/admin/system/');
         }
-        
+
         if ((int) $type == 3) {
             for ($i = 0; $i < $ROW_COUNT; $i++) {
                 $report = new App_Model_Report(array(

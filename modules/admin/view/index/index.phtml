@@ -23,9 +23,10 @@
         <div class="widgetbox">
             <div class="title"><h2 class="tabbed"><span>Poslední novinky</span></h2></div>
             <div class="widgetcontent announcement">
-                {if !empty($latestnews)}
-                    {foreach $news in $latestnews}
+                {if !empty($latestnews1)}
+                    {foreach $news in $latestnews1}
                         <p>
+                            <span class="radius2">Autor: {echo $news->getUserAlias()}</span>
                             <span class="radius2">Název: {echo $news->getTitle()}</span>
                             <span class="radius2">Vytvořeno: {echo $news->getCreated()}</span>
                             <span class="radius2">Stav: 
@@ -45,6 +46,33 @@
         </div><!--widgetbox-->
     </div><!--one_half-->
 
+    <div class="one_half last">
+        <div class="widgetbox">
+            <div class="title"><h2 class="tabbed"><span>Poslední novinky</span></h2></div>
+            <div class="widgetcontent announcement">
+                {if !empty($latestnews2)}
+                    {foreach $news in $latestnews2}
+                        <p>
+                            <span class="radius2">Autor: {echo $news->getUserAlias()}</span>
+                            <span class="radius2">Název: {echo $news->getTitle()}</span>
+                            <span class="radius2">Vytvořeno: {echo $news->getCreated()}</span>
+                            <span class="radius2">Stav: 
+                                {if $news->getApproved() == 0}Čeká na schválení{/if}
+                                {elseif $news->getApproved() == 1}Schváleno{/elseif}
+                                {else}Zamítnuto{/else}
+                            </span>
+                            <br/><br/>
+                            {echo $news->shortBody}
+                        </p>
+                        <hr/>
+                    {/foreach}
+                {/if}{else}
+                <p>Žádné aktuality</p>
+                {/else}
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
+    </div><!--one_half-->
+    
     <br class="clear-all"/><br />
     
     <div class="one_half ">
@@ -69,7 +97,7 @@
                             {foreach $report in $latestreports}
                                 <tr>
                                     <td>{echo $report->getTitle()}</td>
-                                    <td>{echo $report->firstname." ".$action->lastname}</td>
+                                    <td>{echo $report->getUserAlias()}</td>
                                     <td>{echo $report->getCreated()}</td>
                                     <td>
                                         {if $report->getApproved() == 0}Čeká na schválení{/if}
@@ -107,7 +135,7 @@
                             {foreach $action in $latestactions}
                                 <tr>
                                     <td>{echo $action->getTitle()}</td>
-                                    <td>{echo $action->firstname." ".$action->lastname}</td>
+                                    <td>{echo $action->getUserAlias()}</td>
                                     <td>{echo $action->getCreated()}</td>
                                     <td>
                                         {if $action->getApproved() == 0}Čeká na schválení{/if}
