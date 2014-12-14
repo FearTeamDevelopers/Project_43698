@@ -32,11 +32,7 @@ class Admin_Controller_Action extends Controller
      */
     public function index()
     {
-        $view = $this->getActionView();
-
-        $actions = App_Model_Action::all();
-
-        $view->set('actions', $actions);
+        
     }
 
     /**
@@ -63,11 +59,9 @@ class Admin_Controller_Action extends Controller
 
             $autoApprove = Registry::get('configuration')->action_autopublish;
 
-            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
-                    array('/akce/r/'.$urlKey, '[Celý článek]'), 
-                    RequestMethods::post('shorttext')
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
-            
+
             $action = new App_Model_Action(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
@@ -136,10 +130,8 @@ class Admin_Controller_Action extends Controller
                 $action->userId = $this->getUser()->getId();
                 $action->userAlias = $this->getUser()->getWholeName();
             }
-            
-            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
-                    array('/akce/r/'.$urlKey, '[Celý článek]'), 
-                    RequestMethods::post('shorttext')
+
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
 
             $action->title = RequestMethods::post('title');
@@ -269,11 +261,11 @@ class Admin_Controller_Action extends Controller
     {
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
-        
+
         $actions = App_Model_Action::all(
-                array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
+                        array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
         );
-        
+
         $view->set('actions', $actions);
     }
 
@@ -282,116 +274,335 @@ class Admin_Controller_Action extends Controller
      */
     public function massAction()
     {
-        $view = $this->getActionView();
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
         $errors = array();
 
-        if (RequestMethods::post('performActionAction')) {
-            if ($this->checkCSRFToken() !== true) {
-                self::redirect('/admin/action/');
+        $ids = RequestMethods::post('ids');
+        $action = RequestMethods::post('action');
+
+        if (empty($ids)) {
+            echo 'Nějaký řádek musí být označen';
+            return;
+        }
+
+        switch ($action) {
+            case 'delete':
+                $actions = App_Model_Action::all(
+                        array('id IN ?' => $ids), 
+                        array('id','title')
+                );
+                
+                if (NULL !== $actions) {
+                    foreach ($actions as $action) {
+                        if (!$action->delete()) {
+                            $errors[] = 'An error occured while deleting ' . $action->getTitle();
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Event::fire('admin.log', array('delete success', 'Action ids: ' . join(',', $ids)));
+                    Registry::get('cache')->invalidate();
+                    echo self::SUCCESS_MESSAGE_6;
+                } else {
+                    Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'activate':
+                $actions = App_Model_Action::all(array(
+                            'id IN ?' => $ids,
+                            'active = ?' => false
+                ));
+                
+                if (NULL !== $actions) {
+                    foreach ($actions as $action) {
+                        $action->active = true;
+
+                        if ($action->userId === null) {
+                            $action->userId = $this->getUser()->getId();
+                            $action->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($action->validate()) {
+                            $action->save();
+                        } else {
+                            $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
+                                    . join(', ', $action->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Event::fire('admin.log', array('activate success', 'Action ids: ' . join(',', $ids)));
+                    Registry::get('cache')->invalidate();
+                    echo self::SUCCESS_MESSAGE_4;
+                } else {
+                    Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'deactivate':
+                $actions = App_Model_Action::all(array(
+                            'id IN ?' => $ids,
+                            'active = ?' => true
+                ));
+                
+                if (NULL !== $actions) {
+                    foreach ($actions as $action) {
+                        $action->active = false;
+
+                        if ($action->userId === null) {
+                            $action->userId = $this->getUser()->getId();
+                            $action->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($action->validate()) {
+                            $action->save();
+                        } else {
+                            $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
+                                    . join(', ', $action->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Event::fire('admin.log', array('deactivate success', 'Action ids: ' . join(',', $ids)));
+                    Registry::get('cache')->invalidate();
+                    echo self::SUCCESS_MESSAGE_5;
+                } else {
+                    Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'approve':
+                $actions = App_Model_Action::all(array(
+                            'id IN ?' => $ids,
+                            'approved IN ?' => array(0,2)
+                ));
+                
+                if (NULL !== $actions) {
+                    foreach ($actions as $action) {
+                        $action->approved = 1;
+
+                        if ($action->userId === null) {
+                            $action->userId = $this->getUser()->getId();
+                            $action->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($action->validate()) {
+                            $action->save();
+                        } else {
+                            $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
+                                    . join(', ', $action->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
+                    Registry::get('cache')->invalidate();
+                    echo self::SUCCESS_MESSAGE_2;
+                } else {
+                    Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'reject':
+                $actions = App_Model_Action::all(array(
+                            'id IN ?' => $ids,
+                            'approved IN ?' => array(0,1)
+                ));
+                
+                if (NULL !== $actions) {
+                    foreach ($actions as $action) {
+                        $action->approved = 2;
+
+                        if ($action->userId === null) {
+                            $action->userId = $this->getUser()->getId();
+                            $action->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($action->validate()) {
+                            $action->save();
+                        } else {
+                            $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
+                                    . join(', ', $action->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
+                    Registry::get('cache')->invalidate();
+                    echo self::SUCCESS_MESSAGE_2;
+                } else {
+                    Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            default:
+                echo self::ERROR_MESSAGE_1;
+                break;
+        }
+    }
+
+    /**
+     * @before _secured, _participant
+     */
+    public function load()
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
+        $page = (int) RequestMethods::post('page', 0);
+        $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
+
+        if ($search != '') {
+            $whereCond = "ac.created='?' OR ac.expirationDate='?' "
+                    . "OR ac.userAlias LIKE '%%?%%' OR ac.title LIKE '%%?%%'";
+
+            $query = App_Model_Action::getQuery(
+                            array('ac.id', 'ac.userId', 'ac.userAlias', 'ac.title', 'ac.expirationDate',
+                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created'))
+                    ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+                    ->wheresql($whereCond, $search, $search, $search, $search);
+
+            if (RequestMethods::issetpost('iSortCol_0')) {
+                $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
+                $column = RequestMethods::post('iSortCol_0');
+
+                if ($column == 0) {
+                    $query->order('ac.id', $dir);
+                } elseif ($column == 2) {
+                    $query->order('ac.title', $dir);
+                } elseif ($column == 3) {
+                    $query->order('ac.userAlias', $dir);
+                } elseif ($column == 4) {
+                    $query->order('ac.expirationDate', $dir);
+                } elseif ($column == 5) {
+                    $query->order('ac.created', $dir);
+                }
+            } else {
+                $query->order('ac.id', 'desc');
             }
 
-            $ids = RequestMethods::post('actionids');
-            $action = RequestMethods::post('action');
+            $limit = (int) RequestMethods::post('iDisplayLength');
+            $query->limit($limit, $page + 1);
+            $actions = App_Model_Action::initialize($query);
 
-            switch ($action) {
-                case 'delete':
-                    $action = App_Model_Action::all(array(
-                                'id IN ?' => $ids
-                    ));
-                    if (NULL !== $action) {
-                        foreach ($action as $_action) {
-                            if (!$_action->delete()) {
-                                $errors[] = 'An error occured while deleting ' . $_action->getTitle();
-                            }
-                        }
-                    }
+            $countQuery = App_Model_Action::getQuery(array('ac.id'))
+                    ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+                    ->wheresql($whereCond, $search, $search, $search, $search);
 
-                    if (empty($errors)) {
-                        Event::fire('admin.log', array('delete success', 'Action ids: ' . join(',', $ids)));
-                        Registry::get('cache')->invalidate();
-                        $view->successMessage(self::SUCCESS_MESSAGE_6);
-                    } else {
-                        Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
-                        $message = join(PHP_EOL, $errors);
-                        $view->longFlashMessage($message);
-                    }
+            $actionsCount = App_Model_Action::initialize($countQuery);
+            unset($countQuery);
+            $count = count($actionsCount);
+            unset($actionsCount);
+        } else {
+            $query = App_Model_Action::getQuery(
+                            array('ac.id', 'ac.userId', 'ac.userAlias', 'ac.title', 'ac.expirationDate',
+                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created'))
+                    ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
-                    self::redirect('/admin/action/');
+            if (RequestMethods::issetpost('iSortCol_0')) {
+                $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
+                $column = RequestMethods::post('iSortCol_0');
 
-                    break;
-                case 'activate':
-                    $action = App_Model_Action::all(array(
-                                'id IN ?' => $ids
-                    ));
-                    if (NULL !== $action) {
-                        foreach ($action as $_action) {
-                            $_action->active = true;
-
-                            if ($_action->userId === null) {
-                                $_action->userId = $this->getUser()->getId();
-                                $_action->userAlias = $this->getUser()->getWholeName();
-                            }
-
-                            if ($_action->validate()) {
-                                $_action->save();
-                            } else {
-                                $errors[] = "Action id {$_action->getId()} - {$_action->getTitle()} errors: "
-                                        . join(', ', $_action->getErrors());
-                            }
-                        }
-                    }
-
-                    if (empty($errors)) {
-                        Event::fire('admin.log', array('activate success', 'Action ids: ' . join(',', $ids)));
-                        Registry::get('cache')->invalidate();
-                        $view->successMessage(self::SUCCESS_MESSAGE_4);
-                    } else {
-                        Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
-                        $message = join(PHP_EOL, $errors);
-                        $view->longFlashMessage($message);
-                    }
-
-                    self::redirect('/admin/action/');
-
-                    break;
-                case 'deactivate':
-                    $action = App_Model_Action::all(array(
-                                'id IN ?' => $ids
-                    ));
-                    if (NULL !== $action) {
-                        foreach ($action as $_action) {
-                            $_action->active = false;
-
-                            if ($_action->userId === null) {
-                                $_action->userId = $this->getUser()->getId();
-                                $_action->userAlias = $this->getUser()->getWholeName();
-                            }
-
-                            if ($_action->validate()) {
-                                $_action->save();
-                            } else {
-                                $errors[] = "Action id {$_action->getId()} - {$_action->getTitle()} errors: "
-                                        . join(', ', $_action->getErrors());
-                            }
-                        }
-                    }
-
-                    if (empty($errors)) {
-                        Event::fire('admin.log', array('deactivate success', 'Action ids: ' . join(',', $ids)));
-                        Registry::get('cache')->invalidate();
-                        $view->successMessage(self::SUCCESS_MESSAGE_5);
-                    } else {
-                        Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
-                        $message = join(PHP_EOL, $errors);
-                        $view->longFlashMessage($message);
-                    }
-
-                    self::redirect('/admin/action/');
-                    break;
-                default:
-                    self::redirect('/admin/action/');
-                    break;
+                if ($column == 0) {
+                    $query->order('ac.id', $dir);
+                } elseif ($column == 2) {
+                    $query->order('ac.title', $dir);
+                } elseif ($column == 3) {
+                    $query->order('ac.userAlias', $dir);
+                } elseif ($column == 4) {
+                    $query->order('ac.expirationDate', $dir);
+                } elseif ($column == 5) {
+                    $query->order('ac.created', $dir);
+                }
+            } else {
+                $query->order('ac.id', 'desc');
             }
+
+            $limit = (int) RequestMethods::post('iDisplayLength');
+            $query->limit($limit, $page + 1);
+            $actions = App_Model_Action::initialize($query);
+
+            $count = App_Model_Action::count();
+        }
+
+        $draw = $page + 1 + time();
+
+        $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
+
+        $returnArr = array();
+        if ($actions !== null) {
+            foreach ($actions as $action) {
+                $label = '';
+                if ($action->active) {
+                    $label .= "<span class='labelProduct labelProductGreen'>Aktivní</span>";
+                } else {
+                    $label .= "<span class='labelProduct labelProductRed'>Neaktivní</span>";
+                }
+
+                if ($action->approved == 1) {
+                    $label .= "<span class='labelProduct labelProductGreen'>Schváleno</span>";
+                } elseif ($action->approved == 2) {
+                    $label .= "<span class='labelProduct labelProductRed'>Zamítnuto</span>";
+                } else {
+                    $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
+                }
+
+
+                if ($action->archive) {
+                    $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";
+                } else {
+                    $archiveLabel = "<span class='labelProduct labelProductGray'>Ne</span>";
+                }
+
+                $arr = array();
+                $arr [] = "[ \"" . $action->getId() . "\"";
+                $arr [] = "\"" . $action->getTitle() . "\"";
+                $arr [] = "\"" . $action->getUserAlias() . "\"";
+                $arr [] = "\"" . $action->getExpirationDate() . "\"";
+                $arr [] = "\"" . $action->getCreated() . "\"";
+                $arr [] = "\"" . $label . "\"";
+                $arr [] = "\"" . $archiveLabel . "\"";
+
+                $tempStr = "\"<a href='/admin/action/edit/" . $action->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
+
+                if ($this->isAdmin() || $action->userId == $this->getUser()->getId()) {
+                    $tempStr .= "<a href='/admin/action/delete/" . $action->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
+                }
+
+                if ($this->isAdmin() && $action->approved == 0) {
+                    $tempStr .= "<a href='/admin/action/approvenews/" . $action->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/action/rejectnews/" . $action->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                }
+
+                $arr [] = $tempStr . "\"]";
+                $returnArr[] = join(',', $arr);
+            }
+
+            $str .= join(',', $returnArr) . "]}";
+
+            echo $str;
+        } else {
+            $str .= "[ \"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]]}";
+
+            echo $str;
         }
     }
 

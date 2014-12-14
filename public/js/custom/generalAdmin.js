@@ -90,7 +90,7 @@ jQuery(document).ready(function () {
     });
 
     var selected = [];
-
+    var type = jQuery('#type').val();
     var table = jQuery('.stdtable2').DataTable({
         'aaSorting': [],
         'iDisplayLength': 50,
@@ -99,7 +99,7 @@ jQuery(document).ready(function () {
         "bProcessing": true,
         "sServerMethod": "POST",
         "sAjaxDataProp": "data",
-        "sAjaxSource": "/admin/product/load/",
+        "sAjaxSource": "/admin/" + type + "/load/",
         "fnServerParams": function (aoData) {
             aoData.push({"name": "page", "value": this.fnPagingInfo().iPage});
         },
@@ -110,15 +110,81 @@ jQuery(document).ready(function () {
         },
         "aoColumns": [
             null,
+            null,
+            null,
+            null,
+            null,
             {"bSortable": false},
-            null,
-            null,
-            null,
-            null,
-            null,
             {"bSortable": false},
             {"bSortable": false}
         ]
+    });
+
+    table.on('draw', function () {
+        //delete individual row
+        jQuery('.ajaxDelete').click(function (event) {
+            event.preventDefault();
+            var parentTr = jQuery(this).parents('tr');
+            var url = jQuery(this).attr('href');
+            var csrf = jQuery('#csrf').val();
+
+            jQuery('#deleteDialog p').text('Opravdu chcete pokračovat v mazání?');
+
+            jQuery('#deleteDialog').dialog({
+                resizable: false,
+                width: 300,
+                height: 150,
+                modal: true,
+                buttons: {
+                    "Smazat": function () {
+                        jQuery.post(url, {csrf: csrf}, function (msg) {
+                            if (msg == 'success') {
+                                parentTr.fadeOut();
+                            } else {
+                                alert(msg);
+                            }
+                        });
+                        jQuery(this).dialog("close");
+                    },
+                    "Zrušit": function () {
+                        jQuery(this).dialog("close");
+                    }
+                }
+            });
+
+            return false;
+        });
+
+        jQuery('.ajaxReload').click(function () {
+            event.preventDefault();
+            var url = jQuery(this).attr('href');
+            var csrf = jQuery('#csrf').val();
+
+            jQuery('#deleteDialog p').text('Opravdu chcete pokračovat?');
+
+            jQuery('#deleteDialog').dialog({
+                resizable: false,
+                width: 300,
+                height: 150,
+                modal: true,
+                buttons: {
+                    "Ano": function () {
+                        jQuery.post(url, {csrf: csrf}, function (msg) {
+                            if (msg == 'success') {
+                                location.reload();
+                            } else {
+                                alert(msg);
+                            }
+                        });
+                    },
+                    "Ne": function () {
+                        jQuery(this).dialog("close");
+                    }
+                }
+            });
+            return false;
+        });
+
     });
 
     jQuery('.stdtable2 tbody').on('click', 'tr', function () {
@@ -159,8 +225,10 @@ jQuery(document).ready(function () {
         }
     });
 
-    jQuery('.ajaxMassAction').click(function (event) {
+    jQuery('.ajax-massaction').click(function (event) {
         event.preventDefault();
+
+        jQuery("#loader, .loader").show();
 
         var url = jQuery(this).attr('href');
         var action = jQuery('.tableoptions select[name=action]').children('option:selected').val();
@@ -168,10 +236,11 @@ jQuery(document).ready(function () {
 
         jQuery.post(url, {csrf: csrf, action: action, ids: selected}, function (msg) {
             jQuery('#dialog p').text(msg);
+            jQuery("#loader, .loader").hide();
 
             jQuery('#dialog').dialog({
                 title: 'Výsledek',
-                width: 600,
+                width: 450,
                 modal: true,
                 buttons: {
                     Close: function () {
@@ -606,8 +675,7 @@ jQuery(document).ready(function () {
                 }
             }
         });
-        
-        
+
         return false;
     });
 
@@ -797,7 +865,7 @@ jQuery(document).ready(function () {
 });
 
 CKEDITOR.replace('ckeditor', {
-    filebrowserBrowseUrl:'/public/js/plugins/filemanager/index.html',
+    filebrowserBrowseUrl: '/public/js/plugins/filemanager/index.html',
     filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/index.html?type=image',
     filebrowserFlashBrowseUrl: null,
     filebrowserUploadUrl: null,
@@ -805,7 +873,7 @@ CKEDITOR.replace('ckeditor', {
     filebrowserFlashUploadUrl: null
 });
 CKEDITOR.replace('ckeditor2', {
-    filebrowserBrowseUrl:'/public/js/plugins/filemanager/index.html',
+    filebrowserBrowseUrl: '/public/js/plugins/filemanager/index.html',
     filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/index.html?type=image',
     filebrowserFlashBrowseUrl: null,
     filebrowserUploadUrl: null,
