@@ -82,7 +82,7 @@ class Admin_Controller_System extends Controller
         $view->set('config', $config);
 
         if (RequestMethods::post('submitEditSet')) {
-            if ($this->checkCSRFToken() !== true){
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/');
             }
             $errors = array();
@@ -145,7 +145,7 @@ class Admin_Controller_System extends Controller
                 . "<url><loc>http://{$host}/kontakty</loc></url>"
                 . "<url><loc>http://{$host}/reference</loc></url>" . PHP_EOL;
 
-        
+
 
         file_put_contents('./sitemap.xml', $xml . $pageContentXml . $xmlEnd);
 
@@ -155,57 +155,102 @@ class Admin_Controller_System extends Controller
     }
 
     /**
+     * Fill database tables tb_action, tb_news and tb_report with testing data
      * 
+     * @before _secured, _superadmin
      */
-    public function fillDatabase()
+    public function fillDatabase($type)
     {
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
-        
-        $NEWS_ROW_COUNT = 750;
-        $ACTIONS_ROW_COUNT = 600;
-        $REPORTS_ROW_COUNT = 900;
+
+        ini_set('max_execution_time', 1800);
+        ini_set('memory_limit', '512M');
+
+        $ROW_COUNT = 750;
+
         $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
+        $contentShort = App_Model_PageContent::first(array('urlKey = ?' => 'technika'), array('body'));
+        
+        $SHORT_TEXT = $contentShort->getBody();
         $LARGE_TEXT = $content->getBody();
+        unset($content);unset($contentShort);
+
         $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
                 . 'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
-        
-        for($i = 0; $i<$NEWS_ROW_COUNT; $i++){
-            $news = new App_Model_News(array(
-                'title' => 'News-'.$i.'-'.time(),
-                'userId' => 1,
-                'userAlias' => 'System',
-                'urlKey' => 'News-'.$i.'-'.time(),
-                'approved' => 1,
-                'archive' => 0,
-                'shortBody' => $LARGE_TEXT,
-                'body' => $LARGE_TEXT,
-                'expirationDate' => '2016-01-01',
-                'rank' => 1,
-                'keywords' => 'bla,bla,bla,bla',
-                'metaTitle' => 'News-'.$i.'-'.time(),
-                'metaDescription' => $META_DESC
-            ));
-            
-            $news->save();
+
+        if ((int) $type == 1) {
+            for ($i = 0; $i < $ROW_COUNT; $i++) {
+                $news = new App_Model_News(array(
+                    'title' => 'News-' . $i . '-' . time(),
+                    'userId' => 1,
+                    'userAlias' => 'System',
+                    'urlKey' => 'news-' . $i . '-' . time(),
+                    'approved' => 1,
+                    'archive' => 0,
+                    'shortBody' => $SHORT_TEXT,
+                    'body' => $LARGE_TEXT,
+                    'expirationDate' => '2016-01-01',
+                    'rank' => 1,
+                    'keywords' => 'bla,bla,bla,bla',
+                    'metaTitle' => 'News-' . $i . '-' . time(),
+                    'metaDescription' => $META_DESC
+                ));
+
+                $news->save();
+                unset($news);
+            }
+            self::redirect('/admin/system/');
         }
         
-        for($i = 0; $i<$NEWS_ROW_COUNT; $i++){
-            $action = new App_Model_Action(array(
-                'title' => 'Actions-'.$i.'-'.time(),
-                'userId' => 1,
-                'userAlias' => 'System',
-                'urlKey' => 'Actions-'.$i.'-'.time(),
-                'approved' => 1,
-                'archive' => 0,
-                'shortBody' => $LARGE_TEXT,
-                'body' => $LARGE_TEXT,
-                'expirationDate' => '2016-01-01',
-                'rank' => 1,
-                'keywords' => 'action,bla,bla'
-            ));
-            
-            $action->save();
+        if ((int) $type == 2) {
+            for ($i = 0; $i < $ROW_COUNT; $i++) {
+                $action = new App_Model_Action(array(
+                    'title' => 'Action-' . $i . '-' . time(),
+                    'userId' => 1,
+                    'userAlias' => 'System',
+                    'urlKey' => 'action-' . $i . '-' . time(),
+                    'approved' => 1,
+                    'archive' => 0,
+                    'shortBody' => $SHORT_TEXT,
+                    'body' => $LARGE_TEXT,
+                    'expirationDate' => '2016-01-01',
+                    'rank' => 1,
+                    'keywords' => 'action,bla,bla'
+                ));
+
+                $action->save();
+                unset($action);
+            }
+            self::redirect('/admin/system/');
+        }
+        
+        if ((int) $type == 3) {
+            for ($i = 0; $i < $ROW_COUNT; $i++) {
+                $report = new App_Model_Report(array(
+                    'title' => 'Report-' . $i . '-' . time(),
+                    'userId' => 1,
+                    'userAlias' => 'System',
+                    'urlKey' => 'report-' . $i . '-' . time(),
+                    'approved' => 1,
+                    'archive' => 0,
+                    'shortBody' => $SHORT_TEXT,
+                    'body' => $LARGE_TEXT,
+                    'expirationDate' => '2016-01-01',
+                    'rank' => 1,
+                    'keywords' => 'report,bla,bla,bla',
+                    'metaTitle' => 'Report-' . $i . '-' . time(),
+                    'metaDescription' => $META_DESC,
+                    'metaImage' => '',
+                    'photoName' => '',
+                    'imgMain' => '',
+                    'imgThumb' => ''
+                ));
+
+                $report->save();
+                unset($report);
+            }
+            self::redirect('/admin/system/');
         }
     }
 

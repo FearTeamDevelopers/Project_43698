@@ -155,7 +155,7 @@ class App_Model_Report extends Model
      * @type text
      * @length 250
      * 
-     * @validate required, path, max(250)
+     * @validate path, max(250)
      * @label photo path
      */
     protected $_imgMain;
@@ -166,7 +166,7 @@ class App_Model_Report extends Model
      * @type text
      * @length 250
      * 
-     * @validate required, path, max(250)
+     * @validate path, max(250)
      * @label thumb path
      */
     protected $_imgThumb;

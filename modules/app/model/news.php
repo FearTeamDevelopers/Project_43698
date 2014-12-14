@@ -222,13 +222,13 @@ class App_Model_News extends Model
      * Called from admin module
      * @return array
      */
-    public static function fetchWithLimit($limit = 10)
+    public static function fetchWithLimit($limit = 10, $page = 1)
     {
         $query = self::getQuery(array('nw.*'))
                 ->join('tb_user', 'nw.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
                 ->order('nw.created', 'desc')
-                ->limit((int)$limit);
+                ->limit((int)$limit, $page);
 
         return self::initialize($query);
     }

@@ -33,11 +33,7 @@ class Admin_Controller_Report extends Controller
      */
     public function index()
     {
-        $view = $this->getActionView();
-
-        $reports = App_Model_Report::all();
-
-        $view->set('reports', $reports);
+        
     }
 
     /**
@@ -91,10 +87,8 @@ class Admin_Controller_Report extends Controller
                 $imgMain = '';
                 $imgThumb = '';
             }
-            
-            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
-                    array('/reportaz/r/'.$urlKey, '[Celý článek]'), 
-                    RequestMethods::post('shorttext')
+
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
 
             $report = new App_Model_Report(array(
@@ -207,10 +201,8 @@ class Admin_Controller_Report extends Controller
                 $report->userId = $this->getUser()->getId();
                 $report->userAlias = $this->getUser()->getWholeName();
             }
-            
-            $shortText = str_replace(array('(!read_more_link!)','(!read_more_title!)'),
-                    array('/reportaz/r/'.$urlKey, '[Celý článek]'), 
-                    RequestMethods::post('shorttext')
+
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
 
             $report->title = RequestMethods::post('title');
@@ -379,18 +371,18 @@ class Admin_Controller_Report extends Controller
         }
     }
 
-/**
+    /**
      * @before _secured, _participant
      */
     public function insertToContent()
     {
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
-        
+
         $reports = App_Model_Report::all(
-                array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
+                        array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
         );
-        
+
         $view->set('reports', $reports);
     }
 
@@ -399,116 +391,334 @@ class Admin_Controller_Report extends Controller
      */
     public function massAction()
     {
-        $view = $this->getActionView();
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
         $errors = array();
 
-        if (RequestMethods::post('performReportAction')) {
-            if ($this->checkCSRFToken() !== true) {
-                self::redirect('/admin/report/');
+        $ids = RequestMethods::post('ids');
+        $action = RequestMethods::post('action');
+
+        if (empty($ids)) {
+            echo 'Nějaký řádek musí být označen';
+            return;
+        }
+
+        switch ($action) {
+            case 'delete':
+                $reports = App_Model_Report::all(
+                                array('id IN ?' => $ids), array('id', 'title')
+                );
+
+                if (NULL !== $reports) {
+                    foreach ($reports as $report) {
+                        if (!$report->delete()) {
+                            $errors[] = 'An error occured while deleting ' . $report->getTitle();
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Registry::get('cache')->invalidate();
+                    Event::fire('admin.log', array('delete success', 'Report ids: ' . join(',', $ids)));
+                    echo self::SUCCESS_MESSAGE_6;
+                } else {
+                    Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'activate':
+                $reports = App_Model_Report::all(array(
+                            'id IN ?' => $ids,
+                            'active = ?' => false
+                ));
+
+                if (NULL !== $reports) {
+                    foreach ($reports as $report) {
+                        $report->active = true;
+
+                        if ($report->userId === null) {
+                            $report->userId = $this->getUser()->getId();
+                            $report->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($report->validate()) {
+                            $report->save();
+                        } else {
+                            $errors[] = "Report id {$report->getId()} - {$report->getTitle()} errors: "
+                                    . join(', ', $report->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Registry::get('cache')->invalidate();
+                    Event::fire('admin.log', array('activate success', 'Report ids: ' . join(',', $ids)));
+                    echo self::SUCCESS_MESSAGE_4;
+                } else {
+                    Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'deactivate':
+                $reports = App_Model_Report::all(array(
+                            'id IN ?' => $ids,
+                            'active = ?' => true
+                ));
+
+                if (NULL !== $reports) {
+                    foreach ($reports as $report) {
+                        $report->active = false;
+
+                        if ($report->userId === null) {
+                            $report->userId = $this->getUser()->getId();
+                            $report->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($report->validate()) {
+                            $report->save();
+                        } else {
+                            $errors[] = "Report id {$report->getId()} - {$report->getTitle()} errors: "
+                                    . join(', ', $report->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Registry::get('cache')->invalidate();
+                    Event::fire('admin.log', array('deactivate success', 'Report ids: ' . join(',', $ids)));
+                    echo self::SUCCESS_MESSAGE_5;
+                } else {
+                    Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'approve':
+                $reports = App_Model_Report::all(array(
+                            'id IN ?' => $ids,
+                            'approved IN ?' => array(0, 2)
+                ));
+
+                if (NULL !== $reports) {
+                    foreach ($reports as $report) {
+                        $report->approved = 1;
+
+                        if ($report->userId === null) {
+                            $report->userId = $this->getUser()->getId();
+                            $report->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($report->validate()) {
+                            $report->save();
+                        } else {
+                            $errors[] = "Action id {$report->getId()} - {$report->getTitle()} errors: "
+                                    . join(', ', $report->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
+                    Registry::get('cache')->invalidate();
+                    echo self::SUCCESS_MESSAGE_2;
+                } else {
+                    Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            case 'reject':
+                $reports = App_Model_Report::all(array(
+                            'id IN ?' => $ids,
+                            'approved IN ?' => array(0, 1)
+                ));
+
+                if (NULL !== $reports) {
+                    foreach ($reports as $report) {
+                        $report->approved = 2;
+
+                        if ($report->userId === null) {
+                            $report->userId = $this->getUser()->getId();
+                            $report->userAlias = $this->getUser()->getWholeName();
+                        }
+
+                        if ($report->validate()) {
+                            $report->save();
+                        } else {
+                            $errors[] = "Action id {$report->getId()} - {$report->getTitle()} errors: "
+                                    . join(', ', $report->getErrors());
+                        }
+                    }
+                }
+
+                if (empty($errors)) {
+                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
+                    Registry::get('cache')->invalidate();
+                    echo self::SUCCESS_MESSAGE_2;
+                } else {
+                    Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));
+                    $message = join(PHP_EOL, $errors);
+                    echo $message;
+                }
+
+                break;
+            default:
+                echo self::ERROR_MESSAGE_1;
+                break;
+        }
+    }
+
+    /**
+     * @before _secured, _participant
+     */
+    public function load()
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
+        $page = (int) RequestMethods::post('page', 0);
+        $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
+
+        if ($search != '') {
+            $whereCond = "rp.created='?' OR rp.expirationDate='?' "
+                    . "OR rp.userAlias LIKE '%%?%%' OR rp.title LIKE '%%?%%'";
+
+            $query = App_Model_Report::getQuery(
+                            array('rp.id', 'rp.userId', 'rp.userAlias', 'rp.title', 'rp.expirationDate',
+                                'rp.active', 'rp.approved', 'rp.archive', 'rp.created'))
+                    ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+                    ->wheresql($whereCond, $search, $search, $search, $search);
+
+            if (RequestMethods::issetpost('iSortCol_0')) {
+                $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
+                $column = RequestMethods::post('iSortCol_0');
+
+                if ($column == 0) {
+                    $query->order('rp.id', $dir);
+                } elseif ($column == 2) {
+                    $query->order('rp.title', $dir);
+                } elseif ($column == 3) {
+                    $query->order('rp.userAlias', $dir);
+                } elseif ($column == 4) {
+                    $query->order('rp.expirationDate', $dir);
+                } elseif ($column == 5) {
+                    $query->order('rp.created', $dir);
+                }
+            } else {
+                $query->order('rp.id', 'desc');
             }
 
-            $ids = RequestMethods::post('reportids');
-            $action = RequestMethods::post('action');
+            $limit = (int) RequestMethods::post('iDisplayLength');
+            $query->limit($limit, $page + 1);
+            $reports = App_Model_Report::initialize($query);
 
-            switch ($action) {
-                case 'delete':
-                    $report = App_Model_Report::all(array(
-                                'id IN ?' => $ids
-                    ));
-                    if (NULL !== $report) {
-                        foreach ($report as $_report) {
-                            if (!$_report->delete()) {
-                                $errors[] = 'An error occured while deleting ' . $_report->getTitle();
-                            }
-                        }
-                    }
+            $countQuery = App_Model_Report::getQuery(array('rp.id'))
+                    ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+                    ->wheresql($whereCond, $search, $search, $search, $search);
 
-                    if (empty($errors)) {
-                        Registry::get('cache')->invalidate();
-                        Event::fire('admin.log', array('delete success', 'Report ids: ' . join(',', $ids)));
-                        $view->successMessage(self::SUCCESS_MESSAGE_6);
-                    } else {
-                        Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
-                        $message = join(PHP_EOL, $errors);
-                        $view->longFlashMessage($message);
-                    }
+            $reportsCount = App_Model_Report::initialize($countQuery);
+            unset($countQuery);
+            $count = count($reportsCount);
+            unset($reportsCount);
+        } else {
+            $query = App_Model_Report::getQuery(
+                            array('rp.id', 'rp.userId', 'rp.userAlias', 'rp.title', 'rp.expirationDate',
+                                'rp.active', 'rp.approved', 'rp.archive', 'rp.created'))
+                    ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
-                    self::redirect('/admin/report/');
+            if (RequestMethods::issetpost('iSortCol_0')) {
+                $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
+                $column = RequestMethods::post('iSortCol_0');
 
-                    break;
-                case 'activate':
-                    $report = App_Model_Report::all(array(
-                                'id IN ?' => $ids
-                    ));
-                    if (NULL !== $report) {
-                        foreach ($report as $_report) {
-                            $_report->active = true;
-
-                            if ($_report->userId === null) {
-                                $_report->userId = $this->getUser()->getId();
-                                $_report->userAlias = $this->getUser()->getWholeName();
-                            }
-
-                            if ($_report->validate()) {
-                                $_report->save();
-                            } else {
-                                $errors[] = "Report id {$_report->getId()} - {$_report->getTitle()} errors: "
-                                        . join(', ', $_report->getErrors());
-                            }
-                        }
-                    }
-
-                    if (empty($errors)) {
-                        Registry::get('cache')->invalidate();
-                        Event::fire('admin.log', array('activate success', 'Report ids: ' . join(',', $ids)));
-                        $view->successMessage(self::SUCCESS_MESSAGE_4);
-                    } else {
-                        Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
-                        $message = join(PHP_EOL, $errors);
-                        $view->longFlashMessage($message);
-                    }
-
-                    self::redirect('/admin/report/');
-
-                    break;
-                case 'deactivate':
-                    $report = App_Model_Report::all(array(
-                                'id IN ?' => $ids
-                    ));
-                    if (NULL !== $report) {
-                        foreach ($report as $_report) {
-                            $_report->active = false;
-
-                            if ($_report->userId === null) {
-                                $_report->userId = $this->getUser()->getId();
-                                $_report->userAlias = $this->getUser()->getWholeName();
-                            }
-
-                            if ($_report->validate()) {
-                                $_report->save();
-                            } else {
-                                $errors[] = "Report id {$_report->getId()} - {$_report->getTitle()} errors: "
-                                        . join(', ', $_report->getErrors());
-                            }
-                        }
-                    }
-
-                    if (empty($errors)) {
-                        Registry::get('cache')->invalidate();
-                        Event::fire('admin.log', array('deactivate success', 'Report ids: ' . join(',', $ids)));
-                        $view->successMessage(self::SUCCESS_MESSAGE_5);
-                    } else {
-                        Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
-                        $message = join(PHP_EOL, $errors);
-                        $view->longFlashMessage($message);
-                    }
-
-                    self::redirect('/admin/report/');
-                    break;
-                default:
-                    self::redirect('/admin/report/');
-                    break;
+                if ($column == 0) {
+                    $query->order('rp.id', $dir);
+                } elseif ($column == 2) {
+                    $query->order('rp.title', $dir);
+                } elseif ($column == 3) {
+                    $query->order('rp.userAlias', $dir);
+                } elseif ($column == 4) {
+                    $query->order('rp.expirationDate', $dir);
+                } elseif ($column == 5) {
+                    $query->order('rp.created', $dir);
+                }
+            } else {
+                $query->order('rp.id', 'desc');
             }
+
+            $limit = (int) RequestMethods::post('iDisplayLength');
+            $query->limit($limit, $page + 1);
+            $reports = App_Model_Report::initialize($query);
+
+            $count = App_Model_Report::count();
+        }
+
+        $draw = $page + 1 + time();
+
+        $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
+
+        $returnArr = array();
+        if ($reports !== null) {
+            foreach ($reports as $report) {
+                $label = '';
+                if ($report->active) {
+                    $label .= "<span class='labelProduct labelProductGreen'>Aktivní</span>";
+                } else {
+                    $label .= "<span class='labelProduct labelProductRed'>Neaktivní</span>";
+                }
+
+                if ($report->approved == 1) {
+                    $label .= "<span class='labelProduct labelProductGreen'>Schváleno</span>";
+                } elseif ($report->approved == 2) {
+                    $label .= "<span class='labelProduct labelProductRed'>Zamítnuto</span>";
+                } else {
+                    $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
+                }
+
+
+                if ($report->archive) {
+                    $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";
+                } else {
+                    $archiveLabel = "<span class='labelProduct labelProductGray'>Ne</span>";
+                }
+
+                $arr = array();
+                $arr [] = "[ \"" . $report->getId() . "\"";
+                $arr [] = "\"" . $report->getTitle() . "\"";
+                $arr [] = "\"" . $report->getUserAlias() . "\"";
+                $arr [] = "\"" . $report->getExpirationDate() . "\"";
+                $arr [] = "\"" . $report->getCreated() . "\"";
+                $arr [] = "\"" . $label . "\"";
+                $arr [] = "\"" . $archiveLabel . "\"";
+
+                $tempStr = "\"<a href='/admin/report/edit/" . $report->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
+
+                if ($this->isAdmin() || $report->userId == $this->getUser()->getId()) {
+                    $tempStr .= "<a href='/admin/report/delete/" . $report->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
+                }
+
+                if ($this->isAdmin() && $report->approved == 0) {
+                    $tempStr .= "<a href='/admin/report/approvenews/" . $report->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/report/rejectnews/" . $report->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                }
+
+                $arr [] = $tempStr . "\"]";
+                $returnArr[] = join(',', $arr);
+            }
+
+            $str .= join(',', $returnArr) . "]}";
+
+            echo $str;
+        } else {
+            $str .= "[ \"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"]]}";
+
+            echo $str;
         }
     }
 
