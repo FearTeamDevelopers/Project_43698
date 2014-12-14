@@ -2,6 +2,7 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Registry\Registry;
 
 /**
  * 

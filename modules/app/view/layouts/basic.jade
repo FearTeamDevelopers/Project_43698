@@ -1,0 +1,72 @@
+doctype html
+html
+  head
+      meta(charset='UTF-8')
+      | {if $env == "dev"}
+      meta(http-equiv='Cache-control', content='no-store')
+      | {/if}
+      meta(name='viewport', content='width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0')
+      meta(name='description', content='{echo $metadescription}')
+      meta(name='author', content='Tomas Hodan')
+      meta(name='robots', content='{echo $metarobots}')
+      link(href='/public/css/custom/reset.css', media='screen', rel='stylesheet', type='text/css')
+      link(href='/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css', media='screen', rel='stylesheet', type='text/css')
+      link(href='/public/css/foundation/foundation.css', rel='stylesheet')
+      link(href='/public/css/custom/styles.css', media='screen', rel='stylesheet', type='text/css')
+      link(href='/public/css/plugins/jquery.bxslider.css', media='screen', rel='stylesheet', type='text/css')
+      
+      script(type='text/javascript', src='/public/js/plugins/modernizr.js')
+
+      
+      title
+  body
+    header.topPanel
+      .row.bgBlack
+        .large-4.columns 
+          a(href='/')
+            h1 Hastrman
+        .large-8.columns.navWrapper
+          nav
+            ul
+              li 
+                a(href='#') O nás
+              li.sluzby 
+                a(href='#') Služby
+                .dropdown
+                  ul.cast1.left
+                    li 
+                      a(href='#') basdfasdf
+                    li 
+                      a(href='#') aaasdfasdf
+                    li 
+                      a(href='#') casdfasdf
+                  ul.cast2.left
+                    li 
+                      a(href='#') basdfasdf
+                    li 
+                      a(href='#') aasdfa
+                    li 
+                      a(href='#') casdfasdf
+                  ul.cast3.left
+                    li 
+                      a(href='#') basdfasdf
+                    li 
+                      a(href='#') aasdfasdf
+                    li 
+                      a(href='#') casdfasdf
+              li 
+                a(href='#') Odkazy
+              li 
+                a(href='#') Galerie
+    .row.contentWrapper
+      | {yield action}
+    //
+      JS scripts 
+    script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
+    script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')
+    script(type='text/javascript', src='/public/js/jquery.bxslider.js')
+    script(type='text/javascript', src='/public/js/custom/generalApp.js')
+    script(type='text/javascript', src='/public/js/foundation.min.js')
+    script(type='text/javascript' src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
+    //
+      End JS scripts 

@@ -1,6 +1,9 @@
 jQuery.noConflict();
 
+
 jQuery(document).ready(function () {
+
+    jQuery('.bxslider').bxSlider();
 
     jQuery(window).load(function () {
         jQuery('#loader, .loader').hide();
@@ -34,5 +37,32 @@ jQuery(document).ready(function () {
                 }
             }
         });
+    });
+});
+
+jQuery(function () {
+    var _direction = 'left';
+    jQuery('#carousel').carouFredSel({
+        direction: _direction,
+        responsive: true,
+        circular: true,
+        items: {
+            width: 350,
+            height: 300,
+            visible: {
+                min: 2,
+                max: 5
+            }
+        },
+        scroll: {
+            items: 1,
+            duration: 1000,
+            timeoutDuration: 1500,
+            pauseOnHover: 'immediate',
+            onEnd: function (data) {
+                _direction = (_direction == 'left') ? 'right' : 'left';
+                $(this).trigger('configuration', ['direction', _direction]);
+            }
+        }
     });
 });
