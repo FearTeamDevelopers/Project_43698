@@ -1,3 +1,15 @@
 footer.wrapper {
   padding-bottom: 10px;
+  padding-top: 20px;
+}
+footer.wrapper .container header h3 {
+  width: 25%;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  text-align: center;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  border-bottom: 2px solid defaultGreen;
+  color: #000;
+  font-weight: 700;
 }

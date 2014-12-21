@@ -1,4 +1,21 @@
 html {
+  font-family: 'Ubuntu', sans-serif !important;
+  font-size: 16px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+span,
+p,
+ul,
+li {
+  font-family: 'Ubuntu', sans-serif !important;
+}
+html {
   min-height: 100%;
 }
 body {
@@ -46,13 +63,22 @@ body {
   padding-top: 3em;
 }
 .pb {
-  paddinb-bottom: 1.2em;
+  padding-bottom: 1.2em;
 }
 .pb.half {
   padding-bottom: 0.6em;
 }
 .pb.big {
   padding-bottom: 2.4em;
+}
+.pr {
+  padding-right: 1.2em;
+}
+.pr.half {
+  padding-right: 0.6em;
+}
+.pr.big {
+  padding-right: 3em;
 }
 html {
   min-height: 100%;
@@ -71,7 +97,7 @@ body {
   background: rgba(255,255,255,0.7);
 }
 .wrapper.blue {
-  background: #394c5f;
+  background: rgba(57,76,95,0.8);
   color: #fff;
 }
 .wrapper.blue h1,
@@ -79,16 +105,6 @@ body {
 .wrapper.blue h3,
 .wrapper.blue h4 {
   color: #fff !important;
-}
-.wrapper.blue h1:hover,
-.wrapper.blue h2:hover,
-.wrapper.blue h3:hover,
-.wrapper.blue h4:hover {
-  color: #1dd2af !important;
-}
-.wrapper.headerColor {
-  background: #394c5f;
-  color: #fff;
 }
 .content {
   width: 100%;
@@ -108,12 +124,12 @@ body {
 .topPanel header a h1:after {
   content: ' ';
   background: url("../../images/Logo_Hastrmnek%20copy.png") no-repeat;
-  background-size: 200px 200px;
-  width: 200px;
-  height: 200px;
+  background-size: 300px 300px;
+  width: 300px;
+  height: 300px;
   position: absolute;
-  top: -12px;
-  right: -16px;
+  top: 291px;
+  left: -245px;
 }
 .topPanel header a:hover h1 {
   color: #1dd2af;
@@ -184,6 +200,18 @@ body {
 }
 footer.wrapper {
   padding-bottom: 10px;
+  padding-top: 20px;
+}
+footer.wrapper .container header h3 {
+  width: 25%;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  text-align: center;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  border-bottom: 2px solid #1dd2af;
+  color: #000;
+  font-weight: 700;
 }
 .homepage section.wrapper {
   padding-top: 40px;
@@ -241,9 +269,10 @@ footer.wrapper {
 }
 .homepage section.wrapper .container .container-box article.indexNew {
   float: left;
-  width: 140px;
-  margin-left: 13.3px;
-  margin-right: 13.3px;
+  width: 45%;
+  height: 220px;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
   background: #fff;
   color: #000;
   padding: 10px;
@@ -325,7 +354,7 @@ footer.wrapper {
   color: #000;
 }
 .homepage section.wrapper .container .moreWrap .more:hover {
-  background: #394c5f;
+  background: rgba(57,76,95,0.8);
 }
 .homepage section.wrapper .container .moreWrap .more:hover span {
   color: #fff;
@@ -340,9 +369,9 @@ footer.wrapper {
   font-weight: 600;
 }
 .page section.wrapper .container h2 {
-  -webkit-box-shadow: 0px -42px 3px -34px #394c5f;
-  -moz-box-shadow: 0px -42px 3px -34px #394c5f;
-  box-shadow: 0px -42px 3px -34px #394c5f;
+  -webkit-box-shadow: 0px -42px 3px -34px rgba(57,76,95,0.8);
+  -moz-box-shadow: 0px -42px 3px -34px rgba(57,76,95,0.8);
+  box-shadow: 0px -42px 3px -34px rgba(57,76,95,0.8);
   padding-top: 20px;
 }
 .page section.wrapper .container a {
@@ -355,5 +384,5 @@ footer.wrapper {
   list-style-type: circle;
 }
 .page section.wrapper .container hr {
-  border-color: #394c5f;
+  border-color: rgba(57,76,95,0.8);
 }

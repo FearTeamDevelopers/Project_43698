@@ -46,11 +46,20 @@ body {
   padding-top: 3em;
 }
 .pb {
-  paddinb-bottom: 1.2em;
+  padding-bottom: 1.2em;
 }
 .pb.half {
   padding-bottom: 0.6em;
 }
 .pb.big {
   padding-bottom: 2.4em;
+}
+.pr {
+  padding-right: 1.2em;
+}
+.pr.half {
+  padding-right: 0.6em;
+}
+.pr.big {
+  padding-right: 3em;
 }
