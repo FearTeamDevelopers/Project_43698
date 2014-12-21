@@ -5,6 +5,12 @@ jQuery(document).ready(function () {
 
     jQuery('.bxslider').bxSlider();
 
+     jQuery('.sluzby').click(function(e){
+        e.preventDefault();
+        jQuery('#dropdown').toggle('slow')
+    });
+    
+
     jQuery(window).load(function () {
         jQuery('#loader, .loader').hide();
 
@@ -47,17 +53,17 @@ jQuery(function () {
         responsive: true,
         circular: true,
         items: {
-            width: 350,
+            width:330,
             height: 300,
             visible: {
                 min: 2,
-                max: 5
+                max: 3
             }
         },
         scroll: {
             items: 1,
-            duration: 1000,
-            timeoutDuration: 1500,
+            duration: 2000,
+            timeoutDuration: 3500,
             pauseOnHover: 'immediate',
             onEnd: function (data) {
                 _direction = (_direction == 'left') ? 'right' : 'left';

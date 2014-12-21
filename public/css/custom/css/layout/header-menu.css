@@ -1,0 +1,40 @@
+.navWrapper {
+  position: absolute;
+  bottom: 0%;
+  right: 0%;
+  padding: 0;
+  margin: 0;
+}
+.navWrapper nav {
+  float: right;
+  bottom: 10px;
+}
+.navWrapper nav ul {
+  position: relative;
+  float: right;
+  margin-left: 1rem;
+  list-style-type: none;
+}
+.navWrapper nav ul li {
+  display: block;
+  padding-left: 20px;
+  padding-right: 20px;
+  border: 0;
+}
+.navWrapper nav ul li:last-child {
+  border: 0px;
+  padding-right: 0;
+}
+.navWrapper nav ul a {
+  color: #fff;
+  font-size: 1.25rem;
+}
+.navWrapper nav ul a:hover {
+  color: defaultGreen;
+}
+.navWrapper nav ul li {
+  display: inline;
+  border-right: 1px solid #fff;
+  padding-right: 15px;
+  padding-left: 15px;
+}

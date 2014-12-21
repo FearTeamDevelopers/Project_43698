@@ -1,0 +1,42 @@
+.bx-wrapper{
+	.bx-viewport{
+		ul.bxslider{
+			position relative
+			img{
+				width 100%
+			}
+			.nadpisWrapper{
+				left 50%
+				top 200px
+				position absolute
+				width 60%
+				.nadpis{
+					left -50%
+					background rgba(255,255,255,0.6)
+					position relative
+					text-align center
+					z-index 10
+				}
+			}
+		}
+	}
+	.bx-controls{
+		.bx-pager{
+			width 10%
+			left 45%
+			background rgba(255,255,255,0.6)
+			height 1.5em
+			line-height 1.5em
+			padding-top 0.5em
+			bottom 2em
+			.bx-pager-link{
+				background secondaryBlue
+				&.active{
+					background defaultBLue !important
+				}
+			}
+		}
+		.bx-controls-directions{
+		}
+	}
+}

@@ -1,55 +1,61 @@
-ul.bxslider
-	li
-		img(title='bla' src='public/images/baner.jpg') 
-		.nadpisWrapper
-			.nadpis
-				h2 bla
-	li
-		img(title='bla' src='public/images/holidays type.jpg') 
-		.nadpisWrapper
-			.nadpis
-				h2 bla2
-	li
-		img(title='bla' src='public/images/dubai.jpg') 
-		.nadpisWrapper
-			.nadpis 
-				h2 bla3
-section.large-12.columns.block
-	header.blueHeader
-		h3.pad Novinky
-		a.right(href='/novinky') zobrazit více
-	.indexContent
-		-	for(var x=0; x<3; x++)
-			article.row.indexNew
-				header
-					a(href='#')
-						h4 nazev
-				p Lorem ipsum Et non in eu ex mollit amet sunt cupidatat consequat voluptate ut ad mollit incididunt Ut laboris anim.
+.homepage
+	section.wrapper
+		.row.container
+			ul.bxslider
+				li
+					img(title='bla' src='public/images/baner.jpg')
+					.nadpisWrapper
+						.nadpis
+							h2 bla
+				li
+					img(title='bla' src='public/images/holidays type.jpg')
+					.nadpisWrapper
+						.nadpis
+							h2 bla2
+				li
+					img(title='bla' src='public/images/dubai.jpg')
+					.nadpisWrapper
+						.nadpis
+							h2 bla3
+	section.wrapper.blue
+		.row.container
+			header
+				h3 Novinky
+			.container-box
+				-	for(var x=0; x<2; x++)
+					article.indexNew
+						header
+							a(href='#')
+								h4 nazev
+						p Lorem ipsum Et non in eu ex mollit amet sunt cupidatat consequat voluptate ut ad mollit incididunt Ut laboris anim.
+			.moreWrap
+				a(href='/novinky')
+					.more.blue
+						span Zobrazit více
+	section.wrapper
+		.row.container
+			header
+				h3 Akce
+			.container-box#wrapper
+				#carousel
+					- for(var x=0; x<7; x++)
+						a(href='#')
+							article
+								header
+									h4 blabla
+									span.datum 24.12.2015
+								p Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore
+			.moreWrap
+				a(href='#')
+					.more
+						span Další akce
 
-section.large-12.columns.block
-	header.blueHeader
-		h3.pad Akce
-		a.right(href='#') Další akce
-	.indexContent#wrapper
-			#carousel
-				- for(var x=0; x<7; x++)
-					a(href='#')
-						article
-							header
-								h4 blabla
-								span.datum 24.12.2015
-							p Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore
-section.large-12.columns.right.adsWrapper
-	header.blueHeader.alignCenter
-		h3 Partneři
-footer.large-12.columns
-	header.blueHeader
-		h3 Kontakty
-	.large-4.columns.borderRight
-		p Potápěčské centrum <br> HASTRMAN <br>	Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy
-	.large-4.columns.borderRight
-		p Klub sportovních potápěčů <br> HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz
-	.large-4.columns
-		p HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz
+	
+
+	section.wrapper.blue
+		.row.container
+			header
+				h3 Partneři
+
 
 

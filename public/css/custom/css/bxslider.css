@@ -1,0 +1,11 @@
+.bx-wrapper .bx-viewport ul.bxslider {
+  position: relative;
+}
+.bx-wrapper .bx-viewport ul.bxslider img {
+  width: 100%;
+}
+.bx-wrapper .bx-controls .bx-pager {
+  width: 20%;
+  left: 40%;
+  background: rgba(255,255,255,0.6);
+}

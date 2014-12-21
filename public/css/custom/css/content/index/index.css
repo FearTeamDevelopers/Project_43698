@@ -1,0 +1,144 @@
+.homepage section.wrapper {
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+.homepage section.wrapper .container header h3 {
+  width: 25%;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  text-align: center;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  border-bottom: 2px solid defaultGreen;
+  color: #000;
+  font-weight: 700;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-viewport ul.bxslider {
+  position: relative;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-viewport ul.bxslider img {
+  width: 100%;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-viewport ul.bxslider .nadpisWrapper {
+  left: 50%;
+  top: 200px;
+  position: absolute;
+  width: 60%;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-viewport ul.bxslider .nadpisWrapper .nadpis {
+  left: -50%;
+  background: rgba(255,255,255,0.6);
+  position: relative;
+  text-align: center;
+  z-index: 10;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-controls .bx-pager {
+  width: 10%;
+  left: 45%;
+  background: rgba(255,255,255,0.6);
+  height: 1.5em;
+  line-height: 1.5em;
+  padding-top: 0.5em;
+  bottom: 2em;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-controls .bx-pager .bx-pager-link {
+  background: secondaryBlue;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-controls .bx-pager .bx-pager-link.active {
+  background: defaultBLue !important;
+}
+.homepage section.wrapper .container .container-box {
+  background: transparent;
+  position: relative;
+  height: 100%;
+}
+.homepage section.wrapper .container .container-box article.indexNew {
+  float: left;
+  width: 140px;
+  margin-left: 13.3px;
+  margin-right: 13.3px;
+  background: #fff;
+  color: #000;
+  padding: 10px;
+}
+.homepage section.wrapper .container .container-box article.indexNew header a:hover h4 {
+  text-decoration: underline;
+  color: defaultGreen;
+}
+.homepage section.wrapper .container .container-box article.indexNew header h4 {
+  text-transform: uppercase;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #000 !important;
+  text-align: center;
+}
+.homepage section.wrapper .container .container-box #carousel {
+  padding-top: 20px;
+}
+.homepage section.wrapper .container .container-box #carousel a {
+  margin: 10px;
+  padding: 15px;
+  float: left;
+  height: 270px;
+  -webkit-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.75);
+  box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.75);
+  background: #fff;
+  color: #000;
+  border-radius: 8px;
+  border: 1px solid #000;
+}
+.homepage section.wrapper .container .container-box #carousel a:hover {
+  margin-top: -2px;
+  border-color: defaultGreen;
+  border-width: 4px;
+}
+.homepage section.wrapper .container .container-box #carousel a header {
+  margin-bottom: 2em;
+}
+.homepage section.wrapper .container .container-box #carousel a header h4 {
+  margin-bottom: 0;
+  color: #000;
+  font-weight: 700;
+}
+.homepage section.wrapper .container .container-box #carousel a header .datum {
+  font-style: italic;
+  font-size: 0.7em;
+  line-height: 0.7em;
+  margin: 0;
+}
+.homepage section.wrapper .container .moreWrap {
+  position: absolute;
+  left: 50%;
+  height: 40px;
+  line-height: 40px;
+  width: 140px;
+  bottom: 4%;
+  z-index: 100;
+}
+.homepage section.wrapper .container .moreWrap .more {
+  position: relative;
+  text-align: center;
+  left: -50%;
+  height: 40px;
+  line-height: 40px;
+  background: defaultGreen;
+}
+.homepage section.wrapper .container .moreWrap .more span {
+  height: 40;
+  line: height 40;
+  width: 100%;
+  color: #fff;
+}
+.homepage section.wrapper .container .moreWrap .more.blue:hover {
+  background: #fff;
+}
+.homepage section.wrapper .container .moreWrap .more.blue:hover span {
+  color: #000;
+}
+.homepage section.wrapper .container .moreWrap .more:hover {
+  background: headerColor;
+}
+.homepage section.wrapper .container .moreWrap .more:hover span {
+  color: #fff;
+}

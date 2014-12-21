@@ -1,0 +1,26 @@
+#dropdown{
+	display none
+	background-color transparent
+	overflow hidden
+	text-align right
+	position relative
+	ul{
+		float right
+		position relative
+		margin-left 1em
+		padding-right 1em
+		border-right 1px solid white
+		list-style-type: none;
+		&:first-child{
+			border 0
+		}
+		li{
+			a{
+				color white
+				&:hover{
+					color defaultGreen
+				}
+			}
+		}
+	}
+}
