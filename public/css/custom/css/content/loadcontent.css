@@ -1,0 +1,21 @@
+.page section.wrapper {
+  overflow: hidden;
+  padding: 50px 0px;
+}
+.page section.wrapper .container h1 {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.page section.wrapper .container h2 {
+  -webkit-box-shadow: 0px -42px 3px -34px #144e6e;
+  -moz-box-shadow: 0px -42px 3px -34px #144e6e;
+  box-shadow: 0px -42px 3px -34px #144e6e;
+  padding-top: 20px;
+}
+.page section.wrapper .container a {
+  color: secondaryBlue;
+}
+.page section.wrapper .container a:hover {
+  color: defaultBLue;
+}

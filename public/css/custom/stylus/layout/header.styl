@@ -1,0 +1,37 @@
+.topPanel{
+	padding 20px 0
+	header{
+		position relative
+		z-index 2
+		a{
+			h1{
+				font-weight 700
+				color white
+				text-transform uppercase
+				&:after{
+					content ' '
+					background url('../../images/Logo_Hastrmnek%20copy.png') no-repeat
+					background-size 200px 200px
+					width 200px
+					height 200px
+					position absolute
+					top -12px
+					right -16px
+				}
+			}
+
+			&:hover{
+				h1{
+					color defaultGreen
+
+				}
+			}
+		}
+		@import "header-menu"
+
+	}
+	@import "header-submenu"
+}
+
+
+

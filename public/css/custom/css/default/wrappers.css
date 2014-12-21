@@ -1,0 +1,39 @@
+html {
+  min-height: 100%;
+  background: transparent url("../../images/IMG_9650.jpg") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+body {
+  background: none;
+}
+.wrapper {
+  width: 100%;
+  position: relative;
+  background: rgba(255,255,255,0.7);
+}
+.wrapper.blue {
+  background: headerColor;
+  color: #fff;
+}
+.wrapper.blue h1,
+.wrapper.blue h2,
+.wrapper.blue h3,
+.wrapper.blue h4 {
+  color: #fff !important;
+}
+.wrapper.blue h1:hover,
+.wrapper.blue h2:hover,
+.wrapper.blue h3:hover,
+.wrapper.blue h4:hover {
+  color: defaultGreen !important;
+}
+.wrapper.headerColor {
+  background: headerColor;
+  color: #fff;
+}
+.content {
+  width: 100%;
+}

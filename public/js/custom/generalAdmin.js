@@ -2,6 +2,10 @@ jQuery.noConflict();
 
 jQuery(document).ready(function () {
 
+    jQuery('.sluzby').click(function(e){
+        e.preventDefault();
+        jQuery('#dropdown').toggle('slow')
+    });
     jQuery(window).load(function () {
         jQuery("#loader, .loader").hide();
 

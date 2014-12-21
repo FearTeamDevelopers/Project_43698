@@ -1,0 +1,24 @@
+#dropdown {
+  display: none;
+  background-color: headerColor;
+  overflow: hidden;
+  text-align: right;
+  position: relative;
+}
+#dropdown ul {
+  float: right;
+  position: relative;
+  margin-left: 1em;
+  padding-right: 1em;
+  border-right: 1px solid #fff;
+  list-style-type: none;
+}
+#dropdown ul:first-child {
+  border: 0;
+}
+#dropdown ul li a {
+  color: #fff;
+}
+#dropdown ul li a:hover {
+  color: defaultGreen;
+}

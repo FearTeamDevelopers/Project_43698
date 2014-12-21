@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="fileman-modified">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/public/js/plugins/filemanager/js/fileman-modified.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
