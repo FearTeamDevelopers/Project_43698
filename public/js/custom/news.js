@@ -126,7 +126,7 @@ jQuery(document).ready(function () {
                     var src = jQuery('#content').val();
                     var target = jQuery('#link-target').val();
                     var name = jQuery('#link-name').val();
-                    var tag = "<a href=\"/reportaz/r/" + src + "\" target=" + target + ">" + name + "</a>";
+                    var tag = "<a href=\"/reportaze/r/" + src + "\" target=" + target + ">" + name + "</a>";
 
                     if (type.substr(0, 4) == 'text') {
                         CKEDITOR.instances['ckeditor'].insertText(tag);
@@ -159,7 +159,7 @@ jQuery(document).ready(function () {
                     var src = jQuery('#content').val();
                     var target = jQuery('#link-target').val();
                     var name = jQuery('#link-name').val();
-                    var tag = "<a href=\"/news/r/" + src + "\" target=" + target + ">" + name + "</a>";
+                    var tag = "<a href=\"/novinky/r/" + src + "\" target=" + target + ">" + name + "</a>";
 
                     if (type.substr(0, 4) == 'text') {
                         CKEDITOR.instances['ckeditor'].insertText(tag);

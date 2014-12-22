@@ -263,8 +263,7 @@ class Admin_Controller_Action extends Controller
         $this->willRenderLayoutView = false;
 
         $actions = App_Model_Action::all(
-                        array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
-        );
+                        array('approved = ?' => 1, 'active = ?' => true));
 
         $view->set('actions', $actions);
     }
