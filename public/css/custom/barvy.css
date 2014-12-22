@@ -1,0 +1,37 @@
+/* CSS - Cascading Style Sheet */
+/* Palette color codes */
+/* Palette URL: http://paletton.com/#uid=23w050kuEmcq5DOvouSzjfgHZ5m */
+
+/* Feel free to copy&paste color codes to your application */
+
+
+/* As hex codes */
+
+.color-primary-0 { color: #0C4771 }	/* Main HlavnĂ­ barva */
+.color-primary-1 { color: #2C81BD }
+.color-primary-2 { color: #0D629E }
+.color-primary-3 { color: #042F4E }
+.color-primary-4 { color: #01101B }
+
+.color-complement-0 { color: #B16707 }	/* Main DoplĹkovĂˇ barva */
+.color-complement-1 { color: #FFA52F }
+.color-complement-2 { color: #F68D05 }
+.color-complement-3 { color: #7A4500 }
+.color-complement-4 { color: #2B1800 }
+
+
+
+/* As RGBa codes */
+
+.rgba-primary-0 { color: rgba( 12, 71,113,1) }	/* Main HlavnĂ­ barva */
+.rgba-primary-1 { color: rgba( 44,129,189,1) }
+.rgba-primary-2 { color: rgba( 13, 98,158,1) }
+.rgba-primary-3 { color: rgba(  4, 47, 78,1) }
+.rgba-primary-4 { color: rgba(  1, 16, 27,1) }
+
+.rgba-complement-0 { color: rgba(177,103,  7,1) }	/* Main DoplĹkovĂˇ barva */
+.rgba-complement-1 { color: rgba(255,165, 47,1) }
+.rgba-complement-2 { color: rgba(246,141,  5,1) }
+.rgba-complement-3 { color: rgba(122, 69,  0,1) }
+.rgba-complement-4 { color: rgba( 43, 24,  0,1) }
+

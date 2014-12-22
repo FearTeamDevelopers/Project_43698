@@ -865,18 +865,12 @@ jQuery(document).ready(function () {
 });
 
 CKEDITOR.replace('ckeditor', {
-    filebrowserBrowseUrl: '/public/js/plugins/filemanager/index.html',
-    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/index.html?type=image',
-    filebrowserFlashBrowseUrl: null,
-    filebrowserUploadUrl: null,
-    filebrowserImageUploadUrl: null,
-    filebrowserFlashUploadUrl: null
+    filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
+    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
+    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.html'
 });
 CKEDITOR.replace('ckeditor2', {
-    filebrowserBrowseUrl: '/public/js/plugins/filemanager/index.html',
-    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/index.html?type=image',
-    filebrowserFlashBrowseUrl: null,
-    filebrowserUploadUrl: null,
-    filebrowserImageUploadUrl: null,
-    filebrowserFlashUploadUrl: null
+    filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
+    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
+    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.html'
 });

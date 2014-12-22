@@ -6,6 +6,7 @@ use THCFrame\Database as Database;
 use THCFrame\Database\Exception as Exception;
 use THCFrame\Profiler\Profiler;
 use THCFrame\Model\Model;
+use THCFrame\Core\Core;
 
 /**
  * The Database\Connector\Mysql class defines a handful of adaptable 
@@ -81,6 +82,19 @@ class Mysql extends Database\Connector
         $this->_realEscapeStringExists = function_exists('mysqli_real_escape_string');
     }
 
+    /**
+     * 
+     * @param type $error
+     * @param type $sql
+     */
+    protected function _logError($error, $sql)
+    {
+        $errMessage = sprintf('There was an error in the query %s', $error) . PHP_EOL;
+        $errMessage .= 'SQL: ' . $sql;
+
+        Core::getLogger()->log($errMessage);
+    }
+    
     /**
      * Method is used to ensure that the value of the
      * $_service is a valid MySQLi instance
@@ -173,12 +187,14 @@ class Mysql extends Database\Connector
             $profiler->dbQueryStart($sql);
             $result = $this->_service->query($sql);
             $profiler->dbQueryStop($this->getAffectedRows());
-            
+
             return $result;
         }
 
         $profiler->dbQueryStart($sql);
         if (!$stmt = $this->_service->prepare($sql)) {
+            $this->_logError($this->_service->error, $sql);
+
             if (ENV == 'dev') {
                 throw new Exception\Sql(sprintf('There was an error in the query %s', $this->_service->error));
             } else {
@@ -408,8 +424,10 @@ class Mysql extends Database\Connector
 
         $result = $this->execute("DROP TABLE IF EXISTS {$table};");
         if ($result === false) {
+            $this->_logError($this->_service->error, $sql);
+            
             if (ENV == 'dev') {
-                $error = $this->lastError;
+                $error = $this->getLastError();
                 throw new Exception\Sql(sprintf('There was an error in the query: %s', $error));
             } else {
                 throw new Exception\Sql(sprintf('There was an error in the query'));
@@ -418,8 +436,10 @@ class Mysql extends Database\Connector
 
         $result2 = $this->execute($sql);
         if ($result2 === false) {
+            $this->_logError($this->_service->error, $sql);
+            
             if (ENV == 'dev') {
-                $error = $this->lastError;
+                $error = $this->getLastError();
                 throw new Exception\Sql(sprintf('There was an error in the query: %s', $error));
             } else {
                 throw new Exception\Sql(sprintf('There was an error in the query'));

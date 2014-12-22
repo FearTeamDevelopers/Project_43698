@@ -59,8 +59,8 @@ class Admin_Controller_News extends Controller
 
             $autoApprove = Registry::get('configuration')->news_autopublish;
 
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-            );
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                    array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
 
             $news = new App_Model_News(array(
                 'title' => RequestMethods::post('title'),
@@ -133,8 +133,8 @@ class Admin_Controller_News extends Controller
                 $news->userAlias = $this->getUser()->getWholeName();
             }
 
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-            );
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                    array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
 
             $news->title = RequestMethods::post('title');
             $news->urlKey = $urlKey;
@@ -267,8 +267,7 @@ class Admin_Controller_News extends Controller
         $this->willRenderLayoutView = false;
 
         $news = App_Model_News::all(
-                        array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
-        );
+                        array('approved = ?' => 1, 'active = ?' => true));
 
         $view->set('news', $news);
     }
@@ -317,7 +316,8 @@ class Admin_Controller_News extends Controller
                 break;
             case 'activate':
                 $news = App_Model_News::all(array(
-                            'id IN ?' => $ids
+                            'id IN ?' => $ids,
+                            'active = ?' => false
                 ));
                 if (NULL !== $news) {
                     foreach ($news as $_news) {
@@ -350,7 +350,8 @@ class Admin_Controller_News extends Controller
                 break;
             case 'deactivate':
                 $news = App_Model_News::all(array(
-                            'id IN ?' => $ids
+                            'id IN ?' => $ids,
+                            'active = ?' => true
                 ));
                 if (NULL !== $news) {
                     foreach ($news as $_news) {
@@ -562,7 +563,6 @@ class Admin_Controller_News extends Controller
                 } else {
                     $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
                 }
-
 
                 if ($_news->archive) {
                     $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";

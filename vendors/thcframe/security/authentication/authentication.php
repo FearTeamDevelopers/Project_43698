@@ -5,7 +5,6 @@ namespace THCFrame\Security\Authentication;
 use THCFrame\Core\Base;
 use THCFrame\Security\Exception;
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry;
 
 /**
  * Authentication factory class
@@ -40,11 +39,9 @@ class Authentication extends Base
      * It accepts initialization options and selects the type of returned object, 
      * based on the internal $_type property
      */
-    public function initialize()
+    public function initialize($configuration)
     {
         Event::fire('framework.authentication.initialize.before', array($this->type));
-        
-        $configuration = Registry::get('configuration');
         
         if (!$this->type) {
             if(!empty($configuration->security->authentication)){
@@ -56,7 +53,7 @@ class Authentication extends Base
         }
         
         if (!$this->type) {
-            throw new Exception\Argument('Invalid type');
+            throw new Exception\Argument('Invalid authentication type');
         }
 
         Event::fire('framework.authentication.initialize.after', array($this->type));
@@ -72,7 +69,7 @@ class Authentication extends Base
                 break;
             }
             default:{
-                throw new Exception\Argument('Invalid type');
+                throw new Exception\Argument('Invalid authentication type');
                 break;
             }
         }

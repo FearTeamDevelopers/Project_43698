@@ -19,21 +19,21 @@ class Controller extends BaseController
      * @read
      */
     protected $_security;
-    
+
     /**
      * Store initialized cache object
      * @var type 
      * @read
      */
     protected $_cache;
-    
+
     /**
      * Store server host name
      * @var type 
      * @read
      */
     protected $_serverHost;
-    
+
     const SUCCESS_MESSAGE_1 = ' byl(a) úspěšně vytovřen(a)';
     const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
     const SUCCESS_MESSAGE_3 = ' byl(a) úspěšně smazán(a)';
@@ -43,14 +43,12 @@ class Controller extends BaseController
     const SUCCESS_MESSAGE_7 = 'Vše bylo úspěšně nahráno';
     const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
     const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
-    
     const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
     const ERROR_MESSAGE_2 = 'Nenalezeno';
     const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
     const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnění';
     const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
     const ERROR_MESSAGE_6 = 'Přísput odepřen';
-    
 
     /**
      * 
@@ -70,7 +68,7 @@ class Controller extends BaseController
             $database = Registry::get('database');
             $database->disconnect();
         });
-        
+
         $metaData = $this->getCache()->get('global_meta_data');
 
         if ($metaData !== null) {
@@ -88,7 +86,7 @@ class Controller extends BaseController
 
             $this->getCache()->set('global_meta_data', $metaData);
         }
-        
+
         $this->getLayoutView()
                 ->set('metatitle', $metaData['metatitle'])
                 ->set('metarobots', $metaData['metarobots'])
@@ -242,15 +240,15 @@ class Controller extends BaseController
 
         if ($view) {
             $view->set('authUser', $user)
-                    ->set('env', ENV);
-            $view->set('isMember', $this->isMember())
+                    ->set('env', ENV)
+                    ->set('isMember', $this->isMember())
                     ->set('token', $this->_security->getCSRF()->getToken());
         }
 
         if ($layoutView) {
             $layoutView->set('authUser', $user)
-                    ->set('env', ENV);
-            $layoutView->set('isMember', $this->isMember())
+                    ->set('env', ENV)
+                    ->set('isMember', $this->isMember())
                     ->set('token', $this->_security->getCSRF()->getToken());
         }
 

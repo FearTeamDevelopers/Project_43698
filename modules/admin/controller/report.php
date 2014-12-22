@@ -380,8 +380,7 @@ class Admin_Controller_Report extends Controller
         $this->willRenderLayoutView = false;
 
         $reports = App_Model_Report::all(
-                        array('approved = ?' => 1, 'active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'))
-        );
+                        array('approved = ?' => 1, 'active = ?' => true));
 
         $view->set('reports', $reports);
     }
