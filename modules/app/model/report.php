@@ -101,7 +101,7 @@ class App_Model_Report extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html, max(5000)
+     * @validate required, html, max(1000)
      * @label teaser
      */
     protected $_shortBody;
@@ -197,9 +197,9 @@ class App_Model_Report extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 255
+     * @length 256
      * 
-     * @validate alphanumeric, max(250)
+     * @validate alphanumeric
      * @label meta-popis
      */
     protected $_metaDescription;
@@ -286,7 +286,7 @@ class App_Model_Report extends Model
     {
         $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'imgMain', 'imgThumb', 'photoName'), 
-                array('rank' => 'asc','created' => 'desc'), 
+                array('rank' => 'desc','created' => 'desc'), 
                 $limit, $page
         );
         
@@ -302,7 +302,7 @@ class App_Model_Report extends Model
     {
         $reports = self::all(array('active = ?' => true, 'approved = ?' => 1), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'imgMain', 'imgThumb', 'photoName'), 
-                array('rank' => 'asc','created' => 'desc'), 
+                array('rank' => 'desc','created' => 'desc'), 
                 $limit, $page
         );
         

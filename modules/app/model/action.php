@@ -101,7 +101,7 @@ class App_Model_Action extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html, max(5000)
+     * @validate required, html, max(1000)
      * @label teaser
      */
     protected $_shortBody;
@@ -142,6 +142,50 @@ class App_Model_Action extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 12
+     * 
+     * @validate date, max(12)
+     * @label datum začátek
+     */
+    protected $_startDate;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 12
+     * 
+     * @validate date, max(12)
+     * @label datum konec
+     */
+    protected $_endDate;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 10
+     * 
+     * @validate time, max(10)
+     * @label čas začátek
+     */
+    protected $_startTime;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 10
+     * 
+     * @validate time, max(10)
+     * @label čas konec
+     */
+    protected $_endTime;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 250
      * 
      * @validate alphanumeric, max(250)
@@ -149,6 +193,28 @@ class App_Model_Action extends Model
      */
     protected $_keywords;
 
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 150
+     * 
+     * @validate alphanumeric, max(150)
+     * @label meta-název
+     */
+    protected $_metaTitle;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 256
+     * 
+     * @validate alphanumeric
+     * @label meta-popis
+     */
+    protected $_metaDescription;
+    
     /**
      * @column
      * @readwrite
@@ -215,7 +281,7 @@ class App_Model_Action extends Model
     {
         $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
-                array('rank' => 'asc','created' => 'desc'), 
+                array('rank' => 'desc','created' => 'desc'), 
                 $limit, $page
         );
         
@@ -231,7 +297,7 @@ class App_Model_Action extends Model
     {
         $actions = self::all(array('active = ?' => true, 'approved = ?' => 1), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
-                array('rank' => 'asc','created' => 'desc'), 
+                array('rank' => 'desc','created' => 'desc'), 
                 $limit, $page
         );
         

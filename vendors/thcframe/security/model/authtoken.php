@@ -6,14 +6,25 @@ use THCFrame\Model\Model;
 
 /**
  * Authtoken used by "Remember me" function
+ * 
+ * SQL code: 
+ * CREATE TABLE `tb_authtoken` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `userId` INT UNSIGNED NOT NULL DEFAULT 0,
+  `token` varchar(130) NOT NULL DEFAULT '',
+  `created` datetime DEFAULT NULL,
+  `modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  */
 class Authtoken extends Model
 {
+
     /**
      * @readwrite
      */
     protected $_alias = 'auth';
-    
+
     /**
      * @column
      * @readwrite
@@ -21,7 +32,7 @@ class Authtoken extends Model
      * @type auto_increment
      */
     protected $_id;
-    
+
     /**
      * @column
      * @readwrite
@@ -30,7 +41,7 @@ class Authtoken extends Model
      * @validate required, numeric, max(8)
      */
     protected $_userId;
-    
+
     /**
      * @column
      * @readwrite
@@ -43,7 +54,7 @@ class Authtoken extends Model
      * @label auth token
      */
     protected $_token;
-    
+
     /**
      * @column
      * @readwrite
@@ -57,7 +68,7 @@ class Authtoken extends Model
      * @type datetime
      */
     protected $_modified;
-    
+
     /**
      * 
      */
@@ -71,4 +82,5 @@ class Authtoken extends Model
         }
         $this->setModified(date("Y-m-d H:i:s"));
     }
+
 }

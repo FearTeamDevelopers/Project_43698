@@ -104,8 +104,8 @@ class App_Model_AdSection extends Model
         $sections = self::all(
                 array(),
                 array('ads.*', 
-                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.type="tender")' => 'adTenderCount',
-                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.type="demand")' => 'adDemandCount')
+                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="tender")' => 'adTenderCount',
+                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand")' => 'adDemandCount')
                 );
         
         return $sections;
@@ -120,8 +120,8 @@ class App_Model_AdSection extends Model
         $sections = self::all(
                 array('ads.active = ?' => true),
                 array('ads.*', 
-                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.type="tender" AND adv.active=1)' => 'adTenderCount',
-                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.type="demand" AND adv.active=1)' => 'adDemandCount',
+                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="tender" AND adv.active=1)' => 'adTenderCount',
+                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand" AND adv.active=1)' => 'adDemandCount',
                     )
                 );
         

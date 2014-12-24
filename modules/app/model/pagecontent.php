@@ -60,7 +60,7 @@ class App_Model_PageContent extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html, max(80000)
+     * @validate required, html
      * @label text
      */
     protected $_body;
@@ -71,7 +71,7 @@ class App_Model_PageContent extends Model
      * @type text
      * @length 256
      * 
-     * @validate html, max(80000)
+     * @validate html
      * @label text en
      */
     protected $_bodyEn;
@@ -91,9 +91,9 @@ class App_Model_PageContent extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 250
+     * @length 150
      * 
-     * @validate alphanumeric, max(250)
+     * @validate alphanumeric, max(150)
      * @label meta-název
      */
     protected $_metaTitle;
@@ -104,7 +104,7 @@ class App_Model_PageContent extends Model
      * @type text
      * @length 256
      * 
-     * @validate alphanumeric, max(500)
+     * @validate alphanumeric
      * @label meta-popis
      */
     protected $_metaDescription;

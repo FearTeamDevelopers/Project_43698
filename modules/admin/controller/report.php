@@ -88,7 +88,8 @@ class Admin_Controller_Report extends Controller
                 $imgThumb = '';
             }
 
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                    array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
 
             $report = new App_Model_Report(array(
@@ -105,7 +106,7 @@ class Admin_Controller_Report extends Controller
                 'keywords' => RequestMethods::post('keywords'),
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
                 'metaDescription' => RequestMethods::post('metadescription'),
-                'metaImage' => RequestMethods::post('metaimage'),
+                'metaImage' => $imgMain,
                 'photoName' => $urlKey,
                 'imgMain' => $imgMain,
                 'imgThumb' => $imgThumb
@@ -147,10 +148,7 @@ class Admin_Controller_Report extends Controller
             self::redirect('/admin/report/');
         }
 
-        $view->set('report', $report)
-                ->set('photos', $this->_getPhotos())
-                ->set('documents', $this->_getDocuments())
-                ->set('galleries', $this->_getGalleries());
+        $view->set('report', $report);
 
         if (RequestMethods::post('submitEditReport')) {
             if ($this->checkCSRFToken() !== true) {
@@ -202,7 +200,8 @@ class Admin_Controller_Report extends Controller
                 $report->userAlias = $this->getUser()->getWholeName();
             }
 
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                    array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
 
             $report->title = RequestMethods::post('title');
@@ -217,7 +216,7 @@ class Admin_Controller_Report extends Controller
             $report->keywords = RequestMethods::post('keywords');
             $report->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
             $report->metaDescription = RequestMethods::post('metadescription');
-            $report->metaImage = RequestMethods::post('metaimage');
+            $report->metaImage = $imgMain;
             $report->photoName = $urlKey;
             $report->imgMain = $imgMain;
             $report->imgThumb = $imgThumb;
@@ -379,8 +378,7 @@ class Admin_Controller_Report extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $reports = App_Model_Report::all(
-                        array('approved = ?' => 1, 'active = ?' => true));
+        $reports = App_Model_Report::all(array(), array('urlKey', 'title'));
 
         $view->set('reports', $reports);
     }
@@ -703,8 +701,8 @@ class Admin_Controller_Report extends Controller
                 }
 
                 if ($this->isAdmin() && $report->approved == 0) {
-                    $tempStr .= "<a href='/admin/report/approvenews/" . $report->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
-                    $tempStr .= "<a href='/admin/report/rejectnews/" . $report->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                    $tempStr .= "<a href='/admin/report/approvereport/" . $report->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/report/rejectreport/" . $report->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
                 }
 
                 $arr [] = $tempStr . "\"]";

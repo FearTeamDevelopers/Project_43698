@@ -117,16 +117,6 @@ class App_Model_Gallery extends Model
     /**
      * @column
      * @readwrite
-     * @type boolean
-     * 
-     * @validate max(2)
-     * @lable systémová
-     */
-    protected $_isSystem;
-    
-    /**
-     * @column
-     * @readwrite
      * @type datetime
      */
     protected $_created;
@@ -171,6 +161,21 @@ class App_Model_Gallery extends Model
         return self::initialize($query);
     }
 
+    /**
+     * Called from admin module
+     * @return array
+     */
+    public static function fetchWithLimit($limit = 10)
+    {
+        $query = self::getQuery(array('gl.*'))
+                ->join('tb_user', 'gl.userId = us.id', 'us', 
+                        array('us.firstname', 'us.lastname'))
+                ->order('gl.created', 'desc')
+                ->limit((int)$limit);
+
+        return self::initialize($query);
+    }
+    
     /**
      * Called from admin module
      * 

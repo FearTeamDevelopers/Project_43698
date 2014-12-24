@@ -62,7 +62,8 @@ class Admin_Controller_Partner extends Controller
                             'title' => RequestMethods::post('title'),
                             'web' => RequestMethods::post('web'),
                             'logo' => trim($file->getFilename(), '.'),
-                            'section' => RequestMethods::post('section')
+                            'section' => RequestMethods::post('section'),
+                            'rank' => RequestMethods::post('rank', 1)
                         ));
 
                         if ($partner->validate()) {
@@ -147,6 +148,7 @@ class Admin_Controller_Partner extends Controller
             $partner->web = RequestMethods::post('web');
             $partner->section = RequestMethods::post('section');
             $partner->logo = $logo;
+            $partner->rank = RequestMethods::post('rank', 1);
             $partner->active = RequestMethods::post('active');
 
             if (empty($errors) && $partner->validate()) {

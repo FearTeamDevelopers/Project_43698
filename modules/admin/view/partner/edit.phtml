@@ -8,7 +8,7 @@
     <div class="contenttitle">
         <h2 class="form"><span>Základní info</span></h2>
     </div>
-    
+
     <form class="stdform stdform2" method="post" action="#" enctype="multipart/form-data">
         <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
         <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
@@ -18,7 +18,7 @@
             <span class="field">
                 <input required type="text" name="title" class="longinput" value="{echo $partner->title}"/>
                 {if isset($errors["title"])}
-                    <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                <label class="error">{echo join("<br/>", $errors["title"])}</label>
                 {/if}
             </span>
         </p>
@@ -29,18 +29,18 @@
                 <img src="{echo $partner->logo}" alt="" height="100px" />
                 <a href="/admin/partner/deletelogo/{echo $partner->id}" class="btn btn3 btn_trash deleteImg" title="Delete logo"></a>
             </span> 
-            
+
             <span class="field nodisplay uploadNewImage">
                 <input type="file" name="logo" />
                 {if isset($errors["logo"])}
-                    <label class="error">{echo join("<br/>", $errors["logo"])}</label>
+                <label class="error">{echo join("<br/>", $errors["logo"])}</label>
                 {/if}
             </span>
             {/if}{else}
             <span class="field">
                 <input type="file" name="logo" />
                 {if isset($errors["logo"])}
-                    <label class="error">{echo join("<br/>", $errors["logo"])}</label>
+                <label class="error">{echo join("<br/>", $errors["logo"])}</label>
                 {/if}
             </span> 
             {/else}
@@ -50,11 +50,19 @@
             <span class="field">
                 <input required type="text" name="web" class="longinput" value="{echo $partner->web}"/>
                 {if isset($errors["web"])}
-                    <label class="error">{echo join("<br/>", $errors["web"])}</label>
+                <label class="error">{echo join("<br/>", $errors["web"])}</label>
                 {/if}
             </span>
         </p>
-       
+        <p>
+            <label>Pořadí<small>Max. 99</small></label>
+            <span class="field">
+                <input type="text" name="rank" class="longinput" value="{echo $partner->rank}"/>
+                {if isset($errors["rank"])}
+                <label class="error">{echo join("<br/>", $errors["rank"])}</label>
+                {/if}
+            </span>
+        </p>
         <p>
             <label>Aktivní</label>
             <span class="field">

@@ -46,7 +46,7 @@ jQuery(document).ready(function () {
         return true;
     });
 
-    jQuery('.datepicker').datepicker({
+    jQuery('.datepicker, .datepicker2, .datepicker3').datepicker({
         changeMonth: true,
         changeYear: true,
         dateFormat: 'yy-mm-dd',
@@ -159,7 +159,7 @@ jQuery(document).ready(function () {
             return false;
         });
 
-        jQuery('.ajaxReload').click(function () {
+        jQuery('.ajaxReload').click(function (event) {
             event.preventDefault();
             var url = jQuery(this).attr('href');
             var csrf = jQuery('#csrf').val();
@@ -868,13 +868,15 @@ jQuery(document).ready(function () {
 
 });
 
-CKEDITOR.replace('ckeditor', {
-    filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
-    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
-    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.html'
+var editor1 = CKEDITOR.replace('ckeditor', {
+    height: 550,
+    filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
+    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
+    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.php'
 });
-CKEDITOR.replace('ckeditor2', {
-    filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
-    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.html',
-    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.html'
+
+var editor2 = CKEDITOR.replace('ckeditor2', {
+    filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
+    filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
+    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.php'
 });

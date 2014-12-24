@@ -29,18 +29,9 @@
             </span>
         </p>
         <p>
-            <label>Systémová</label>
+            <label>Popis*</label>
             <span class="field">
-                <select class="longinput" name="system">
-                    <option value="0">Ne</option>
-                    <option value="1">Ano</option>
-                </select>
-            </span>
-        </p>
-        <p>
-            <label>Popis*<small>Max. 15 000 znaků</small></label>
-            <span class="field">
-                <textarea class="longinput" name="description" id="ckeditor">{echo isset($gallery)? $gallery->description: ""}</textarea>
+                <textarea class="longinput" name="description" id="ckeditor2">{echo isset($gallery)? $gallery->description: ""}</textarea>
                 {if isset($errors["description"])}
                 <label class="error">{echo join("<br/>", $errors["description"])}</label>
                 {/if}
@@ -49,7 +40,7 @@
         <p>
             <label>Pořadí<small>Max. 99</small></label>
             <span class="field">
-                <input type="text" name="rank" class="longinput" value="{echo isset($action)? $action->rank: 1}"/>
+                <input type="text" name="rank" class="longinput" value="{echo isset($gallery)? $gallery->rank: 1}"/>
                 {if isset($errors["rank"])}
                 <label class="error">{echo join("<br/>", $errors["rank"])}</label>
                 {/if}

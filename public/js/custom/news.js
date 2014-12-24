@@ -1,16 +1,21 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function () {
-    jQuery('.nosubmit').submit(function(event){
+    jQuery('.nosubmit').submit(function (event) {
         event.preventDefault();
         return false;
     });
-    
+
     jQuery('#text-to-teaser').click(function (event) {
         event.preventDefault();
         var value = CKEDITOR.instances['ckeditor'].getData();
-        var short = value.substr(0, 240);
-        CKEDITOR.instances['ckeditor2'].setData(short);
+        CKEDITOR.instances['ckeditor2'].setData(value);
+    });
+    
+    jQuery('#teaser-to-text').click(function (event) {
+        event.preventDefault();
+        var value = CKEDITOR.instances['ckeditor2'].getData();
+        CKEDITOR.instances['ckeditor'].setData(value);
     });
 
     jQuery('#teaser-to-meta').click(function (event) {
@@ -49,10 +54,11 @@ jQuery(document).ready(function () {
         event.preventDefault();
         var type = jQuery(this).attr('id');
 
+        jQuery('#insert-dialog p').html('Nahrávám ...');
         jQuery('#insert-dialog p').load('/admin/gallery/inserttocontent/');
 
         jQuery('#insert-dialog').dialog({
-            title: 'Insert',
+            title: 'Vložit odkaz',
             width: 600,
             modal: true,
             buttons: {
@@ -68,9 +74,11 @@ jQuery(document).ready(function () {
                         CKEDITOR.instances['ckeditor2'].insertText(tag);
                     }
 
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 },
                 Close: function () {
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 }
             }
@@ -82,10 +90,11 @@ jQuery(document).ready(function () {
         event.preventDefault();
         var type = jQuery(this).attr('id');
 
+        jQuery('#insert-dialog p').html('Nahrávám ...');
         jQuery('#insert-dialog p').load('/admin/action/inserttocontent/');
 
         jQuery('#insert-dialog').dialog({
-            title: 'Insert',
+            title: 'Vložit odkaz',
             width: 600,
             modal: true,
             buttons: {
@@ -101,9 +110,11 @@ jQuery(document).ready(function () {
                         CKEDITOR.instances['ckeditor2'].insertText(tag);
                     }
 
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 },
                 Close: function () {
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 }
             }
@@ -115,10 +126,11 @@ jQuery(document).ready(function () {
         event.preventDefault();
         var type = jQuery(this).attr('id');
 
+        jQuery('#insert-dialog p').html('Nahrávám ...');
         jQuery('#insert-dialog p').load('/admin/report/inserttocontent/');
 
         jQuery('#insert-dialog').dialog({
-            title: 'Insert',
+            title: 'Vložit odkaz',
             width: 600,
             modal: true,
             buttons: {
@@ -134,24 +146,27 @@ jQuery(document).ready(function () {
                         CKEDITOR.instances['ckeditor2'].insertText(tag);
                     }
 
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 },
                 Close: function () {
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 }
             }
         });
         return false;
     });
-    
+
     jQuery('#text-link-to-news, #teaser-link-to-news').click(function (event) {
         event.preventDefault();
         var type = jQuery(this).attr('id');
 
+        jQuery('#insert-dialog p').html('Nahrávám ...');
         jQuery('#insert-dialog p').load('/admin/news/inserttocontent/');
 
         jQuery('#insert-dialog').dialog({
-            title: 'Insert',
+            title: 'Vložit odkaz',
             width: 600,
             modal: true,
             buttons: {
@@ -167,9 +182,47 @@ jQuery(document).ready(function () {
                         CKEDITOR.instances['ckeditor2'].insertText(tag);
                     }
 
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 },
                 Close: function () {
+                    jQuery('#insert-dialog p').html('');
+                    jQuery(this).dialog('close');
+                }
+            }
+        });
+        return false;
+    });
+
+    jQuery('#text-link-to-content, #teaser-link-to-content').click(function (event) {
+        event.preventDefault();
+        var type = jQuery(this).attr('id');
+
+        jQuery('#insert-dialog p').html('Nahrávám ...');
+        jQuery('#insert-dialog p').load('/admin/content/inserttocontent/');
+
+        jQuery('#insert-dialog').dialog({
+            title: 'Vložit odkaz',
+            width: 600,
+            modal: true,
+            buttons: {
+                'Insert': function () {
+                    var src = jQuery('#content').val();
+                    var target = jQuery('#link-target').val();
+                    var name = jQuery('#link-name').val();
+                    var tag = "<a href=\"/page/" + src + "\" target=" + target + ">" + name + "</a>";
+
+                    if (type.substr(0, 4) == 'text') {
+                        CKEDITOR.instances['ckeditor'].insertText(tag);
+                    } else {
+                        CKEDITOR.instances['ckeditor2'].insertText(tag);
+                    }
+
+                    jQuery('#insert-dialog p').html('');
+                    jQuery(this).dialog('close');
+                },
+                Close: function () {
+                    jQuery('#insert-dialog p').html('');
                     jQuery(this).dialog('close');
                 }
             }

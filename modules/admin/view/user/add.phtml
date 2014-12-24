@@ -36,7 +36,7 @@
             </span>
         </p>
         <p>
-            <label>Profil<small>Max. 10 000 znaků</small></label>
+            <label>Profil</label>
             <span class="field">
                 <textarea rows="20" name="text" id="ckeditor">{echo isset($user)? $user->profile: ""}</textarea>
                 {if isset($errors["profile"])}
@@ -117,7 +117,23 @@
                 {/if}
             </span>
         </p>
-        {/if}
+        {/if}{elseif $isAdmin}
+        <p>
+            <label>Role</label>
+            <span class="field">
+                <select name="role" class="longinput">
+                    <option value="role_member">Člen</option>
+                    <option value="role_participant">Člen s přístupem do administrace</option>
+                    <option value="role_admin">Admin</option>
+                </select>
+                {if isset($errors["role"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["role"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        {/elseif}
 
         <p class="stdformbutton">
             <input type="submit" name="submitAddUser" value="Uložit" class="submit radius2" />

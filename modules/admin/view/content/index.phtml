@@ -1,5 +1,6 @@
 <ul class="maintabmenu">
     <li class="current"><a href="#">Stránky</a></li>
+    <li><a href="/admin/content/add/">Přidat stránku</a></li>
 </ul><!--maintabmenu-->
 
 <div class="content">
@@ -12,17 +13,15 @@
             <col class="con0" /><col class="con1" />
             <col class="con0" /><col class="con1" />
             <col class="con0" /><col class="con1" />
-            <col class="con0" />
         </colgroup>
         <thead>
             <tr>
                 <td class="head0">Název stránky</td>
                 <td class="head1">Klíčová slova</td>
-                <td class="head0">Meta-title</td>
-                <td class="head1">Poslední změna</td>
-                <td class="head0">Vytvořeno</td>
-                <td class="head1">Stav</td>
-                <td class="head0">&nbsp;</td>
+                <td class="head0">Poslední změna</td>
+                <td class="head1">Vytvořeno</td>
+                <td class="head0">Stav</td>
+                <td class="head1">&nbsp;</td>
             </tr>
         </thead>
         <tbody>
@@ -31,7 +30,6 @@
                     <tr>
                         <td>{echo $page->pageName}</td>
                         <td>{echo $page->keywords}</td>
-                        <td>{echo $page->metaTitle}</td>
                         <td>{echo $page->modified}</td>
                         <td>{echo $page->created}</td>
                         <td>

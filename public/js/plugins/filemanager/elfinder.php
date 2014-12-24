@@ -1,3 +1,11 @@
+<?php 
+session_start();
+
+if(!isset($_SESSION['app_authUser'])){
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -39,7 +47,7 @@
                         window.close();
                     },
                     lang: 'cs',
-                    height: 500
+                    height: 600
                 }).elfinder('instance');
             });
         </script>

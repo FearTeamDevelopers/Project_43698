@@ -71,23 +71,19 @@ class Admin_Controller_Advertisement extends Controller
         $this->willRenderLayoutView = false;
 
         $ad = App_Model_Advertisement::first(
-                        array('id = ?' => (int) $id), array('id', 'userId')
+                        array('id = ?' => (int) $id), 
+                        array('id')
         );
 
         if (NULL === $ad) {
             echo self::ERROR_MESSAGE_2;
         } else {
-            if ($this->_security->isGranted('role_admin') === true ||
-                    $ad->getUserId() == $this->getUser()->getId()) {
-                if ($ad->delete()) {
-                    Event::fire('admin.log', array('success', 'Ad id: ' . $id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
-                }
+            if ($ad->delete()) {
+                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                echo 'success';
             } else {
-                echo self::ERROR_MESSAGE_4;
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
             }
         }
     }
@@ -133,7 +129,8 @@ class Admin_Controller_Advertisement extends Controller
 
         if ($this->checkCSRFToken()) {
             $photo = App_Model_AdImage::first(
-                            array('id = ?' => (int) $imageId), array('id', 'adId', 'imgMain', 'imgThumb')
+                            array('id = ?' => (int) $imageId), 
+                            array('id', 'adId', 'imgMain', 'imgThumb')
             );
 
             if (null === $photo) {

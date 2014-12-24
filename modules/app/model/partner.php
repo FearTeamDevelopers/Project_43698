@@ -74,7 +74,17 @@ class App_Model_Partner extends Model
      * @label sekce
      */
     protected $_section;
-    
+
+    /**
+     * @column
+     * @readwrite
+     * @type tinyint
+     * 
+     * @validate numeric, max(2)
+     * @label rank
+     */
+    protected $_rank;
+
     /**
      * @column
      * @readwrite

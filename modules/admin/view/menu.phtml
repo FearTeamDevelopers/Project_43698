@@ -5,10 +5,15 @@
     <li><a href="/admin/report/" class="tables"><span>Reportáže</span></a></li>
     <li><a href="/admin/gallery/" class="media"><span>Galerie</span></a></li>
     <li><a href="/admin/content/" class="editor"><span>Obsah webu</span></a></li>
-    <li><a href="/admin/advertisement/" class="tables"><span>Bazar</span></a></li>
+    <li><a href="/admin/advertisement/" class="chat"><span>Bazar</span></a></li>
     {if $isAdmin || $isSuperAdmin}
     <li><a href="/admin/partner/" class="grid"><span>Partneři</span></a></li>
     <li><a href="/admin/user/" class="users"><span>Uživatelé</span></a></li>
-    <li><a href="/admin/system/" class="error"><span>Nastavení</span></a></li>
+    <li>
+        <a href="/admin/system/" class="error menudrop"><span>Nastavení</span></a>
+        <ul>
+            <li><a href="/admin/redirect/"><span>Přesměrování</span></a></li>
+        </ul>
+    </li>
     {/if}
 </ul>

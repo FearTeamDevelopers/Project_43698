@@ -52,6 +52,19 @@ if(HTTPS){
 // https://github.com/Studio-42/elFinder/wiki/Connector-configuration-options
 $opts = array(
     // 'debug' => true,
+    'bind' => array(
+        'upload.presave' => array(
+            'Plugin.AutoResize.onUpLoadPreSave'
+        )
+    ),
+    'plugin' => array(
+        'AutoResize' => array(
+        'enable' => true,
+        'maxWidth'  => 1920,
+        'maxHeight'  => 1080,
+        'quality' => 80
+        )
+    ),
     'roots' => array(
         array(
             'driver' => 'LocalFileSystem', // driver for accessing file system (REQUIRED)
@@ -59,10 +72,9 @@ $opts = array(
             'URL' => $url, // URL to files (REQUIRED)
             'accessControl' => 'access', // disable and hide dot starting files (OPTIONAL)
             'alias' => 'Home',
-            'uploadMaxSize' => '9M',
+            'uploadMaxSize' => 15000000,
             'imgLib' => 'gd',
-            'tmbCrop' => false,
-            'tmbSize' => 150
+            'tmbCrop' => false
         )
     )
 );

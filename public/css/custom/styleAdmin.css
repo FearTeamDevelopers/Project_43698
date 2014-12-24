@@ -866,6 +866,7 @@ a.btn_table { background-position: -82px -480px; }
 .floatleft { float: left; }
 .floatright { float: right; }
 .fs15{font-size: 15px;}
+.clear{clear: both;}
 .clear-all{clear: both;}
 
 .ui-datepicker-inline .ui-datepicker-calendar td a:hover { background: #ddd; text-decoration: none; color: #666; text-shadow: none; }

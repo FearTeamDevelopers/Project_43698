@@ -13,7 +13,7 @@
             <li><a href="/admin/action/add/" class="events">Akci</a></li>
             <li><a href="/admin/report/add/" class="message">Reportáž</a></li>
             <li><a href="/admin/gallery/add/" class="upload">Galerii</a></li>
-            <li><a href="/admin/document/upload/" class="upload">Dokument</a></li>
+            <li><a href="/admin/partner/add/" class="upload">Partnera</a></li>
         </ul>
     </div>
 
@@ -22,53 +22,75 @@
     <div class="one_half">
         <div class="widgetbox">
             <div class="title"><h2 class="tabbed"><span>Poslední novinky</span></h2></div>
-            <div class="widgetcontent announcement">
-                {if !empty($latestnews1)}
-                    {foreach $news in $latestnews1}
-                        <p>
-                            <span class="radius2">Autor: {echo $news->getUserAlias()}</span>
-                            <span class="radius2">Název: {echo $news->getTitle()}</span>
-                            <span class="radius2">Vytvořeno: {echo $news->getCreated()}</span>
-                            <span class="radius2">Stav: 
-                                {if $news->getApproved() == 0}Čeká na schválení{/if}
-                                {elseif $news->getApproved() == 1}Schváleno{/elseif}
-                                {else}Zamítnuto{/else}
-                            </span>
-                            <br/><br/>
-                            {echo $news->shortBody}
-                        </p>
-                        <hr/>
-                    {/foreach}
-                {/if}{else}
-                <p>Žádné aktuality</p>
-                {/else}
+            <div class="widgetcontent padding0 statement">
+                <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+                    <colgroup>
+                        <col class="con0" /><col class="con1" />
+                        <col class="con0" /><col class="con1" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">Název</th>
+                            <th class="head1">Autor</th>
+                            <th class="head0">Vytvořeno</th>
+                            <th class="head1">Stav</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($latestnews)}
+                            {foreach $news in $latestnews}
+                                <tr>
+                                    <td><a href="/admin/news/edit/{echo $news->getId()}">{echo $news->getTitle()}</a></td>
+                                    <td>{echo $news->getUserAlias()}</td>
+                                    <td>{echo $news->getCreated()}</td>
+                                    <td>
+                                        {if $news->getApproved() == 0}Čeká na schválení{/if}
+                                        {elseif $news->getApproved() == 1}Schváleno{/elseif}
+                                        {else}Zamítnuto{/else}
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {/if} 
+                    </tbody>
+                </table>
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
     </div><!--one_half-->
 
     <div class="one_half last">
         <div class="widgetbox">
-            <div class="title"><h2 class="tabbed"><span>Poslední novinky</span></h2></div>
-            <div class="widgetcontent announcement">
-                {if !empty($latestnews2)}
-                    {foreach $news in $latestnews2}
-                        <p>
-                            <span class="radius2">Autor: {echo $news->getUserAlias()}</span>
-                            <span class="radius2">Název: {echo $news->getTitle()}</span>
-                            <span class="radius2">Vytvořeno: {echo $news->getCreated()}</span>
-                            <span class="radius2">Stav: 
-                                {if $news->getApproved() == 0}Čeká na schválení{/if}
-                                {elseif $news->getApproved() == 1}Schváleno{/elseif}
-                                {else}Zamítnuto{/else}
-                            </span>
-                            <br/><br/>
-                            {echo $news->shortBody}
-                        </p>
-                        <hr/>
-                    {/foreach}
-                {/if}{else}
-                <p>Žádné aktuality</p>
-                {/else}
+            <div class="title"><h2 class="tabbed"><span>Nejnovější Akce</span></h2></div>
+            <div class="widgetcontent padding0 statement">
+                <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+                    <colgroup>
+                        <col class="con0" /><col class="con1" />
+                        <col class="con0" /><col class="con1" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">Název</th>
+                            <th class="head1">Autor</th>
+                            <th class="head0">Vytvořeno</th>
+                            <th class="head1">Stav</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($latestactions)}
+                            {foreach $action in $latestactions}
+                                <tr>
+                                    <td><a href="/admin/action/edit/{echo $action->getId()}">{echo $action->getTitle()}</a></td>
+                                    <td>{echo $action->getUserAlias()}</td>
+                                    <td>{echo $action->getCreated()}</td>
+                                    <td>
+                                        {if $action->getApproved() == 0}Čeká na schválení{/if}
+                                        {elseif $action->getApproved() == 1}Schváleno{/elseif}
+                                        {else}Zamítnuto{/else}
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {/if} 
+                    </tbody>
+                </table>
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
     </div><!--one_half-->
@@ -96,7 +118,7 @@
                         {if !empty($latestreports)}
                             {foreach $report in $latestreports}
                                 <tr>
-                                    <td>{echo $report->getTitle()}</td>
+                                    <td><a href="/admin/report/edit/{echo $report->getId()}">{echo $report->getTitle()}</a></td>
                                     <td>{echo $report->getUserAlias()}</td>
                                     <td>{echo $report->getCreated()}</td>
                                     <td>
@@ -115,7 +137,7 @@
     
     <div class="one_half last">
         <div class="widgetbox">
-            <div class="title"><h2 class="tabbed"><span>Nejnovější Akce</span></h2></div>
+            <div class="title"><h2 class="tabbed"><span>Poslední galerie</span></h2></div>
             <div class="widgetcontent padding0 statement">
                 <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
                     <colgroup>
@@ -131,16 +153,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {if !empty($latestactions)}
-                            {foreach $action in $latestactions}
+                        {if !empty($latestgalleries)}
+                            {foreach $gallery in $latestgalleries}
                                 <tr>
-                                    <td>{echo $action->getTitle()}</td>
-                                    <td>{echo $action->getUserAlias()}</td>
-                                    <td>{echo $action->getCreated()}</td>
+                                    <td><a href="/admin/gallery/edit/{echo $gallery->getId()}">{echo $gallery->getTitle()}</a></td>
+                                    <td>{echo $gallery->getUserAlias()}</td>
+                                    <td>{echo $gallery->getCreated()}</td>
                                     <td>
-                                        {if $action->getApproved() == 0}Čeká na schválení{/if}
-                                        {elseif $action->getApproved() == 1}Schváleno{/elseif}
-                                        {else}Zamítnuto{/else}
+                                        {if $gallery->getIsPublic() == 1}Veřejná{/if}
+                                        {else}Soukromá{/else}
                                     </td>
                                 </tr>
                             {/foreach}

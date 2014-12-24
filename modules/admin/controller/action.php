@@ -73,7 +73,13 @@ class Admin_Controller_Action extends Controller
                 'body' => RequestMethods::post('text'),
                 'expirationDate' => RequestMethods::post('expiration'),
                 'rank' => RequestMethods::post('rank', 1),
-                'keywords' => RequestMethods::post('keywords')
+                'startDate' => RequestMethods::post('datestart'),
+                'endDate' => RequestMethods::post('dateend'),
+                'startTime' => RequestMethods::post('timestart'),
+                'endTime' => RequestMethods::post('timeend'),
+                'keywords' => RequestMethods::post('keywords'),
+                'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
+                'metaDescription' => RequestMethods::post('metadescription')
             ));
 
             if (empty($errors) && $action->validate()) {
@@ -140,10 +146,16 @@ class Admin_Controller_Action extends Controller
             $action->body = RequestMethods::post('text');
             $action->shortBody = $shortText;
             $action->rank = RequestMethods::post('rank', 1);
+            $action->startDate = RequestMethods::post('datestart');
+            $action->endDate = RequestMethods::post('dateend');
+            $action->startTime = RequestMethods::post('timestart');
+            $action->endTime = RequestMethods::post('timeend');
             $action->active = RequestMethods::post('active');
             $action->approved = RequestMethods::post('approve');
             $action->archive = RequestMethods::post('archive');
             $action->keywords = RequestMethods::post('keywords');
+            $action->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
+            $action->metaDescription = RequestMethods::post('metadescription');
 
             if (empty($errors) && $action->validate()) {
                 $action->save();
@@ -262,8 +274,7 @@ class Admin_Controller_Action extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $actions = App_Model_Action::all(
-                        array('approved = ?' => 1, 'active = ?' => true));
+        $actions = App_Model_Action::all(array(), array('urlKey', 'title'));
 
         $view->set('actions', $actions);
     }
@@ -587,8 +598,8 @@ class Admin_Controller_Action extends Controller
                 }
 
                 if ($this->isAdmin() && $action->approved == 0) {
-                    $tempStr .= "<a href='/admin/action/approvenews/" . $action->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
-                    $tempStr .= "<a href='/admin/action/rejectnews/" . $action->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                    $tempStr .= "<a href='/admin/action/approveaction/" . $action->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/action/rejectaction/" . $action->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
                 }
 
                 $arr [] = $tempStr . "\"]";

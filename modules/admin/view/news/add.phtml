@@ -41,24 +41,7 @@
                 </span>
             </p>
             <p>
-                <label>Text*</label>
-                <span class="field">
-                    <textarea name="text" id="ckeditor">{echo isset($news)? $news->body: ""}</textarea>
-                    {if isset($errors["body"])}
-                    <label class="error">{echo join("<br/>", $errors["body"])}</label>
-                    {/if}
-                    <br/>
-                    <button id="clear-text">Smazat</button>
-                    <button id="text-new-paragraph">Nový odstavec</button>
-                    <button id="text-link-to-gallery">Odkaz na galerii</button>
-                    <button id="text-link-to-action">Odkaz na akci</button>
-                    <button id="text-link-to-news">Odkaz na novinku</button>
-                    <button id="text-link-to-report">Odkaz na reportáž</button>
-                    <button id="text-to-teaser">Zkopírovat do Teaser</button>
-                </span>
-            </p>
-            <p>
-                <label>Teaser*<small>Max. 5000 znaků</small></label>
+                <label>Teaser*<small>Max. 750 znaků</small></label>
                 <span class="field">
                     <textarea rows="20" name="shorttext" id="ckeditor2">{echo isset($news)? $news->shortBody: ""}</textarea>
                     {if isset($errors["shortBody"])}
@@ -68,28 +51,39 @@
                     <button id="clear-teaser">Smazat</button>
                     <button id="teaser-new-paragraph">Nový odstavec</button>
                     <button id="teaser-readmore-link">Přidat odkaz na celý článek</button>
+                    <button id="teaser-to-text">Zkopírovat do Text</button>
                     <button id="teaser-link-to-gallery">Odkaz na galerii</button>
                     <button id="teaser-link-to-action">Odkaz na akci</button>
                     <button id="teaser-link-to-news">Odkaz na novinku</button>
                     <button id="teaser-link-to-report">Odkaz na reportáž</button>
+                    <button id="teaser-link-to-content">Odkaz na stránku</button>
                 </span>
             </p>
+            <p>
+                <label>Text*</label>
+                <span class="field">
+                    <textarea name="text" id="ckeditor">{echo isset($news)? $news->body: ""}</textarea>
+                    {if isset($errors["body"])}
+                    <label class="error">{echo join("<br/>", $errors["body"])}</label>
+                    {/if}
+                    <br/>
+                    <button id="clear-text">Smazat</button>
+                    <button id="text-new-paragraph">Nový odstavec</button>
+                    <button id="text-to-teaser">Zkopírovat do Teaser</button>
+                    <button id="text-link-to-gallery">Odkaz na galerii</button>
+                    <button id="text-link-to-action">Odkaz na akci</button>
+                    <button id="text-link-to-news">Odkaz na novinku</button>
+                    <button id="text-link-to-report">Odkaz na reportáž</button>
+                    <button id="text-link-to-content">Odkaz na stránku</button>
+                </span>
+            </p>
+
             <br/>
             <div class="contenttitle radiusbottom0">
                 <h2 class="table"><span>Metadata</span></h2>
             </div><!--contenttitle-->
             <p>
-                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
-                <span class="field">
-                    <input type="text" name="keywords" class="longinput" value="{echo isset($news)? $news->keywords: ""}" 
-                           placeholder="Oddělovač: ,"/>
-                    {if isset($errors["keywords"])}
-                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
-                    {/if}
-                </span>
-            </p>
-            <p>
-                <label>Meta-název<small>Vyplnit pokud se liší od Název</small></label>
+                <label>Meta-název</label>
                 <span class="field">
                     <input type="text" name="metatitle" class="longinput" value="{echo isset($news)? $news->metaTitle: ""}" />
                     {if isset($errors["metaTitle"])}
@@ -98,13 +92,23 @@
                 </span>
             </p>
             <p>
-                <label>Meta-popis<small>Max. 250 znaků<br/>Pouze text<br/>Vyplnit pokud se liší od Teaser</small></label>
+                <label>Meta-popis</label>
                 <span class="field">
                     <textarea rows="5" name="metadescription" class="longinput" >{echo isset($news)? $news->metaDescription: ""}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
                     <br/>
+                </span>
+            </p>
+            <p>
+                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
+                <span class="field">
+                    <input type="text" name="keywords" class="longinput" value="{echo isset($news)? $news->keywords: ""}" 
+                           placeholder="Oddělovač: ,"/>
+                    {if isset($errors["keywords"])}
+                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
+                    {/if}
                 </span>
             </p>
 

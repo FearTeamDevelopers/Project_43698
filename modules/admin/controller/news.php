@@ -266,8 +266,7 @@ class Admin_Controller_News extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $news = App_Model_News::all(
-                        array('approved = ?' => 1, 'active = ?' => true));
+        $news = App_Model_News::all(array(), array('urlKey', 'title'));
 
         $view->set('news', $news);
     }

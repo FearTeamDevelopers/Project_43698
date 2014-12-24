@@ -12,7 +12,7 @@ CKEDITOR.editorConfig = function (config) {
     config.wordcount = {
         showWordCount: false,
         showCharCount: true,
-        countHTML: true
+        countHTML: false
     };
 
     config.toolbar = [

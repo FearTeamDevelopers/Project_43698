@@ -859,7 +859,12 @@ class Model extends Base
             $rows[] = new $class($row);
         }
 
-        return $rows;
+        if(empty($rows)){
+            return null;
+        }else{
+            return $rows;
+        }
+        
     }
 
     /**

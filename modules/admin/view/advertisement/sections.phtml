@@ -6,7 +6,7 @@
 
 <div class="content">
     <div class="contenttitle radiusbottom0">
-        <h2 class="image"><span>Kategorie Bazaru</span></h2>
+        <h2 class="table"><span>Kategorie Bazaru</span></h2>
     </div><!--contenttitle-->
 
     <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
@@ -33,11 +33,11 @@
                         <td>{echo $section->getTitle()}</td>
                         <td>{echo $section->adTenderCount}</td>
                         <td>{echo $section->adDemandCount}</td>
-                        <td>{if ($section->active)}<span class="labelProduct labelProductGreen">Active</span>{/if}</td>
+                        <td>{if ($section->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}</td>
                         <td>{echo $section->getCreated()}</td>
                         <td>
-                            <a href="/admin/advertisement/editsection/{echo $section->getId()}" class="btn btn3 btn_pencil" title="Upravit"></a>
-                            {if $isAdmin}<a href="/admin/advertisement/deletesection/{echo $section->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>{/if}
+                            {if $isAdmin}<a href="/admin/advertisement/editsection/{echo $section->getId()}" class="btn btn3 btn_pencil" title="Upravit"></a>
+                            <a href="/admin/advertisement/deletesection/{echo $section->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>{/if}
                         </td>
                     </tr>
                 {/foreach}

@@ -138,7 +138,14 @@ class Admin_Controller_System extends Controller
         $xmlEnd = '</urlset>';
 
         $host = RequestMethods::server('HTTP_HOST');
+        $pageContentXml = '';
 
+        $pageContent = App_Model_PageContent::all(array('active = ?' => true));
+        if($pageContent !== null){
+            foreach ($pageContent as $content){
+                $pageContentXml .= '';
+            }
+        }
         $pageContentXml = "<url><loc>http://{$host}</loc></url>"
                 . "<url><loc>http://{$host}/o-nas</loc></url>"
                 . "<url><loc>http://{$host}/cenik</loc></url>"
@@ -163,21 +170,31 @@ class Admin_Controller_System extends Controller
      */
     public function fillDatabase($type)
     {
+        if(ENV !== 'dev'){
+            exit;
+        }
+        
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
         ini_set('max_execution_time', 1800);
         ini_set('memory_limit', '512M');
 
-        $ROW_COUNT = 750;
+        $ROW_COUNT = 300;
 
         $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
-        $contentShort = App_Model_PageContent::first(array('urlKey = ?' => 'technika'), array('body'));
 
-        $SHORT_TEXT = $contentShort->getBody();
+        $SHORT_TEXT = 'Vedle používání zdravého rozumu, dostatečné kvalifikace i praxe je kvalitní a spolehlivá 
+            potápěčská technika jednou z podmínek dosažení nejvyšší míry bezpečnosti vašich ponorů. 
+            Kupujte jen takovou výstroj, která tato kriteria splňuje! Pamatujte, že cena je až 
+            druhotným ukazatelem ... nebo váš život stojí za pár ušetřených stokorun?<br /><br />
+            Potápěčské centrum <strong>Hastrman</strong> Mladá Boleslav vám pomůže zorientovat 
+            se v obrovském sortimentu výstroje pro rekreační i technické potápění. Co je vhodné 
+            pro jeden druh potápění, nemusí vyhovovat podmínkám druhého. Váháte-li s výběrem 
+            konkrétního produktu, kontaktujte a využijte možnost odborné konzultace, poradenství i zácviku.';
+        
         $LARGE_TEXT = $content->getBody();
         unset($content);
-        unset($contentShort);
 
         $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
                 . 'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
@@ -219,7 +236,13 @@ class Admin_Controller_System extends Controller
                     'body' => $LARGE_TEXT,
                     'expirationDate' => '2016-01-01',
                     'rank' => 1,
-                    'keywords' => 'action,bla,bla'
+                    'startDate' => '',
+                    'endDate' => '',
+                    'startTime' => '',
+                    'endTime' => '',
+                    'keywords' => 'action,bla,bla',
+                    'metaTitle' => 'Action-' . $i . '-' . time(),
+                    'metaDescription' => $META_DESC
                 ));
 
                 $action->save();

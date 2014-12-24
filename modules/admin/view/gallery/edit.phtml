@@ -10,10 +10,10 @@
     <div class="contenttitle radiusbottom0">
         <h2 class="table"><span>Editovat Galerii</span></h2>
     </div><!--contenttitle-->
-    
+
     <form class="stdform stdform2" method="post" action="#" >
         <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
-        
+
         <p>
             <label>Název*</label>
             <span class="field">
@@ -29,15 +29,33 @@
                 <select class="longinput" name="avatar">
                     {script $photos = $gallery->getPhotos()}
                     {if !empty($photos)}
-                        {foreach $photo in $photos}
-                            {if $photo->getId() == $gallery->getAvatarPhotoId()}
-                                <option value="{echo $photo->getId()}" selected>{echo $photo->getPhotoName()}</option>
-                            {/if}{else}
-                                <option value="{echo $photo->getId()}">{echo $photo->getPhotoName()}</option>
-                            {/else}
-                        {/foreach}
+                    {foreach $photo in $photos}
+                    {if $photo->getId() == $gallery->getAvatarPhotoId()}
+                    <option value="{echo $photo->getId()}" selected>{echo $photo->getPhotoName()}</option>
+                    {/if}{else}
+                    <option value="{echo $photo->getId()}">{echo $photo->getPhotoName()}</option>
+                    {/else}
+                    {/foreach}
                     {/if}
                 </select>
+            </span>
+        </p>
+        <p>
+            <label>Pořadí<small>Max. 99</small></label>
+            <span class="field">
+                <input type="text" name="rank" class="longinput" value="{echo isset($gallery)? $gallery->rank: 1}"/>
+                {if isset($errors["rank"])}
+                <label class="error">{echo join("<br/>", $errors["rank"])}</label>
+                {/if}
+            </span>
+        </p>
+        <p>
+            <label>Popis*</label>
+            <span class="field">
+                <textarea class="longinput" name="description" id="ckeditor2">{echo $gallery->description}</textarea>
+                {if isset($errors["description"])}
+                <label class="error">{echo join("<br/>", $errors["description"])}</label>
+                {/if}
             </span>
         </p>
         <p>
@@ -52,29 +70,6 @@
                     <option value="1" selected>Veřejná</option>
                     {/else}
                 </select>
-            </span>
-        </p>
-        <p>
-            <label>Systémová</label>
-            <span class="field">
-                <select class="longinput" name="system">
-                    {if $gallery->isSystem == 0}
-                    <option value="0" selected>Ne</option>
-                    <option value="1">Ano</option>
-                    {/if}{else}
-                    <option value="0">Ne</option>
-                    <option value="1" selected>Ano</option>
-                    {/else}
-                </select>
-            </span>
-        </p>
-        <p>
-            <label>Popis*<small>Max. 15 000 znaků</small></label>
-            <span class="field">
-                <textarea class="longinput" name="description" id="ckeditor">{echo $gallery->description}</textarea>
-                {if isset($errors["description"])}
-                <label class="error">{echo join("<br/>", $errors["description"])}</label>
-                {/if}
             </span>
         </p>
         <p>

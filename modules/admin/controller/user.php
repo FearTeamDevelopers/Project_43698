@@ -81,9 +81,7 @@ class Admin_Controller_User extends Controller
         $superAdmin = $security->isGranted('role_superadmin');
 
         $users = App_Model_User::all(
-                        array('role <> ?' => 'role_superadmin'), 
-                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), 
-                array('id' => 'asc')
+                        array('role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), array('id' => 'asc')
         );
 
         $view->set('users', $users)
@@ -120,45 +118,52 @@ class Admin_Controller_User extends Controller
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
 
-            $cfg = Registry::get('configuration');
+            if (RequestMethods::post('croppedimage') != '') {
+                $cfg = Registry::get('configuration');
 
-            $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
-            ));
+                $fileManager = new FileManager(array(
+                    'thumbWidth' => $cfg->thumb_width,
+                    'thumbHeight' => $cfg->thumb_height,
+                    'thumbResizeBy' => $cfg->thumb_resizeby,
+                    'maxImageWidth' => $cfg->photo_maxwidth,
+                    'maxImageHeight' => $cfg->photo_maxheight
+                ));
 
-            $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
-            $photoName = $this->_createUrlKey($photoNameRaw);
+                $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
+                $photoName = $this->_createUrlKey($photoNameRaw);
 
-            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
-            $files = $fileManager->getUploadedFiles();
+                $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
+                $files = $fileManager->getUploadedFiles();
 
-            if (!empty($fileErrors)) {
-                $errors['croppedimage'] = $fileErrors;
-            }
+                if (!empty($fileErrors)) {
+                    $errors['croppedimage'] = $fileErrors;
+                }
 
-            if (!empty($files)) {
-                foreach ($files as $i => $file) {
-                    if ($file instanceof \THCFrame\Filesystem\Image) {
-                        $user = new App_Model_User(array(
-                            'firstname' => RequestMethods::post('firstname'),
-                            'lastname' => RequestMethods::post('lastname'),
-                            'email' => RequestMethods::post('email'),
-                            'profile' => RequestMethods::post('text'),
-                            'password' => $hash,
-                            'salt' => $salt,
-                            'role' => RequestMethods::post('role', 'role_member'),
-                            'imgMain' => trim($file->getFilename(), '.'),
-                            'imgThumb' => trim($file->getThumbname(), '.')
-                        ));
-
-                        break;
+                if (!empty($files)) {
+                    foreach ($files as $i => $file) {
+                        if ($file instanceof \THCFrame\Filesystem\Image) {
+                            $imgMain = trim($file->getFilename(), '.');
+                            $imgThumb = trim($file->getThumbname(), '.');
+                            break;
+                        }
                     }
                 }
+            } else {
+                $imgMain = '';
+                $imgThumb = '';
             }
+
+            $user = new App_Model_User(array(
+                'firstname' => RequestMethods::post('firstname'),
+                'lastname' => RequestMethods::post('lastname'),
+                'email' => RequestMethods::post('email'),
+                'profile' => RequestMethods::post('text'),
+                'password' => $hash,
+                'salt' => $salt,
+                'role' => RequestMethods::post('role', 'role_member'),
+                'imgMain' => $imgMain,
+                'imgThumb' => $imgThumb
+            ));
 
             if (empty($errors) && $user->validate()) {
                 $userId = $user->save();
@@ -222,32 +227,37 @@ class Admin_Controller_User extends Controller
             }
 
             if ($user->imgMain == '') {
-                $cfg = Registry::get('configuration');
+                if (RequestMethods::post('croppedimage') != '') {
+                    $cfg = Registry::get('configuration');
 
-                $fileManager = new FileManager(array(
-                    'thumbWidth' => $cfg->thumb_width,
-                    'thumbHeight' => $cfg->thumb_height,
-                    'thumbResizeBy' => $cfg->thumb_resizeby,
-                    'maxImageWidth' => $cfg->photo_maxwidth,
-                    'maxImageHeight' => $cfg->photo_maxheight
-                ));
+                    $fileManager = new FileManager(array(
+                        'thumbWidth' => $cfg->thumb_width,
+                        'thumbHeight' => $cfg->thumb_height,
+                        'thumbResizeBy' => $cfg->thumb_resizeby,
+                        'maxImageWidth' => $cfg->photo_maxwidth,
+                        'maxImageHeight' => $cfg->photo_maxheight
+                    ));
 
-                $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
-                $photoName = $this->_createUrlKey($photoNameRaw);
+                    $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
+                    $photoName = $this->_createUrlKey($photoNameRaw);
 
-                $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
-                $files = $fileManager->getUploadedFiles();
+                    $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
+                    $files = $fileManager->getUploadedFiles();
 
-                if (!empty($files)) {
-                    foreach ($files as $i => $file) {
-                        if ($file instanceof \THCFrame\Filesystem\Image) {
-                            $imgMain = trim($file->getFilename(), '.');
-                            $imgThumb = trim($file->getThumbname(), '.');
-                            break;
+                    if (!empty($files)) {
+                        foreach ($files as $i => $file) {
+                            if ($file instanceof \THCFrame\Filesystem\Image) {
+                                $imgMain = trim($file->getFilename(), '.');
+                                $imgThumb = trim($file->getThumbname(), '.');
+                                break;
+                            }
                         }
+                    } else {
+                        $errors['croppedimage'] = $fileErrors;
                     }
                 } else {
-                    $errors['croppedimage'] = $fileErrors;
+                    $imgMain = '';
+                    $imgThumb = '';
                 }
             } else {
                 $imgMain = $user->imgMain;
@@ -328,32 +338,37 @@ class Admin_Controller_User extends Controller
             }
 
             if ($user->imgMain == '') {
-                $cfg = Registry::get('configuration');
+                if (RequestMethods::post('croppedimage') != '') {
+                    $cfg = Registry::get('configuration');
 
-                $fileManager = new FileManager(array(
-                    'thumbWidth' => $cfg->thumb_width,
-                    'thumbHeight' => $cfg->thumb_height,
-                    'thumbResizeBy' => $cfg->thumb_resizeby,
-                    'maxImageWidth' => $cfg->photo_maxwidth,
-                    'maxImageHeight' => $cfg->photo_maxheight
-                ));
+                    $fileManager = new FileManager(array(
+                        'thumbWidth' => $cfg->thumb_width,
+                        'thumbHeight' => $cfg->thumb_height,
+                        'thumbResizeBy' => $cfg->thumb_resizeby,
+                        'maxImageWidth' => $cfg->photo_maxwidth,
+                        'maxImageHeight' => $cfg->photo_maxheight
+                    ));
 
-                $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
-                $photoName = $this->_createUrlKey($photoNameRaw);
+                    $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
+                    $photoName = $this->_createUrlKey($photoNameRaw);
 
-                $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
-                $files = $fileManager->getUploadedFiles();
+                    $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
+                    $files = $fileManager->getUploadedFiles();
 
-                if (!empty($files)) {
-                    foreach ($files as $i => $file) {
-                        if ($file instanceof \THCFrame\Filesystem\Image) {
-                            $imgMain = trim($file->getFilename(), '.');
-                            $imgThumb = trim($file->getThumbname(), '.');
-                            break;
+                    if (!empty($files)) {
+                        foreach ($files as $i => $file) {
+                            if ($file instanceof \THCFrame\Filesystem\Image) {
+                                $imgMain = trim($file->getFilename(), '.');
+                                $imgThumb = trim($file->getThumbname(), '.');
+                                break;
+                            }
                         }
+                    } else {
+                        $errors['croppedimage'] = $fileErrors;
                     }
                 } else {
-                    $errors['croppedimage'] = $fileErrors;
+                    $imgMain = '';
+                    $imgThumb = '';
                 }
             } else {
                 $imgMain = $user->imgMain;

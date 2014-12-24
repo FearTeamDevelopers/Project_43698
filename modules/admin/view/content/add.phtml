@@ -1,7 +1,6 @@
 <ul class="maintabmenu multipletabmenu">
     <li><a href="/admin/content/">Stránky</a></li>
-    <li><a href="/admin/content/add/">Přidat stránku</a></li>
-    <li class="current"><a href="#">Editovat stránku</a></li>
+    <li class="current"><a href="#">Přidat stránku</a></li>
 </ul><!--maintabmenu-->
 
 <div class="content">
@@ -9,14 +8,15 @@
         <div class="contenttitle radiusbottom0">
             <h2 class="table"><span>Základní info</span></h2>
         </div><!--contenttitle-->
-
+        
         <form class="stdform stdform2" method="post" action="#">
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
-            <input type="hidden" name="page" value="{echo $content->pageName}" />
+            <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
+            
             <p>
-                <label>Název stránky</label>
+                <label>Název stránky*</label>
                 <span class="field">
-                    <input type="text" name="name" disabled class="longinput" value="{echo $content->pageName}"/>
+                    <input type="text" name="page" class="longinput" value="{echo isset($content)? $content->pageName: ""}"/>
                     {if isset($errors["pageName"])}
                     <label class="error">{echo join("<br/>", $errors["pageName"])}</label>
                     {/if}
@@ -25,7 +25,7 @@
             <p>
                 <label>Text*</label>
                 <span class="field">
-                    <textarea rows="20" name="text" id="ckeditor">{echo $content->body}</textarea>
+                    <textarea rows="20" name="text" id="ckeditor">{echo isset($content)? $content->body: ""}</textarea>
                     {if isset($errors["body"])}
                     <label class="error">{echo join("<br/>", $errors["body"])}</label>
                     {/if}
@@ -39,7 +39,7 @@
                     <button id="text-link-to-content">Odkaz na stránku</button>
                 </span>
             </p>
-
+            
             <br/>
             <div class="contenttitle radiusbottom0">
                 <h2 class="table"><span>Metadata</span></h2>
@@ -47,7 +47,7 @@
             <p>
                 <label>Meta-Název</label>
                 <span class="field" >
-                    <input class="longinput" type="text" name="metatitle" value="{echo $content->metaTitle}" />
+                    <input class="longinput" type="text" name="metatitle" value="{echo isset($content)? $content->metaTitle: ""}" />
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -56,39 +56,19 @@
             <p>
                 <label>Meta-Popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput">{echo $content->metaDescription}</textarea>
+                    <textarea rows="5" name="metadescription" class="longinput">{echo isset($content)? $content->metaDescription: ""}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
                 </span>
             </p>
-
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač<br/>Oddělovač: ,</small></label>
                 <span class="field">
-                    <input type="text" name="keywords" value="{echo $content->keywords}" />
+                    <input type="text" name="keywords" value="{echo isset($content)? $content->keywords: ""}" />
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}
-                </span>
-            </p>
-
-            <br/>
-            <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Systémové info</span></h2>
-            </div><!--contenttitle-->
-            <p>
-                <label>Aktivní</label>
-                <span class="field">
-                    <select name="active" class="longinput">
-                        {if $content->active}
-                        <option value="0">Neaktivní</option>
-                        <option value="1" selected>Aktivní</option>
-                        {/if}{else}
-                        <option value="0" selected>Neaktivní</option>
-                        <option value="1">Aktivní</option>
-                        {/else}
-                    </select>
                 </span>
             </p>
             <p class="stdformbutton">

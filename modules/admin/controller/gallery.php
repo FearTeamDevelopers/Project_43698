@@ -98,7 +98,6 @@ class Admin_Controller_Gallery extends Controller
                 'userId' => $this->getUser()->getId(),
                 'userAlias' => $this->getUser()->getWholeName(),
                 'isPublic' => RequestMethods::post('public', 1),
-                'isSystem' => RequestMethods::post('system', 0),
                 'urlKey' => $urlKey,
                 'avatarPhotoId' => 0,
                 'description' => RequestMethods::post('description'),
@@ -191,7 +190,6 @@ class Admin_Controller_Gallery extends Controller
 
             $gallery->title = RequestMethods::post('title');
             $gallery->isPublic = RequestMethods::post('public');
-            $gallery->isSystem = RequestMethods::post('system');
             $gallery->active = RequestMethods::post('active');
             $gallery->urlKey = $urlKey;
             $gallery->rank = RequestMethods::post('rank', 1);
@@ -296,9 +294,7 @@ class Admin_Controller_Gallery extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
         
-        $galleries = App_Model_Gallery::all(
-                array('isPublic = ?' => 1, 'active = ?' => true)
-        );
+        $galleries = App_Model_Gallery::all(array(), array('urlKey', 'title'));
         
         $view->set('galleries', $galleries);
     }

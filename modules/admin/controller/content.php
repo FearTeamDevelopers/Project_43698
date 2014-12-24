@@ -139,4 +139,17 @@ class Admin_Controller_Content extends Controller
             }
         }
     }
+    
+    /**
+     * @before _secured, _participant
+     */
+    public function insertToContent()
+    {
+        $view = $this->getActionView();
+        $this->willRenderLayoutView = false;
+        
+        $content = App_Model_PageContent::all(array(), array('urlKey', 'pageName'));
+        
+        $view->set('contents', $content);
+    }
 }

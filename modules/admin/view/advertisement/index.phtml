@@ -5,7 +5,7 @@
 
 <div class="content">
     <div class="contenttitle radiusbottom0">
-        <h2 class="image"><span>Inzeráty</span></h2>
+        <h2 class="table"><span>Inzeráty</span></h2>
     </div><!--contenttitle-->
 
     <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
@@ -40,7 +40,7 @@
                         <td>{echo $ad->sectionTitle}</td>
                         <td>{echo $ad->getExpirationDate()}</td>
                         <td>{echo $ad->messageCount}</td>
-                        <td>{if ($ad->active)}<span class="labelProduct labelProductGreen">Active</span>{/if}</td>
+                        <td>{if ($ad->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}</td>
                         <td>{echo $ad->getCreated()}</td>
                         <td>
                             <a href="/admin/advertisement/detail/{echo $ad->getId()}" class="btn btn3 btn_search" title="Detail"></a>

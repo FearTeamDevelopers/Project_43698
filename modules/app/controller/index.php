@@ -48,7 +48,7 @@ class App_Controller_Index extends Controller
             $news = $cachedNews;
             unset($cachedNews);
         }else{
-            $news = App_Model_News::fetchActiveWithLimit(5);
+            $news = App_Model_News::fetchActiveWithLimit(2);
             $this->getCache()->set('index-news', $news);
         }
         
@@ -58,7 +58,7 @@ class App_Controller_Index extends Controller
             $actions = $cachedActions;
             unset($cachedActions);
         }else{
-            $actions = App_Model_Action::fetchActiveWithLimit(5);
+            $actions = App_Model_Action::fetchActiveWithLimit(6);
             $this->getCache()->set('index-actions', $actions);
         }
         
@@ -68,12 +68,23 @@ class App_Controller_Index extends Controller
             $reports = $cachedReports;
             unset($cachedReports);
         }else{
-            $reports = App_Model_Report::fetchActiveWithLimit(10);
+            $reports = App_Model_Report::fetchActiveWithLimit(6);
             $this->getCache()->set('index-reports', $reports);
+        }
+        
+        $cachedPartners = $this->getCache()->get('index-partners');
+        
+        if($cachedPartners !== null){
+            $partners = $cachedPartners;
+            unset($cachedPartners);
+        }else{
+            $partners = App_Model_Partner::all(array('active = ?' => true), array('*'), array('rank' => 'desc', 'created' => 'desc'));
+            $this->getCache()->set('index-partners', $partners);
         }
             
         $view->set('news', $news)
                 ->set('actions', $actions)
+                ->set('partners', $partners)
                 ->set('reports', $reports);
         
         $layoutView->set('canonical', $canonical);
