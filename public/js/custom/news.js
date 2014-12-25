@@ -42,12 +42,12 @@ jQuery(document).ready(function () {
 
     jQuery('#text-new-paragraph').click(function (event) {
         event.preventDefault();
-        CKEDITOR.instances['ckeditor'].insertText('<br class="clear" />');
+        CKEDITOR.instances['ckeditor'].insertText('<br class="clear-all" />');
     });
 
     jQuery('#teaser-new-paragraph').click(function (event) {
         event.preventDefault();
-        CKEDITOR.instances['ckeditor2'].insertText('<br class="clear" />');
+        CKEDITOR.instances['ckeditor2'].insertText('<br class="clear-all" />');
     });
 
     jQuery('#text-link-to-gallery, #teaser-link-to-gallery').click(function (event) {

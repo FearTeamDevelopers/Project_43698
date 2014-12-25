@@ -1,8 +1,6 @@
 <?php
 
 use App\Etc\Controller;
-use THCFrame\Registry\Registry;
-use THCFrame\Request\RequestMethods;
 
 /**
  * 
@@ -13,23 +11,54 @@ class App_Controller_Gallery extends Controller
     /**
      * 
      */
-    public function index()
+    public function index($page = 1)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
 
-        $canonical = 'http://' . $this->getServerHost() . '/gallerie';
-        $content = $this->getCache()->get('galerie');
+        if($page <= 0){
+            $page = 1;
+        }
+        
+        if ($page == 1) {
+            $canonical = 'http://' . $this->getServerHost() . '/galerie';
+        } else {
+            $canonical = 'http://' . $this->getServerHost() . '/galerie/p/' . $page;
+        }
+        
+        $content = $this->getCache()->get('galerie-'.$page);
 
         if ($content !== null) {
             $galleries = $content;
             unset($content);
         } else {
-            $galleries = App_Model_Gallery::fetchPublicActiveGalleries();
-            $this->getCache()->set('galerie', $galleries);
+            $galleries = App_Model_Gallery::fetchPublicActiveGalleries(30, $page);
+            $this->getCache()->set('galerie-'.$page, $galleries);
+        }
+        
+        $galleryCount = App_Model_Gallery::count(
+                        array('active = ?' => true,
+                            'isPublic = ?' => true)
+        );
+        $galleryPageCount = ceil($galleryCount / 30);
+
+        if ($galleryPageCount > 1) {
+            $prevPage = $page - 1;
+            $nextPage = $page + 1;
+
+            if ($nextPage > $galleryPageCount) {
+                $nextPage = 0;
+            }
+
+            $layoutView
+                    ->set('pagedprev', $prevPage)
+                    ->set('pagedprevlink', '/galerie/p/' . $prevPage)
+                    ->set('pagednext', $nextPage)
+                    ->set('pagednextlink', '/galerie/p/' . $nextPage);
         }
 
-        $view->set('galleries', $galleries);
+        $view->set('galleries', $galleries)
+                ->set('pagecount', $galleryPageCount);
 
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Galerie');
@@ -50,7 +79,7 @@ class App_Controller_Gallery extends Controller
             self::redirect('/nenalezeno');
         }
 
-        $canonical = 'http://' . $this->getServerHost() . '/gallerie/r/' . $gallery->getUrlKey();
+        $canonical = 'http://' . $this->getServerHost() . '/galerie/r/' . $gallery->getUrlKey();
 
         $view->set('gallery', $gallery);
 

@@ -47,6 +47,10 @@ class App_Controller_News extends Controller
 
         $articlesPerPage = $config->news_per_page;
 
+        if($page <= 0){
+            $page = 1;
+        }
+        
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/novinky';
         } else {

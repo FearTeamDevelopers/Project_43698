@@ -50,6 +50,10 @@ class App_Controller_Report extends Controller
 
         $articlesPerPage = $config->reports_per_page;
 
+        if($page <= 0){
+            $page = 1;
+        }
+        
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/reportaze';
         } else {

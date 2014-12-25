@@ -11,6 +11,31 @@ class App_Controller_Action extends Controller
 {
 
     /**
+     * Check if are sets specific metadata or leave their default values
+     */
+    private function _checkMetaData($layoutView, App_Model_Action $object)
+    {
+        $uri = RequestMethods::server('REQUEST_URI');
+
+        if ($object->getMetaTitle() != '') {
+            $layoutView->set('metatitle', $object->getMetaTitle());
+        }
+
+        if ($object->getMetaDescription() != '') {
+            $layoutView->set('metadescription', $object->getMetaDescription());
+        }
+
+        $canonical = 'http://' . $this->getServerHost() . '/akce/r/' . $object->getUrlKey();
+
+        $layoutView->set('canonical', $canonical)
+                ->set('article', 1)
+                ->set('articlecreated', $object->getCreated())
+                ->set('articlemodified', $object->getModified())
+                ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
+                ->set('metaogtype', 'article');
+    }
+    
+    /**
      * 
      * @param type $page
      */
@@ -22,6 +47,10 @@ class App_Controller_Action extends Controller
 
         $articlesPerPage = $config->actions_per_page;
 
+        if($page <= 0){
+            $page = 1;
+        }
+        
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/akce';
         } else {
@@ -74,7 +103,6 @@ class App_Controller_Action extends Controller
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $uri = RequestMethods::server('REQUEST_URI');
 
         $action = App_Model_Action::fetchByUrlKey($urlKey);
 
@@ -82,16 +110,7 @@ class App_Controller_Action extends Controller
             self::redirect('/nenalezeno');
         }
 
-        $canonical = 'http://' . $this->getServerHost() . '/akce/r/' . $action->getUrlKey();
-
-        $layoutView->set('canonical', $canonical)
-                ->set('article', 1)
-                ->set('articlecreated', $action->getCreated())
-                ->set('articlemodified', $action->getModified())
-                ->set('metatitle', $action->getTitle())
-                ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
-                ->set('metaogtype', 'article');
-
+        $this->_checkMetaData($layoutView, $action);
         $view->set('action', $action);
     }
 

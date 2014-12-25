@@ -227,7 +227,7 @@ class App_Model_Gallery extends Model
      * 
      * @param type $year
      */
-    public static function fetchPublicActiveGalleries()
+    public static function fetchPublicActiveGalleries($limit = 30, $page = 1)
     {
         $query = self::getQuery(array('gl.*'))
                 ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', 
@@ -235,7 +235,8 @@ class App_Model_Gallery extends Model
                 ->where('gl.active = ?', true)
                 ->where('gl.isPublic = ?', true)
                 ->order('gl.rank', 'desc')
-                ->order('gl.created', 'desc');
+                ->order('gl.created', 'desc')
+                ->limit($limit, $page);
 
         return self::initialize($query);
     }

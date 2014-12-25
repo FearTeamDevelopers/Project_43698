@@ -93,7 +93,7 @@ class App_Etc_Module extends Module
             'pattern' => '/page/:urlkey',
             'module' => 'app',
             'controller' => 'index',
-            'action' => 'loadPage',
+            'action' => 'loadContent',
             'args' => ':urlkey'
         ),
         array(
@@ -116,6 +116,13 @@ class App_Etc_Module extends Module
             'controller' => 'gallery',
             'action' => 'detail',
             'args' => ':urlkey'
+        ),
+        array(
+            'pattern' => '/galerie/p/:page',
+            'module' => 'app',
+            'controller' => 'gallery',
+            'action' => 'index',
+            'args' => ':page'
         ),
         array(
             'pattern' => '/akce/p/:page',
