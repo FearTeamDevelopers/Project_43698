@@ -62,6 +62,8 @@ class Admin_Controller_News extends Controller
             $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
                     array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
 
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+            
             $news = new App_Model_News(array(
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
@@ -73,7 +75,7 @@ class Admin_Controller_News extends Controller
                 'body' => RequestMethods::post('text'),
                 'expirationDate' => RequestMethods::post('expiration'),
                 'rank' => RequestMethods::post('rank', 1),
-                'keywords' => RequestMethods::post('keywords'),
+                'keywords' => $keywords,
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
                 'metaDescription' => RequestMethods::post('metadescription')
             ));
@@ -136,6 +138,8 @@ class Admin_Controller_News extends Controller
             $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
                     array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
 
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+            
             $news->title = RequestMethods::post('title');
             $news->urlKey = $urlKey;
             $news->expirationDate = RequestMethods::post('expiration');
@@ -145,7 +149,7 @@ class Admin_Controller_News extends Controller
             $news->active = RequestMethods::post('active');
             $news->approved = RequestMethods::post('approve');
             $news->archive = RequestMethods::post('archive');
-            $news->keywords = RequestMethods::post('keywords');
+            $news->keywords = $keywords;
             $news->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
             $news->metaDescription = RequestMethods::post('metadescription');
 

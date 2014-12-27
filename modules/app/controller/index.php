@@ -3,7 +3,7 @@
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Model\Model;
-use THCFrame\Core\StringMethods;
+use THCFrame\Request\Request;
 
 /**
  * 
@@ -130,6 +130,15 @@ class App_Controller_Index extends Controller
      */
     public function search()
     {
-        $searchString = StringMethods::fastClean(RequestMethods::get('hledat'));
+        $view = $this->getActionView();
+        
+        $url = 'http://'.$this->getServerHost().'/dosearch';
+        $parameters = array('str' => RequestMethods::get('str'));
+
+        $request = new Request();
+        $response = $request->request('post', $url, $parameters);
+        $urls = json_decode($response, true);
+var_dump($urls);die;
+        $view->set('urls', $urls);
     }
 }

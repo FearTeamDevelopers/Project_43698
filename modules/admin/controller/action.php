@@ -4,6 +4,7 @@ use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
+use THCFrame\Core\StringMethods;
 
 /**
  * 
@@ -59,8 +60,11 @@ class Admin_Controller_Action extends Controller
 
             $autoApprove = Registry::get('configuration')->action_autopublish;
 
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                    array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
+            
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $action = new App_Model_Action(array(
                 'title' => RequestMethods::post('title'),
@@ -77,7 +81,7 @@ class Admin_Controller_Action extends Controller
                 'endDate' => RequestMethods::post('dateend'),
                 'startTime' => RequestMethods::post('timestart'),
                 'endTime' => RequestMethods::post('timeend'),
-                'keywords' => RequestMethods::post('keywords'),
+                'keywords' => $keywords,
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
                 'metaDescription' => RequestMethods::post('metadescription')
             ));
@@ -137,9 +141,13 @@ class Admin_Controller_Action extends Controller
                 $action->userAlias = $this->getUser()->getWholeName();
             }
 
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+            $shortText = str_replace(
+                    array('(!read_more_link!)', '(!read_more_title!)'), 
+                    array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
 
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+            
             $action->title = RequestMethods::post('title');
             $action->urlKey = $urlKey;
             $action->expirationDate = RequestMethods::post('expiration');
@@ -153,7 +161,7 @@ class Admin_Controller_Action extends Controller
             $action->active = RequestMethods::post('active');
             $action->approved = RequestMethods::post('approve');
             $action->archive = RequestMethods::post('archive');
-            $action->keywords = RequestMethods::post('keywords');
+            $action->keywords = $keywords;
             $action->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
             $action->metaDescription = RequestMethods::post('metadescription');
 

@@ -20,7 +20,7 @@ class App_Etc_Module extends Module
     
     /**
      * @read
-     * @var type 
+     * @var array 
      */
     protected $_routes = array(
         array(

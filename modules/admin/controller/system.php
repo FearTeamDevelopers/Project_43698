@@ -180,18 +180,14 @@ class Admin_Controller_System extends Controller
         ini_set('max_execution_time', 1800);
         ini_set('memory_limit', '512M');
 
-        $ROW_COUNT = 300;
+        $ROW_COUNT = 250;
 
         $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
 
         $SHORT_TEXT = 'Vedle používání zdravého rozumu, dostatečné kvalifikace i praxe je kvalitní a spolehlivá 
             potápěčská technika jednou z podmínek dosažení nejvyšší míry bezpečnosti vašich ponorů. 
             Kupujte jen takovou výstroj, která tato kriteria splňuje! Pamatujte, že cena je až 
-            druhotným ukazatelem ... nebo váš život stojí za pár ušetřených stokorun?<br /><br />
-            Potápěčské centrum <strong>Hastrman</strong> Mladá Boleslav vám pomůže zorientovat 
-            se v obrovském sortimentu výstroje pro rekreační i technické potápění. Co je vhodné 
-            pro jeden druh potápění, nemusí vyhovovat podmínkám druhého. Váháte-li s výběrem 
-            konkrétního produktu, kontaktujte a využijte možnost odborné konzultace, poradenství i zácviku.';
+            druhotným ukazatelem ... nebo váš život stojí za pár ušetřených stokorun?';
         
         $LARGE_TEXT = $content->getBody();
         unset($content);
@@ -212,7 +208,7 @@ class Admin_Controller_System extends Controller
                     'body' => $LARGE_TEXT,
                     'expirationDate' => '2016-01-01',
                     'rank' => 1,
-                    'keywords' => 'bla,bla,bla,bla',
+                    'keywords' => 'news',
                     'metaTitle' => 'News-' . $i . '-' . time(),
                     'metaDescription' => $META_DESC
                 ));
@@ -240,7 +236,7 @@ class Admin_Controller_System extends Controller
                     'endDate' => '',
                     'startTime' => '',
                     'endTime' => '',
-                    'keywords' => 'action,bla,bla',
+                    'keywords' => 'action',
                     'metaTitle' => 'Action-' . $i . '-' . time(),
                     'metaDescription' => $META_DESC
                 ));
@@ -264,7 +260,7 @@ class Admin_Controller_System extends Controller
                     'body' => $LARGE_TEXT,
                     'expirationDate' => '2016-01-01',
                     'rank' => 1,
-                    'keywords' => 'report,bla,bla,bla',
+                    'keywords' => 'report',
                     'metaTitle' => 'Report-' . $i . '-' . time(),
                     'metaDescription' => $META_DESC,
                     'metaImage' => '',

@@ -12,13 +12,13 @@
 
         <form class="stdform stdform2" method="post" action="#">
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
-            <input type="hidden" name="page" value="{echo $content->pageName}" />
+            <input type="hidden" name="page" value="{echo $content->title}" />
             <p>
                 <label>Název stránky</label>
                 <span class="field">
-                    <input type="text" name="name" disabled class="longinput" value="{echo $content->pageName}"/>
-                    {if isset($errors["pageName"])}
-                    <label class="error">{echo join("<br/>", $errors["pageName"])}</label>
+                    <input type="text" name="name" disabled class="longinput" value="{echo $content->title}"/>
+                    {if isset($errors["title"])}
+                    <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
                 </span>
             </p>
@@ -64,9 +64,9 @@
             </p>
 
             <p>
-                <label>Klíčová slova<small>Pro interní vyhledávač<br/>Oddělovač: ,</small></label>
+                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    <input type="text" name="keywords" value="{echo $content->keywords}" />
+                    <input type="text" name="keywords" value="{echo $content->keywords}" placeholder="Oddělovač: mezera"/>
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}

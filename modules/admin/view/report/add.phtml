@@ -88,7 +88,7 @@
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
                     <input type="text" name="keywords" value="{echo isset($report)? $report->keywords: ""}" 
-                           class="longinput" placeholder="Oddělovač: ,"/>
+                           class="longinput" placeholder="Oddělovač: mezera"/>
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}

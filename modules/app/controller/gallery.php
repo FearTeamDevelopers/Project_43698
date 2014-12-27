@@ -58,6 +58,7 @@ class App_Controller_Gallery extends Controller
         }
 
         $view->set('galleries', $galleries)
+                ->set('currentpage', $page)
                 ->set('pagecount', $galleryPageCount);
 
         $layoutView->set('canonical', $canonical)
