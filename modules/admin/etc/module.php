@@ -20,6 +20,7 @@ class Admin_Etc_Module extends Module
     
     /**
      * @read
+     * @var array 
      */
     protected $_routes = array(
         array(

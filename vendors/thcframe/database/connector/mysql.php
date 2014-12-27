@@ -82,6 +82,11 @@ class Mysql extends Database\Connector
         $this->_realEscapeStringExists = function_exists('mysqli_real_escape_string');
     }
 
+    public function __destruct()
+    {
+        $this->disconnect();
+        unset($this->_service);
+    }
     /**
      * 
      * @param type $error
@@ -191,7 +196,7 @@ class Mysql extends Database\Connector
             return $result;
         }
 
-        $profiler->dbQueryStart($sql);
+        //$profiler->dbQueryStart($sql);
         if (!$stmt = $this->_service->prepare($sql)) {
             $this->_logError($this->_service->error, $sql);
 
@@ -217,9 +222,11 @@ class Mysql extends Database\Connector
         $bindParamsMethod->invokeArgs($stmt, $bindParamsReferences);
 
         $stmt->execute();
-        $profiler->dbQueryStop($stmt->affected_rows);
+        //$profiler->dbQueryStop($stmt->affected_rows);
         $meta = $stmt->result_metadata();
 
+        unset($bindParamsMethod);
+        
         if ($meta) {
             $stmtRow = array();
             $rowReferences = array();
@@ -242,6 +249,9 @@ class Mysql extends Database\Connector
             $stmt->free_result();
             $stmt->close();
 
+            unset($stmt);
+            unset($bindResultMethod);
+            
             return $result;
         } else {
             return null;

@@ -16,9 +16,9 @@
             <p>
                 <label>Název stránky*</label>
                 <span class="field">
-                    <input type="text" name="page" class="longinput" value="{echo isset($content)? $content->pageName: ""}"/>
-                    {if isset($errors["pageName"])}
-                    <label class="error">{echo join("<br/>", $errors["pageName"])}</label>
+                    <input type="text" name="page" class="longinput" value="{echo isset($content)? $content->title: ""}"/>
+                    {if isset($errors["title"])}
+                    <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
                 </span>
             </p>
@@ -63,9 +63,10 @@
                 </span>
             </p>
             <p>
-                <label>Klíčová slova<small>Pro interní vyhledávač<br/>Oddělovač: ,</small></label>
+                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    <input type="text" name="keywords" value="{echo isset($content)? $content->keywords: ""}" />
+                    <input type="text" name="keywords" value="{echo isset($content)? $content->keywords: ""}" 
+                           placeholder="Oddělovač: mezera"/>
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}

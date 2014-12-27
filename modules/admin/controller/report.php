@@ -91,6 +91,8 @@ class Admin_Controller_Report extends Controller
             $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
                     array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
+            
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $report = new App_Model_Report(array(
                 'title' => RequestMethods::post('title'),
@@ -103,7 +105,7 @@ class Admin_Controller_Report extends Controller
                 'body' => RequestMethods::post('text'),
                 'expirationDate' => RequestMethods::post('expiration'),
                 'rank' => RequestMethods::post('rank', 1),
-                'keywords' => RequestMethods::post('keywords'),
+                'keywords' => $keywords,
                 'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
                 'metaDescription' => RequestMethods::post('metadescription'),
                 'metaImage' => $imgMain,
@@ -203,6 +205,8 @@ class Admin_Controller_Report extends Controller
             $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
                     array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
             );
+            
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $report->title = RequestMethods::post('title');
             $report->urlKey = $urlKey;
@@ -213,7 +217,7 @@ class Admin_Controller_Report extends Controller
             $report->active = RequestMethods::post('active');
             $report->approved = RequestMethods::post('approve');
             $report->archive = RequestMethods::post('archive');
-            $report->keywords = RequestMethods::post('keywords');
+            $report->keywords = $keywords;
             $report->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
             $report->metaDescription = RequestMethods::post('metadescription');
             $report->metaImage = $imgMain;

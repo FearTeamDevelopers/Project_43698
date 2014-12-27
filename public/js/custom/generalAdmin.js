@@ -2,10 +2,13 @@ jQuery.noConflict();
 
 jQuery(document).ready(function () {
 
-    jQuery('.sluzby').click(function(e){
-        e.preventDefault();
-        jQuery('#dropdown').toggle('slow')
+    /***** WIDGET LIST HOVER *****/
+    jQuery('.widgetlist a').hover(function () {
+        jQuery(this).switchClass('default', 'hover');
+    }, function () {
+        jQuery(this).switchClass('hover', 'default');
     });
+
     jQuery(window).load(function () {
         jQuery("#loader, .loader").hide();
 
@@ -872,11 +875,11 @@ var editor1 = CKEDITOR.replace('ckeditor', {
     height: 550,
     filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
     filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
-    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.php'
+    filebrowserFlashBrowseUrl: '/public/js/plugins/filemanager/elfinder.php'
 });
 
 var editor2 = CKEDITOR.replace('ckeditor2', {
     filebrowserBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
     filebrowserImageBrowseUrl: '/public/js/plugins/filemanager/elfinder.php',
-    filebrowserFlashBrowseUrl:  '/public/js/plugins/filemanager/elfinder.php'
+    filebrowserFlashBrowseUrl: '/public/js/plugins/filemanager/elfinder.php'
 });

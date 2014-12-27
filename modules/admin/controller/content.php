@@ -61,12 +61,14 @@ class Admin_Controller_Content extends Controller
                 $errors['title'] = array('Stránka s tímto názvem již existuje');
             }
 
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+            
             $content = new App_Model_PageContent(array(
-                'pageName' => RequestMethods::post('page'),
+                'title' => RequestMethods::post('page'),
                 'urlKey' => $urlKey,
                 'body' => RequestMethods::post('text'),
                 'bodyEn' => RequestMethods::post('texten'),
-                'keywords' => RequestMethods::post('keywords'),
+                'keywords' => $keywords,
                 'metaTitle' => RequestMethods::post('metatitle'),
                 'metaDescription' => RequestMethods::post('metadescription')
             ));
@@ -115,11 +117,13 @@ class Admin_Controller_Content extends Controller
                 $errors['title'] = array('Stránka s tímto názvem již existuje');
             }
 
-            $content->pageName = RequestMethods::post('page');
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+            
+            $content->title = RequestMethods::post('page');
             $content->urlKey = $urlKey;
             $content->body = RequestMethods::post('text');
             $content->bodyEn = RequestMethods::post('texten');
-            $content->keywords = RequestMethods::post('keywords');
+            $content->keywords = $keywords;
             $content->metaTitle = RequestMethods::post('metatitle');
             $content->metaDescription = RequestMethods::post('metadescription');
             $content->active = RequestMethods::post('active');
@@ -148,7 +152,7 @@ class Admin_Controller_Content extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
         
-        $content = App_Model_PageContent::all(array(), array('urlKey', 'pageName'));
+        $content = App_Model_PageContent::all(array(), array('urlKey', 'title'));
         
         $view->set('contents', $content);
     }

@@ -40,7 +40,7 @@ class App_Model_PageContent extends Model
      * @validate required, alpha, max(150)
      * @label název
      */
-    protected $_pageName;
+    protected $_title;
 
     /**
      * @column

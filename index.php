@@ -45,7 +45,7 @@ foreach ($iterator as $item) {
 }
 
 //register modules
-$modules = array('App', 'Admin');
+$modules = array('App', 'Admin', 'Search');
 THCFrame\Core\Core::registerModules($modules);
 
 //internal profiler
