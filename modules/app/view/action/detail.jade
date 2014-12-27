@@ -1,0 +1,19 @@
+.page
+   section.wrapper
+      .row.container
+         header
+            h1 {echo $action->title}
+            span autor: {echo $action->userAlias}<br/>
+            |{if !empty($startDate)}
+            span od: <strong>{echo $action->startDate}</strong><br/>
+            |{/if}
+            |{if !empty($endDate)}
+            span do: <strong>{echo $action->endDate}</strong><br/>
+            |{/if}
+            |{if !empty($startTime)}
+            span od: <strong>{echo $action->startTime}</strong><br/>
+            |{/if}
+            |{if !empty($endTime)}
+            span do: <strong>{echo $action->endTime}</strong><br/>
+            |{/if}
+         |{$action->body}

@@ -1,0 +1,35 @@
+article.partner{
+	float left
+	height 100px
+	padding 0 1em
+	margin 1em 0
+	position relative;
+	overflow:hidden;
+	text-align center
+	background white
+	img{
+		height 100px
+	}
+	&:hover > .info{
+		top 0
+		transition top 0.8 ease
+	}
+	.info{
+		position absolute
+		top -100px;
+		width 88%
+		height 100px
+		line-height 100px
+		background rgba(0,0,0, 0.8)
+		transition top 0.8s ease;
+		a{
+			color defaultGreen
+			font-size 1.1em
+			&:hover{
+				text-decoration underline
+				font-weight 700
+				color defaultGreen
+			}
+		}
+	}
+}

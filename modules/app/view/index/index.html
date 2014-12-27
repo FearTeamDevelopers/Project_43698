@@ -1,113 +1,67 @@
 
-<div class="homepage">
+<div class="homepage">{if !empty($reports)}
   <section class="wrapper">
     <div class="row container">
-      <ul class="bxslider">
-        <li><img title="bla" src="public/images/baner.jpg"/>
+      <ul class="bxslider">{foreach $report in $reports}
+        <li><img src="{echo $report->imgMain}"/>
           <div class="nadpisWrapper">
-            <div class="nadpis">
-              <h2>bla</h2>
-            </div>
+            <h2 class="nadpis"><a href="/reportaze/r/{echo $report->urlKey}">{echo $report->title}</a></h2>
           </div>
-        </li>
-        <li><img title="bla" src="public/images/holidays type.jpg"/>
-          <div class="nadpisWrapper">
-            <div class="nadpis">
-              <h2>bla2</h2>
-            </div>
-          </div>
-        </li>
-        <li><img title="bla" src="public/images/dubai.jpg"/>
-          <div class="nadpisWrapper">
-            <div class="nadpis">
-              <h2>bla3</h2>
-            </div>
-          </div>
-        </li>
+        </li>{/foreach}
       </ul>
     </div>
-  </section>
+    <div class="moreWrap"><a href="/reportaze">
+        <div class="more"><span>Zobrazit více</span></div></a></div>
+  </section>{/if}
+  {if !empty($news)}
   <section class="wrapper blue">
     <div class="row container">
       <header>
         <h3>Novinky</h3>
       </header>
-      <div class="container-box">
+      <div class="container-box">{foreach $new in $news}
         <article class="indexNew">
-          <header><a href="#">
-              <h4>nazev</h4></a></header>
-          <p>Lorem ipsum Et non in eu ex mollit amet sunt cupidatat consequat voluptate ut ad mollit incididunt Ut laboris anim.</p>
-        </article>
-        <article class="indexNew">
-          <header><a href="#">
-              <h4>nazev</h4></a></header>
-          <p>Lorem ipsum Et non in eu ex mollit amet sunt cupidatat consequat voluptate ut ad mollit incididunt Ut laboris anim.</p>
-        </article>
+          <header><a href="/novinky/r/{echo $new->urlKey}">
+              <h4>{echo $new->title}</h4></a></header>
+          <p>{echo $new->shortBody}</p>
+        </article>{/foreach}
       </div>
       <div class="moreWrap"><a href="/novinky">
           <div class="more blue"><span>Zobrazit více</span></div></a></div>
     </div>
-  </section>
+  </section>{/if}
+  {if !empty($actions)}
   <section class="wrapper">
     <div class="row container">
       <header>
         <h3>Akce</h3>
       </header>
       <div id="wrapper" class="container-box">
-        <div id="carousel"><a href="#">
+        <div id="carousel">{foreach $action in $actions}<a href="/akce/r/{echo $action->urlKey}">
             <article>
               <header>
-                <h4>blabla</h4><span class="datum">24.12.2015</span>
+                <h4>{echo $action->title}</h4><span class="datum">{echo $action->startDate}</span>
               </header>
-              <p>Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore</p>
-            </article></a><a href="#">
-            <article>
-              <header>
-                <h4>blabla</h4><span class="datum">24.12.2015</span>
-              </header>
-              <p>Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore</p>
-            </article></a><a href="#">
-            <article>
-              <header>
-                <h4>blabla</h4><span class="datum">24.12.2015</span>
-              </header>
-              <p>Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore</p>
-            </article></a><a href="#">
-            <article>
-              <header>
-                <h4>blabla</h4><span class="datum">24.12.2015</span>
-              </header>
-              <p>Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore</p>
-            </article></a><a href="#">
-            <article>
-              <header>
-                <h4>blabla</h4><span class="datum">24.12.2015</span>
-              </header>
-              <p>Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore</p>
-            </article></a><a href="#">
-            <article>
-              <header>
-                <h4>blabla</h4><span class="datum">24.12.2015</span>
-              </header>
-              <p>Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore</p>
-            </article></a><a href="#">
-            <article>
-              <header>
-                <h4>blabla</h4><span class="datum">24.12.2015</span>
-              </header>
-              <p>Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore</p>
-            </article></a>
-        </div>
+              <p>{echo $action->shortBody}</p>
+            </article></a>{/foreach}</div>
       </div>
-      <div class="moreWrap"><a href="#">
+      <div class="moreWrap"><a href="/akce">
           <div class="more"><span>Další akce</span></div></a></div>
     </div>
-  </section>
+  </section>{/if}
+  {if !empty($partners)}
   <section class="wrapper blue">
     <div class="row container">
       <header>
         <h3>Partneři</h3>
       </header>
+      <div class="container-box partneri">
+        <div id="carousel2">{foreach $partner in $partners}
+          <article class="partner"><img src="{echo $partner->logo}"/>
+            <div class="info"><a href="{echo $partner->web}">{echo $partner->title}</a></div>
+          </article>{/foreach}
+        </div>
+      </div>
     </div>
-  </section>
+  </section>{/if}
 </div>

@@ -1,4 +1,4 @@
 .page
 	section.wrapper
 		.row.container
-			{$content->body}
+			|{echo html_entity_decode($content->body)}

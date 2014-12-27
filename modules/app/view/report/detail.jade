@@ -1,0 +1,12 @@
+section.wrapper.report
+   .row
+   header.row
+      .imgWrapper
+         img(src!='$report->imgMain')
+      .info
+         h2 {echo $report->title}
+         span {echo $report->created}<br/>
+         span autor: {$report->userAlias}
+   .page.row
+      .container
+         |{echo $report->body}

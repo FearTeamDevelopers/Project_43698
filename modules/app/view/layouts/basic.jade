@@ -9,6 +9,22 @@ html
       meta(name='description', content='{echo $metadescription}')
       meta(name='author', content='Tomas Hodan')
       meta(name='robots', content='{echo $metarobots}')
+      |{if isset($article)}
+      <meta property="og:title" content="{echo $metatitle}" />
+      <meta property="og:type" content="{echo $metaogtype}" />
+      <meta property="og:url" content="{echo $metaogurl}" />
+      <meta property="og:image" content="{echo $metaogimage}" />
+      <meta property="og:description" content="{echo $metadescription}" />
+      <meta property="og:site_name" content="{echo $metaogsitename}" />
+      <meta property="article:published_time" content="{echo $artcreated}" />
+      <meta property="article:modified_time" content="{echo $artmodified}" />
+      |{/if}{else}
+      <meta property="og:url" content="{echo $metaogurl}" />
+      <meta property="og:title" content="{echo $metatitle}" />
+      <meta property="og:description" content="{echo $metadescription}" />
+      <meta property="og:type" content="{echo $metaogtype}" />
+      <meta property="og:site_name" content="{echo $metaogsitename}" />
+      |{/else}
       link(href='/public/css/custom/reset.css', media='screen', rel='stylesheet', type='text/css')
       link(href='/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css', media='screen', rel='stylesheet', type='text/css')
       link(href='/public/css/foundation/foundation.css', rel='stylesheet')
@@ -17,8 +33,11 @@ html
       link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
       script(type='text/javascript', src='/public/js/plugins/modernizr.js')
 
-      
-      title
+
+       link(rel='canonical' href='{echo $canonical}')
+      |{if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
+      |{if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
+      title {echo $metatitle}
   body
     section.wrapper.topPanel.blue
       header.row

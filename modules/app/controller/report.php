@@ -2,6 +2,7 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -88,6 +89,7 @@ class App_Controller_Report extends Controller
         }
 
         $view->set('reports', $reports)
+                ->set('currentpage', $page)
                 ->set('pagecount', $reportsPageCount);
 
         $layoutView->set('canonical', $canonical)
