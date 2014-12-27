@@ -7,6 +7,7 @@ CKEDITOR.editorConfig = function (config) {
     config.entities_latin = false;
     config.allowedContent = true;
     config.enterMode = CKEDITOR.ENTER_BR;
+    config.format_tags = 'p;h2;h3;h4;h5;h6;pre;address;div';
 
     config.extraPlugins = 'wordcount';
     config.wordcount = {
