@@ -1,0 +1,23 @@
+section.wrapper.reports
+   header.row
+      h2 Reportáže
+   .row
+      |{foreach $report in $reports}
+      a(href!='/reportaze/r/{echo $report->urlKey}')
+         article.report.large-6.columns
+            img(src!='{echo $report->imgThumb}')
+            .info
+               h2 {echo $report->title}
+               span {echo $report->created.", ".$report->userAlias}
+               p {echo $report->shortBody}
+      |{/foreach}
+   section.pager.row
+      | {if $currentpage != 1}
+      a(href='/reportaze/p/1') <<
+      a(href='/reportaze/p/{echo $currentpage-1}') <
+      | {/if}
+      a(href='#').active {echo $currentpage}
+      | {if $currentpage != $pagecount & $pagecount > 1}
+      a(href='/reportaze/p/{echo $currentpage+1}') >
+      a(href='/reportaze/p/{echo $pagecount}') >>
+      | {/if}

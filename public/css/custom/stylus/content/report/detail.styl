@@ -1,0 +1,51 @@
+
+section.wrapper.report{
+	header{
+		border 2px solid headerColor
+		border-top none
+		position relative
+		margin-bottom 40px
+		.imgWrapper{
+			height 250px
+			overflow hidden
+			width 100%
+			img{
+				width 75% !important
+				min-height 250px
+				-webkit-transition: all 1s ease;
+				-moz-transition: all 1s ease;
+				-o-transition: all 1s ease;
+				-ms-transition: all 1s ease;
+				transition: all 1s ease;
+				&:hover{
+					width 80% !important
+					margin-left -2.5%
+				}
+			}
+		}
+		.info{
+			position absolute
+			right 0
+			top 0
+			height 100%
+			background rgba(0,0,0,1)
+			width 25%
+			padding 10px
+			text-align center
+			h2 {
+				color white
+				margin 0
+				margin-top 20px
+				padding 0
+				padding-bottom 35px
+			}
+			span{
+				color white
+			}
+		}
+	}
+	.container{
+		padding-bottom 40px
+	}
+
+}

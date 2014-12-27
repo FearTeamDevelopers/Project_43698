@@ -1,0 +1,26 @@
+//
+   Created by Slamic on 26.12.2014.
+
+section.wrapper.akce
+   header.row
+      h2 akce
+   section.row.container
+      |{foreach $action in $actions}
+      article
+         header
+            h3 {echo $action->title}
+            span autor: {echo $action->userAlias}
+         .body
+            p {echo $action->shortBody}
+            a(href!='/akce/r/$action->urlKey') čti více
+      |{/foreach}
+   section.pager.row
+      | {if $currentpage != 1}
+      a(href='/akce/p/1') <<
+      a(href='/akce/p/{echo $currentpage-1}') <
+      | {/if}
+      a(href='#').active {echo $currentpage}
+      | {if $currentpage != $pagecount & $pagecount > 1}
+      a(href='/akce/p/{echo $currentpage+1}') >
+      a(href='/akce/p/{echo $pagecount}') >>
+      | {/if}

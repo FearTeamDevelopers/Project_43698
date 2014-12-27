@@ -21,7 +21,6 @@ html {
 body {
   min-height: 100%;
 }
-.clear{clear: both;}
 .mv10 {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -106,6 +105,66 @@ body {
 .wrapper.blue h3,
 .wrapper.blue h4 {
   color: #fff !important;
+}
+.wrapper header.row h2 {
+  text-align: center;
+  text-transform: uppercase;
+  padding: 2em 0;
+}
+.wrapper section.row.container article {
+  position: relative;
+  padding: 20px;
+}
+.wrapper section.row.container article:last-child {
+  margin-bottom: 20px;
+}
+.wrapper section.row.container article span {
+  font-style: italic;
+  margin: 0;
+}
+.wrapper section.row.container article header h3 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+.wrapper section.row.container article .body {
+  margin-top: 1.5em;
+}
+.wrapper section.row.container article .body p {
+  height: 50px;
+  line-height: 25px;
+  overflow: hidden;
+}
+.wrapper section.row.container article .body a {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  color: #000;
+  font-weight: bold;
+}
+.wrapper section.row.container article .body a:hover {
+  font-weight: 900;
+  text-decoration: underline;
+  text-transform: uppercase;
+}
+.wrapper section.row.container article:nth-child(odd) {
+  background: rgba(19,78,110,0.7);
+  border: 1px solid #134e6e;
+}
+.wrapper section.row.container article:nth-child(odd) h3,
+.wrapper section.row.container article:nth-child(odd) p,
+.wrapper section.row.container article:nth-child(odd) span {
+  color: #fff;
+}
+.wrapper section.row.container article:nth-child(odd) a {
+  color: #1dd2af;
+}
+.page section.wrapper header {
+  border-bottom: 2px dotted rgba(57,76,95,0.8);
+}
+.page section.wrapper header h1 {
+  text-align: left !important;
 }
 .content {
   width: 100%;
@@ -218,6 +277,41 @@ footer.wrapper .container header h3 {
   padding-top: 40px;
   padding-bottom: 80px;
 }
+.homepage section.wrapper .moreWrap {
+  position: absolute;
+  left: 50%;
+  height: 40px;
+  line-height: 40px;
+  width: 140px;
+  bottom: 4%;
+  z-index: 100;
+}
+.homepage section.wrapper .moreWrap .more {
+  position: relative;
+  text-align: center;
+  left: -50%;
+  height: 40px;
+  line-height: 40px;
+  background: #1dd2af;
+}
+.homepage section.wrapper .moreWrap .more span {
+  height: 40;
+  line: height 40;
+  width: 100%;
+  color: #fff;
+}
+.homepage section.wrapper .moreWrap .more.blue:hover {
+  background: #fff;
+}
+.homepage section.wrapper .moreWrap .more.blue:hover span {
+  color: #000;
+}
+.homepage section.wrapper .moreWrap .more:hover {
+  background: rgba(57,76,95,0.8);
+}
+.homepage section.wrapper .moreWrap .more:hover span {
+  color: #fff;
+}
 .homepage section.wrapper .container header h3 {
   width: 25%;
   margin: 0 auto;
@@ -240,17 +334,25 @@ footer.wrapper .container header h3 {
   top: 200px;
   position: absolute;
   width: 60%;
+  height: 62px;
 }
 .homepage section.wrapper .container .bx-wrapper .bx-viewport ul.bxslider .nadpisWrapper .nadpis {
   left: -50%;
   background: rgba(255,255,255,0.6);
   position: relative;
   text-align: center;
-  z-index: 10;
+  overflow: hidden;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-viewport ul.bxslider .nadpisWrapper .nadpis a {
+  color: #000 !important;
+}
+.homepage section.wrapper .container .bx-wrapper .bx-viewport ul.bxslider .nadpisWrapper .nadpis a:hover {
+  text-decoration: underline;
+  font-weight: bold;
 }
 .homepage section.wrapper .container .bx-wrapper .bx-controls .bx-pager {
-  width: 10%;
-  left: 45%;
+  width: 12%;
+  left: 44%;
   background: rgba(255,255,255,0.6);
   height: 1.5em;
   line-height: 1.5em;
@@ -277,6 +379,13 @@ footer.wrapper .container header h3 {
   background: #fff;
   color: #000;
   padding: 10px;
+}
+.homepage section.wrapper .container .container-box article.indexNew p {
+  height: 100px;
+  line-height: 25px;
+  overflow: hidden;
+  padding: 0 1em;
+  margin-top: 20px;
 }
 .homepage section.wrapper .container .container-box article.indexNew header a:hover h4 {
   text-decoration: underline;
@@ -305,11 +414,18 @@ footer.wrapper .container header h3 {
   color: #000;
   border-radius: 8px;
   border: 1px solid #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .homepage section.wrapper .container .container-box #carousel a:hover {
   margin-top: -2px;
   border-color: #1dd2af;
   border-width: 4px;
+}
+.homepage section.wrapper .container .container-box #carousel a p {
+  height: 150px;
+  overflow: hidden;
+  line-height: 25px;
 }
 .homepage section.wrapper .container .container-box #carousel a header {
   margin-bottom: 2em;
@@ -325,40 +441,44 @@ footer.wrapper .container header h3 {
   line-height: 0.7em;
   margin: 0;
 }
-.homepage section.wrapper .container .moreWrap {
-  position: absolute;
-  left: 50%;
-  height: 40px;
-  line-height: 40px;
-  width: 140px;
-  bottom: 4%;
-  z-index: 100;
-}
-.homepage section.wrapper .container .moreWrap .more {
+.homepage section.wrapper .container .container-box article.partner {
+  float: left;
+  height: 100px;
+  padding: 0 1em;
+  margin: 1em 0;
   position: relative;
+  overflow: hidden;
   text-align: center;
-  left: -50%;
-  height: 40px;
-  line-height: 40px;
-  background: #1dd2af;
-}
-.homepage section.wrapper .container .moreWrap .more span {
-  height: 40;
-  line: height 40;
-  width: 100%;
-  color: #fff;
-}
-.homepage section.wrapper .container .moreWrap .more.blue:hover {
   background: #fff;
 }
-.homepage section.wrapper .container .moreWrap .more.blue:hover span {
-  color: #000;
+.homepage section.wrapper .container .container-box article.partner img {
+  height: 100px;
 }
-.homepage section.wrapper .container .moreWrap .more:hover {
-  background: rgba(57,76,95,0.8);
+.homepage section.wrapper .container .container-box article.partner:hover > .info {
+  top: 0;
+  transition: top 0.8 ease;
 }
-.homepage section.wrapper .container .moreWrap .more:hover span {
-  color: #fff;
+.homepage section.wrapper .container .container-box article.partner .info {
+  position: absolute;
+  top: -100px;
+  width: 88%;
+  height: 100px;
+  line-height: 100px;
+  background: rgba(0,0,0,0.8);
+  transition: top 0.8s ease;
+}
+.homepage section.wrapper .container .container-box article.partner .info a {
+  color: #1dd2af;
+  font-size: 1.1em;
+}
+.homepage section.wrapper .container .container-box article.partner .info a:hover {
+  text-decoration: underline;
+  font-weight: 700;
+  color: #1dd2af;
+}
+.homepage section.wrapper .container .partneri {
+  float: left;
+  width: 100%;
 }
 .page section.wrapper {
   overflow: hidden;
@@ -386,4 +506,133 @@ footer.wrapper .container header h3 {
 }
 .page section.wrapper .container hr {
   border-color: rgba(57,76,95,0.8);
+}
+article.report {
+  margin-top: 30px;
+  height: 200px;
+  overflow: hidden;
+  width: 45% !important;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+  padding: 0 !important;
+}
+article.report img {
+  min-height: 100%;
+  min-width: 100%;
+}
+article.report:hover > .info {
+  top: 0px;
+  transition: top 0.8 ease;
+}
+article.report:last-child {
+  margin-bottom: 30px;
+}
+article.report .info {
+  position: absolute;
+  top: 150px;
+  width: 100%;
+  padding: 10px;
+  height: 200px;
+  line-height: 25px;
+  background: rgba(0,0,0,0.6);
+  transition: top 0.8s ease;
+  overflow: hidden;
+}
+article.report .info h2,
+article.report .info span,
+article.report .info p {
+  color: #fff !important;
+  font-family: 'Ubuntu', sans-serif !important;
+}
+article.report .info h2 span,
+article.report .info span span,
+article.report .info p span {
+  color: #fff !important;
+}
+article.report .info h2 {
+  margin: 0;
+  padding: 0;
+  line-height: 40px;
+  height: 40px;
+}
+article.report .info span {
+  font-style: italic;
+  font-size: 0.7em;
+  padding: 0;
+  margin: 0;
+}
+article.report .info p {
+  margin-top: 15px;
+  font-size: 0.8em;
+}
+section.wrapper.report header {
+  border: 2px solid rgba(57,76,95,0.8);
+  border-top: none;
+  position: relative;
+  margin-bottom: 40px;
+}
+section.wrapper.report header .imgWrapper {
+  height: 250px;
+  overflow: hidden;
+  width: 100%;
+}
+section.wrapper.report header .imgWrapper img {
+  width: 75% !important;
+  min-height: 250px;
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  transition: all 1s ease;
+}
+section.wrapper.report header .imgWrapper img:hover {
+  width: 80% !important;
+  margin-left: -2.5%;
+}
+section.wrapper.report header .info {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  background: #000;
+  width: 25%;
+  padding: 10px;
+  text-align: center;
+}
+section.wrapper.report header .info h2 {
+  color: #fff;
+  margin: 0;
+  margin-top: 20px;
+  padding: 0;
+  padding-bottom: 35px;
+}
+section.wrapper.report header .info span {
+  color: #fff;
+}
+section.wrapper.report .container {
+  padding-bottom: 40px;
+}
+.pager {
+  text-align: center;
+  padding-bottom: 20px;
+}
+.pager a {
+  background: rgba(57,76,95,0.8);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  margin: 5px;
+}
+.pager a.active {
+  background: #1dd2af;
+  color: #fff;
+}
+.pager a:hover {
+  background: #fff;
+  color: #1dd2af;
+  border-color: #1dd2af;
 }

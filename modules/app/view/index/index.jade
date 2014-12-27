@@ -1,61 +1,73 @@
 .homepage
+	|{if !empty($reports)}
 	section.wrapper
 		.row.container
 			ul.bxslider
+				|{foreach $report in $reports}
 				li
-					img(title='bla' src='public/images/baner.jpg')
+					img(src!='{echo $report->imgMain}')
 					.nadpisWrapper
-						.nadpis
-							h2 bla
-				li
-					img(title='bla' src='public/images/holidays type.jpg')
-					.nadpisWrapper
-						.nadpis
-							h2 bla2
-				li
-					img(title='bla' src='public/images/dubai.jpg')
-					.nadpisWrapper
-						.nadpis
-							h2 bla3
+						h2.nadpis
+							a(href!='/reportaze/r/{echo $report->urlKey}') {echo $report->title}
+				|{/foreach}
+		.moreWrap
+			a(href='/reportaze')
+				.more
+					span Zobrazit více
+
+	|{/if}
+	| {if !empty($news)}
 	section.wrapper.blue
 		.row.container
 			header
 				h3 Novinky
 			.container-box
-				-	for(var x=0; x<2; x++)
-					article.indexNew
-						header
-							a(href='#')
-								h4 nazev
-						p Lorem ipsum Et non in eu ex mollit amet sunt cupidatat consequat voluptate ut ad mollit incididunt Ut laboris anim.
+				| {foreach $new in $news}
+				article.indexNew
+					header
+						a(href!='/novinky/r/{echo $new->urlKey}')
+							h4 {echo $new->title}
+					p {echo $new->shortBody}
+				| {/foreach}
 			.moreWrap
 				a(href='/novinky')
 					.more.blue
 						span Zobrazit více
+	| {/if}
+	|{if !empty($actions)}
 	section.wrapper
 		.row.container
 			header
 				h3 Akce
 			.container-box#wrapper
 				#carousel
-					- for(var x=0; x<7; x++)
-						a(href='#')
-							article
-								header
-									h4 blabla
-									span.datum 24.12.2015
-								p Lorem ipsum Veniam Ut sit esse incididunt ut commodo aute occaecat sit laboris incididunt. Lorem ipsum Dolore
+					|{foreach $action in $actions}
+					a(href!='/akce/r/{echo $action->urlKey}')
+						article
+							header
+								h4 {echo $action->title}
+								span.datum {echo $action->startDate}
+							p {echo $action->shortBody}
+					|{/foreach}
 			.moreWrap
-				a(href='#')
+				a(href='/akce')
 					.more
 						span Další akce
-
-	
-
+	|{/if}
+	|{if !empty($partners)}
 	section.wrapper.blue
 		.row.container
 			header
 				h3 Partneři
+			.container-box.partneri
+				#carousel2
+					|{foreach $partner in $partners}
+					article.partner
+						img(src!='{echo $partner->logo}')
+						.info
+							a(href!="{echo $partner->web}") {echo $partner->title}
+					|{/foreach}
+	|{/if}
 
 
 

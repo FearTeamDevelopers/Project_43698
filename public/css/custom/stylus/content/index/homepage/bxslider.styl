@@ -10,20 +10,29 @@
 				top 200px
 				position absolute
 				width 60%
+				height 62px
 				.nadpis{
 					left -50%
 					background rgba(255,255,255,0.6)
 					position relative
 					text-align center
-					z-index 10
+					overflow hidden
+					a{
+						color black!important
+						&:hover{
+							text-decoration underline
+							font-weight bold
+						}
+					}
+
 				}
 			}
 		}
 	}
 	.bx-controls{
 		.bx-pager{
-			width 10%
-			left 45%
+			width 12%
+			left 44%
 			background rgba(255,255,255,0.6)
 			height 1.5em
 			line-height 1.5em

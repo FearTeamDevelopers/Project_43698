@@ -1,0 +1,13 @@
+
+<div class="page">
+  <section class="wrapper">
+    <div class="row container">
+      <header>
+        <h1>{echo $news->title}</h1><span>autor: {echo $news->userAlias}<br/></span>{if !empty($startDate)}<span>od: <strong>{echo $news->startDate}</strong><br/></span>{/if}
+        {if !empty($endDate)}<span>do: <strong>{echo $news->endDate}</strong><br/></span>{/if}
+        {if !empty($startTime)}<span>od: <strong>{echo $news->startTime}</strong><br/></span>{/if}
+        {if !empty($endTime)}<span>do: <strong>{echo $news->endTime}</strong><br/></span>{/if}
+      </header>{$news->body}
+    </div>
+  </section>
+</div>

@@ -1,0 +1,2 @@
+
+<section class="pager row">{if $currentpage != 1}<a href="/novinky/p/1"><<</a><a href="/novinky/p/{echo $currentpage-1}"><</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="/novinky/p/{echo $currentpage+1}">></a><a href="/novinky/p/{echo $pagecount}">>></a>{/if}</section>
