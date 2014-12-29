@@ -12,16 +12,15 @@
 						img(src!='{echo $report->imgThumb}')
 						.info
 							h2 {echo $report->title}
-							span {echo $report->created.", ".$report->userAlias}
+							span {echo date("d.m. Y H:i", strtotime($report->created)).", ".$report->userAlias}
 							p {echo $report->shortBody}
-					|{/if}
-					|{else}
+					|{/if}{else}
 					article.report.medium-3
 
 						img(src!='{echo $report->imgThumb}')
 						.info
 							h3 {echo $report->title}
-							span {echo $report->created}<br/>
+							span {echo date("d.m. Y H:i", strtotime($report->created))}<br/>
 							span {echo $report->userAlias}
 
 					|{/else}

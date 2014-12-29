@@ -29,6 +29,26 @@ class App_Controller_Advertisement extends Controller
         unset($cleanStr);
         return $cleanStr2;
     }
+    
+    /**
+     * 
+     * @param App_Model_Advertisement $ad
+     * @param App_Model_AdMessage $message
+     * @return string
+     */
+    private function _getEmailBody(App_Model_Advertisement $ad, App_Model_AdMessage $message)
+    {
+        $body = '<div>'
+                . '<strong>Dotaz k inzerátu<strong><br/>'
+                . 'Byl odeslán následující dotaz k inzerátu na serveru <a href="http://'.$this->getServerHost().'">Hastrman</a>:'
+                . '<br/><br/>'
+                . 'Inzerát: <a href="http://'.$this->getServerHost().'/bazar/r/'.$ad->getUniqueKey().'">'.$ad->getTitle().'</a><br/>'
+                . 'Jméno: '.$message->getMsAuthor().'<br/>'
+                . 'Email: '.$message->getMsEmail().'<br/>'
+                . 'Text: <br/>'.$message->getMessage().'<br/>';
+        
+        return $body;
+    }
 
     /**
      * 
@@ -213,7 +233,52 @@ class App_Controller_Advertisement extends Controller
             self::redirect('/nenalezeno');
         }
 
-        $view->set('ad', $ad);
+        $view->set('ad', $ad)
+                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+
+        if (RequestMethods::post('submitAdReply')) {
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                self::redirect('/bazar/r/' . RequestMethods::post('aduniquekey'));
+            }
+
+            $message = new App_Model_AdMessage(array(
+                'adId' => $ad->getId(),
+                'msAuthor' => RequestMethods::post('name'),
+                'msEmail' => RequestMethods::post('email'),
+                'message' => RequestMethods::post('message'),
+                'sendEmailCopy' => RequestMethods::post('getemailcopy', 0),
+                'messageSent' => ''
+            ));
+
+            if ($message->validate()) {
+                require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+                $transport = Swift_MailTransport::newInstance();
+                $mailer = Swift_Mailer::newInstance($transport);
+
+                $email = Swift_Message::newInstance()
+                        ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
+                        ->setFrom('bazar@hastrman.cz')
+                        ->setBody($this->_getEmailBody($ad, $message));
+                
+                if ($message->getSendEmailCopy() == 1) {
+                    $email->setTo($message->getMsEmail(), $ad->getEmail());
+                } else {
+                    $email->setTo($ad->getEmail());
+                }
+                
+                $mailer->send($email);
+                
+                $message->messageSent = 1;
+                $message->save();
+                
+                $view->successMessage('Dotaz byl úspěšně odeslán');
+            }else{
+                $view->set('errors', $message->getErrors())
+                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                    ->set('admessage', $message);
+            }
+        }
     }
 
     /**

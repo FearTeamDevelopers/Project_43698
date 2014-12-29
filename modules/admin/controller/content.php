@@ -4,6 +4,7 @@ use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
+use THCFrame\Core\StringMethods;
 
 /**
  * 
@@ -83,6 +84,7 @@ class Admin_Controller_Content extends Controller
             } else {
                 Event::fire('admin.log', array('fail'));
                 $view->set('errors', $content->getErrors())
+                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                     ->set('content', $content);
             }
         }

@@ -255,7 +255,15 @@ class App_Model_Advertisement extends Model
                     ->order('adv.created', 'desc')
                     ->limit((int)$adsPerPage, (int)$page);
 
-            return self::initialize($query);
+            $ads = self::initialize($query);
+            
+            if(null !== $ads){
+                foreach($ads as &$ad){
+                    $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
+                }
+            }
+            
+            return $ads;
         }else{
             return null;
         }
@@ -269,7 +277,7 @@ class App_Model_Advertisement extends Model
     public static function countActiveByType($type)
     {
         if ($type == 'tender' || $type == 'demand') {
-            return self::count(array('active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'), 'type = ?' => $type));
+            return self::count(array('active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'), 'type = ?' => $type), array('id'));
         }else{
             return null;
         }
@@ -297,7 +305,15 @@ class App_Model_Advertisement extends Model
                     ->order('adv.created', 'desc')
                     ->limit((int)$adsPerPage, (int)$page);
 
-            return self::initialize($query);
+            $ads = self::initialize($query);
+            
+            if(null !== $ads){
+                foreach($ads as &$ad){
+                    $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
+                }
+            }
+            
+            return $ads;
         }else{
             return null;
         }
@@ -312,7 +328,7 @@ class App_Model_Advertisement extends Model
     public static function countActiveByTypeSection($type, $section)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.adtype', 'adv.active', 'adv.expirationDate', 'COUNT(adv.id) as count'))
+            $query = self::getQuery(array('COUNT(adv.id) as count'))
                     ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                             array('ads.title' => 'sectionTitle'))
                     ->where('ads.urlKey = ?', $section)
@@ -338,7 +354,7 @@ class App_Model_Advertisement extends Model
     {
         $query = self::getQuery(array('adv.*'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
-                        array('us.firstname', 'us.lastname'))
+                        array('us.firstname', 'us.lastname', 'us.email'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                         array('ads.title' => 'sectionTitle'))
                 ->where('adv.uniqueKey = ?', $uniquekey)
@@ -347,6 +363,11 @@ class App_Model_Advertisement extends Model
         $adArr = self::initialize($query);
         $ad = array_shift($adArr);
 
+        if ($ad !== null) {
+            $ad->messages = App_Model_AdMessage::all(array('adId = ?' => $ad->getId()));
+            $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
+        }
+        
         return $ad;
     }
 
