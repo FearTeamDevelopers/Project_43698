@@ -76,16 +76,14 @@ class Admin_Controller_User extends Controller
     public function index()
     {
         $view = $this->getActionView();
-        $security = Registry::get('security');
-
-        $superAdmin = $security->isGranted('role_superadmin');
 
         $users = App_Model_User::all(
-                        array('role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), array('id' => 'asc')
+                        array('role <> ?' => 'role_superadmin'), 
+                        array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), 
+                        array('id' => 'asc')
         );
 
-        $view->set('users', $users)
-                ->set('superadmin', $superAdmin);
+        $view->set('users', $users);
     }
 
     /**
@@ -192,6 +190,7 @@ class Admin_Controller_User extends Controller
 
         if (NULL === $user) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         }
 
@@ -218,7 +217,7 @@ class Admin_Controller_User extends Controller
 
             $pass = RequestMethods::post('password');
 
-            if ($pass === null || $pass == '') {
+            if (null === $pass || $pass == '') {
                 $salt = $user->getSalt();
                 $hash = $user->getPassword();
             } else {
@@ -298,9 +297,11 @@ class Admin_Controller_User extends Controller
 
         if (NULL === $user) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         } elseif ($user->role == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
-            $view->errorMessage(self::ERROR_MESSAGE_4);
+            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         }
 
@@ -329,7 +330,7 @@ class Admin_Controller_User extends Controller
 
             $pass = RequestMethods::post('password');
 
-            if ($pass === null || $pass == '') {
+            if (null === $pass || $pass == '') {
                 $salt = $user->getSalt();
                 $hash = $user->getPassword();
             } else {
@@ -401,7 +402,7 @@ class Admin_Controller_User extends Controller
 
     /**
      * 
-     * @before _secured, _superadmin
+     * @before _secured, _admin
      * @param type $id
      */
     public function delete($id)
@@ -444,7 +445,7 @@ class Admin_Controller_User extends Controller
                 $user = App_Model_User::first(array('id = ?' => $this->getUser()->getId()));
             }
 
-            if ($user === null) {
+            if (null === $user) {
                 echo self::ERROR_MESSAGE_2;
             } else {
                 $unlinkMainImg = $user->getUnlinkPath();

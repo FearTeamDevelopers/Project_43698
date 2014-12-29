@@ -4,8 +4,10 @@
     <li class="current"><a href="#">Editovat uživatele</a></li>
 </ul>
 
+{if isset($user)}
 <div class="content">
-    <form class="stdform stdform2 cropit-form" method="post" action="#">
+    <form class="stdform stdform2 cropit-form" method="post" action="#" enctype="multipart/form-data">
+        <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
         <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
         <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
 
@@ -45,7 +47,7 @@
         </p>
         
         <div class="par">
-            <label>Profilová fotka*<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
+            <label>Profilová fotka*<small>*.jpg, *.jpeg, *.png, *.gif<br/>Max. 15MB</small></label>
             {if $user->imgMain != ""}
             <span class="field" id="currentLogo">
                 <img src="{echo $user->imgThumb}" alt="" height="100" />
@@ -209,3 +211,4 @@
         </p>
     </form>
 </div>
+{/if}

@@ -19,7 +19,7 @@ class Admin_Controller_Advertisement extends Controller
     {
         $status = App_Model_AdSection::first(array('urlKey = ?' => $key));
 
-        if ($status === null) {
+        if (null === $status) {
             return true;
         } else {
             return false;
@@ -54,7 +54,7 @@ class Admin_Controller_Advertisement extends Controller
         $view = $this->getActionView();
         $ad = App_Model_Advertisement::fetchById($id);
 
-        if ($ad === null) {
+        if (null === $ad) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/admin/advertisement/');
         }

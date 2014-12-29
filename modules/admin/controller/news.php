@@ -13,6 +13,21 @@ class Admin_Controller_News extends Controller
 
     /**
      * 
+     * @param App_Model_News $news
+     * @return boolean
+     */
+    private function _checkAccess(App_Model_News $news)
+    {
+        if($this->_security->isGranted('role_admin') === true ||
+                $news->getUserId() == $this->getUser()->getId()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * 
      * @param type $key
      * @return boolean
      */
@@ -20,7 +35,7 @@ class Admin_Controller_News extends Controller
     {
         $status = App_Model_News::first(array('urlKey = ?' => $key));
 
-        if ($status === null) {
+        if (null === $status) {
             return true;
         } else {
             return false;
@@ -105,14 +120,15 @@ class Admin_Controller_News extends Controller
 
         $news = App_Model_News::first(array('id = ?' => (int) $id));
 
-        if ($news === null) {
+        if (null === $news) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/news/');
         }
 
-        if ($this->_security->isGranted('role_admin') !== true ||
-                $news->getUserId() !== $this->getUser()->getId()) {
+        if (!$this->_checkAccess($news)) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/news/');
         }
 
@@ -130,7 +146,7 @@ class Admin_Controller_News extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
-            if ($news->userId === null) {
+            if (null === $news->userId) {
                 $news->userId = $this->getUser()->getId();
                 $news->userAlias = $this->getUser()->getWholeName();
             }
@@ -182,8 +198,7 @@ class Admin_Controller_News extends Controller
         if (NULL === $news) {
             echo self::ERROR_MESSAGE_2;
         } else {
-            if ($this->_security->isGranted('role_admin') === true ||
-                    $news->getUserId() == $this->getUser()->getId()) {
+            if ($this->_checkAccess($news)) {
                 if ($news->delete()) {
                     Registry::get('cache')->invalidate();
                     Event::fire('admin.log', array('success', 'News id: ' . $id));
@@ -213,7 +228,7 @@ class Admin_Controller_News extends Controller
         } else {
             $news->approved = 1;
 
-            if ($news->userId === null) {
+            if (null === $news->userId) {
                 $news->userId = $this->getUser()->getId();
                 $news->userAlias = $this->getUser()->getWholeName();
             }
@@ -245,7 +260,7 @@ class Admin_Controller_News extends Controller
         } else {
             $news->approved = 2;
 
-            if ($news->userId === null) {
+            if (null === $news->userId) {
                 $news->userId = $this->getUser()->getId();
                 $news->userAlias = $this->getUser()->getWholeName();
             }
@@ -326,7 +341,7 @@ class Admin_Controller_News extends Controller
                     foreach ($news as $_news) {
                         $_news->active = true;
 
-                        if ($_news->userId === null) {
+                        if (null === $_news->userId) {
                             $_news->userId = $this->getUser()->getId();
                             $_news->userAlias = $this->getUser()->getWholeName();
                         }
@@ -360,7 +375,7 @@ class Admin_Controller_News extends Controller
                     foreach ($news as $_news) {
                         $_news->active = false;
 
-                        if ($_news->userId === null) {
+                        if (null === $_news->userId) {
                             $_news->userId = $this->getUser()->getId();
                             $_news->userAlias = $this->getUser()->getWholeName();
                         }
@@ -395,7 +410,7 @@ class Admin_Controller_News extends Controller
                     foreach ($news as $_news) {
                         $_news->approved = 1;
 
-                        if ($_news->userId === null) {
+                        if (null === $_news->userId) {
                             $_news->userId = $this->getUser()->getId();
                             $_news->userAlias = $this->getUser()->getWholeName();
                         }
@@ -430,7 +445,7 @@ class Admin_Controller_News extends Controller
                     foreach ($news as $_news) {
                         $_news->approved = 2;
 
-                        if ($_news->userId === null) {
+                        if (null === $_news->userId) {
                             $_news->userId = $this->getUser()->getId();
                             $_news->userAlias = $this->getUser()->getWholeName();
                         }
@@ -565,6 +580,10 @@ class Admin_Controller_News extends Controller
                     $label .= "<span class='labelProduct labelProductRed'>Zamítnuto</span>";
                 } else {
                     $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
+                }
+                
+                if($this->getUser()->getId() == $_news->getUserId()){
+                    $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
                 }
 
                 if ($_news->archive) {

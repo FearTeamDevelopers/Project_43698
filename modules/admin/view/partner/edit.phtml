@@ -4,6 +4,7 @@
     <li class="current"><a href="#">Upravit Partnera</a></li>
 </ul>
 
+{if isset($partner)}
 <div class="content">
     <div class="contenttitle">
         <h2 class="form"><span>Základní info</span></h2>
@@ -23,7 +24,7 @@
             </span>
         </p>
         <p>
-            <label>Logo*</label>
+            <label>Logo*<small>*.jpg, *.jpeg, *.png, *.gif<br/>Max. 5MB</small></label>
             {if $partner->logo != ""}
             <span class="field" id="currentLogo">
                 <img src="{echo $partner->logo}" alt="" height="100px" />
@@ -83,3 +84,4 @@
         </p>
     </form>
 </div>
+{/if}

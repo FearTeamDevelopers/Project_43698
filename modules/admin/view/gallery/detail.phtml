@@ -6,6 +6,7 @@
     <li><a href="/admin/gallery/delete/{echo $gallery->id}">Smazat Galerii</a></li>
 </ul><!--maintabmenu-->
 
+{if isset($gallery)}
 <div class="content">
     <div class="contenttitle radiusbottom0">
         <h2 class="table"><span>{echo $gallery->title}</span></h2>
@@ -53,4 +54,5 @@
         <div class="notification msginfo"><a class="close"></a><p>Žádné foto v galerii</p></div>
         {/else}
     </div>
-</div><!--#tabs-->
+</div>
+{/if}

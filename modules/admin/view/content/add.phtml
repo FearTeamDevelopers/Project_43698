@@ -47,7 +47,8 @@
             <p>
                 <label>Meta-Název</label>
                 <span class="field" >
-                    <input class="longinput" type="text" name="metatitle" value="{echo isset($content)? $content->metaTitle: ""}" />
+                    <input class="longinput" type="text" name="metatitle" value="{echo isset($content)? $content->metaTitle: ""}" 
+                           placeholder="Výchozí hodnota: stejný jako Název stránky" />
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}

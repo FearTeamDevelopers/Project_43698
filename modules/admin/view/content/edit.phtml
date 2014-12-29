@@ -4,6 +4,7 @@
     <li class="current"><a href="#">Editovat stránku</a></li>
 </ul><!--maintabmenu-->
 
+{if isset($content)}
 <div class="content">
     <div class="widgetbox">
         <div class="contenttitle radiusbottom0">
@@ -47,7 +48,8 @@
             <p>
                 <label>Meta-Název</label>
                 <span class="field" >
-                    <input class="longinput" type="text" name="metatitle" value="{echo $content->metaTitle}" />
+                    <input class="longinput" type="text" name="metatitle" value="{echo $content->metaTitle}" 
+                           placeholder="Výchozí hodnota: stejný jako Název stránky"/>
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -100,3 +102,4 @@
 <br class="clear-all"/>
 <div id="insert-dialog"><p></p></div>
 <script type="text/javascript" src="/public/js/custom/news.js"></script>
+{/if}

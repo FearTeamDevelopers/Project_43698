@@ -21,7 +21,7 @@ class Admin_Controller_Gallery extends Controller
     {
         $status = App_Model_Gallery::first(array('urlKey = ?' => $key));
 
-        if ($status === null) {
+        if (null === $status) {
             return true;
         } else {
             return false;
@@ -31,23 +31,11 @@ class Admin_Controller_Gallery extends Controller
     /**
      * 
      * @param App_Model_Gallery $gallery
-     * @param type $access
-     * @param type $edit
      * @return boolean
      */
-    private function hasAccessToGallery(App_Model_Gallery $gallery, $access = true, $edit = false)
+    private function _checkAccess(App_Model_Gallery $gallery)
     {
-        if ($gallery->getId() == 1 && $access && !$edit) {
-            return true;
-        } elseif ($gallery->getId() == 1 && $edit) {
-            return false;
-        } elseif ($gallery->isSystem == 1 && $access && !$edit) {
-            return true;
-        } elseif ($gallery->isSystem == 1 && $edit &&
-                ($this->_security->isGranted('role_admin') === true ||
-                $gallery->getUserId() == $this->getUser()->getId())) {
-            return true;
-        } elseif ($this->_security->isGranted('role_admin') == true ||
+        if ($this->_security->isGranted('role_admin') === true ||
                 $gallery->getUserId() == $this->getUser()->getId()) {
             return true;
         } else {
@@ -110,7 +98,7 @@ class Admin_Controller_Gallery extends Controller
                 Registry::get('cache')->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
                 $view->successMessage('Gallery' . self::SUCCESS_MESSAGE_1);
-                self::redirect('/admin/gallery/');
+                self::redirect('/admin/gallery/detail/' . $id);
             } else {
                 Event::fire('admin.log', array('fail'));
                 $view->set('gallery', $gallery)
@@ -133,13 +121,9 @@ class Admin_Controller_Gallery extends Controller
 
         $gallery = App_Model_Gallery::fetchGalleryById((int) $id);
 
-        if ($gallery === null) {
+        if (null === $gallery) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
-            self::redirect('/admin/gallery/');
-        }
-
-        if (!$this->hasAccessToGallery($gallery)) {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
@@ -161,11 +145,13 @@ class Admin_Controller_Gallery extends Controller
 
         if (NULL === $gallery) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
-        if (!$this->hasAccessToGallery($gallery, true, true)) {
+        if (!$this->_checkAccess($gallery)) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
@@ -183,7 +169,7 @@ class Admin_Controller_Gallery extends Controller
                 $errors['title'] = array('Gallery with this title already exists');
             }
 
-            if ($gallery->userId === null) {
+            if (null === $gallery->userId) {
                 $gallery->userId = $this->getUser()->getId();
                 $gallery->userAlias = $this->getUser()->getWholeName();
             }
@@ -202,7 +188,7 @@ class Admin_Controller_Gallery extends Controller
                 Registry::get('cache')->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
-                self::redirect('/admin/gallery/');
+                self::redirect('/admin/gallery/detail/' . $id);
             } else {
                 Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
                 $view->set('errors', $gallery->getErrors());
@@ -228,11 +214,13 @@ class Admin_Controller_Gallery extends Controller
 
         if (NULL === $gallery) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
-        if (!$this->hasAccessToGallery($gallery, true, true)) {
+        if (!$this->_checkAccess($gallery)) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
@@ -280,7 +268,7 @@ class Admin_Controller_Gallery extends Controller
                 self::redirect('/admin/gallery/');
             } else {
                 Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
-                $view->errorMessage(self::ERROR_MESSAGE_1);
+                $view->warningMessage(self::ERROR_MESSAGE_1);
                 self::redirect('/admin/gallery/');
             }
         }
@@ -293,12 +281,12 @@ class Admin_Controller_Gallery extends Controller
     {
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
-        
+
         $galleries = App_Model_Gallery::all(array(), array('urlKey', 'title'));
-        
+
         $view->set('galleries', $galleries);
     }
-    
+
     /**
      * Action method shows and processes form used for uploading photos into
      * collection specified by param id
@@ -317,13 +305,15 @@ class Admin_Controller_Gallery extends Controller
                         ), array('id', 'title', 'userId')
         );
 
-        if ($gallery === null) {
+        if (null === $gallery) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
-        if (!$this->hasAccessToGallery($gallery, true)) {
+        if (!$this->_checkAccess($gallery)) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
@@ -404,12 +394,26 @@ class Admin_Controller_Gallery extends Controller
         $this->willRenderLayoutView = false;
 
         $photo = App_Model_Photo::first(
-                        array('id = ?' => $id), array('id', 'imgMain', 'imgThumb')
+                        array('id = ?' => $id), 
+                        array('id', 'imgMain', 'imgThumb', 'galleryId')
         );
 
         if (null === $photo) {
             echo self::ERROR_MESSAGE_2;
         } else {
+            $gallery = App_Model_Gallery::first(
+                        array('id = ?' => (int) $photo->getGalleryId()), 
+                        array('id', 'userId')
+            );
+
+            if (null === $gallery) {
+                echo self::ERROR_MESSAGE_2;
+            }
+
+            if (!$this->_checkAccess($gallery)) {
+                echo self::ERROR_MESSAGE_4;
+            }
+
             $mainPath = $photo->getUnlinkPath();
             $thumbPath = $photo->getUnlinkThumbPath();
 
@@ -437,11 +441,24 @@ class Admin_Controller_Gallery extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        $photo = App_Model_Photo::first(array('id = ?' => $id));
+        $photo = App_Model_Photo::first(array('id = ?' => (int)$id));
 
         if (null === $photo) {
             echo self::ERROR_MESSAGE_2;
         } else {
+            $gallery = App_Model_Gallery::first(
+                        array('id = ?' => (int) $photo->getGalleryId()), 
+                        array('id', 'userId')
+            );
+
+            if (null === $gallery) {
+                echo self::ERROR_MESSAGE_2;
+            }
+
+            if (!$this->_checkAccess($gallery)) {
+                echo self::ERROR_MESSAGE_4;
+            }
+            
             if (!$photo->active) {
                 $photo->active = true;
 

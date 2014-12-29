@@ -4,13 +4,15 @@
     <li class="current"><a href="#">Upravit Reportáž</a></li>
 </ul><!--maintabmenu-->
 
+{if isset($report)}
 <div class="content">
     <div class="widgetbox">
         <div class="contenttitle radiusbottom0">
             <h2 class="table"><span>Základní info</span></h2>
         </div><!--contenttitle-->
 
-        <form class="stdform stdform2" method="post" action="#" >
+        <form class="stdform stdform2" method="post" action="#" enctype="multipart/form-data">
+            <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
             <p>
                 <label>Název*</label>
@@ -136,19 +138,10 @@
                 <h2 class="table"><span>Metadata</span></h2>
             </div><!--contenttitle-->
             <p>
-                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
-                <span class="field">
-                    <input type="text" name="keywords" value="{echo $report->keywords}" 
-                           class="longinput" placeholder="Oddělovač: mezera"/>
-                    {if isset($errors["keywords"])}
-                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
-                    {/if}
-                </span>
-            </p>
-            <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    <input type="text" name="metatitle" class="longinput" value="{echo $report->metaTitle}" />
+                    <input type="text" name="metatitle" class="longinput" value="{echo $report->metaTitle}" 
+                           placeholder="Výchozí hodnota: stejný jako Název" />
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -164,13 +157,23 @@
                     <br/>
                 </span>
             </p>
+            <p>
+                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
+                <span class="field">
+                    <input type="text" name="keywords" value="{echo $report->keywords}" 
+                           class="longinput" placeholder="Oddělovač: mezera"/>
+                    {if isset($errors["keywords"])}
+                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
+                    {/if}
+                </span>
+            </p>
 
             <br/>
             <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Pozadí pro slider</span></h2>
+                <h2 class="table"><span>Pozadí pro reportáž</span></h2>
             </div><!--contenttitle-->
             <div class="par">
-                <label>Foto*<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
+                <label>Foto*<small>*.jpg, *.jpeg, *.png, *.gif<br/>Max. 15MB</small></label>
                 {if $report->imgMain != ""}
                 <span class="field" id="currentLogo">
                     <img src="{echo $report->imgThumb}" alt="" height="100" />
@@ -222,3 +225,4 @@
 <br class="clear-all"/>
 <div id="insert-dialog"><p></p></div>
 <script type="text/javascript" src="/public/js/custom/news.js"></script>
+{/if}

@@ -134,8 +134,9 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_admin') !== true) {
-            $view->infoMessage(self::ERROR_MESSAGE_6);
-            self::redirect('/admin/logout');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/search/');
         }
     }
 
@@ -157,8 +158,12 @@ class Controller extends BaseController
      */
     public function _cron()
     {
-        if (RequestMethods::server('HTTP_HOST') === null) {
-            exit;
+        $view = $this->getActionView();
+        
+        if (RequestMethods::server('HTTP_HOST') !== null) {
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/search/');
         }
     }
 
@@ -183,8 +188,9 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') !== true) {
-            $view->infoMessage(self::ERROR_MESSAGE_6);
-            self::redirect('/admin/logout');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/search/');
         }
     }
 

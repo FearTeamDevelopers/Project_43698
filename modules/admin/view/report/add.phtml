@@ -10,6 +10,7 @@
         </div><!--contenttitle-->
 
         <form class="stdform stdform2 cropit-form" method="post" action="#" enctype="multipart/form-data">
+            <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
             <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
             <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
@@ -85,19 +86,10 @@
                 <h2 class="table"><span>Metadata</span></h2>
             </div><!--contenttitle-->
             <p>
-                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
-                <span class="field">
-                    <input type="text" name="keywords" value="{echo isset($report)? $report->keywords: ""}" 
-                           class="longinput" placeholder="Oddělovač: mezera"/>
-                    {if isset($errors["keywords"])}
-                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
-                    {/if}
-                </span>
-            </p>
-            <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    <input type="text" name="metatitle" class="longinput" value="{echo isset($report)? $report->metaTitle: ""}" />
+                    <input type="text" name="metatitle" class="longinput" value="{echo isset($report)? $report->metaTitle: ""}" 
+                           placeholder="Výchozí hodnota: stejný jako Název"/>
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -113,14 +105,24 @@
                     <br/>
                 </span>
             </p>
+            <p>
+                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
+                <span class="field">
+                    <input type="text" name="keywords" value="{echo isset($report)? $report->keywords: ""}" 
+                           class="longinput" placeholder="Oddělovač: mezera"/>
+                    {if isset($errors["keywords"])}
+                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
+                    {/if}
+                </span>
+            </p>
 
             <br/>
             <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Pozadí pro slider</span></h2>
+                <h2 class="table"><span>Pozadí pro reportáž</span></h2>
             </div><!--contenttitle-->
 
             <div class="par">
-                <label>Foto*<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
+                <label>Foto*<small>*.jpg, *.jpeg, *.png, *.gif<br/>Max. 15MB</small></label>
                 <div id="image-cropper" class="field">
                     <input type="file" class="cropit-image-input" accept="image/*"/>
                     <div class="cropit-image-preview-container">

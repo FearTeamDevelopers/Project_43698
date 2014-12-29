@@ -20,7 +20,7 @@ class Admin_Controller_Content extends Controller
     {
         $status = App_Model_PageContent::first(array('urlKey = ?' => $key));
 
-        if ($status === null) {
+        if (null === $status) {
             return true;
         } else {
             return false;
@@ -40,7 +40,7 @@ class Admin_Controller_Content extends Controller
     }
 
     /**
-     * @before _secured, _superadmin
+     * @before _secured, _admin
      */
     public function add()
     {
@@ -98,7 +98,8 @@ class Admin_Controller_Content extends Controller
         $content = App_Model_PageContent::first(array('id = ?' => (int) $id));
 
         if (NULL === $content) {
-            $view->errorMessage('Obsah nenalezen');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/content/');
         }
 

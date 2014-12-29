@@ -284,8 +284,10 @@ class App_Model_Report extends Model
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'imgMain', 'imgThumb', 'photoName'), 
+        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 
+                        'archive = ?' => false, 'expirationDate >= ?' => date('Y-m-d H:i:s')), 
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 
+                        'imgMain', 'imgThumb', 'photoName'), 
                 array('rank' => 'desc','created' => 'desc'), 
                 $limit, $page
         );

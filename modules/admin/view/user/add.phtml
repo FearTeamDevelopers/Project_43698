@@ -6,6 +6,7 @@
 <div class="content">
 
     <form class="stdform stdform2 cropit-form" method="post" action="#" enctype="multipart/form-data">
+        <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
         <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
         <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
         <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
@@ -45,7 +46,7 @@
             </span>
         </p>
         <div class="par">
-            <label>Profilová fotka*<small>*.jpg, *.jpeg, *.png, *.gif</small></label>
+            <label>Profilová fotka*<small>*.jpg, *.jpeg, *.png, *.gif<br/>Max. 15MB</small></label>
             <div id="image-cropper" class="field">
                 <input type="file" class="cropit-image-input" accept="image/*"/>
                 <div class="cropit-image-preview-container">

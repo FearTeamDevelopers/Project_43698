@@ -141,11 +141,13 @@ class Admin_Controller_System extends Controller
         $pageContentXml = '';
 
         $pageContent = App_Model_PageContent::all(array('active = ?' => true));
+        
         if($pageContent !== null){
             foreach ($pageContent as $content){
-                $pageContentXml .= '';
+                $pageContentXml .= "<url><loc>http://{$host}/{$content}</loc></url>";
             }
         }
+        
         $pageContentXml = "<url><loc>http://{$host}</loc></url>"
                 . "<url><loc>http://{$host}/o-nas</loc></url>"
                 . "<url><loc>http://{$host}/cenik</loc></url>"
@@ -178,9 +180,9 @@ class Admin_Controller_System extends Controller
         $this->willRenderLayoutView = false;
 
         ini_set('max_execution_time', 1800);
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '256M');
 
-        $ROW_COUNT = 250;
+        $ROW_COUNT = 450;
 
         $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
 

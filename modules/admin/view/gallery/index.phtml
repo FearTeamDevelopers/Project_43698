@@ -31,17 +31,14 @@
                     <tr>
                         <td>{echo $gallery->getTitle()}</td>
                         <td>
-                            {if $gallery->isPublic == 0}
-                                Soukromá
-                            {/if}{else}
-                                Veřejná
-                            {/else}
+                            {if $gallery->isPublic == 0}Soukromá{/if}
+                            {else}Veřejná{/else}
                         </td>
                         <td>{echo $gallery->getUserAlias()}</td>
                         <td>{echo $gallery->getCreated()}</td>
                         <td>
                             {if ($gallery->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
-                            {if ($gallery->isSystem)}<span class="labelProduct labelProductBlue">Systémová</span>{/if}
+                            {if ($gallery->getUserId() == $authUser->getId())}<span class="labelProduct labelProductGray">Moje</span>{/if}
                         </td>
                         <td>
                             <a href="/admin/gallery/detail/{echo $gallery->id}" class="btn btn_image2">

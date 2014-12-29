@@ -104,6 +104,7 @@ class Admin_Controller_Partner extends Controller
 
         if (NULL === $partner) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/partner/');
         }
 
