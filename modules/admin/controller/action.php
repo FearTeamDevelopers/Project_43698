@@ -14,6 +14,21 @@ class Admin_Controller_Action extends Controller
 
     /**
      * 
+     * @param App_Model_Action $action
+     * @return boolean
+     */
+    private function _checkAccess(App_Model_Action $action)
+    {
+        if($this->_security->isGranted('role_admin') === true ||
+                $action->getUserId() == $this->getUser()->getId()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * 
      * @param type $key
      * @return boolean
      */
@@ -21,7 +36,7 @@ class Admin_Controller_Action extends Controller
     {
         $status = App_Model_Action::first(array('urlKey = ?' => $key));
 
-        if ($status === null) {
+        if (null === $status) {
             return true;
         } else {
             return false;
@@ -111,14 +126,15 @@ class Admin_Controller_Action extends Controller
 
         $action = App_Model_Action::first(array('id = ?' => (int) $id));
 
-        if ($action === null) {
+        if (null === $action) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/action/');
         }
 
-        if ($this->_security->isGranted('role_admin') !== true ||
-                $action->getUserId() !== $this->getUser()->getId()) {
+        if (!$this->_checkAccess($action)) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/action/');
         }
 
@@ -136,7 +152,7 @@ class Admin_Controller_Action extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
-            if ($action->userId === null) {
+            if (null === $action->userId) {
                 $action->userId = $this->getUser()->getId();
                 $action->userAlias = $this->getUser()->getWholeName();
             }
@@ -194,8 +210,7 @@ class Admin_Controller_Action extends Controller
         if (NULL === $action) {
             echo self::ERROR_MESSAGE_2;
         } else {
-            if ($this->_security->isGranted('role_admin') === true ||
-                    $action->getUserId() == $this->getUser()->getId()) {
+            if ($this->_checkAccess($action)) {
                 if ($action->delete()) {
                     Registry::get('cache')->invalidate();
                     Event::fire('admin.log', array('success', 'Action id: ' . $id));
@@ -225,7 +240,7 @@ class Admin_Controller_Action extends Controller
         } else {
             $action->approved = 1;
 
-            if ($action->userId === null) {
+            if (null === $action->userId) {
                 $action->userId = $this->getUser()->getId();
                 $action->userAlias = $this->getUser()->getWholeName();
             }
@@ -257,7 +272,7 @@ class Admin_Controller_Action extends Controller
         } else {
             $action->approved = 2;
 
-            if ($action->userId === null) {
+            if (null === $action->userId) {
                 $action->userId = $this->getUser()->getId();
                 $action->userAlias = $this->getUser()->getWholeName();
             }
@@ -341,7 +356,7 @@ class Admin_Controller_Action extends Controller
                     foreach ($actions as $action) {
                         $action->active = true;
 
-                        if ($action->userId === null) {
+                        if (null === $action->userId) {
                             $action->userId = $this->getUser()->getId();
                             $action->userAlias = $this->getUser()->getWholeName();
                         }
@@ -376,7 +391,7 @@ class Admin_Controller_Action extends Controller
                     foreach ($actions as $action) {
                         $action->active = false;
 
-                        if ($action->userId === null) {
+                        if (null === $action->userId) {
                             $action->userId = $this->getUser()->getId();
                             $action->userAlias = $this->getUser()->getWholeName();
                         }
@@ -411,7 +426,7 @@ class Admin_Controller_Action extends Controller
                     foreach ($actions as $action) {
                         $action->approved = 1;
 
-                        if ($action->userId === null) {
+                        if (null === $action->userId) {
                             $action->userId = $this->getUser()->getId();
                             $action->userAlias = $this->getUser()->getWholeName();
                         }
@@ -446,7 +461,7 @@ class Admin_Controller_Action extends Controller
                     foreach ($actions as $action) {
                         $action->approved = 2;
 
-                        if ($action->userId === null) {
+                        if (null === $action->userId) {
                             $action->userId = $this->getUser()->getId();
                             $action->userAlias = $this->getUser()->getWholeName();
                         }
@@ -583,6 +598,9 @@ class Admin_Controller_Action extends Controller
                     $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
                 }
 
+                if($this->getUser()->getId() == $action->getUserId()){
+                    $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
+                }
 
                 if ($action->archive) {
                     $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";

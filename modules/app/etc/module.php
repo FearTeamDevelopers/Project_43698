@@ -57,7 +57,7 @@ class App_Etc_Module extends Module
             'pattern' => '/bazar',
             'module' => 'app',
             'controller' => 'advertisement',
-            'action' => 'index',
+            'action' => 'index'
         ),
         array(
             'pattern' => '/galerie',
@@ -97,18 +97,37 @@ class App_Etc_Module extends Module
             'args' => ':urlkey'
         ),
         array(
-            'pattern' => '/bazar/:urlkey',
+            'pattern' => '/bazar/nenalezeno',
+            'module' => 'app',
+            'controller' => 'index',
+            'action' => 'notFound'
+        ),
+        array(
+            'pattern' => '/bazar/filtr',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'filter'
+        ),
+        array(
+            'pattern' => '/bazar/filtr/:page',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'filter',
+            'args' => ':page'
+        ),
+        array(
+            'pattern' => '/bazar/p/:page',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'index',
+            'args' => ':page'
+        ),
+        array(
+            'pattern' => '/bazar/r/:uniquekey',
             'module' => 'app',
             'controller' => 'advertisement',
             'action' => 'detail',
-            'args' => ':urlkey'
-        ),
-        array(
-            'pattern' => '/bazar/:type/:page',
-            'module' => 'app',
-            'controller' => 'advertisement',
-            'action' => 'listByType',
-            'args' => array(':type', ':page')
+            'args' => ':uniquekey'
         ),
         array(
             'pattern' => '/galerie/r/:urlkey',
@@ -165,13 +184,6 @@ class App_Etc_Module extends Module
             'controller' => 'news',
             'action' => 'detail',
             'args' => ':urlkey'
-        ),
-        array(
-            'pattern' => '/bazar/:type/:urlkey/:page',
-            'module' => 'app',
-            'controller' => 'advertisement',
-            'action' => 'listByTypeUrlkey',
-            'args' => array(':type', ':urlkey', ':page')
         )
     );
 

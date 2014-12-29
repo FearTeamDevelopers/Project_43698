@@ -131,8 +131,7 @@ class Controller extends BaseController
             $view = $this->getActionView();
 
             $view->infoMessage('Byl jste odhlášen z důvodu dlouhé neaktivity');
-            $this->_security->logout();
-            self::redirect('/login');
+            self::redirect('/logout');
         }
     }
 
@@ -144,8 +143,9 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_member') !== true) {
-            $view->infoMessage(self::ERROR_MESSAGE_6);
-            self::redirect('/logout');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/');
         }
     }
 

@@ -75,7 +75,7 @@ class Controller extends BaseController
         $session = Registry::get('session');
         
         //This line should be present only for DEV env
-        //$this->_security->forceLogin(1);
+        $this->_security->forceLogin(1);
         
         $user = $this->_security->getUser();
 
@@ -102,8 +102,9 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_member') !== true) {
-            $view->infoMessage(self::ERROR_MESSAGE_6);
-            self::redirect('/admin/logout');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/');
         }
     }
 
@@ -128,8 +129,9 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_participant') !== true) {
-            $view->infoMessage(self::ERROR_MESSAGE_6);
-            self::redirect('/admin/logout');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/');
         }
     }
 
@@ -154,8 +156,9 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_admin') !== true) {
-            $view->infoMessage(self::ERROR_MESSAGE_6);
-            self::redirect('/admin/logout');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/');
         }
     }
 
@@ -180,8 +183,9 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') !== true) {
-            $view->infoMessage(self::ERROR_MESSAGE_6);
-            self::redirect('/admin/logout');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/');
         }
     }
 

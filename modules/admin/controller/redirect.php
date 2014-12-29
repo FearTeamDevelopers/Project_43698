@@ -69,8 +69,9 @@ class Admin_Controller_Redirect extends Controller
 
         $redirect = Redirect::first(array('id = ?' => (int) $id));
 
-        if ($redirect === null) {
+        if (null === $redirect) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/redirect/');
         }
         

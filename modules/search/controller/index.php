@@ -125,6 +125,7 @@ class Search_Controller_Index extends Controller
     public function buildIndex()
     {
         Event::fire('search.log', array('success', 'Building search index'));
+        ini_set('max_execution_time', 1800);
 
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
@@ -132,9 +133,14 @@ class Search_Controller_Index extends Controller
         $database = Registry::get('database');
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, 'cron', 0, ?, now(), default)";
+        $prepareIdSql = "ALTER TABLE tb_searchindex auto_increment = 1";
+        $truncateSql = "TRUNCATE tb_searchindex";
 
         $starttime = microtime(true);
 
+        $database->execute($truncateSql);
+        $database->execute($prepareIdSql);
+        
         foreach ($this->_textSource as $table => $variables) {
             $sql = "SELECT " . implode(', ', $variables['columns'])
                     . " FROM " . $table
@@ -188,6 +194,8 @@ class Search_Controller_Index extends Controller
 
         $time = round(microtime(true) - $starttime, 2);
         Event::fire('search.log', array('success', 'Search index built in ' . $time . ' sec'));
+        
+        ini_set('max_execution_time', 30);
     }
 
     /**

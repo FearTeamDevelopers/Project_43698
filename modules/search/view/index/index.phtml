@@ -40,15 +40,13 @@
         <colgroup>
             <col class="con0" /><col class="con1" />
             <col class="con0" /><col class="con1" />
-            <col class="con0" />
         </colgroup>
         <thead>
             <tr>
                 <th class="head0">Model</th>
                 <th class="head1">Run by</th>
-                <th class="head0">Is manual</th>
-                <th class="head1">Indexed words count</th>
-                <th class="head0">Created</th>
+                <th class="head0">Indexed words count</th>
+                <th class="head1">Created</th>
             </tr>
         </thead>
         <tbody>
@@ -57,10 +55,6 @@
                     <tr>
                         <td>{echo $log->getSourceModel()}</td>
                         <td>{echo $log->getRunBy()}</td>
-                        <td>
-                            {if $log->getIsManualIndex() == 1}<span class="labelProduct labelProductOrange">Manual</span>{/if}
-                            {else}<span class="labelProduct labelProductBlue">CronJob</span>{/else}
-                        </td>
                         <td>{echo $log->getWordsCount()}</td>
                         <td>{echo $log->getCreated()}</td>
                     </tr>

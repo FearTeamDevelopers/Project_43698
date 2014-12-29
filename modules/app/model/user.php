@@ -59,7 +59,7 @@ class App_Model_User extends BasicUser
      * @type text
      * @length 256
      * 
-     * @validate html, max(10000)
+     * @validate html
      * @label profil
      */
     protected $_profile;

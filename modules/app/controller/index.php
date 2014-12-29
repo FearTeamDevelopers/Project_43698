@@ -48,7 +48,7 @@ class App_Controller_Index extends Controller
             $news = $cachedNews;
             unset($cachedNews);
         }else{
-            $news = App_Model_News::fetchActiveWithLimit(2);
+            $news = App_Model_News::fetchActiveWithLimit(4);
             $this->getCache()->set('index-news', $news);
         }
         
@@ -78,7 +78,11 @@ class App_Controller_Index extends Controller
             $partners = $cachedPartners;
             unset($cachedPartners);
         }else{
-            $partners = App_Model_Partner::all(array('active = ?' => true), array('*'), array('rank' => 'desc', 'created' => 'desc'));
+            $partners = App_Model_Partner::all(
+                    array('active = ?' => true), 
+                    array('*'), 
+                    array('rank' => 'desc', 'created' => 'desc')
+            );
             $this->getCache()->set('index-partners', $partners);
         }
             
@@ -138,7 +142,7 @@ class App_Controller_Index extends Controller
         $request = new Request();
         $response = $request->request('post', $url, $parameters);
         $urls = json_decode($response, true);
-var_dump($urls);die;
+
         $view->set('urls', $urls);
     }
 }

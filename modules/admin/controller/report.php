@@ -14,6 +14,21 @@ class Admin_Controller_Report extends Controller
 
     /**
      * 
+     * @param App_Model_Report $report
+     * @return boolean
+     */
+    private function _checkAccess(App_Model_Report $report)
+    {
+        if($this->_security->isGranted('role_admin') === true ||
+                $report->getUserId() == $this->getUser()->getId()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * 
      * @param type $key
      * @return boolean
      */
@@ -21,7 +36,7 @@ class Admin_Controller_Report extends Controller
     {
         $status = App_Model_Report::first(array('urlKey = ?' => $key));
 
-        if ($status === null) {
+        if (null === $status) {
             return true;
         } else {
             return false;
@@ -139,14 +154,15 @@ class Admin_Controller_Report extends Controller
 
         $report = App_Model_Report::first(array('id = ?' => (int) $id));
 
-        if ($report === null) {
+        if (null === $report) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/report/');
         }
 
-        if ($this->_security->isGranted('role_admin') !== true ||
-                $report->getUserId() !== $this->getUser()->getId()) {
+        if (!$this->_checkAccess($report)) {
             $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
             self::redirect('/admin/report/');
         }
 
@@ -197,7 +213,7 @@ class Admin_Controller_Report extends Controller
                 $imgThumb = $report->imgThumb;
             }
 
-            if ($report->userId === null) {
+            if (null === $report->userId) {
                 $report->userId = $this->getUser()->getId();
                 $report->userAlias = $this->getUser()->getWholeName();
             }
@@ -254,8 +270,7 @@ class Admin_Controller_Report extends Controller
         if (NULL === $report) {
             echo self::ERROR_MESSAGE_2;
         } else {
-            if ($this->_security->isGranted('role_admin') === true ||
-                    $report->getUserId() == $this->getUser()->getId()) {
+            if ($this->_checkAccess($report)) {
                 if ($report->delete()) {
                     Registry::get('cache')->invalidate();
                     Event::fire('admin.log', array('success', 'Report id: ' . $id));
@@ -285,8 +300,7 @@ class Admin_Controller_Report extends Controller
             if (NULL === $report) {
                 echo self::ERROR_MESSAGE_2;
             } else {
-                if ($this->_security->isGranted('role_admin') !== true ||
-                        $report->getUserId() !== $this->getUser()->getId()) {
+                if (!$this->_checkAccess($report)) {
                     echo self::ERROR_MESSAGE_4;
                 }
 
@@ -325,7 +339,7 @@ class Admin_Controller_Report extends Controller
         } else {
             $report->approved = 1;
 
-            if ($report->userId === null) {
+            if (null === $report->userId) {
                 $report->userId = $this->getUser()->getId();
                 $report->userAlias = $this->getUser()->getWholeName();
             }
@@ -357,7 +371,7 @@ class Admin_Controller_Report extends Controller
         } else {
             $report->approved = 2;
 
-            if ($report->userId === null) {
+            if (null === $report->userId) {
                 $report->userId = $this->getUser()->getId();
                 $report->userAlias = $this->getUser()->getWholeName();
             }
@@ -440,7 +454,7 @@ class Admin_Controller_Report extends Controller
                     foreach ($reports as $report) {
                         $report->active = true;
 
-                        if ($report->userId === null) {
+                        if (null === $report->userId) {
                             $report->userId = $this->getUser()->getId();
                             $report->userAlias = $this->getUser()->getWholeName();
                         }
@@ -475,7 +489,7 @@ class Admin_Controller_Report extends Controller
                     foreach ($reports as $report) {
                         $report->active = false;
 
-                        if ($report->userId === null) {
+                        if (null === $report->userId) {
                             $report->userId = $this->getUser()->getId();
                             $report->userAlias = $this->getUser()->getWholeName();
                         }
@@ -510,7 +524,7 @@ class Admin_Controller_Report extends Controller
                     foreach ($reports as $report) {
                         $report->approved = 1;
 
-                        if ($report->userId === null) {
+                        if (null === $report->userId) {
                             $report->userId = $this->getUser()->getId();
                             $report->userAlias = $this->getUser()->getWholeName();
                         }
@@ -545,7 +559,7 @@ class Admin_Controller_Report extends Controller
                     foreach ($reports as $report) {
                         $report->approved = 2;
 
-                        if ($report->userId === null) {
+                        if (null === $report->userId) {
                             $report->userId = $this->getUser()->getId();
                             $report->userAlias = $this->getUser()->getWholeName();
                         }
@@ -682,6 +696,9 @@ class Admin_Controller_Report extends Controller
                     $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
                 }
 
+                if($this->getUser()->getId() == $report->getUserId()){
+                    $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
+                }
 
                 if ($report->archive) {
                     $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";

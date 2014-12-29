@@ -6,6 +6,7 @@
     <li><a href="/admin/gallery/delete/{echo $gallery->id}">Smazat Galerii</a></li>
 </ul><!--maintabmenu-->
 
+{if isset($gallery)}
 <div class="content">
     <div class="contenttitle radiusbottom0">
         <h2 class="table"><span>Editovat Galerii</span></h2>
@@ -91,3 +92,4 @@
         </p>
     </form>
 </div>
+{/if}

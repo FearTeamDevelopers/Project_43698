@@ -259,6 +259,7 @@ class App_Model_Action extends Model
 
     /**
      * Called from admin module
+     * 
      * @return array
      */
     public static function fetchWithLimit($limit = 10)
@@ -274,12 +275,14 @@ class App_Model_Action extends Model
     
     /**
      * Called from app module
+     * 
      * @param type $limit
      * @return type
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 
+                        'archive = ?' => false, 'expirationDate >= ?' => date('Y-m-d H:i:s')), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
                 array('rank' => 'desc','created' => 'desc'), 
                 $limit, $page
@@ -290,6 +293,7 @@ class App_Model_Action extends Model
 
     /**
      * Called from app module
+     * 
      * @param type $limit
      * @return type
      */
@@ -306,6 +310,7 @@ class App_Model_Action extends Model
     
     /**
      * Called from app module
+     * 
      * @param type $urlKey
      * @return type
      */

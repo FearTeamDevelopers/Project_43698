@@ -240,7 +240,8 @@ class App_Model_News extends Model
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
+        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 
+                        'archive = ?' => false, 'expirationDate >= ?' => date('Y-m-d H:i:s')), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
                 array('rank' => 'desc','created' => 'desc'), 
                 $limit, $page
