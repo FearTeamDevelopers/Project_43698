@@ -1,0 +1,30 @@
+
+<section class="wrapper blue bazar">
+  <header class="row">
+    <h3>Bazar</h3>
+  </header>
+  <section class="row filter">
+    <form method="POST" action="/bazar/filtr">
+      <select name="bftype">
+        <option value="0">Typ</option>
+        <option value="nabidka">Nabídka</option>
+        <option value="poptavka">Poptávka</option>
+      </select>
+      <select name="bfsection">
+        <option value="0">Sekce</option>{foreach $ad in $adsections}
+        <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/foreach}
+      </select>
+      <input type="submit" name="zobrazit" value="Zobrazit"/>
+    </form>
+  </section>
+</section>
+<section class="wrapper">
+  <div class="row container">{foreach $ad in $ads}
+    <article class="large-6 column">{if $ad->adtype == "demand"}.poptavka{/if}.nabidka
+      <div class="imgWrapper"><a rel="lightbox" href="{echo $ad->imageImgMain}"><img src="{echo $ad->imageImgThumb}"/></a></div>
+      <div class="info">
+        <h4>{echo $ad->title}</h4><span>{echo $ad->sectionTitle}<br/></span>
+      </div>
+    </article>{/foreach}
+  </div>
+</section>

@@ -89,6 +89,7 @@ class App_Controller_Action extends Controller
         }
 
         $view->set('actions', $actions)
+                ->set('path', "akce")
                 ->set('currentpage', $page)
                 ->set('pagecount', $actionsPageCount);
 

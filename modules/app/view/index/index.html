@@ -2,13 +2,22 @@
 <div class="homepage">{if !empty($reports)}
   <section class="wrapper">
     <div class="row container">
-      <ul class="bxslider">{foreach $report in $reports}
-        <li><img src="{echo $report->imgMain}"/>
-          <div class="nadpisWrapper">
-            <h2 class="nadpis"><a href="/reportaze/r/{echo $report->urlKey}">{echo $report->title}</a></h2>
-          </div>
-        </li>{/foreach}
-      </ul>
+      <header>
+        <h3>Reportáže</h3>
+      </header>
+      <div class="container-box">{foreach $report in $reports}<a href="/reportaze/r/{echo $report->urlKey}">{if $report_i == 0}
+          <article class="report large-9"><img src="{echo $report->imgThumb}"/>
+            <div class="info">
+              <h2>{echo $report->title}</h2><span>{echo $report->created.", ".$report->userAlias}</span>
+              <p>{echo $report->shortBody}</p>
+            </div>
+          </article>{/if}
+          {else}
+          <article class="report medium-3"><img src="{echo $report->imgThumb}"/>
+            <div class="info">
+              <h3>{echo $report->title}</h3><span>{echo $report->created}<br/></span><span>{echo $report->userAlias}</span>
+            </div>
+          </article>{/else}</a>{/foreach}</div>
     </div>
     <div class="moreWrap"><a href="/reportaze">
         <div class="more"><span>Zobrazit více</span></div></a></div>

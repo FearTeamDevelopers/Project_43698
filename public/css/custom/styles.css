@@ -507,27 +507,25 @@ footer.wrapper .container header h3 {
 .page section.wrapper .container hr {
   border-color: rgba(57,76,95,0.8);
 }
-article.report {
-  margin-top: 30px;
+.reports a:last-child article {
+  margin-bottom: 40px;
+}
+.reports article.report {
+  margin-top: 10px;
   height: 200px;
   overflow: hidden;
-  width: 45% !important;
-  margin-left: 2.5%;
-  margin-right: 2.5%;
-  padding: 0 !important;
+  padding: 0;
+  position: relative;
 }
-article.report img {
+.reports article.report img {
   min-height: 100%;
   min-width: 100%;
 }
-article.report:hover > .info {
-  top: 0px;
-  transition: top 0.8 ease;
+.reports article.report:hover > .info {
+  top: 0;
+  transition: top 0.8s ease;
 }
-article.report:last-child {
-  margin-bottom: 30px;
-}
-article.report .info {
+.reports article.report .info {
   position: absolute;
   top: 150px;
   width: 100%;
@@ -538,30 +536,32 @@ article.report .info {
   transition: top 0.8s ease;
   overflow: hidden;
 }
-article.report .info h2,
-article.report .info span,
-article.report .info p {
+.reports article.report .info h2,
+.reports article.report .info span,
+.reports article.report .info p {
   color: #fff !important;
   font-family: 'Ubuntu', sans-serif !important;
 }
-article.report .info h2 span,
-article.report .info span span,
-article.report .info p span {
+.reports article.report .info h2 span,
+.reports article.report .info span span,
+.reports article.report .info p span {
   color: #fff !important;
 }
-article.report .info h2 {
+.reports article.report .info h2 {
   margin: 0;
   padding: 0;
-  line-height: 40px;
-  height: 40px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.6em;
 }
-article.report .info span {
+.reports article.report .info span {
   font-style: italic;
   font-size: 0.7em;
   padding: 0;
   margin: 0;
 }
-article.report .info p {
+.reports article.report .info p {
   margin-top: 15px;
   font-size: 0.8em;
 }
@@ -635,4 +635,62 @@ section.wrapper.report .container {
   background: #fff;
   color: #1dd2af;
   border-color: #1dd2af;
+}
+.homepage .container-box {
+  overflow: hidden;
+}
+.homepage .container-box a:first-child article.report {
+  height: 300px;
+  overflow: hidden;
+  position: relative;
+}
+.homepage .container-box a:first-child article.report .info {
+  height: 300px;
+  top: 250px;
+  transition: top 0.8s ease;
+  width: 100%;
+}
+.homepage .container-box a:first-child article.report:hover >.info {
+  top: 0;
+  transition: top 0.8s ease;
+}
+.homepage article.report {
+  height: 150px;
+  float: left;
+  overflow: hidden;
+  position: relative;
+  padding-bottom: 0 !important;
+}
+.homepage article.report img {
+  min-width: 100%;
+  min-height: 100%;
+}
+.homepage article.report .info {
+  position: absolute;
+  background: rgba(0,0,0,0.6);
+  height: 150px;
+  top: 110px;
+  width: 100%;
+  padding: 0 20px;
+  transition: top 0.8s ease;
+  overflow: hidden;
+}
+.homepage article.report .info h2,
+.homepage article.report .info h3,
+.homepage article.report .info p,
+.homepage article.report .info span {
+  color: #fff !important;
+}
+.homepage article.report .info h3 {
+  font-size: 1.3em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.homepage article.report .info span {
+  font-size: 0.8em;
+}
+.homepage article.report:hover .info {
+  top: 50px;
+  transition: top 0.8s ease;
 }

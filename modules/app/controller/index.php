@@ -68,7 +68,7 @@ class App_Controller_Index extends Controller
             $reports = $cachedReports;
             unset($cachedReports);
         }else{
-            $reports = App_Model_Report::fetchActiveWithLimit(6);
+            $reports = App_Model_Report::fetchActiveWithLimit(7);
             $this->getCache()->set('index-reports', $reports);
         }
         

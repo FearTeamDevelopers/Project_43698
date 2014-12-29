@@ -36,7 +36,7 @@ class App_Controller_Advertisement extends Controller
         $sections = App_Model_AdSection::fetchAllActive();
 
         $view->set('adsections', $sections)
-                ->set('latestfieveads', $latestFiveAds);
+                ->set('latestfiveads', $latestFiveAds);
     }
 
     /**

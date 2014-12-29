@@ -1,8 +1,9 @@
-html{
+html {
 	font-family: 'Ubuntu', sans-serif !important;
 	font-size: 16px;
 }
-h1, h2, h3, h4, h5, h6, a, span, p, ul, li{
+
+h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 	font-family: 'Ubuntu', sans-serif !important;
 }
 
@@ -24,5 +25,68 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li{
 //components
 @import "/stylus/components/pager"
 
+.homepage {
+	.container-box {
+		overflow hidden
+		a:first-child {
+			article.report {
+				height: 300px;
+				overflow hidden
+				position relative
+				.info {
+					height 300px;
+					top 250px
+					transition top 0.8s ease;
+					width 100%;
+				}
+				&:hover >.info{
+					top 0
+					transition top 0.8s ease;
+				}
+
+			}
+		}
+	}
+	article.report {
+		height 150px
+		float left
+		overflow hidden
+		position relative
+		padding-bottom 0!important
+		img {
+			min-width 100%
+			min-height 100%
+		}
+		.info {
+			position absolute
+			background rgba(0, 0, 0, 0.6)
+			height 150px
+			top 110px
+			width 100%
+			padding 0 20px
+			transition top 0.8s ease;
+			overflow hidden
+			h2, h3, p, span {
+				color white !important
+			}
+			h3{
+				font-size 1.3em
+				white-space nowrap
+				overflow hidden
+				text-overflow ellipsis
+			}
+			span{
+				font-size 0.8em
+
+			}
+		}
+		&:hover {
+			.info{
+				top 50px
+				transition top 0.8s ease;
+			}
+		}
+	}
+}
 
 

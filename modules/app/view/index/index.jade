@@ -2,13 +2,29 @@
 	|{if !empty($reports)}
 	section.wrapper
 		.row.container
-			ul.bxslider
+			header
+				h3 Reportáže
+			.container-box
 				|{foreach $report in $reports}
-				li
-					img(src!='{echo $report->imgMain}')
-					.nadpisWrapper
-						h2.nadpis
-							a(href!='/reportaze/r/{echo $report->urlKey}') {echo $report->title}
+				a(href!='/reportaze/r/{echo $report->urlKey}')
+					|{if $report_i == 0}
+					article.report.large-9
+						img(src!='{echo $report->imgThumb}')
+						.info
+							h2 {echo $report->title}
+							span {echo $report->created.", ".$report->userAlias}
+							p {echo $report->shortBody}
+					|{/if}
+					|{else}
+					article.report.medium-3
+
+						img(src!='{echo $report->imgThumb}')
+						.info
+							h3 {echo $report->title}
+							span {echo $report->created}<br/>
+							span {echo $report->userAlias}
+
+					|{/else}
 				|{/foreach}
 		.moreWrap
 			a(href='/reportaze')

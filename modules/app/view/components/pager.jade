@@ -1,0 +1,25 @@
+//
+   Created by Slamic on 28.12.2014.
+|{if  $pagecount > 1}
+section.pager.row
+   | {if $currentpage != 1}
+   | {if $currentpage !=2}
+   a(href='/{echo $path}/p/1') <<
+   a(href='/{echo $path}/p/{echo $currentpage-1}') <
+
+   a(href='/{echo $path}/p/{echo $currentpage-2}') {echo $currentpage - 2}
+   | {/if}
+   a(href='/{echo $path}/p/{echo $currentpage-1}') {echo $currentpage - 1}
+   | {/if}
+   a(href='#').active {echo $currentpage}
+   | {if $currentpage != $pagecount}
+   a(href='/{echo $path}/p/{echo $currentpage+1}') {echo $currentpage + 1}
+   | {if $currentpage != $pagecount - 1}
+   a(href='/{echo $path}/p/{echo $currentpage+2}') {echo $currentpage + 2}
+
+   a(href='/{echo $path}/p/{echo $currentpage+1}') >
+   a(href='/{echo $path}/p/{echo $pagecount}') >>
+   | {/if}
+   | {/if}
+
+|{/if}

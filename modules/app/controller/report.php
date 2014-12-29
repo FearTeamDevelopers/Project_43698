@@ -94,6 +94,7 @@ class App_Controller_Report extends Controller
 
         $view->set('reports', $reports)
                 ->set('currentpage', $page)
+                ->set('path', "reportaze")
                 ->set('pagecount', $reportsPageCount);
 
         $layoutView->set('canonical', $canonical)

@@ -1,0 +1,26 @@
+section.wrapper.blue.bazar
+   header.row
+      h3 Bazar
+   section.row.filter
+      form(method ='POST' action='/bazar/filtr')
+         select(name='bftype')
+            option(value='0') Typ
+            option(value='nabidka') Nabídka
+            option(value='poptavka') Poptávka
+         select(name='bfsection')
+            option(value='0') Sekce
+            |{foreach $ad in $adsections}
+            option(value!='{echo $ad->urlKey}') {echo $ad->title}
+            |{/foreach}
+         input(type='submit' name='zobrazit' value='Zobrazit')
+section.wrapper
+   .row.container
+      |{foreach $ad in $ads}
+      article.large-6.column{if $ad->adtype == "demand"}.poptavka{/if}.nabidka
+         .imgWrapper
+            a(rel="lightbox", href!="{echo $ad->imageImgMain}")
+               img(src!='{echo $ad->imageImgThumb}')
+         .info
+            h4 {echo $ad->title}
+            span {echo $ad->sectionTitle}<br/>
+      |{/foreach}

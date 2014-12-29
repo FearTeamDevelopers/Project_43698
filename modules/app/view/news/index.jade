@@ -11,16 +11,7 @@ section.wrapper.novinky
                 p {echo $new->shortBody}
                 a(href!='/novinky/r/$new->urlKey') čti více
         | {/foreach}
-    section.pager.row
-        | {if $currentpage != 1}
-        a(href='/novinky/p/1') <<
-        a(href='/novinky/p/{echo $currentpage-1}') <
-        | {/if}
-        a(href='#').active {echo $currentpage}
-        | {if $currentpage != $pagecount & $pagecount > 1}
-        a(href='/novinky/p/{echo $currentpage+1}') >
-        a(href='/novinky/p/{echo $pagecount}') >>
-        | {/if}
+    include ../components/pager
 
 
 

@@ -14,13 +14,4 @@ section.wrapper.akce
             p {echo $action->shortBody}
             a(href!='/akce/r/$action->urlKey') čti více
       |{/foreach}
-   section.pager.row
-      | {if $currentpage != 1}
-      a(href='/akce/p/1') <<
-      a(href='/akce/p/{echo $currentpage-1}') <
-      | {/if}
-      a(href='#').active {echo $currentpage}
-      | {if $currentpage != $pagecount & $pagecount > 1}
-      a(href='/akce/p/{echo $currentpage+1}') >
-      a(href='/akce/p/{echo $pagecount}') >>
-      | {/if}
+   include ../components/pager
