@@ -1,0 +1,44 @@
+include filter-template
+section.wrapper.bazar
+   header.row
+      h2 Moje inzeráty
+   .row.container
+      |{if !empty($ads)}
+      .buttonWrapper
+         ul
+            li
+               a(href='/bazar/pridat').fi-plus Nový inzerát
+
+      | {foreach $ad in $ads}
+      article.medium-6.column.left
+         .imgWrapper
+            | {script $images=$ad->getImages()}
+            | {script $image=$images[0]}
+            a(rel="lightbox", href!="{echo $image->imgMain}")
+               img(src!='{echo $image->imgThumb}')
+         .nazev
+            .nazevWrap
+               h4 {echo $ad->title}
+         .info
+            small
+               span majitel:
+            span {echo " ".$ad->userAlias}<br/>
+            small
+               span sekce:
+            span {echo " ".$ad->sectionTitle}<br/>
+            small
+               span cena:
+            span.price {echo " "}cena? <br/>
+            a(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
+
+         a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->uniqueKey}', title='Upravit')
+         a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->uniqueKey}', title='Požádat o prodloužení')
+         a.buttonTab.delete.ajaxDelete.fi-trash(href!='/bazar/smazat/{echo $ad->uniqueKey}', title='Smazat')
+      | {/foreach}
+      |{/if}
+      |{else}
+      p Nemáte žádné inzeráty
+      |{/else}
+   include ../components/pager
+
+

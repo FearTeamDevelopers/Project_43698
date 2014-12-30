@@ -1,0 +1,35 @@
+include filter-template
+section.wrapper.bazar
+   header.row
+      h2 Výsledky filtru
+   .row.container
+      .buttonWrapper
+         ul
+            li
+               a(href='/bazar/pridat').fi-plus Nový inzerát
+            |{if $user}
+            li
+               a(href='/bazar/moje-inzeraty').fi-page-copy Moje inzeráty
+            |{/if}
+      | {foreach $ad in $ads}
+      article.medium-6.column.left
+         .imgWrapper
+            | {script $images=$ad->getImages()}
+            | {script $image=$images[0]}
+            a(rel="lightbox", href!="{echo $image->imgMain}")
+               img(src!='{echo $image->imgThumb}')
+         .nazev
+            h4 {echo $ad->title}
+         .info
+            small
+               span majitel:
+            span {echo " ".$ad->userAlias}<br/>
+            small
+               span sekce:
+            span {echo " ".$ad->sectionTitle}<br/>
+            small
+               span cena:
+            span.price {echo " "}cena? <br/>
+            a(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
+      | {/foreach}
+   include ../components/pager

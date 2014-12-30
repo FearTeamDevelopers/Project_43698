@@ -28,6 +28,7 @@ jQuery(document).ready(function () {
         firstDay: 1
     });
 
+
     jQuery('.ajax-button').click(function () {
         var href = jQuery(this).attr('href');
         var val = jQuery(this).val();
@@ -43,6 +44,11 @@ jQuery(document).ready(function () {
                 }
             }
         });
+    });
+
+    jQuery('#hledat').click(function(event){
+        event.preventDefault();
+        jQuery('.search').submit();
     });
 });
 /**akce**/

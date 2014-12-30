@@ -90,3 +90,260 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 }
 
 
+.bazar
+	.container{
+		.buttonWrapper{
+			li{
+				list-style none
+				display inline
+				margin-right 30px
+				a{
+					color #ffffff
+					background defaultBLue
+					padding 8px 12px
+					border-radius 5px
+					border 1px solid defaultGreen
+					&:hover{
+						color defaultGreen
+					}
+				}
+				a::before{
+					padding-right 5px
+					margin-right 5px
+					border-right 1px dotted white
+				}
+			}
+		}
+		article{
+			position relative
+			height 300px
+			margin-top 1.875rem
+			&:last-child{
+				margin-bottom 60px
+			}
+			.buttonTab{
+				position absolute
+				overflow hidden
+				top 16px
+				text-align center
+				width 35px
+				height 35px
+				background defaultBLue
+				border-radius 5px
+				color #ffffff
+				z-index 2
+				font-size 15pt
+				&:hover{
+					color defaultGreen
+					top 17px
+				}
+				&.delete{
+					right 20px
+					color #CC1100
+					&:hover{
+						color red
+					}
+				}
+				&.edit{
+					right 60px
+				}
+				&.reload{
+					right 100px
+				}
+			}
+			.imgWrapper{
+				width 60%
+				height 300px
+				line-height 300px
+				float left
+				margin 0
+				padding 0
+				background defaultBLue
+				img{
+					width 100%
+				}
+			}
+			.nazev{
+				position absolute
+
+				top 0
+				width 100%
+				height 40px
+				padding-right 1.875rem
+				z-index 1
+				.nazevWrap{
+					background rgba(0,0,0,0.6)
+					width 100%
+					height 40px
+				}
+				h4{
+					width 74%
+					color #ffffff
+					white-space nowrap
+					overflow hidden
+					text-overflow ellipsis
+					padding-left 0.875rem
+					height 40px
+					line-height 40px
+					margin 0
+
+				}
+
+			}
+
+			.info{
+				background defaultBLue ;
+				padding-top 60px;
+				padding-left 10px
+				padding-right 5px
+				border-left 1px dotted defaultGreen
+				width 40%
+				height 100%
+				float left
+				position relative
+				line-height 2em
+				span, p{
+					color white
+					&.price{
+						color defaultGreen
+						font-weight bold
+						font-size 1.6  em
+					}
+				}
+				a{
+					position absolute
+					bottom 10px
+					left 0
+					text-decoration underline
+					color #ffffff
+					text-align center
+					width 100%
+					&:hover{
+						color default green
+						text-decoration underline
+					}
+				}
+			}
+		}
+	}
+
+.filter
+	form.filtr{
+		width 50%
+		float left
+		select{
+			float left
+			width 25%
+			margin-left 2%
+			font-family: 'Ubuntu', sans-serif !important;
+		}
+		input[type=submit]{
+			height:2.3125rem;
+			line-height:2.3125rem;
+			font-family: 'Ubuntu', sans-serif !important;
+			font-size 0.875rem
+			padding 0 0.5rem
+			margin-left 2%;
+			color #ffffff
+			background defaultGreen
+			border 2px outset white
+			background-image none
+			&:hover{
+				border-color defaultGreen
+				color defaultGreen
+				background white
+			}
+		}
+	}
+	form.search{
+		float right
+		width 25%
+		input[type=text]{
+			width 70%
+			margin-right 5%
+			float left
+		}
+		a{
+			float left
+			width 10%
+			margin-right 5%
+		}
+		a:before{
+			height:2.3112rem
+			text-align center
+			width 2.3112rem
+			color defaultGreen
+			font-size 2.3112rem
+
+		}
+	}
+
+.login{
+	min-height 600px
+	.container{
+		width 40%
+		min-width 300px
+		display block
+		margin 0 auto
+		margin-top 2rem
+		margin-bottom 2rem
+		padding 1.875rem
+		header{
+			.loginInfo{
+				background defaultBLue
+				position relative
+				padding 0.875rem
+				padding-top 3rem
+				text-align center
+				margin-bottom 1.5rem
+				p{
+					color white
+					font-size 0.75rem
+				}
+				a{
+					color defaultGreen
+					&:hover{
+						text-decoration underline
+					}
+				}
+			}
+			p{
+				&:before{
+					position absolute
+					top 10px
+					left 47%
+					font-size 26pt
+					padding-right 0.2em
+					color defaultGreen
+
+				}
+			}
+			h2{
+				text-align center
+				&:before{
+					padding-right 0.5em
+				}
+
+			}
+		}
+		form{
+			input[type=submit]{
+				height:2.3125rem;
+				width 100%
+				margin 0 auto
+				line-height:2.3125rem;
+				font-family: 'Ubuntu', sans-serif !important;
+				font-size 0.875rem
+				padding 0 0.5rem
+				color #ffffff
+				background defaultBLue
+				border 3px outset white
+				&:hover{
+					border-color defaultBLue
+					color defaultBLue
+					background white
+				}
+			}
+		}
+	}
+}

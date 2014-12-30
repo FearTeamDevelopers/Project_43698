@@ -95,6 +95,7 @@ body {
   width: 100%;
   position: relative;
   background: rgba(255,255,255,0.7);
+  overflow: hidden;
 }
 .wrapper.blue {
   background: rgba(57,76,95,0.8);
@@ -109,7 +110,12 @@ body {
 .wrapper header.row h2 {
   text-align: center;
   text-transform: uppercase;
-  padding: 2em 0;
+  margin: 0 auto;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+  padding-bottom: 20px;
+  width: 30%;
+  border-bottom: 3px solid #1dd2af;
 }
 .wrapper section.row.container article {
   position: relative;
@@ -150,7 +156,7 @@ body {
 }
 .wrapper section.row.container article:nth-child(odd) {
   background: rgba(19,78,110,0.7);
-  border: 1px solid #134e6e;
+  border: 1px solid #394c5f;
 }
 .wrapper section.row.container article:nth-child(odd) h3,
 .wrapper section.row.container article:nth-child(odd) p,
@@ -363,7 +369,7 @@ footer.wrapper .container header h3 {
   background: secondaryBlue;
 }
 .homepage section.wrapper .container .bx-wrapper .bx-controls .bx-pager .bx-pager-link.active {
-  background: #134e6e !important;
+  background: #394c5f !important;
 }
 .homepage section.wrapper .container .container-box {
   background: transparent;
@@ -499,7 +505,7 @@ footer.wrapper .container header h3 {
   color: secondaryBlue;
 }
 .page section.wrapper .container a:hover {
-  color: #134e6e;
+  color: #394c5f;
 }
 .page section.wrapper .container ul {
   list-style-type: circle;
@@ -693,4 +699,242 @@ section.wrapper.report .container {
 .homepage article.report:hover .info {
   top: 50px;
   transition: top 0.8s ease;
+}
+.bazar .container .buttonWrapper li {
+  list-style: none;
+  display: inline;
+  margin-right: 30px;
+}
+.bazar .container .buttonWrapper li a {
+  color: #fff;
+  background: #394c5f;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #1dd2af;
+}
+.bazar .container .buttonWrapper li a:hover {
+  color: #1dd2af;
+}
+.bazar .container .buttonWrapper li a::before {
+  padding-right: 5px;
+  margin-right: 5px;
+  border-right: 1px dotted #fff;
+}
+.bazar .container article {
+  position: relative;
+  height: 300px;
+  margin-top: 1.875rem;
+}
+.bazar .container article:last-child {
+  margin-bottom: 60px;
+}
+.bazar .container article .buttonTab {
+  position: absolute;
+  overflow: hidden;
+  top: 16px;
+  text-align: center;
+  width: 35px;
+  height: 35px;
+  background: #394c5f;
+  border-radius: 5px;
+  color: #fff;
+  z-index: 2;
+  font-size: 15pt;
+}
+.bazar .container article .buttonTab:hover {
+  color: #1dd2af;
+  top: 17px;
+}
+.bazar .container article .buttonTab.delete {
+  right: 20px;
+  color: #c10;
+}
+.bazar .container article .buttonTab.delete:hover {
+  color: #f00;
+}
+.bazar .container article .buttonTab.edit {
+  right: 60px;
+}
+.bazar .container article .buttonTab.reload {
+  right: 100px;
+}
+.bazar .container article .imgWrapper {
+  width: 60%;
+  height: 300px;
+  line-height: 300px;
+  float: left;
+  margin: 0;
+  padding: 0;
+  background: #394c5f;
+}
+.bazar .container article .imgWrapper img {
+  width: 100%;
+}
+.bazar .container article .nazev {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 40px;
+  padding-right: 1.875rem;
+  z-index: 1;
+}
+.bazar .container article .nazev .nazevWrap {
+  background: rgba(0,0,0,0.6);
+  width: 100%;
+  height: 40px;
+}
+.bazar .container article .nazev h4 {
+  width: 74%;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 0.875rem;
+  height: 40px;
+  line-height: 40px;
+  margin: 0;
+}
+.bazar .container article .info {
+  background: #394c5f;
+  padding-top: 60px;
+  padding-left: 10px;
+  padding-right: 5px;
+  border-left: 1px dotted #1dd2af;
+  width: 40%;
+  height: 100%;
+  float: left;
+  position: relative;
+  line-height: 2em;
+}
+.bazar .container article .info span,
+.bazar .container article .info p {
+  color: #fff;
+}
+.bazar .container article .info span.price,
+.bazar .container article .info p.price {
+  color: #1dd2af;
+  font-weight: bold;
+  font-size: 1.6em;
+}
+.bazar .container article .info a {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  text-decoration: underline;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+}
+.bazar .container article .info a:hover {
+  color: default #008000;
+  text-decoration: underline;
+}
+.filter form.filtr {
+  width: 50%;
+  float: left;
+}
+.filter form.filtr select {
+  float: left;
+  width: 25%;
+  margin-left: 2%;
+  font-family: 'Ubuntu', sans-serif !important;
+}
+.filter form.filtr input[type=submit] {
+  height: 2.3125rem;
+  line-height: 2.3125rem;
+  font-family: 'Ubuntu', sans-serif !important;
+  font-size: 0.875rem;
+  padding: 0 0.5rem;
+  margin-left: 2%;
+  color: #fff;
+  background: #1dd2af;
+  border: 2px outset #fff;
+  background-image: none;
+}
+.filter form.filtr input[type=submit]:hover {
+  border-color: #1dd2af;
+  color: #1dd2af;
+  background: #fff;
+}
+.filter form.search {
+  float: right;
+  width: 25%;
+}
+.filter form.search input[type=text] {
+  width: 70%;
+  margin-right: 5%;
+  float: left;
+}
+.filter form.search a {
+  float: left;
+  width: 10%;
+  margin-right: 5%;
+}
+.filter form.search a:before {
+  height: 2.3112rem;
+  text-align: center;
+  width: 2.3112rem;
+  color: #1dd2af;
+  font-size: 2.3112rem;
+}
+.login {
+  min-height: 600px;
+}
+.login .container {
+  width: 40%;
+  min-width: 300px;
+  display: block;
+  margin: 0 auto;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.875rem;
+}
+.login .container header .loginInfo {
+  background: #394c5f;
+  position: relative;
+  padding: 0.875rem;
+  padding-top: 3rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.login .container header .loginInfo p {
+  color: #fff;
+  font-size: 0.75rem;
+}
+.login .container header .loginInfo a {
+  color: #1dd2af;
+}
+.login .container header .loginInfo a:hover {
+  text-decoration: underline;
+}
+.login .container header p:before {
+  position: absolute;
+  top: 10px;
+  left: 47%;
+  font-size: 26pt;
+  padding-right: 0.2em;
+  color: #1dd2af;
+}
+.login .container header h2 {
+  text-align: center;
+}
+.login .container header h2:before {
+  padding-right: 0.5em;
+}
+.login .container form input[type=submit] {
+  height: 2.3125rem;
+  width: 100%;
+  margin: 0 auto;
+  line-height: 2.3125rem;
+  font-family: 'Ubuntu', sans-serif !important;
+  font-size: 0.875rem;
+  padding: 0 0.5rem;
+  color: #fff;
+  background: #394c5f;
+  border: 3px outset #fff;
+}
+.login .container form input[type=submit]:hover {
+  border-color: #394c5f;
+  color: #394c5f;
+  background: #fff;
 }

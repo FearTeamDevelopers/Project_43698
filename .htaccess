@@ -183,7 +183,7 @@ mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
 ########## End - Compresion
 
 ########## Begin - HEADER CACHING
-<FilesMatch "\.(flv|gif|jpg|jpeg|png|ico)$">
+<FilesMatch "\.(flv|gif|jpg|jpeg|png|ico|svg)$">
 Header set Cache-Control "max-age=2592000"
 </FilesMatch>
 <FilesMatch "\.(js|css|pdf|swf)$">
@@ -251,11 +251,11 @@ RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R,L]
 
 ########## Begin - Preventing Bandwidth Image Theft
 RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?(hastrman|hastrman\.fear-team)\.(cz|dev) [NC]
-RewriteRule \.(jpe?g|gif|bmp|png|ico)$ - [F]
+RewriteRule \.(jpe?g|gif|bmp|png|ico|svg)$ - [F]
 ########## End - Preventing Bandwidth Image Theft
 
 RewriteCond %{REQUEST_FILENAME} -s
-RewriteRule /public/(.*)/(.*)\.(css|jpe?g|gif|png|js|ico)$ - [NC,L]
+RewriteRule /public/(.*)/(.*)\.(css|jpe?g|gif|png|js|ico|svg)$ - [NC,L]
 
 RewriteCond %{REQUEST_URI} (^/tests/(.*)$) 
 RewriteRule .* - [F]

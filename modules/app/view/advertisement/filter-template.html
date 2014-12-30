@@ -1,0 +1,20 @@
+
+<section class="wrapper blue filter">
+  <div class="row">
+    <form method="POST" action="/bazar/filtr" class="filtr">
+      <select name="bftype">
+        <option value="0">Typ</option>
+        <option value="nabidka">Nabídka</option>
+        <option value="poptavka">Poptávka</option>
+      </select>
+      <select name="bfsection">
+        <option value="0">Sekce</option>{foreach $ad in $adsections}
+        <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/foreach}
+      </select>
+      <input type="submit" name="zobrazit" value="Zobrazit"/>
+    </form>
+    <form method="POST" action="/prohledatbazar" class="search">
+      <input type="text" placeholder="vyhledat v bazaru..."/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
+    </form>
+  </div>
+</section>

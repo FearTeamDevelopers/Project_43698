@@ -20,13 +20,12 @@
 </section>
 <section class="wrapper bazar">
   <header class="row">
-    <h2>Bazar</h2>
+    <h2>Moje inzeráty</h2>
   </header>
-  <div class="row container">
+  <div class="row container">{if !empty($ads)}
     <div class="buttonWrapper">
       <ul>
-        <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>{if $authUser}
-        <li><a href="/bazar/moje-inzeraty" class="fi-page-copy">Moje inzeráty</a></li>{/if}
+        <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>
       </ul>
     </div>{foreach $ad in $ads}
     <article class="medium-6 column left">
@@ -35,10 +34,15 @@
         {script $image=$images[0]}<a rel="lightbox" href="{echo $image->imgMain}"><img src="{echo $image->imgThumb}"/></a>
       </div>
       <div class="nazev">
-        <h4>{echo $ad->title}</h4>
+        <div class="nazevWrap">
+          <h4>{echo $ad->title}</h4>
+        </div>
       </div>
-      <div class="info"><small><span>majitel:</span></small><span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a></div>
+      <div class="info"><small><span>majitel:</span></small><span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a></div><a href="/bazar/upravit/{echo $ad->uniqueKey}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->uniqueKey}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->uniqueKey}" title="Smazat" class="buttonTab delete ajaxDelete fi-trash"></a>
     </article>{/foreach}
+    {/if}
+    {else}
+    <p>Nemáte žádné inzeráty</p>{/else}
   </div>
   <!--Created by Slamic on 28.12.2014.
   -->{if  $pagecount > 1}
