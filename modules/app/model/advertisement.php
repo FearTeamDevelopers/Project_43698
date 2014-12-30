@@ -105,6 +105,16 @@ class App_Model_Advertisement extends Model
      * @label obsah
      */
     protected $_content;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type decimal
+     * 
+     * @validate required, numeric
+     * @label cena
+     */
+    protected $_price;
 
     /**
      * @column

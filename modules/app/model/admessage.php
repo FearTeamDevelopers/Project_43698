@@ -37,10 +37,10 @@ class App_Model_AdMessage extends Model
      * @type text
      * @length 80
      *
-     * @validate required, alpha, max(80)
+     * @validate required, alphanumeric, max(80)
      * @label od
      */
-    protected $_fromName;
+    protected $_msAuthor;
 
     /**
      * @column
@@ -51,7 +51,7 @@ class App_Model_AdMessage extends Model
      * @validate required, email, max(60)
      * @label email
      */
-    protected $_fromEmail;
+    protected $_msEmail;
 
     /**
      * @column
@@ -59,7 +59,7 @@ class App_Model_AdMessage extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html, max(6500)
+     * @validate required, html
      * @label zpráva
      */
     protected $_message;

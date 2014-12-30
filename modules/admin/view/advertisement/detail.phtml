@@ -15,23 +15,25 @@
             <col class="con0" /> <col class="con1" />
             <col class="con0" /> <col class="con1" />
             <col class="con0" /> <col class="con1" />
-            <col class="con0" />
+            <col class="con0" /> <col class="con1" />
         </colgroup>
         <thead>
             <tr>
                 <td class="head0">Název</td>
                 <td class="head1">Autor</td>
-                <td class="head0">Typ</td>
-                <td class="head1">Sekce</td>
-                <td class="head0">Platnost do</td>
-                <td class="head1">Stav</td>
-                <td class="head0">Vytvořen</td>
+                <td class="head0">Cena</td>
+                <td class="head1">Typ</td>
+                <td class="head0">Sekce</td>
+                <td class="head1">Platnost do</td>
+                <td class="head0">Stav</td>
+                <td class="head1">Vytvořen</td>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>{echo $ad->getTitle()}</td>
                 <td>{echo $ad->firstname." ".$ad->lastname}</td>
+                <td>{echo $ad->getPrice()}</td>
                 <td>{if $ad->getType()=="tender"}Nabídka{/if}{else}Poptávka{/else}</td>
                 <td>{echo $ad->sectionTitle}</td>
                 <td>{echo $ad->getExpirationDate()}</td>
@@ -40,7 +42,7 @@
             </tr>
         </tbody>
     </table>
-    
+
     <br/>
     <div class="contenttitle radiusbottom0">
         <h2 class="image"><span>Připojené fotky</span></h2>
@@ -51,17 +53,17 @@
         <div style="overflow:hidden;">
             <ul class="imagelist">
                 {foreach $photo in $photos}
-                    {if $photo->active}
-                        <li class="photoactive">
+                {if $photo->active}
+                <li class="photoactive">
                     {/if}{else}
-                        <li class="photoinactive">
+                <li class="photoinactive">
                     {/else}
-                        <img src="{echo $photo->imgThumb}" alt="" height="120px" />
-                        <span>
-                            <a href="{echo $photo->imgMain}" class="view"></a>
-                            <a href="/admin/advertisement/deleteadimage/{echo $photo->id}" class="delete" value="Smazat"></a>
-                        </span>
-                    </li>
+                    <img src="{echo $photo->imgThumb}" alt="" height="120px" />
+                    <span>
+                        <a href="{echo $photo->imgMain}" class="view"></a>
+                        <a href="/admin/advertisement/deleteadimage/{echo $photo->id}" class="delete" value="Smazat"></a>
+                    </span>
+                </li>
                 {/foreach}
             </ul>
         </div>
@@ -69,7 +71,7 @@
         <div class="notification msginfo"><a class="close"></a><p>Žádné foto</p></div>
         {/else}
     </div>
-    
+
     <div class="contenttitle radiusbottom0">
         <h2 class="table"><span>Odpovědi na inzerát</span></h2>
     </div><!--contenttitle-->
@@ -90,14 +92,14 @@
         <tbody>
             {script $messages = $ad->messages}
             {if !empty($messages)}
-                {foreach $message in $messages}
-                    <tr>
-                        <td>{echo $message->getFromName()}</td>
-                        <td>{echo $message->getFromEmail()}</td>
-                        <td>{echo $message->getMessage()}</td>
-                        <td>{echo $message->getCreated()}</td>
-                    </tr>
-                {/foreach}
+            {foreach $message in $messages}
+            <tr>
+                <td>{echo $message->getMsAuthor()}</td>
+                <td>{echo $message->getMsEmail()}</td>
+                <td>{echo $message->getMessage()}</td>
+                <td>{echo $message->getCreated()}</td>
+            </tr>
+            {/foreach}
             {/if}
         </tbody>
     </table>

@@ -333,6 +333,7 @@ class App_Controller_Advertisement extends Controller
                 'adtype' => RequestMethods::post('type'),
                 'userAlias' => $this->getUser()->getWholeName(),
                 'content' => RequestMethods::post('content'),
+                'price' => RequestMethods::post('price', 0),
                 'expirationDate' => RequestMethods::post('expiration'),
                 'keywords' => RequestMethods::post('keywords')
             ));
@@ -386,6 +387,7 @@ class App_Controller_Advertisement extends Controller
             $ad->adtype = RequestMethods::post('type');
             $ad->sectionId = RequestMethods::post('section');
             $ad->content = RequestMethods::post('content');
+            $ad->price = RequestMethods::post('price', 0);
             $ad->expirationDate = RequestMethods::post('expiration');
             $ad->keywords = RequestMethods::post('keywords');
 
