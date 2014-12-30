@@ -14,7 +14,7 @@
   -->{if  $pagecount > 1}
   <section class="pager row">
     {if $currentpage != 1}
-    {if $currentpage !=2}<a href="/{echo $path}/p/1"><<</a><a href="/{echo $path}/p/{echo $currentpage-1}"><</a><a href="/{echo $path}/p/{echo $currentpage-2}">{echo $currentpage - 2}</a>{/if}<a href="/{echo $path}/p/{echo $currentpage-1}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="/{echo $path}/p/{echo $currentpage+1}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="/{echo $path}/p/{echo $currentpage+2}">{echo $currentpage + 2}</a><a href="/{echo $path}/p/{echo $currentpage+1}">></a><a href="/{echo $path}/p/{echo $pagecount}">>></a>{/if}
+    {if $currentpage !=2}<a href="{echo $path}/p/1"><<</a><a href="{echo $path}/p/{echo $currentpage-1}"><</a><a href="{echo $path}/p/{echo $currentpage-2}">{echo $currentpage - 2}</a>{/if}<a href="{echo $path}/p/{echo $currentpage-1}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $path}/p/{echo $currentpage+1}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $path}/p/{echo $currentpage+2}">{echo $currentpage + 2}</a><a href="{echo $path}/p/{echo $currentpage+1}">></a><a href="{echo $path}/p/{echo $pagecount}">>></a>{/if}
     {/if}
   </section>{/if}
 </section>

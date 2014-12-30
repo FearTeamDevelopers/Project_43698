@@ -1,0 +1,18 @@
+section.wrapper.blue.filter
+   .row
+      |{if $path=='bazar' | $path=='filtr'}
+      form.filtr(method ='POST' action='/bazar/filtr')
+         select(name='bftype')
+            option(value='0') Typ
+            option(value='nabidka') Nabídka
+            option(value='poptavka') Poptávka
+         select(name='bfsection')
+            option(value='0') Sekce
+            | {foreach $ad in $adsections}
+            option(value!='{echo $ad->urlKey}') {echo $ad->title}
+            | {/foreach}
+         input(type='submit' name='zobrazit' value='Zobrazit')
+      |{/if}
+      form.search(method='POST' action='/prohledatbazar')
+         input(type='text' placeholder='vyhledat v bazaru...')
+         a#hledat(href='#').fi-magnifying-glass

@@ -17,10 +17,10 @@ class App_Etc_Module extends Module
      * @readwrite
      */
     protected $_checkForRedirects = true;
-    
+
     /**
      * @read
-     * @var array 
+     * @var array
      */
     protected $_routes = array(
         array(
@@ -78,6 +78,12 @@ class App_Etc_Module extends Module
             'action' => 'login',
         ),
         array(
+            'pattern' => '/registrace',
+            'module' => 'app',
+            'controller' => 'user',
+            'action' => 'registration',
+        ),
+        array(
             'pattern' => '/logout',
             'module' => 'app',
             'controller' => 'user',
@@ -121,6 +127,18 @@ class App_Etc_Module extends Module
             'controller' => 'advertisement',
             'action' => 'index',
             'args' => ':page'
+        ),
+        array(
+            'pattern' => '/bazar/pridat',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'add',
+        ),
+        array(
+            'pattern' => '/bazar/moje-inzeraty',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'listByUser',
         ),
         array(
             'pattern' => '/bazar/r/:uniquekey',

@@ -1,0 +1,13 @@
+section.wrapper.login
+   .row
+      .small-12.columns
+         .container
+            header
+               h2.fi-check Registrace
+            form(method='post',action='/bazar/pridat')
+               input(type='text',placeholder='Jméno', name='firstname' required)
+               input(type='text',placeholder='Příjmení', name='lastname' required)
+               input(type='tel',placeholder='Kontaktní telefon', name='phone' required)
+               input(type='email',placeholder='Kontaktní email', name='email' required)
+               input(type='password',placeholder='Heslo', name='password' required)
+               input(type='submit', name='registr', value='Registrovat')
