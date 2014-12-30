@@ -24,11 +24,9 @@ class App_Controller_User extends Controller
         $canonical = 'http://' . $this->getServerHost() . '/login';
 
         $this->getLayoutView()->set('metatitle', 'Hastrman - Přihlásit se')
-                ->set('canonical', $canonical)
-                ->set('activemenu', 'login');
+                ->set('canonical', $canonical);
 
         if (RequestMethods::post('submitLogin')) {
-
             $email = RequestMethods::post('email');
             $password = RequestMethods::post('password');
             $error = false;
@@ -163,24 +161,22 @@ class App_Controller_User extends Controller
     public function profile()
     {
         $view = $this->getActionView();
-
+        $errors = array();
+        
         $canonical = 'http://' . $this->getServerHost() . '/profil';
 
-        $errors = array();
-
-        $user = App_Model_User::first(array(
-                    'id = ?' => $this->getUser()->getId()
-        ));
+        $user = App_Model_User::first(array('id = ?' => $this->getUser()->getId()));
 
         $this->getLayoutView()
                 ->set('metatile', 'Hastrman - Můj profil')
-                ->set('canonical', $canonical)
-                ->set('activemenu', 'profile');
+                ->set('canonical', $canonical);
         $view->set('user', $user);
 
         if (RequestMethods::post('editProfile')) {
-            $security = Registry::get('security');
-
+            if ($this->checkCSRFToken() !== true) {
+                self::redirect('/muj-profil');
+            }
+            
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Hesla se neshodují');
             }
@@ -249,10 +245,10 @@ class App_Controller_User extends Controller
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
-                $security->setUser($user);
+                $this->getSecurity()->setUser($user);
 
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
-                self::redirect('/profil');
+                self::redirect('/muj-profil');
             } else {
                 $view->set('errors', $errors + $user->getErrors());
             }

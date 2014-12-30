@@ -44,7 +44,12 @@
                         <td>{echo $ad->getCreated()}</td>
                         <td>
                             <a href="/admin/advertisement/detail/{echo $ad->getId()}" class="btn btn3 btn_search" title="Detail"></a>
-                            {if $isAdmin}<a href="/admin/advertisement/delete/{echo $ad->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>{/if}
+                            {if $isAdmin}
+                                <a href="/admin/advertisement/delete/{echo $ad->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>
+                                {if $ad->getHasAvailabilityRequest() == true}
+                                    <a href="/admin/advertisement/extendavailability/{echo $ad->getId()}" class="btn btn3 btn_refresh ajaxReload" title="Prodloužit životnost"></a>
+                                {/if}
+                            {/if}
                         </td>
                     </tr>
                 {/foreach}

@@ -5,6 +5,7 @@ use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
+use THCFrame\Filesystem\FileManager;
 
 /**
  * 
@@ -318,12 +319,36 @@ class App_Controller_Advertisement extends Controller
                 self::redirect('/bazar');
             }
 
-            $errors = array();
+            $errors = $uploadErrors = array();
             $uniqueKey = sha1(RequestMethods::post('title') . RequestMethods::post('content') . $this->getUser()->getId());
 
             if (!$this->_checkAdKey($uniqueKey)) {
                 $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
             }
+            
+            $cfg = Registry::get('configuration');
+
+            $fileManager = new FileManager(array(
+                'thumbWidth' => $cfg->thumb_width,
+                'thumbHeight' => $cfg->thumb_height,
+                'thumbResizeBy' => $cfg->thumb_resizeby,
+                'maxImageWidth' => $cfg->photo_maxwidth,
+                'maxImageHeight' => $cfg->photo_maxheight
+            ));
+
+            $fileErrors = $fileManager->uploadImage('uploadfile', 'ads', time() . '_', true)->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
+
+            if(!empty($fileErrors)){
+                $uploadErrors += $fileErrors;
+            }
+            
+            $adTtl = $cfg->bazar_ad_ttl;
+            $date = new DateTime();
+            $date->add(new DateInterval('P'.(int)$adTtl.'D'));
+            $expirationDate = $date->format('Y-m-d');
+            
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $ad = new App_Model_Advertisement(array(
                 'title' => RequestMethods::post('title'),
@@ -334,21 +359,59 @@ class App_Controller_Advertisement extends Controller
                 'userAlias' => $this->getUser()->getWholeName(),
                 'content' => RequestMethods::post('content'),
                 'price' => RequestMethods::post('price', 0),
-                'expirationDate' => RequestMethods::post('expiration'),
-                'keywords' => RequestMethods::post('keywords')
+                'expirationDate' => $expirationDate,
+                'keywords' => $keywords
             ));
 
             if (empty($errors) && $ad->validate()) {
                 $id = $ad->save();
 
-                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
-                $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
-                self::redirect('/bazar/' . $ad->getUniqueKey());
+                if (!empty($files)) {
+                    $files = array_slice(&$files, 0, 3);
+                    
+                    foreach ($files as $i => $file) {
+                        if ($file instanceof \THCFrame\Filesystem\Image) {
+                            $adImage = new App_Model_AdImage(array(
+                                'adId' => $id,
+                                'userId' => $this->getUser()->getId(),
+                                'photoName' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
+                                'imgMain' => trim($file->getFilename(), '.'),
+                                'imgThumb' => trim($file->getThumbname(), '.')
+                            ));
+
+                            if ($adImage->validate()) {
+                                $adImageId = $adImage->save();
+
+                                Event::fire('admin.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $id));
+                            } else {
+                                Event::fire('admin.log', array('fail', 'Upload photo for ad ' . $id));
+                                $uploadErrors += $adImage->getErrors();
+                            }
+                        }
+                    }
+                    
+                    $errors['uploadfile'] = $uploadErrors;
+
+                    if (empty($errors['uploadfile'])) {
+                        Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                        $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
+                        self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                    } else {
+                        Event::fire('admin.log', array('fail'));
+                        $view->set('ad', $ad)
+                                ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                                ->set('errors', $errors + $ad->getErrors());
+                    }
+                } else {
+                    Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                    $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
+                    self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                }
             } else {
                 Event::fire('admin.log', array('fail'));
                 $view->set('ad', $ad)
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                        ->set('errors', $ad->getErrors());
+                        ->set('errors', $errors + $ad->getErrors());
             }
         }
     }
@@ -375,31 +438,92 @@ class App_Controller_Advertisement extends Controller
                 self::redirect('/bazar');
             }
 
-            $errors = array();
+            $errors = $uploadErrors = array();
             $uniqueKey = sha1(RequestMethods::post('title') . RequestMethods::post('content') . $this->getUser()->getId());
 
             if ($ad->getUniqueKey() !== $uniqueKey && !$this->_checkAdKey($uniqueKey)) {
                 $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
             }
 
+            $cfg = Registry::get('configuration');
+
+            $fileManager = new FileManager(array(
+                'thumbWidth' => $cfg->thumb_width,
+                'thumbHeight' => $cfg->thumb_height,
+                'thumbResizeBy' => $cfg->thumb_resizeby,
+                'maxImageWidth' => $cfg->photo_maxwidth,
+                'maxImageHeight' => $cfg->photo_maxheight
+            ));
+
+            $fileErrors = $fileManager->uploadImage('uploadfile', 'ads', time() . '_', true)->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
+
+            if (!empty($fileErrors)) {
+                $uploadErrors += $fileErrors;
+            }
+
+            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+            
             $ad->title = RequestMethods::post('title');
             $ad->uniqueKey = $uniqueKey;
             $ad->adtype = RequestMethods::post('type');
             $ad->sectionId = RequestMethods::post('section');
             $ad->content = RequestMethods::post('content');
             $ad->price = RequestMethods::post('price', 0);
-            $ad->expirationDate = RequestMethods::post('expiration');
-            $ad->keywords = RequestMethods::post('keywords');
+            $ad->keywords = $keywords;
 
             if (empty($errors) && $ad->validate()) {
                 $ad->save();
 
-                Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
-                self::redirect('/bazar/' . $ad->getUniqueKey());
+                if (!empty($files)) {
+                    $currentPhotoCount = App_Model_AdImage::count(array('adId = ?' => $ad->getId()), array('id'));
+                    $files = array_slice(&$files, 0, 3 - $currentPhotoCount);
+
+                    if (!empty($files)) {
+                        foreach ($files as $i => $file) {
+                            if ($file instanceof \THCFrame\Filesystem\Image) {
+                                $adImage = new App_Model_AdImage(array(
+                                    'adId' => $ad->getId(),
+                                    'userId' => $this->getUser()->getId(),
+                                    'photoName' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
+                                    'imgMain' => trim($file->getFilename(), '.'),
+                                    'imgThumb' => trim($file->getThumbname(), '.')
+                                ));
+
+                                if ($adImage->validate()) {
+                                    $adImageId = $adImage->save();
+
+                                    Event::fire('admin.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $ad->getId()));
+                                } else {
+                                    Event::fire('admin.log', array('fail', 'Upload photo for ad ' . $ad->getId()));
+                                    $uploadErrors += $adImage->getErrors();
+                                }
+                            }
+                        }
+                        
+                        $errors['uploadfile'] = $uploadErrors;
+
+                        if (empty($errors['uploadfile'])) {
+                            Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                            $view->successMessage(self::SUCCESS_MESSAGE_2);
+                            self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                        } else {
+                            Event::fire('admin.log', array('fail'));
+                            $view->set('errors', $errors + $ad->getErrors());
+                        }
+                    } else {
+                        Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                        $view->successMessage(self::SUCCESS_MESSAGE_2 . ', ale více fotek už není možné nahrát');
+                        self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                    }
+                } else {
+                    Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                    $view->successMessage(self::SUCCESS_MESSAGE_2);
+                    self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                }
             } else {
                 Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId()));
-                $view->set('errors', $ad->getErrors());
+                $view->set('errors', $errors + $ad->getErrors());
             }
         }
     }
@@ -422,9 +546,66 @@ class App_Controller_Advertisement extends Controller
                 Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
                 echo 'success';
             } else {
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId()));
+                echo self::ERROR_MESSAGE_1;
+            }
+        }
+    }
+    
+    /**
+     * @before _secured, _member
+     * @param type $id
+     */
+    public function deleteAdImage($id)
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
+        $adImage = App_Model_AdImage::first(array('id = ?' => (int)$id, 'userId = ?' => $this->getUser()->getId()));
+
+        if (NULL === $adImage) {
+            echo self::ERROR_MESSAGE_2;
+        } else {
+            $imgMain = $adImage->getUnlinkPath();
+            $imgThumb = $adImage->getUnlinkThumbPath();
+            
+            if ($adImage->delete()) {
+                @unlink($imgMain);
+                @unlink($imgThumb);
+                
+                Event::fire('admin.log', array('success', 'AdImage id: ' . $adImage->getId()));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'AdImage id: ' . $adImage->getId()));
                 echo self::ERROR_MESSAGE_1;
             }
         }
     }
 
+    /**
+     * @before _secured, _member
+     * @param type $uniqueKey
+     */
+    public function sendAvailabilityExtendRequest($uniqueKey)
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
+        $ad = App_Model_Advertisement::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
+
+        if (NULL === $ad) {
+            echo self::ERROR_MESSAGE_2;
+        } else {
+            $ad->hasAvailabilityRequest = true;
+            
+            if ($ad->validate()) {
+                $ad->save();
+                Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId()));
+                echo self::ERROR_MESSAGE_1;
+            }
+        }
+    }
 }

@@ -567,7 +567,7 @@ jQuery(document).ready(function () {
         if (jQuery('.uploadForm .file_inputs input[type=file]').length < 7) {
             jQuery('.uploadForm .file_inputs input[type=file]')
                     .last()
-                    .after('<input type="file" name="secondfile[]" />');
+                    .after('<input type="file" name="uploadfile[]" accept="image/*"/>');
         }
     });
 

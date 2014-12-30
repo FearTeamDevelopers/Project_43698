@@ -3,6 +3,7 @@
 use Admin\Etc\Controller;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -269,4 +270,38 @@ class Admin_Controller_Advertisement extends Controller
         }
     }
 
+    /**
+     * @before _secured, _admin
+     */
+    public function extendAvailability($id)
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
+        $ad = App_Model_Advertisement::first(array('id = ?' => (int) $id, 'hasAvailabilityRequest = ?' => true));
+
+        if (NULL === $ad) {
+            echo self::ERROR_MESSAGE_2;
+        } else {
+            $cfg = Registry::get('configuration');
+            $adTtl = $cfg->bazar_ad_ttl;
+            
+            $date = new DateTime();
+            $date->add(new DateInterval('P'.(int)$adTtl.'D'));
+            $expirationDate = $date->format('Y-m-d');
+
+            $ad->hasAvailabilityRequest = false;
+            $ad->expirationDate = $expirationDate;
+
+            if ($ad->validate()) {
+                $ad->save();
+
+                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                echo 'success';
+            } else {
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
+                echo self::ERROR_MESSAGE_1;
+            }
+        }
+    }
 }

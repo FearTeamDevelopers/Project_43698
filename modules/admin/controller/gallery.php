@@ -325,8 +325,7 @@ class Admin_Controller_Gallery extends Controller
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/gallery/');
             }
-            $errors = array();
-
+            $errors = $uploadErrors = array();
             $cfg = Registry::get('configuration');
 
             $fileManager = new FileManager(array(
@@ -337,8 +336,12 @@ class Admin_Controller_Gallery extends Controller
                 'maxImageHeight' => $cfg->photo_maxheight
             ));
 
-            $fileErrors = $fileManager->uploadImage('secondfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('uploadfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
+
+            if(!empty($fileErrors)){
+                $uploadErrors += $fileErrors;
+            }
 
             if (!empty($files)) {
                 foreach ($files as $i => $file) {
@@ -365,15 +368,14 @@ class Admin_Controller_Gallery extends Controller
                             Event::fire('admin.log', array('success', 'Photo id: ' . $aid . ' in gallery ' . $gallery->getId()));
                         } else {
                             Event::fire('admin.log', array('fail', 'Photo in gallery ' . $gallery->getId()));
-                            $errors['secondfile'][] = $photo->getErrors();
+                            $uploadErrors += $photo->getErrors();
                         }
                     }
                 }
             }
-
-            $errors['secondfile'] = $fileErrors;
-
-            if (empty($errors['secondfile'])) {
+            
+            $errors['uploadfile'] = $uploadErrors;
+            if (empty($errors['uploadfile'])) {
                 $view->successMessage(self::SUCCESS_MESSAGE_7);
                 self::redirect('/admin/gallery/detail/' . $gallery->getId());
             } else {

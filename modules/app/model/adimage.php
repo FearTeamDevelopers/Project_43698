@@ -34,6 +34,16 @@ class App_Model_AdImage extends Model
     /**
      * @column
      * @readwrite
+     * @type integer
+     * @index
+     * 
+     * @validate required, numeric, max(8)
+     */
+    protected $_userId;
+    
+    /**
+     * @column
+     * @readwrite
      * @type text
      * @length 60
      * 

@@ -42,10 +42,10 @@
                 <a href="#" class="btn btn_folder multi_upload_dec"><span>-</span></a>
             </span>
             <span class="field file_inputs">
-                <input type="file" name="secondfile[]" accept="image/*"/>
-                {if isset($errors["secondfile"])}
+                <input type="file" name="uploadfile[]" accept="image/*"/>
+                {if isset($errors["uploadfile"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["secondfile"])}
+                    {echo join("<br/>", $errors["uploadfile"])}
                 </label>
                 {/if}
             </span> 

@@ -141,6 +141,15 @@ class App_Model_Advertisement extends Model
     /**
      * @column
      * @readwrite
+     * @type boolean
+     * 
+     * @validate max(3)
+     */
+    protected $_hasAvailabilityRequest;
+    
+    /**
+     * @column
+     * @readwrite
      * @type datetime
      */
     protected $_created;
@@ -178,6 +187,7 @@ class App_Model_Advertisement extends Model
         if (empty($this->$raw)) {
             $this->setCreated(date('Y-m-d H:i:s'));
             $this->setActive(true);
+            $this->setHasAvailabilityRequest(false);
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
