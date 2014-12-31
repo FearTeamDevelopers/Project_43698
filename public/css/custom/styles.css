@@ -664,6 +664,105 @@ section.wrapper.report .container {
   color: #1dd2af;
   border-color: #1dd2af;
 }
+.clear-all {
+  clear: both;
+}
+.centerBlock {
+  display: block;
+  margin: 0 auto;
+}
+.searchWrapper {
+  display: none;
+}
+.searchWrapper .fulltextsearch {
+  padding-top: 1em;
+  position: relative;
+}
+.searchWrapper .fulltextsearch input[type="text"] {
+  width: 80% !important;
+}
+.searchWrapper .fulltextsearch .close {
+  position: absolute;
+  top: 0;
+  right: -25px;
+}
+.searchWrapper .fulltextsearch .close:hover {
+  color: #f00;
+}
+.searchWrapper .fulltextsearch a:before {
+  margin-left: 0.5em;
+  font-size: 24pt;
+}
+.searchWrapper .fulltextsearch a {
+  color: #fff;
+}
+.searchWrapper .fulltextsearch a:hover {
+  color: #1dd2af;
+}
+.notificationWrapper .notification {
+  position: relative;
+  padding: 5px;
+  border: 1px solid #394c5f;
+  height: 60px;
+}
+.notificationWrapper .notification p {
+  padding-left: 60px;
+  padding-right: 30px;
+  margin: 0;
+}
+.notificationWrapper .notification p:before {
+  font-size: 30pt;
+  height: 58px;
+  line-height: 58px;
+  position: absolute;
+  border-right: 2px dotted #fff;
+  padding-right: 10px;
+  left: 10px;
+  top: 0;
+}
+.notificationWrapper .notification a:before {
+  position: absolute;
+  right: 4px;
+  top: 2px;
+  font-size: 18pt;
+}
+.notificationWrapper .notification.msgalert {
+  background: #ffa500;
+}
+.notificationWrapper .notification.msgalert p:before {
+  border-color: #000;
+}
+.notificationWrapper .notification.msgalert p,
+.notificationWrapper .notification.msgalert a {
+  color: #000;
+}
+.notificationWrapper .notification.msginfo {
+  background: #00bfff;
+}
+.notificationWrapper .notification.msginfo p:before {
+  border-color: #000;
+}
+.notificationWrapper .notification.msginfo p,
+.notificationWrapper .notification.msginfo a {
+  color: #000;
+}
+.notificationWrapper .notification.msgsuccess {
+  background: #1dd2af;
+}
+.notificationWrapper .notification.msgsuccess p,
+.notificationWrapper .notification.msgsuccess a {
+  color: #fff;
+}
+.notificationWrapper .notification.msgerror {
+  background: #f00;
+}
+.notificationWrapper .notification.msgerror p:before {
+  border-color: #000;
+}
+.notificationWrapper .notification.msgerror p,
+.notificationWrapper .notification.msgerror a {
+  color: #000;
+}
 .homepage .container-box {
   overflow: hidden;
 }

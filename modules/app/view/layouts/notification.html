@@ -1,0 +1,17 @@
+
+<div class="row">{if !empty($infoMessage)}
+  <div class="notification msginfo"><a class="close">
+      <p>{echo $infoMessage}</p></a></div>{/if}
+  {if !empty($warningMessage)}
+  <div class="notification msgalert"><a class="close">
+      <p>{echo $warningMessage}</p></a></div>{/if}
+  {if !empty($successMessage)}
+  <div class="notification msgsuccess"><a class="close">
+      <p>{echo $successMessage}</p></a></div>{/if}
+  {if !empty($errorMessage)}
+  <div class="notification msgerror"><a class="close">
+      <p>{echo $errorMessage}</p></a></div>{/if}
+  {if !empty($longFlashMessage)}
+  <div class="notification_long msginfo"><a class="close">
+      <p>{echo $longFlashMessage}</p></p></a></div>{/if}
+</div>

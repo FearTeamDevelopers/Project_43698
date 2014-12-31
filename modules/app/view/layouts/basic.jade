@@ -1,78 +1,85 @@
 doctype html
 html
-  head
-      meta(charset='UTF-8')
-      | {if $env == "dev"}
-      meta(http-equiv='Cache-control', content='no-store')
-      | {/if}
-      meta(name='viewport', content='width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0')
-      meta(name='description', content='{echo $metadescription}')
-      meta(name='author', content='Tomas Hodan')
-      meta(name='robots', content='{echo $metarobots}')
-      |{if isset($article)}
-      <meta property="og:title" content="{echo $metatitle}" />
-      <meta property="og:type" content="{echo $metaogtype}" />
-      <meta property="og:url" content="{echo $metaogurl}" />
-      <meta property="og:image" content="{echo $metaogimage}" />
-      <meta property="og:description" content="{echo $metadescription}" />
-      <meta property="og:site_name" content="{echo $metaogsitename}" />
-      <meta property="article:published_time" content="{echo $artcreated}" />
-      <meta property="article:modified_time" content="{echo $artmodified}" />
-      |{/if}{else}
-      <meta property="og:url" content="{echo $metaogurl}" />
-      <meta property="og:title" content="{echo $metatitle}" />
-      <meta property="og:description" content="{echo $metadescription}" />
-      <meta property="og:type" content="{echo $metaogtype}" />
-      <meta property="og:site_name" content="{echo $metaogsitename}" />
-      |{/else}
+    head
+        meta(charset='UTF-8')
+        | {if $env == "dev"}
+        meta(http-equiv='Cache-control', content='no-store')
+        | {/if}
+        meta(name='viewport', content='width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0')
+        meta(name='description', content='{echo $metadescription}')
+        meta(name='author', content='Tomas Hodan')
+        meta(name='robots', content='{echo $metarobots}')
+        | {if isset($article)}
+        <meta property="og:title" content="{echo $metatitle}" />
+        <meta property="og:type" content="{echo $metaogtype}" />
+        <meta property="og:url" content="{echo $metaogurl}" />
+        <meta property="og:image" content="{echo $metaogimage}" />
+        <meta property="og:description" content="{echo $metadescription}" />
+        <meta property="og:site_name" content="{echo $metaogsitename}" />
+        <meta property="article:published_time" content="{echo $artcreated}" />
+        <meta property="article:modified_time" content="{echo $artmodified}" />
+        | {/if}{else}
+        <meta property="og:url" content="{echo $metaogurl}" />
+        <meta property="og:title" content="{echo $metatitle}" />
+        <meta property="og:description" content="{echo $metadescription}" />
+        <meta property="og:type" content="{echo $metaogtype}" />
+        <meta property="og:site_name" content="{echo $metaogsitename}" />
+        | {/else}
 
-      link(href='/public/css/custom/reset.css', media='screen', rel='stylesheet', type='text/css')
-      link(href='/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css', media='screen', rel='stylesheet', type='text/css')
-      link(href='/public/css/foundation/foundation.css', rel='stylesheet')
-      link(href='/public/css/foundation/foundation-icons.css', rel='stylesheet')
-      link(href='/public/css/plugins/jquery.bxslider.css', media='screen', rel='stylesheet', type='text/css')
-      link(href='/public/css/custom/styles.css', media='screen', rel='stylesheet', type='text/css')
-      link(href='/public/css/plugins/jquery.lightbox-0.5.css')
-      link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
-      script(type='text/javascript', src='/public/js/plugins/modernizr.js')
+        link(href='/public/css/custom/reset.css', media='screen', rel='stylesheet', type='text/css')
+        link(href='/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css', media='screen', rel='stylesheet', type='text/css')
+        link(href='/public/css/foundation/foundation.css', rel='stylesheet')
+        link(href='/public/css/foundation/foundation-icons.css', rel='stylesheet')
+        link(href='/public/css/plugins/jquery.bxslider.css', media='screen', rel='stylesheet', type='text/css')
+        link(href='/public/css/custom/styles.css', media='screen', rel='stylesheet', type='text/css')
+        link(href='/public/css/plugins/jquery.lightbox-0.5.css')
+        link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
+        script(type='text/javascript', src='/public/js/plugins/modernizr.js')
 
 
-       link(rel='canonical' href='{echo $canonical}')
-      |{if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
-      |{if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
-      title {echo $metatitle}
-  body
-    section.wrapper.topPanel.blue
-      header.row
-        .small-12.medium-12.large-4.columns
-          a(href='/')
-            h1 Hastrman
-        .small-12.medium-12.large-8.columns.navWrapper
-          include menu.jade
+            link(rel='canonical' href='{echo $canonical}')
+        | {if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
+        | {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
+        title {echo $metatitle}
+    body
+        section.wrapper.topPanel.blue
+            .row.searchWrapper
+                .large-3.small-6.medium-4.centerBlock
+                    form.fulltextsearch(method='get', action='/hledat')
+                        input(type='text', placeholder='Prohledat hastrmana...').small-10.left
+                        a#hledatHastrman(href='#', title='Hledat').fi-magnifying-glass.left
+                        a.close(href='#', title='Zavřít').fi-x-circle
+            header.row
+                .small-12.medium-12.large-4.columns
+                    a(href='/')
+                        h1 Hastrman
+                .small-12.medium-12.large-8.columns.navWrapper
+                    include menu.jade
 
-      .row
-        .large-8.medium-12.small-12.columns.right#dropdown
-          include submenu.jade
-    .content
-        | {yield action}
-    footer.wrapper.blue#kontakty
-      .row.container
-        header
-          h3 Kontakty
-        .large-4.small-12.medium-12.columns.borderRight
-          p Potápěčské centrum HASTRMAN <br> Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy
-        .large-4.columns.borderRight
-          p Klub sportovních potápěčů HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz
-        .large-4.columns
-            p HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz
-    //
-      JS scripts 
-    script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
-    script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')
-    script(type='text/javascript', src='/public/js/plugins/jquery.bxslider.js')
-    script(type='text/javascript', src='/public/js/plugins/jquery.lightbox-0.5.min.js')
-    script(type='text/javascript', src='/public/js/custom/generalApp.js')
-    script(type='text/javascript', src='/public/js/foundation.min.js')
-    script(type='text/javascript', src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
-    //
-      End JS scripts 
+            .row
+                .large-8.medium-12.small-12.columns.right#dropdown
+                    include submenu.jade
+        include notification
+        .content
+            | {yield action}
+        footer.wrapper.blue#kontakty
+            .row.container
+                header
+                    h3 Kontakty
+                .large-4.small-12.medium-12.columns.borderRight
+                    p Potápěčské centrum HASTRMAN <br> Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy
+                .large-4.columns.borderRight
+                    p Klub sportovních potápěčů HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz
+                .large-4.columns
+                    p HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz
+        //
+          JS scripts
+        script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
+        script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')
+        script(type='text/javascript', src='/public/js/plugins/jquery.bxslider.js')
+        script(type='text/javascript', src='/public/js/plugins/jquery.lightbox-0.5.min.js')
+        script(type='text/javascript', src='/public/js/custom/generalApp.js')
+        script(type='text/javascript', src='/public/js/foundation.min.js')
+        script(type='text/javascript', src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
+        //
+          End JS scripts

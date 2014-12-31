@@ -8,7 +8,18 @@ jQuery(document).ready(function () {
          event.preventDefault();
         jQuery('#dropdown').toggle('slow');
     });
-    
+    jQuery('#displaySearch').click(function(event){
+        event.preventDefault();
+        jQuery('.searchWrapper').toggle('slow');
+    });
+    jQuery('.close').click(function(event){
+        event.preventDefault();
+        jQuery('.searchWrapper').hide('slow');
+    });
+    jQuery('.closeNotif').click(function(event){
+        event.preventDefault();
+        jQuery('.notificationWrapper').hide('slow');
+    });
 
     jQuery(window).load(function () {
         jQuery('#loader, .loader').hide();
@@ -48,6 +59,10 @@ jQuery(document).ready(function () {
     jQuery('#hledat').click(function(event){
         event.preventDefault();
         jQuery('.search').submit();
+    });
+    jQuery('#hledatHastrman').click(function(event){
+        event.preventDefault();
+        jQuery('.fulltextsearch').submit();
     });
 });
 /**akce**/

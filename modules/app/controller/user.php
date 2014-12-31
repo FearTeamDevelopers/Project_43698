@@ -126,7 +126,7 @@ class App_Controller_User extends Controller
                 $user->save();
 
                 $view->successMessage('Registrace byla úspěšná');
-                self::redirect('/muj-profil');
+                self::redirect('/');
             } else {
                 $view->set('errors', $errors + $user->getErrors())
                         ->set('user', $user);

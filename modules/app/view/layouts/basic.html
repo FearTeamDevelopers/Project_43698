@@ -38,6 +38,13 @@
   </head>
   <body>
     <section class="wrapper topPanel blue">
+      <div class="row searchWrapper">
+        <div class="large-3 small-6 medium-4 centerBlock">
+          <form method="get" action="/hledat" class="fulltextsearch">
+            <input type="text" placeholder="Prohledat hastrmana..." class="small-10 left"><a id="hledatHastrman" href="#" title="Hledat" class="fi-magnifying-glass left"></a><a href="#" title="Zavřít" class="close fi-x-circle"></a>
+          </form>
+        </div>
+      </div>
       <header class="row">
         <div class="small-12 medium-12 large-4 columns"><a href="/">
             <h1>Hastrman</h1></a></div>
@@ -49,7 +56,7 @@
               <li><a href="#" class="sluzby">Služby</a></li>
               <li><a href="/odkazy">Odkazy</a></li>
               <li><a href="/galerie">Galerie</a></li>
-              <li><a href="#" title="Hledat" class="fi-magnifying-glass"></a></li>
+              <li><a href="#" title="Hledat" id="displaySearch" class="fi-magnifying-glass"></a></li>
               <li><a href="/login" title="Přihlásit se" class="fi-torso"></a></li>
             </ul>
           </nav>
@@ -82,6 +89,29 @@
         </div>
       </div>
     </section>
+    <section class="wrapper notificationWrapper">
+      <div class="row">{if !empty($infoMessage)}
+        <div class="notification msginfo large-6 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
+          <p class="fi-info">{echo $infoMessage}</p>
+        </div>{/if}
+        {if !empty($warningMessage)}
+        <div class="notification msgalert large-6 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
+          <p class="fi-alert">{echo $warningMessage}</p>
+        </div>{/if}
+        {if !empty($successMessage)}
+        <div class="notification msgsuccess large-6 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
+          <p class="fi-check">{echo $successMessage}</p>
+        </div>{/if}
+        {if !empty($errorMessage)}
+        <div class="notification msgerror large-6 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
+          <p class="fi-skull">{echo $errorMessage}</p>
+        </div>{/if}
+        {if !empty($longFlashMessage)}
+        <div class="notification_long msginfo large-6 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
+          <p class="fi-info">{echo $longFlashMessage}</p></p>
+        </div>{/if}
+      </div>
+    </section>
     <div class="content">{yield action}</div>
     <footer id="kontakty" class="wrapper blue">
       <div class="row container">
@@ -99,7 +129,7 @@
         </div>
       </div>
     </footer>
-    <!--JS scripts 
+    <!--JS scripts
     -->
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
@@ -108,7 +138,7 @@
     <script type="text/javascript" src="/public/js/custom/generalApp.js"></script>
     <script type="text/javascript" src="/public/js/foundation.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js"></script>
-    <!--End JS scripts 
+    <!--End JS scripts
     -->
   </body>
 </html>

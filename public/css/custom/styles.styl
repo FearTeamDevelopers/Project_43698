@@ -24,7 +24,106 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 
 //components
 @import "/stylus/components/pager"
+.clear-all{
+	clear both
+}
+.centerBlock
+	display block
+	margin 0 auto
+.searchWrapper{
+	display none
+	.fulltextsearch{
+		padding-top 1em
+		position relative
+		input[type="text"]{
+			width 80% !important
+		}
+		.close{
+			position absolute
+			top 0
+			right -25px
+			&:hover{
+				color red
+			}
+		}
+		a:before{
+			margin-left 0.5em
+			font-size 24pt
+		}
+		a{
+			color #ffffff
+			&:hover{
+				color defaultGreen
+			}
+		}
+	}
+}
 
+.notificationWrapper{
+	.notification{
+		position relative
+		padding 5px
+		border 1px solid defaultBLue
+		height 60px
+		p{
+			padding-left 60px
+			padding-right 30px
+			margin 0
+			&:before{
+				font-size 30pt
+				height 58px
+				line-height 58px
+				position absolute
+				border-right 2px dotted #ffffff
+				padding-right 10px
+				left 10px
+				top 0
+			}
+		}
+		a{
+			&:before{
+				position absolute
+				right 4px
+				top 2px
+				font-size 18pt
+			}
+		}
+		&.msgalert{
+			background orange
+			p:before{
+				border-color black
+			}
+			p,a{
+				color black
+			}
+		}
+		&.msginfo{
+			background deepskyblue
+			p:before{
+				border-color black
+			}
+			p,a{
+				color black
+			}
+
+		}
+		&.msgsuccess{
+			background defaultGreen
+			p,a{
+				color white
+			}
+		}
+		&.msgerror{
+			background #ff0000
+			p:before{
+				border-color black
+			}
+			p,a{
+				color black
+			}
+		}
+	}
+}
 .homepage {
 	.container-box {
 		overflow hidden
@@ -201,7 +300,7 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 				border-left 1px dotted defaultGreen
 				width 40%
 				height 100%
-				float left 
+				float left
 				position relative
 				line-height 2em
 				span, p{

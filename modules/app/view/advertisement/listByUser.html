@@ -42,7 +42,7 @@
       </div>
       <div class="info">{if $ad->adtype=='tender'}
         <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
-        <center><span class="poptavka">Popstávka <br/></span></center>{/else}<small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a>
+        <center><span class="poptavka">Poptávka <br/></span></center>{/else}<small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a>
       </div><a href="/bazar/upravit/{echo $ad->uniqueKey}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->uniqueKey}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->uniqueKey}" title="Smazat" class="buttonTab delete ajaxDelete fi-trash"></a>
     </article>{/foreach}
     {/if}

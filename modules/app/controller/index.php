@@ -41,7 +41,8 @@ class App_Controller_Index extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         $canonical = 'http://' . $this->getServerHost();
-        
+
+
         $cachedNews = $this->getCache()->get('index-news');
         
         if($cachedNews !== null){
