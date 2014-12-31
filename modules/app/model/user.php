@@ -34,37 +34,12 @@ class App_Model_User extends BasicUser
      * @column
      * @readwrite
      * @type text
-     * @length 250
+     * @length 15
      * 
-     * @validate path, max(250)
-     * @label photo path
+     * @validate numeric, max(15)
+     * @label telefon
      */
-    protected $_imgMain;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 250
-     * 
-     * @validate path, max(250)
-     * @label thumb path
-     */
-    protected $_imgThumb;
-   
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate html
-     * @label profil
-     */
-    protected $_profile;
-
-
+    protected $_phoneNumber;
 
     /**
      * 
@@ -83,44 +58,6 @@ class App_Model_User extends BasicUser
     {
         $str = "Id: {$this->_id} <br/>Email: {$this->_email} <br/> Name: {$this->_firstname} {$this->_lastname}";
         return $str;
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    public function getUnlinkPath($type = true)
-    {
-        if ($type && !empty($this->_imgMain)) {
-            if (file_exists($this->_imgMain)) {
-                return $this->_imgMain;
-            } elseif (file_exists('.' . $this->_imgMain)) {
-                return '.' . $this->_imgMain;
-            } elseif (file_exists('./' . $this->_imgMain)) {
-                return './' . $this->_imgMain;
-            }
-        } else {
-            return $this->_imgMain;
-        }
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    public function getUnlinkThumbPath($type = true)
-    {
-        if ($type && !empty($this->_imgThumb)) {
-            if (file_exists($this->_imgThumb)) {
-                return $this->_imgThumb;
-            } elseif (file_exists('.' . $this->_imgThumb)) {
-                return '.' . $this->_imgThumb;
-            } elseif (file_exists('./' . $this->_imgThumb)) {
-                return './' . $this->_imgThumb;
-            }
-        } else {
-            return $this->_imgThumb;
-        }
     }
     
 }

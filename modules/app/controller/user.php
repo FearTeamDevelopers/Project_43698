@@ -1,9 +1,7 @@
 <?php
 
 use App\Etc\Controller as Controller;
-use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
-use THCFrame\Filesystem\FileManager;
 use THCFrame\Security\PasswordManager;
 
 /**
@@ -23,10 +21,15 @@ class App_Controller_User extends Controller
 
         $canonical = 'http://' . $this->getServerHost() . '/login';
 
-        $this->getLayoutView()->set('metatitle', 'Hastrman - Přihlásit se')
+        $this->getLayoutView()
+                ->set('metatitle', 'Hastrman - Přihlásit se')
                 ->set('canonical', $canonical);
 
         if (RequestMethods::post('submitLogin')) {
+            if ($this->checkCSRFToken() !== true) {
+                self::redirect('/login');
+            }
+            
             $email = RequestMethods::post('email');
             $password = RequestMethods::post('password');
             $error = false;
@@ -46,7 +49,7 @@ class App_Controller_User extends Controller
                     $status = $this->getSecurity()->authenticate($email, $password);
 
                     if ($status === true) {
-                        self::redirect('/');
+                        self::redirect('/muj-profil');
                     } else {
                         $view->set('account_error', 'Email a/nebo heslo je špatně');
                     }
@@ -79,13 +82,19 @@ class App_Controller_User extends Controller
     public function registration()
     {
         $view = $this->getActionView();
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         $canonical = 'http://' . $this->getServerHost() . '/registrace';
 
-        $this->getLayoutView()->set('metatitle', 'Hastrman - Registrace')
+        $this->getLayoutView()
+                ->set('metatitle', 'Hastrman - Registrace')
                 ->set('canonical', $canonical);
 
         if (RequestMethods::post('register')) {
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                self::redirect('/');
+            }
             $errors = array();
 
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
@@ -100,54 +109,24 @@ class App_Controller_User extends Controller
                 $errors['email'] = array('Tento email je již použit');
             }
 
-            $cfg = Registry::get('configuration');
-
-            $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
-            ));
-
-            $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
-            $photoName = $this->_createUrlKey($photoNameRaw);
-
-            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
-            $files = $fileManager->getUploadedFiles();
-
-            if (!empty($fileErrors)) {
-                $errors['croppedimage'] = $fileErrors;
-            }
-
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
             
-            if (!empty($files)) {
-                foreach ($files as $i => $file) {
-                    if ($file instanceof \THCFrame\Filesystem\Image) {
-                        $user = new App_Model_User(array(
-                            'firstname' => RequestMethods::post('firstname'),
-                            'lastname' => RequestMethods::post('lastname'),
-                            'email' => RequestMethods::post('email'),
-                            'profile' => RequestMethods::post('text'),
-                            'password' => $hash,
-                            'salt' => $salt,
-                            'role' => 'role_member',
-                            'imgMain' => trim($file->getFilename(), '.'),
-                            'imgThumb' => trim($file->getThumbname(), '.')
-                        ));
-
-                        break;
-                    }
-                }
-            }
+            $user = new App_Model_User(array(
+                'firstname' => RequestMethods::post('firstname'),
+                'lastname' => RequestMethods::post('lastname'),
+                'email' => RequestMethods::post('email'),
+                'phoneNumber' => RequestMethods::post('phone'),
+                'password' => $hash,
+                'salt' => $salt,
+                'role' => 'role_member'
+            ));
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
 
                 $view->successMessage('Registrace byla úspěšná');
-                self::redirect('/');
+                self::redirect('/muj-profil');
             } else {
                 $view->set('errors', $errors + $user->getErrors())
                         ->set('user', $user);
@@ -201,47 +180,12 @@ class App_Controller_User extends Controller
                 $hash = PasswordManager::hashPassword($pass, $salt);
             }
 
-            if ($user->imgMain == '') {
-                $cfg = Registry::get('configuration');
-
-                $fileManager = new FileManager(array(
-                    'thumbWidth' => $cfg->thumb_width,
-                    'thumbHeight' => $cfg->thumb_height,
-                    'thumbResizeBy' => $cfg->thumb_resizeby,
-                    'maxImageWidth' => $cfg->photo_maxwidth,
-                    'maxImageHeight' => $cfg->photo_maxheight
-                ));
-
-                $photoNameRaw = RequestMethods::post('firstname') . '-' . RequestMethods::post('lastname');
-                $photoName = $this->_createUrlKey($photoNameRaw);
-
-                $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $photoName, 'members', time() . '_')->getUploadErrors();
-                $files = $fileManager->getUploadedFiles();
-
-                if (!empty($files)) {
-                    foreach ($files as $i => $file) {
-                        if ($file instanceof \THCFrame\Filesystem\Image) {
-                            $imgMain = trim($file->getFilename(), '.');
-                            $imgThumb = trim($file->getThumbname(), '.');
-                            break;
-                        }
-                    }
-                } else {
-                    $errors['croppedimage'] = $fileErrors;
-                }
-            } else {
-                $imgMain = $user->imgMain;
-                $imgThumb = $user->imgThumb;
-            }
-
             $user->firstname = RequestMethods::post('firstname');
             $user->lastname = RequestMethods::post('lastname');
             $user->email = RequestMethods::post('email');
-            $user->profile = RequestMethods::post('text');
+            $user->phoneNumber = RequestMethods::post('phone');
             $user->password = $hash;
             $user->salt = $salt;
-            $user->imgMain = $imgMain;
-            $user->imgThumb = $imgThumb;
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
@@ -254,39 +198,4 @@ class App_Controller_User extends Controller
             }
         }
     }
-
-    /**
-     * @before _secured, _member
-     */
-    public function deleteUserMainPhoto()
-    {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
-
-        if ($this->checkCSRFToken()) {
-            $user = App_Model_User::first(array('id = ?' => (int) $this->getUser()->getId()));
-
-            if ($user === null) {
-                echo self::ERROR_MESSAGE_2;
-            } else {
-                $unlinkMainImg = $user->getUnlinkPath();
-                $unlinkThumbImg = $user->getUnlinkThumbPath();
-                $user->imgMain = '';
-                $user->imgThumb = '';
-
-                if ($user->validate()) {
-                    $user->save();
-                    @unlink($unlinkMainImg);
-                    @unlink($unlinkThumbImg);
-
-                    echo 'success';
-                } else {
-                    echo self::ERROR_MESSAGE_1;
-                }
-            }
-        } else {
-            echo self::ERROR_MESSAGE_1;
-        }
-    }
-
 }
