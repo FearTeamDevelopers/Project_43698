@@ -63,31 +63,37 @@ class App_Etc_Module extends Module
             'pattern' => '/galerie',
             'module' => 'app',
             'controller' => 'gallery',
-            'action' => 'index',
+            'action' => 'index'
         ),
         array(
             'pattern' => '/nenalezeno',
             'module' => 'app',
             'controller' => 'index',
-            'action' => 'notFound',
+            'action' => 'notFound'
         ),
         array(
             'pattern' => '/login',
             'module' => 'app',
             'controller' => 'user',
-            'action' => 'login',
+            'action' => 'login'
+        ),
+        array(
+            'pattern' => '/muj-profil',
+            'module' => 'app',
+            'controller' => 'user',
+            'action' => 'profile'
         ),
         array(
             'pattern' => '/logout',
             'module' => 'app',
             'controller' => 'user',
-            'action' => 'logout',
+            'action' => 'logout'
         ),
         array(
             'pattern' => '/admin',
             'module' => 'admin',
             'controller' => 'index',
-            'action' => 'index',
+            'action' => 'index'
         ),
         array(
             'pattern' => '/page/:urlkey',
@@ -103,17 +109,43 @@ class App_Etc_Module extends Module
             'action' => 'notFound'
         ),
         array(
+            'pattern' => '/bazar/pridat',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'add'
+        ),
+        array(
+            'pattern' => '/bazar/moje-inzeraty',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'listByUser'
+        ),
+        array(
             'pattern' => '/bazar/filtr',
             'module' => 'app',
             'controller' => 'advertisement',
             'action' => 'filter'
         ),
         array(
-            'pattern' => '/bazar/filtr/:page',
+            'pattern' => '/bazar/smazat/:uniquekey',
             'module' => 'app',
             'controller' => 'advertisement',
-            'action' => 'filter',
-            'args' => ':page'
+            'action' => 'delete',
+            'args' => ':uniquekey'
+        ),
+        array(
+            'pattern' => '/bazar/upravit/:uniquekey',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'edit',
+            'args' => ':uniquekey'
+        ),
+        array(
+            'pattern' => '/bazar/prodlouzit/:uniquekey',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'sendAvailabilityExtendRequest',
+            'args' => ':uniquekey'
         ),
         array(
             'pattern' => '/bazar/p/:page',
@@ -184,6 +216,20 @@ class App_Etc_Module extends Module
             'controller' => 'news',
             'action' => 'detail',
             'args' => ':urlkey'
+        ),
+        array(
+            'pattern' => '/bazar/filtr/p/:page',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'filter',
+            'args' => ':page'
+        ),
+        array(
+            'pattern' => '/bazar/moje-inzeraty/p/:page',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'listByUser',
+            'args' => ':page'
         )
     );
 

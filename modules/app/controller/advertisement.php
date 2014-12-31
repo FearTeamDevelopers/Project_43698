@@ -30,7 +30,7 @@ class App_Controller_Advertisement extends Controller
         unset($cleanStr);
         return $cleanStr2;
     }
-    
+
     /**
      * 
      * @param App_Model_Advertisement $ad
@@ -41,14 +41,38 @@ class App_Controller_Advertisement extends Controller
     {
         $body = '<div>'
                 . '<strong>Dotaz k inzerátu<strong><br/>'
-                . 'Byl odeslán následující dotaz k inzerátu na serveru <a href="http://'.$this->getServerHost().'">Hastrman</a>:'
+                . 'Byl odeslán následující dotaz k inzerátu na serveru <a href="http://' . $this->getServerHost() . '">Hastrman</a>:'
                 . '<br/><br/>'
-                . 'Inzerát: <a href="http://'.$this->getServerHost().'/bazar/r/'.$ad->getUniqueKey().'">'.$ad->getTitle().'</a><br/>'
-                . 'Jméno: '.$message->getMsAuthor().'<br/>'
-                . 'Email: '.$message->getMsEmail().'<br/>'
-                . 'Text: <br/>'.$message->getMessage().'<br/>';
-        
+                . 'Inzerát: <a href="http://' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a><br/>'
+                . 'Jméno: ' . $message->getMsAuthor() . '<br/>'
+                . 'Email: ' . $message->getMsEmail() . '<br/>'
+                . 'Text: <br/>' . $message->getMessage() . '<br/>';
+
         return $body;
+    }
+
+    /**
+     * 
+     * @param type $adsPageCount
+     * @param type $page
+     * @param type $path
+     */
+    private function _prepareMetaLinks($adsPageCount, $page, $path)
+    {
+        if ($adsPageCount > 1) {
+            $prevPage = $page - 1;
+            $nextPage = $page + 1;
+
+            if ($nextPage > $adsPageCount) {
+                $nextPage = 0;
+            }
+
+            $this->getLayoutView()
+                    ->set('pagedprev', $prevPage)
+                    ->set('pagedprevlink', $path . $prevPage)
+                    ->set('pagednext', $nextPage)
+                    ->set('pagednextlink', $path . $nextPage);
+        }
     }
 
     /**
@@ -75,23 +99,23 @@ class App_Controller_Advertisement extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         $adsPerPage = 10;
-        
+
         $adSections = App_Model_AdSection::fetchAllActive();
 
         $view->set('adsections', $adSections);
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
-        
+
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/bazar';
         } else {
             $canonical = 'http://' . $this->getServerHost() . '/bazar/p/' . $page;
         }
-        
+
         $content = $this->getCache()->get('bazar-' . $page);
-        
+
         if ($content !== null) {
             $ads = $content;
         } else {
@@ -104,31 +128,18 @@ class App_Controller_Advertisement extends Controller
                         array('active = ?' => true,
                             'expirationDate >= ?' => date('Y-m-d H:i:s'))
         );
-        
+
         $adsPageCount = ceil($adsCount / $adsPerPage);
 
-        if ($adsPageCount > 1) {
-            $prevPage = $page - 1;
-            $nextPage = $page + 1;
+        $this->_prepareMetaLinks($adsPageCount, $page, '/bazar/p/');
 
-            if ($nextPage > $adsPageCount) {
-                $nextPage = 0;
-            }
-
-            $layoutView
-                    ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', '/bazar/p/' . $prevPage)
-                    ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', '/bazar/p/' . $nextPage);
-        }
-
-        $view->set('news', $ads)
+        $view->set('ads', $ads)
                 ->set('currentpage', $page)
+                ->set('path', '/bazar')
                 ->set('pagecount', $adsPageCount);
 
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar');
-        
     }
 
     /**
@@ -137,24 +148,28 @@ class App_Controller_Advertisement extends Controller
      */
     public function filter($page = 1)
     {
+        if ($this->checkCSRFToken() !== true) {
+            self::redirect('/bazar');
+        }
+
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         $adsPerPage = 10;
-        
+
         $adSections = App_Model_AdSection::fetchAllActive();
         $view->set('adsections', $adSections);
 
         $type = RequestMethods::post('bftype');
         $section = RequestMethods::post('bfsection');
-        
-        if($page <= 0){
+
+        if ($page <= 0) {
             $page = 1;
         }
-        
+
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/bazar/filtr';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/filtr/' . $page;
+            $canonical = 'http://' . $this->getServerHost() . '/bazar/filtr/p/' . $page;
         }
 
         if ($section == '0') {
@@ -183,23 +198,11 @@ class App_Controller_Advertisement extends Controller
 
         $adsPageCount = ceil($adsCount / $adsPerPage);
 
-        if ($adsPageCount > 1) {
-            $prevPage = $page - 1;
-            $nextPage = $page + 1;
-
-            if ($nextPage > $adsPageCount) {
-                $nextPage = 0;
-            }
-
-            $layoutView
-                    ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', '/bazar/filtr/' . $prevPage)
-                    ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', '/bazar/filtr/' . $nextPage);
-        }
+        $this->_prepareMetaLinks($adsPageCount, $page, '/bazar/filtr/p/');
 
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
+                ->set('path', '/bazar/filtr')
                 ->set('pagecount', $adsPageCount)
                 ->set('bftype', $type)
                 ->set('bfsection', $section);
@@ -211,13 +214,38 @@ class App_Controller_Advertisement extends Controller
     /**
      * 
      */
-    public function listByUser()
+    public function listByUser($page = 1)
     {
         $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
 
-        $ads = App_Model_Advertisement::fetchActiveByUser($this->getUser()->getId());
+        $userId = $this->getUser()->getId();
+        $adsPerPage = 10;
 
-        $view->set('ads', $ads);
+        if ($page <= 0) {
+            $page = 1;
+        }
+
+        if ($page == 1) {
+            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray';
+        } else {
+            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray/p/' . $page;
+        }
+
+        $ads = App_Model_Advertisement::fetchActiveByUser($userId, $adsPerPage, $page);
+        $adsCount = App_Model_Advertisement::countActiveByUser($userId);
+
+        $adsPageCount = ceil($adsCount / $adsPerPage);
+
+        $this->_prepareMetaLinks($adsPageCount, $page, '/bazar/moje-inzeraty/p/');
+
+        $view->set('ads', $ads)
+                ->set('currentpage', $page)
+                ->set('path', '/bazar/moje-inzeraty')
+                ->set('pagecount', $adsPageCount);
+
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Bazar - Moje inzeráty');
     }
 
     /**
@@ -261,23 +289,23 @@ class App_Controller_Advertisement extends Controller
                         ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
                         ->setFrom('bazar@hastrman.cz')
                         ->setBody($this->_getEmailBody($ad, $message));
-                
+
                 if ($message->getSendEmailCopy() == 1) {
                     $email->setTo($message->getMsEmail(), $ad->getEmail());
                 } else {
                     $email->setTo($ad->getEmail());
                 }
-                
+
                 $mailer->send($email);
-                
+
                 $message->messageSent = 1;
                 $message->save();
-                
+
                 $view->successMessage('Dotaz byl úspěšně odeslán');
-            }else{
+            } else {
                 $view->set('errors', $message->getErrors())
-                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                    ->set('admessage', $message);
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('admessage', $message);
             }
         }
     }
@@ -287,6 +315,10 @@ class App_Controller_Advertisement extends Controller
      */
     public function search()
     {
+        if ($this->checkCSRFToken() !== true) {
+            self::redirect('/bazar');
+        }
+
         $db = Registry::get('database');
         $ssql = "SELECT *, SUM(MATCH(title, content, keywords) AGAINST(? IN BOOLEAN MODE)) as score "
                 . "FROM tb_advertisement "
@@ -325,7 +357,7 @@ class App_Controller_Advertisement extends Controller
             if (!$this->_checkAdKey($uniqueKey)) {
                 $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
             }
-            
+
             $cfg = Registry::get('configuration');
 
             $fileManager = new FileManager(array(
@@ -339,15 +371,15 @@ class App_Controller_Advertisement extends Controller
             $fileErrors = $fileManager->uploadImage('uploadfile', 'ads', time() . '_', true)->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
-            if(!empty($fileErrors)){
+            if (!empty($fileErrors)) {
                 $uploadErrors += $fileErrors;
             }
-            
+
             $adTtl = $cfg->bazar_ad_ttl;
             $date = new DateTime();
-            $date->add(new DateInterval('P'.(int)$adTtl.'D'));
+            $date->add(new DateInterval('P' . (int) $adTtl . 'D'));
             $expirationDate = $date->format('Y-m-d');
-            
+
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $ad = new App_Model_Advertisement(array(
@@ -368,7 +400,7 @@ class App_Controller_Advertisement extends Controller
 
                 if (!empty($files)) {
                     $files = array_slice(&$files, 0, 3);
-                    
+
                     foreach ($files as $i => $file) {
                         if ($file instanceof \THCFrame\Filesystem\Image) {
                             $adImage = new App_Model_AdImage(array(
@@ -389,7 +421,7 @@ class App_Controller_Advertisement extends Controller
                             }
                         }
                     }
-                    
+
                     $errors['uploadfile'] = $uploadErrors;
 
                     if (empty($errors['uploadfile'])) {
@@ -463,7 +495,7 @@ class App_Controller_Advertisement extends Controller
             }
 
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-            
+
             $ad->title = RequestMethods::post('title');
             $ad->uniqueKey = $uniqueKey;
             $ad->adtype = RequestMethods::post('type');
@@ -500,7 +532,7 @@ class App_Controller_Advertisement extends Controller
                                 }
                             }
                         }
-                        
+
                         $errors['uploadfile'] = $uploadErrors;
 
                         if (empty($errors['uploadfile'])) {
@@ -551,7 +583,7 @@ class App_Controller_Advertisement extends Controller
             }
         }
     }
-    
+
     /**
      * @before _secured, _member
      * @param type $id
@@ -561,18 +593,18 @@ class App_Controller_Advertisement extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        $adImage = App_Model_AdImage::first(array('id = ?' => (int)$id, 'userId = ?' => $this->getUser()->getId()));
+        $adImage = App_Model_AdImage::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $adImage) {
             echo self::ERROR_MESSAGE_2;
         } else {
             $imgMain = $adImage->getUnlinkPath();
             $imgThumb = $adImage->getUnlinkThumbPath();
-            
+
             if ($adImage->delete()) {
                 @unlink($imgMain);
                 @unlink($imgThumb);
-                
+
                 Event::fire('admin.log', array('success', 'AdImage id: ' . $adImage->getId()));
                 echo 'success';
             } else {
@@ -597,7 +629,7 @@ class App_Controller_Advertisement extends Controller
             echo self::ERROR_MESSAGE_2;
         } else {
             $ad->hasAvailabilityRequest = true;
-            
+
             if ($ad->validate()) {
                 $ad->save();
                 Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
@@ -608,4 +640,5 @@ class App_Controller_Advertisement extends Controller
             }
         }
     }
+
 }

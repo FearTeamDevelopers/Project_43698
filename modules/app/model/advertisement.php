@@ -397,7 +397,7 @@ class App_Model_Advertisement extends Model
      * @param type $userId
      * @return type
      */
-    public static function fetchActiveByUser($userId)
+    public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
         $query = self::getQuery(array('adv.*'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
@@ -405,9 +405,20 @@ class App_Model_Advertisement extends Model
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                         array('ads.title' => 'sectionTitle'))
                 ->where('adv.userId = ?', $userId)
-                ->where('adv.active = ?', true);
+                ->where('adv.active = ?', true)
+                ->limit((int)$adsPerPage, (int)$page);
 
         return self::initialize($query);
+    }
+    
+    /**
+     * 
+     * @param type $userId
+     * @return type
+     */
+    public static function countActiveByUser($userId)
+    {
+        return self::count(array('active = ?' => true, 'userId = ?' => (int)$userId), array('id'));
     }
 
 }
