@@ -64,7 +64,7 @@ class BasicUser extends Model
      * @length 200
      * @index
      *
-     * @validate required, min(5), max(200)
+     * @validate required, max(200)
      * @label password
      */
     protected $_password;

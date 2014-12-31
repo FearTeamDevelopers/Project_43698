@@ -5,6 +5,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
 use THCFrame\Filesystem\FileManager;
+use THCFrame\Core\StringMethods;
 
 /**
  * 
