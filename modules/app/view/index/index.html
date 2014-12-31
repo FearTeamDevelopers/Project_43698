@@ -6,14 +6,13 @@
         <h3>Reportáže</h3>
       </header>
       <div class="container-box">{foreach $report in $reports}<a href="/reportaze/r/{echo $report->urlKey}">{if $report_i == 0}
-          <article class="report large-9"><img src="{echo $report->imgThumb}"/>
+          <article class="report large-9 medium-12 small-12"><img src="{echo $report->imgThumb}"/>
             <div class="info">
               <h2>{echo $report->title}</h2><span>{echo date("d.m. Y H:i", strtotime($report->created)).", ".$report->userAlias}</span>
               <p>{echo $report->shortBody}</p>
             </div>
-          </article>
-              {/if}{else}
-          <article class="report medium-3"><img src="{echo $report->imgThumb}"/>
+          </article>{/if}{else}
+          <article class="report large-3 medium-4 small-6"><img src="{echo $report->imgThumb}"/>
             <div class="info">
               <h3>{echo $report->title}</h3><span>{echo date("d.m. Y H:i", strtotime($report->created))}<br/></span><span>{echo $report->userAlias}</span>
             </div>
@@ -29,11 +28,13 @@
         <h3>Novinky</h3>
       </header>
       <div class="container-box">{foreach $new in $news}
-        <article class="indexNew">
-          <header><a href="/novinky/r/{echo $new->urlKey}">
-              <h4>{echo $new->title}</h4></a></header>
-          <p>{echo $new->shortBody}</p>
-        </article>{/foreach}
+        <div class="large-6 medium-6 small-12 columns">
+          <article class="indexNew">
+            <header><a href="/novinky/r/{echo $new->urlKey}">
+                <h4>{echo $new->title}</h4></a></header>
+            <p>{echo $new->shortBody}</p>
+          </article>
+        </div>{/foreach}
       </div>
       <div class="moreWrap"><a href="/novinky">
           <div class="more blue"><span>Zobrazit více</span></div></a></div>
@@ -46,7 +47,7 @@
         <h3>Akce</h3>
       </header>
       <div id="wrapper" class="container-box">
-        <div id="carousel">{foreach $action in $actions}<a href="/akce/r/{echo $action->urlKey}">
+        <div id="carousel">{foreach $action in $actions}<a href="/akce/r/{echo $action->urlKey}" class="large-4 medium-6 small-12">
             <article>
               <header>
                 <h4>{echo $action->title}</h4><span class="datum">{echo $action->startDate}</span>

@@ -1,0 +1,32 @@
+.moreWrap {
+  height: 40px;
+  line-height: 40px;
+  width: 140px;
+  margin: 0 auto;
+  margin-top: 1.875rem;
+}
+.moreWrap .more {
+  position: relative;
+  text-align: center;
+  height: 40px;
+  line-height: 40px;
+  background: defaultGreen;
+}
+.moreWrap .more span {
+  height: 40px;
+  line-height: 40px;
+  width: 100%;
+  color: #fff;
+}
+.moreWrap .more.blue:hover {
+  background: #fff;
+}
+.moreWrap .more.blue:hover span {
+  color: #000;
+}
+.moreWrap .more:hover {
+  background: headerColor;
+}
+.moreWrap .more:hover span {
+  color: #fff;
+}

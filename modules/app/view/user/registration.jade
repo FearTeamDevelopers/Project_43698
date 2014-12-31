@@ -11,3 +11,5 @@ section.wrapper.login
                input(type='email',placeholder='Kontaktní email', name='email' required)
                input(type='password',placeholder='Heslo', name='password' required)
                input(type='submit', name='registr', value='Registrovat')
+               input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+               input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")

@@ -12,9 +12,11 @@
         <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/foreach}
       </select>
       <input type="submit" name="zobrazit" value="Zobrazit"/>
+      <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
     </form>{/if}
     <form method="POST" action="/prohledatbazar" class="search">
       <input type="text" placeholder="vyhledat v bazaru..."/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
+      <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
     </form>
   </div>
 </section>
@@ -34,11 +36,14 @@
         {script $image=$images[0]}<a rel="lightbox" href="{echo $image->imgMain}"><img src="{echo $image->imgThumb}"/></a>
       </div>
       <div class="nazev">
-        <div class="nazevWrap">
+        <div class="nazevWrapper">
           <h4>{echo $ad->title}</h4>
         </div>
       </div>
-      <div class="info"><small><span>majitel:</span></small><span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a></div><a href="/bazar/upravit/{echo $ad->uniqueKey}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->uniqueKey}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->uniqueKey}" title="Smazat" class="buttonTab delete ajaxDelete fi-trash"></a>
+      <div class="info">{if $ad->adtype=='tender'}
+        <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
+        <center><span class="poptavka">Popstávka <br/></span></center>{/else}<small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a>
+      </div><a href="/bazar/upravit/{echo $ad->uniqueKey}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->uniqueKey}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->uniqueKey}" title="Smazat" class="buttonTab delete ajaxDelete fi-trash"></a>
     </article>{/foreach}
     {/if}
     {else}

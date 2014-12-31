@@ -34,7 +34,6 @@ html
       link(href='/public/css/custom/styles.css', media='screen', rel='stylesheet', type='text/css')
       link(href='/public/css/plugins/jquery.lightbox-0.5.css')
       link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
-      link(href='/public/images/icons/font-awesome-4.2.0/css/font-awesome.min.css', media='screen', rel='stylesheet', type='text/css')
       script(type='text/javascript', src='/public/js/plugins/modernizr.js')
 
 
@@ -45,34 +44,35 @@ html
   body
     section.wrapper.topPanel.blue
       header.row
-        .large-4.columns 
+        .small-12.medium-12.large-4.columns
           a(href='/')
             h1 Hastrman
-        .large-8.columns.navWrapper
+        .small-12.medium-12.large-8.columns.navWrapper
           include menu.jade
 
-      .row#dropdown
-        include submenu.jade
+      .row
+        .large-8.medium-12.small-12.columns.right#dropdown
+          include submenu.jade
     .content
         | {yield action}
     footer.wrapper.blue#kontakty
       .row.container
         header
           h3 Kontakty
+        .large-4.small-12.medium-12.columns.borderRight
+          p Potápěčské centrum HASTRMAN <br> Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy
         .large-4.columns.borderRight
-          p Potápěčské centrum <br> HASTRMAN <br> Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy
-        .large-4.columns.borderRight
-          p Klub sportovních potápěčů <br> HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz
+          p Klub sportovních potápěčů HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz
         .large-4.columns
-        p HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz    
+            p HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz
     //
       JS scripts 
     script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
     script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')
     script(type='text/javascript', src='/public/js/plugins/jquery.bxslider.js')
-    script(type='text/javascript', src='/public/js/plugins/jquery.lightbox-0.5-mod.js')
+    script(type='text/javascript', src='/public/js/plugins/jquery.lightbox-0.5.min.js')
     script(type='text/javascript', src='/public/js/custom/generalApp.js')
     script(type='text/javascript', src='/public/js/foundation.min.js')
-    script(type='text/javascript' src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
+    script(type='text/javascript', src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
     //
       End JS scripts 

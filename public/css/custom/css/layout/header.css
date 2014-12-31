@@ -1,13 +1,16 @@
-.topPanel {
-  padding: 20px 0;
-}
 .topPanel header {
+  margin-top: 0;
+  padding: 0;
   position: relative;
   z-index: 2;
 }
 .topPanel header a h1 {
   font-weight: 700;
+  height: 112px;
+  line-height: 112px;
   color: #fff;
+  width: 260px;
+  margin: 0 auto;
   text-transform: uppercase;
 }
 .topPanel header a h1:after {
@@ -18,30 +21,33 @@
   height: 300px;
   position: absolute;
   top: 291px;
-  left: -250px;
+  left: -245px;
 }
 .topPanel header a:hover h1 {
   color: defaultGreen;
 }
 .topPanel header .navWrapper {
-  position: absolute;
-  bottom: 0%;
-  right: 0%;
   padding: 0;
   margin: 0;
+  height: 112px;
 }
 .topPanel header .navWrapper nav {
-  float: right;
+  min-width: 600px;
+  max-width: 600px;
   bottom: 10px;
+  margin: 0 auto;
 }
 .topPanel header .navWrapper nav ul {
   position: relative;
+  margin-left: 0;
+  margin-right: 0.875rem;
   float: right;
-  margin-left: 1rem;
   list-style-type: none;
 }
 .topPanel header .navWrapper nav ul li {
   display: block;
+  height: 112px;
+  line-height: 112px;
   padding-left: 20px;
   padding-right: 20px;
   border: 0;
@@ -69,6 +75,11 @@
   overflow: hidden;
   text-align: right;
   position: relative;
+}
+.topPanel #dropdown .submenu {
+  width: 500px;
+  margin: 0 auto;
+  overflow: hidden;
 }
 .topPanel #dropdown ul {
   float: right;

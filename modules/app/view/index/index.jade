@@ -8,14 +8,14 @@
 				|{foreach $report in $reports}
 				a(href!='/reportaze/r/{echo $report->urlKey}')
 					|{if $report_i == 0}
-					article.report.large-9
+					article.report.large-9.medium-12.small-12
 						img(src!='{echo $report->imgThumb}')
 						.info
 							h2 {echo $report->title}
 							span {echo date("d.m. Y H:i", strtotime($report->created)).", ".$report->userAlias}
 							p {echo $report->shortBody}
 					|{/if}{else}
-					article.report.medium-3
+					article.report.large-3.medium-4.small-6
 
 						img(src!='{echo $report->imgThumb}')
 						.info
@@ -38,11 +38,12 @@
 				h3 Novinky
 			.container-box
 				| {foreach $new in $news}
-				article.indexNew
-					header
-						a(href!='/novinky/r/{echo $new->urlKey}')
-							h4 {echo $new->title}
-					p {echo $new->shortBody}
+				.large-6.medium-6.small-12.columns
+					article.indexNew
+						header
+							a(href!='/novinky/r/{echo $new->urlKey}')
+								h4 {echo $new->title}
+						p {echo $new->shortBody}
 				| {/foreach}
 			.moreWrap
 				a(href='/novinky')
@@ -57,7 +58,7 @@
 			.container-box#wrapper
 				#carousel
 					|{foreach $action in $actions}
-					a(href!='/akce/r/{echo $action->urlKey}')
+					a.large-4.medium-6.small-12(href!='/akce/r/{echo $action->urlKey}')
 						article
 							header
 								h4 {echo $action->title}

@@ -122,7 +122,7 @@ class App_Controller_Advertisement extends Controller
                     ->set('pagednextlink', '/bazar/p/' . $nextPage);
         }
 
-        $view->set('news', $ads)
+        $view->set('ads', $ads)
                 ->set('currentpage', $page)
                 ->set('pagecount', $adsPageCount);
 
@@ -367,7 +367,7 @@ class App_Controller_Advertisement extends Controller
                 $id = $ad->save();
 
                 if (!empty($files)) {
-                    $files = array_slice(&$files, 0, 3);
+                    $files = array_slice($files, 0, 3);
                     
                     foreach ($files as $i => $file) {
                         if ($file instanceof \THCFrame\Filesystem\Image) {
@@ -477,7 +477,7 @@ class App_Controller_Advertisement extends Controller
 
                 if (!empty($files)) {
                     $currentPhotoCount = App_Model_AdImage::count(array('adId = ?' => $ad->getId()), array('id'));
-                    $files = array_slice(&$files, 0, 3 - $currentPhotoCount);
+                    $files = array_slice($files, 0, 3 - $currentPhotoCount);
 
                     if (!empty($files)) {
                         foreach ($files as $i => $file) {

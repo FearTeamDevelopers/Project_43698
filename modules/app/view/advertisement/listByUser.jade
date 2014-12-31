@@ -17,12 +17,16 @@ section.wrapper.bazar
             a(rel="lightbox", href!="{echo $image->imgMain}")
                img(src!='{echo $image->imgThumb}')
          .nazev
-            .nazevWrap
+            .nazevWrapper
                h4 {echo $ad->title}
          .info
-            small
-               span majitel:
-            span {echo " ".$ad->userAlias}<br/>
+            | {if $ad->adtype=='tender'}
+            center
+               span.nabidka Nabídka <br/>
+            |{/if}{else}
+            center
+               span.poptavka Popstávka <br/>
+            |{/else}
             small
                span sekce:
             span {echo " ".$ad->sectionTitle}<br/>

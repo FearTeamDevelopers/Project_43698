@@ -30,7 +30,6 @@
     <link href="/public/css/custom/styles.css" media="screen" rel="stylesheet" type="text/css">
     <link href="/public/css/plugins/jquery.lightbox-0.5.css">
     <link href="http://fonts.googleapis.com/css?family=Ubuntu:400,700" rel="stylesheet" type="text/css">
-    <link href="/public/images/icons/font-awesome-4.2.0/css/font-awesome.min.css" media="screen" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="/public/js/plugins/modernizr.js">
       <link rel="canonical" href="{echo $canonical}">
     </script>{if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
@@ -40,40 +39,47 @@
   <body>
     <section class="wrapper topPanel blue">
       <header class="row">
-        <div class="large-4 columns"><a href="/">
+        <div class="small-12 medium-12 large-4 columns"><a href="/">
             <h1>Hastrman</h1></a></div>
-        <div class="large-8 columns navWrapper">
+        <div class="small-12 medium-12 large-8 columns navWrapper">
           <nav>
             <ul>
               <li><a href="/o-nas">O nás</a></li>
+              <li><a href="#">Apnea</a></li>
               <li><a href="#" class="sluzby">Služby</a></li>
               <li><a href="/odkazy">Odkazy</a></li>
               <li><a href="/galerie">Galerie</a></li>
+              <li><a href="#" title="Hledat" class="fi-magnifying-glass"></a></li>
+              <li><a href="/login" title="Přihlásit se" class="fi-torso"></a></li>
             </ul>
           </nav>
         </div>
       </header>
-      <div id="dropdown" class="row">
-        <ul>
-          <li><a href="/bazen">Bazén</a></li>
-          <li><a href="/technika">Technika</a></li>
-          <li><a href="/pojisteni">Pojišťění</a></li>
-          <li><a href="/bazar">Bazar</a></li>
-        </ul>
-        <ul>
-          <li><a href="/sluzby/plneni-lahvi">Plnění lahví</a></li>
-          <li><a href="#">Půjčovna potápěčské výstroje</a></li>
-          <li><a href="#">Prodej nové výstroje</a></li>
-          <li><a href="#">Práce pod vodou</a></li>
-          <li><a href="/sluzby/servis-potapeckse-techniky">Servis potápěčské techniky</a></li>
-        </ul>
-        <ul>
-          <li><a href="/kurzy">Kurzy</a></li>
-          <li><a href="/kurzy/cmas">CMAS</a></li>
-          <li><a href="/kurzy/tdi">TDI</a></li>
-          <li><a href="/kurzy/sdi">SDI</a></li>
-          <li><a href="/kurzy/udi">UDI</a></li>
-        </ul>
+      <div class="row">
+        <div id="dropdown" class="large-8 medium-12 small-12 columns right">
+          <div class="submenu">
+            <ul>
+              <li><a href="/bazen">Bazén</a></li>
+              <li><a href="/technika">Technika</a></li>
+              <li><a href="/pojisteni">Pojišťění</a></li>
+              <li><a href="/bazar">Bazar</a></li>
+            </ul>
+            <ul>
+              <li><a href="/sluzby/plneni-lahvi">Plnění lahví</a></li>
+              <li><a href="#">Půjčovna potápěčské výstroje</a></li>
+              <li><a href="#">Prodej nové výstroje</a></li>
+              <li><a href="#">Práce pod vodou</a></li>
+              <li><a href="/sluzby/servis-potapeckse-techniky">Servis potápěčské techniky</a></li>
+            </ul>
+            <ul>
+              <li><a href="/kurzy">Kurzy</a></li>
+              <li><a href="/kurzy/cmas">CMAS</a></li>
+              <li><a href="/kurzy/tdi">TDI</a></li>
+              <li><a href="/kurzy/sdi">SDI</a></li>
+              <li><a href="/kurzy/udi">UDI</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
     <div class="content">{yield action}</div>
@@ -82,14 +88,15 @@
         <header>
           <h3>Kontakty</h3>
         </header>
-        <div class="large-4 columns borderRight">
-          <p>Potápěčské centrum <br> HASTRMAN <br> Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy</p>
+        <div class="large-4 small-12 medium-12 columns borderRight">
+          <p>Potápěčské centrum HASTRMAN <br> Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy</p>
         </div>
         <div class="large-4 columns borderRight">
-          <p>Klub sportovních potápěčů <br> HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz</p>
+          <p>Klub sportovních potápěčů HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz</p>
         </div>
-        <div class="large-4 columns"></div>
-        <p>HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz    </p>
+        <div class="large-4 columns">
+          <p>HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz</p>
+        </div>
       </div>
     </footer>
     <!--JS scripts 
@@ -97,7 +104,7 @@
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery.bxslider.js"></script>
-    <script type="text/javascript" src="/public/js/plugins/jquery.lightbox-0.5-mod.js"></script>
+    <script type="text/javascript" src="/public/js/plugins/jquery.lightbox-0.5.min.js"></script>
     <script type="text/javascript" src="/public/js/custom/generalApp.js"></script>
     <script type="text/javascript" src="/public/js/foundation.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js"></script>

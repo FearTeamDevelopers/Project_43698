@@ -116,8 +116,11 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 		}
 		article{
 			position relative
+			display block
+			margin 0 auto
 			height 300px
 			margin-top 1.875rem
+			min-width 500px
 			&:last-child{
 				margin-bottom 60px
 			}
@@ -165,13 +168,12 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 			}
 			.nazev{
 				position absolute
-
 				top 0
 				width 100%
 				height 40px
 				padding-right 1.875rem
 				z-index 1
-				.nazevWrap{
+				.nazevWrapper{
 					background rgba(0,0,0,0.6)
 					width 100%
 					height 40px
@@ -199,7 +201,7 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 				border-left 1px dotted defaultGreen
 				width 40%
 				height 100%
-				float left
+				float left 
 				position relative
 				line-height 2em
 				span, p{
@@ -209,6 +211,24 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 						font-weight bold
 						font-size 1.6  em
 					}
+				}
+				small{
+					font-size 80%
+				}
+				center{
+					margin-bottom 1em
+				}
+				.nabidka{
+					text-transform uppercase
+					font-weight bold
+					color greenyellow
+					margin-bottom 1em
+				}
+				.poptavka{
+					text-transform uppercase
+					font-weight bold
+					color orangered
+					margin-bottom 1em
 				}
 				a{
 					position absolute

@@ -3,11 +3,10 @@ jQuery.noConflict();
 
 jQuery(document).ready(function () {
 
-    jQuery('.bxslider').bxSlider();
 
-     jQuery('.sluzby').click(function(e){
-        e.preventDefault();
-        jQuery('#dropdown').toggle('slow')
+     jQuery('.sluzby').click(function(event){
+         event.preventDefault();
+        jQuery('#dropdown').toggle('slow');
     });
     
 
@@ -59,10 +58,10 @@ jQuery(function () {
         responsive: true,
         circular: true,
         items: {
-            width:330,
+            width:400,
             height: 300,
             visible: {
-                min: 2,
+                min: 1,
                 max: 3
             }
         },

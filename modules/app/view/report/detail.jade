@@ -3,10 +3,12 @@ section.wrapper.report
    header.row
       .imgWrapper
          img(src!='$report->imgMain')
-      .info
+      .reportInfo
          h2 {echo $report->title}
          span {echo $report->created}<br/>
-         span autor: {$report->userAlias}
+         small
+            span Autor:
+         span {echo " ".$report->userAlias}
    .page.row
       .container
          |{echo $report->body}

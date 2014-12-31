@@ -11,7 +11,8 @@ section.wrapper.login
             form(method='POST' action='#')
                input(type='email' name='email' placeholder='Váš@email.cz')
                input(type='password' name='password' placeholder='Vaše heslo')
-               input(type='submit' name='submitLogin' value='přihlásit')
+               input(type='submit' name='submitLogin' value='Přihlásit')
+               input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
 
 
 
