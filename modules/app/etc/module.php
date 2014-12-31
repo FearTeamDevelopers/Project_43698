@@ -87,7 +87,7 @@ class App_Etc_Module extends Module
             'pattern' => '/registrace',
             'module' => 'app',
             'controller' => 'user',
-            'action' => 'registration',
+            'action' => 'registration'
         ),
         array(
             'pattern' => '/logout',
@@ -107,6 +107,13 @@ class App_Etc_Module extends Module
             'controller' => 'index',
             'action' => 'loadContent',
             'args' => ':urlkey'
+        ),
+        array(
+            'pattern' => '/aktivovatucet/:key',
+            'module' => 'app',
+            'controller' => 'user',
+            'action' => 'activateAccount',
+            'args' => ':key'
         ),
         array(
             'pattern' => '/bazar/nenalezeno',

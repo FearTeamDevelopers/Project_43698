@@ -3,6 +3,8 @@
 use App\Etc\Controller as Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Security\PasswordManager;
+use THCFrame\Events\Events as Event;
+use THCFrame\Core\Rand;
 
 /**
  * Description of App_Controller_User
@@ -53,6 +55,8 @@ class App_Controller_User extends Controller
                     } else {
                         $view->set('account_error', 'Email a/nebo heslo je špatně');
                     }
+                } catch (THCFrame\Security\Exception\UserInactive $e){
+                    $view->set('account_error', 'Účet ještě nebyl aktivován');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
@@ -111,6 +115,7 @@ class App_Controller_User extends Controller
 
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
+            $actToken = Rand::randStr(50);
             
             $user = new App_Model_User(array(
                 'firstname' => RequestMethods::post('firstname'),
@@ -119,12 +124,32 @@ class App_Controller_User extends Controller
                 'phoneNumber' => RequestMethods::post('phone'),
                 'password' => $hash,
                 'salt' => $salt,
-                'role' => 'role_member'
+                'role' => 'role_member',
+                'active' => false,
+                'emailActivationToken' => $actToken
             ));
 
             if (empty($errors) && $user->validate()) {
-                $user->save();
+                $uid = $user->save();
+                
+                require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+                $transport = Swift_MailTransport::newInstance();
+                $mailer = Swift_Mailer::newInstance($transport);
 
+                $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
+                        . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
+                        . '<a href="/aktivovatucet/'.$actToken.'">Aktivovat účet</a><br/><br/>'
+                        . 'S pozdravem,<br/> Hastrmani';
+                
+                $email = Swift_Message::newInstance()
+                        ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
+                        ->setFrom('bazar@hastrman.cz')
+                        ->setTo($user->getEmail())
+                        ->setBody($emailBody);
+
+                $mailer->send($email);
+
+                Event::fire('admin.log', array('success', 'User Id: '.$uid));
                 $view->successMessage('Registrace byla úspěšná');
                 self::redirect('/');
             } else {
@@ -196,6 +221,37 @@ class App_Controller_User extends Controller
             } else {
                 $view->set('errors', $errors + $user->getErrors());
             }
+        }
+    }
+    
+    /**
+     * 
+     * @param type $key
+     */
+    public function activateAccount($key)
+    {
+        $view = $this->getActionView();
+        
+        $user = App_Model_User::first(array('active = ?' => false, 'emailActivationToken = ?' => $key));
+        
+        if(null === $user){
+            $view->warningMessage(self::ERROR_MESSAGE_2);
+            self::redirect('/');
+        }
+        
+        $user->active = true;
+        $user->emailActivationToken = '';
+        
+        if($user->validate()){
+            $user->save();
+            
+            Event::fire('admin.log', array('success', 'User Id: '.$user->getId()));
+            $view->successMessage('Účet byl aktivován');
+            self::redirect('/');
+        }else{
+            Event::fire('admin.log', array('fail', 'User Id: '.$user->getId()));
+            $view->warningMessage(self::ERROR_MESSAGE_1);
+            self::redirect('/');
         }
     }
 }

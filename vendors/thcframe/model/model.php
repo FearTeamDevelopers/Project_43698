@@ -986,7 +986,7 @@ class Model extends Base
 
         foreach ($this->columns as $column) {
             if ($column['validate']) {
-                $pattern = '#[a-z]+\(([a-zA-Z0-9, ]+)\)#';
+                $pattern = '#[a-z]+\(([a-zá-žA-Z0-9, ]+)\)#';
 
                 $raw = $column['raw'];
                 $name = $column['name'];

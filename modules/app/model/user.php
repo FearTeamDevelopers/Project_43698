@@ -15,7 +15,7 @@ class App_Model_User extends BasicUser
      * @length 40
      *
      * @validate required, alpha, min(3), max(40)
-     * @label jméno
+     * @label jmeno
      */
     protected $_firstname;
 
@@ -26,7 +26,7 @@ class App_Model_User extends BasicUser
      * @length 40
      *
      * @validate required, alpha, min(3), max(40)
-     * @label příjmení
+     * @label prijmeni
      */
     protected $_lastname;
 
@@ -40,7 +40,36 @@ class App_Model_User extends BasicUser
      * @label telefon
      */
     protected $_phoneNumber;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 50
+     *
+     * @validate alphanumeric, max(50)
+     * @label activation token
+     */
+    protected $_emailActivationToken;
 
+    /**
+     * 
+     */
+    public function preSave()
+    {
+        $primary = $this->getPrimaryColumn();
+        $raw = $primary['raw'];
+
+        if (empty($this->$raw)) {
+            $this->setCreated(date('Y-m-d H:i:s'));
+            $this->setLastLogin(0);
+            $this->setTotalLoginAttempts(0);
+            $this->setLastLoginAttempt(0);
+            $this->setFirstLoginAttempt(0);
+        }
+        $this->setModified(date('Y-m-d H:i:s'));
+    }
+    
     /**
      * 
      * @return type
