@@ -97,7 +97,7 @@ class Admin_Controller_Gallery extends Controller
             if (empty($errors) && $gallery->validate()) {
                 $id = $gallery->save();
 
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
                 $view->successMessage('Gallery' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/gallery/detail/' . $id);
@@ -185,7 +185,7 @@ class Admin_Controller_Gallery extends Controller
             if (empty($errors) && $gallery->validate()) {
                 $gallery->save();
 
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/gallery/detail/' . $id);
@@ -260,7 +260,7 @@ class Admin_Controller_Gallery extends Controller
             }
 
             if ($gallery->delete()) {
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
                 $view->successMessage('Galerie' . self::SUCCESS_MESSAGE_3);
                 self::redirect('/admin/gallery/');

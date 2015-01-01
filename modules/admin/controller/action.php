@@ -110,7 +110,7 @@ class Admin_Controller_Action extends Controller
 
             if (empty($errors) && $action->validate()) {
                 $id = $action->save();
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 $view->successMessage('Action' . self::SUCCESS_MESSAGE_1);
@@ -193,7 +193,7 @@ class Admin_Controller_Action extends Controller
 
             if (empty($errors) && $action->validate()) {
                 $action->save();
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
@@ -225,7 +225,7 @@ class Admin_Controller_Action extends Controller
         } else {
             if ($this->_checkAccess($action)) {
                 if ($action->delete()) {
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     Event::fire('admin.log', array('success', 'Action id: ' . $id));
                     echo 'success';
                 } else {
@@ -360,7 +360,7 @@ class Admin_Controller_Action extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('delete success', 'Action ids: ' . join(',', $ids)));
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_6;
                 } else {
                     Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
@@ -395,7 +395,7 @@ class Admin_Controller_Action extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('activate success', 'Action ids: ' . join(',', $ids)));
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_4;
                 } else {
                     Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
@@ -430,7 +430,7 @@ class Admin_Controller_Action extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('deactivate success', 'Action ids: ' . join(',', $ids)));
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_5;
                 } else {
                     Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
@@ -465,7 +465,7 @@ class Admin_Controller_Action extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
                     Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
@@ -500,7 +500,7 @@ class Admin_Controller_Action extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
                     Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));

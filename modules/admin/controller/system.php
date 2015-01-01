@@ -34,8 +34,7 @@ class Admin_Controller_System extends Controller
 
         if (RequestMethods::post('clearCache')) {
             Event::fire('admin.log', array('success'));
-            $cache = Registry::get('cache');
-            $cache->clearCache();
+            $this->getCache()->clearCache();
             $view->successMessage('Cache has been successfully deleted');
             self::redirect('/admin/system/');
         }

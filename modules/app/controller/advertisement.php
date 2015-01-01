@@ -277,7 +277,7 @@ class App_Controller_Advertisement extends Controller
                     $email->setTo($ad->getEmail());
                 }
 
-                $mailer->send($email);
+                //$mailer->send($email);
 
                 $message->messageSent = 1;
                 $message->save();

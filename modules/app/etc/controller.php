@@ -13,6 +13,22 @@ use THCFrame\Request\RequestMethods;
 class Controller extends BaseController
 {
 
+    const SUCCESS_MESSAGE_1 = ' byl(a) úspěšně vytovřen(a)';
+    const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
+    const SUCCESS_MESSAGE_3 = ' byl(a) úspěšně smazán(a)';
+    const SUCCESS_MESSAGE_4 = 'Vše bylo úspěšně aktivováno';
+    const SUCCESS_MESSAGE_5 = 'Vše bylo úspěšně deaktivováno';
+    const SUCCESS_MESSAGE_6 = 'Vše bylo úspěšně smazáno';
+    const SUCCESS_MESSAGE_7 = 'Vše bylo úspěšně nahráno';
+    const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
+    const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
+    const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
+    const ERROR_MESSAGE_2 = 'Nenalezeno';
+    const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
+    const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnění';
+    const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
+    const ERROR_MESSAGE_6 = 'Přísput odepřen';
+    
     /**
      * Store security context object
      * @var type 
@@ -40,22 +56,6 @@ class Controller extends BaseController
      * @read
      */
     protected $_serverHost;
-
-    const SUCCESS_MESSAGE_1 = ' byl(a) úspěšně vytovřen(a)';
-    const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
-    const SUCCESS_MESSAGE_3 = ' byl(a) úspěšně smazán(a)';
-    const SUCCESS_MESSAGE_4 = 'Vše bylo úspěšně aktivováno';
-    const SUCCESS_MESSAGE_5 = 'Vše bylo úspěšně deaktivováno';
-    const SUCCESS_MESSAGE_6 = 'Vše bylo úspěšně smazáno';
-    const SUCCESS_MESSAGE_7 = 'Vše bylo úspěšně nahráno';
-    const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
-    const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
-    const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
-    const ERROR_MESSAGE_2 = 'Nenalezeno';
-    const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
-    const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnění';
-    const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
-    const ERROR_MESSAGE_6 = 'Přísput odepřen';
 
     /**
      * 
@@ -266,17 +266,16 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $user = $this->_security->getUser();
 
         if ($view) {
-            $view->set('authUser', $user)
+            $view->set('authUser', $this->_security->getUser())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('token', $this->_security->getCSRF()->getToken());
         }
 
         if ($layoutView) {
-            $layoutView->set('authUser', $user)
+            $layoutView->set('authUser', $this->_security->getUser())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('token', $this->_security->getCSRF()->getToken());

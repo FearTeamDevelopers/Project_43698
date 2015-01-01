@@ -57,6 +57,104 @@ jQuery(document).ready(function () {
             }
         });
     });
+    
+    /* ---------------------- UPLOAD FORMS --------------------------------*/
+    jQuery('.uploadForm .multi_upload').click(function () {
+        if (jQuery('.uploadForm .file_inputs input[type=file]').length < 7) {
+            jQuery('.uploadForm .file_inputs input[type=file]')
+                    .last()
+                    .after('<input type="file" name="uploadfile[]" accept="image/*"/>');
+        }
+    });
+
+    jQuery('.uploadForm .multi_upload_dec').click(function () {
+        if (jQuery('.uploadForm .file_inputs input[type=file]').length > 1) {
+            jQuery('.uploadForm .file_inputs input[type=file]').last().remove();
+        }
+    });
+
+    jQuery('.uploadForm').submit(function () {
+        jQuery('#loader').show();
+    });
+
+    /* ---------------------- AJAX OPERATIONS --------------------------------*/
+    jQuery('.ajaxDelete').click(function (event) {
+        event.preventDefault();
+        var parentTr = jQuery(this).parents('article');
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
+
+        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat v mazání?');
+
+        jQuery('#deleteDialog').dialog({
+            resizable: false,
+            width: 350,
+            height: 200,
+            modal: true,
+            buttons: {
+                "Smazat": function () {
+                    jQuery.post(url, {csrf: csrf}, function (msg) {
+                        if (msg == 'success') {
+                            parentTr.fadeOut();
+                        } else {
+                            alert(msg);
+                        }
+                    });
+                    jQuery(this).dialog("close");
+                },
+                "Zrušit": function () {
+                    jQuery(this).dialog("close");
+                }
+            }
+        });
+
+        return false;
+    });
+
+    jQuery('.ajaxReload').click(function () {
+        event.preventDefault();
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
+
+        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat?');
+
+        jQuery('#deleteDialog').dialog({
+            resizable: false,
+            width: 350,
+            height: 200,
+            modal: true,
+            buttons: {
+                "Ano": function () {
+                    jQuery.post(url, {csrf: csrf}, function (msg) {
+                        if (msg == 'success') {
+                            location.reload();
+                        } else {
+                            alert(msg);
+                        }
+                    });
+                },
+                "Ne": function () {
+                    jQuery(this).dialog("close");
+                }
+            }
+        });
+        return false;
+    });
+
+    jQuery('.ajaxChangestate').click(function () {
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
+
+        jQuery.post(url, {csrf: csrf}, function (msg) {
+            if (msg == 'active' || msg == 'inactive') {
+                location.reload();
+            } else {
+                alert(msg);
+            }
+        });
+
+        return false;
+    });
 
     jQuery('#hledat').click(function (event) {
         event.preventDefault();

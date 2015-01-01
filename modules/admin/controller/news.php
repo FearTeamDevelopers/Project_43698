@@ -106,7 +106,7 @@ class Admin_Controller_News extends Controller
             if (empty($errors) && $news->validate()) {
                 $id = $news->save();
 
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/news/');
@@ -183,7 +183,7 @@ class Admin_Controller_News extends Controller
             if (empty($errors) && $news->validate()) {
                 $news->save();
 
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/news/');
@@ -214,7 +214,7 @@ class Admin_Controller_News extends Controller
         } else {
             if ($this->_checkAccess($news)) {
                 if ($news->delete()) {
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     Event::fire('admin.log', array('success', 'News id: ' . $id));
                     echo 'success';
                 } else {
@@ -346,7 +346,7 @@ class Admin_Controller_News extends Controller
                 }
 
                 if (empty($errors)) {
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     Event::fire('admin.log', array('delete success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_6;
                 } else {
@@ -380,7 +380,7 @@ class Admin_Controller_News extends Controller
                 }
 
                 if (empty($errors)) {
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     Event::fire('admin.log', array('activate success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_4;
                 } else {
@@ -414,7 +414,7 @@ class Admin_Controller_News extends Controller
                 }
 
                 if (empty($errors)) {
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     Event::fire('admin.log', array('deactivate success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_5;
                 } else {
@@ -450,7 +450,7 @@ class Admin_Controller_News extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
                     Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
@@ -485,7 +485,7 @@ class Admin_Controller_News extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
-                    Registry::get('cache')->invalidate();
+                    $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
                     Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));

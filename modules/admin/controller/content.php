@@ -82,7 +82,7 @@ class Admin_Controller_Content extends Controller
             if (empty($errors) && $content->validate()) {
                 $id = $content->save();
 
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
                 $view->successMessage('Obsah'.self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/content/');
@@ -120,7 +120,6 @@ class Admin_Controller_Content extends Controller
                 self::redirect('/admin/content/');
             }
             
-            $cache = Registry::get('cache');
             $errors = array();
             $urlKey = $this->_createUrlKey(RequestMethods::post('page'));
 
@@ -142,10 +141,9 @@ class Admin_Controller_Content extends Controller
             if (empty($errors) && $content->validate()) {
                 $content->save();
                 
-                Registry::get('cache')->invalidate();
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
-                $cache->erase($content->getUrlKey());
                 self::redirect('/admin/content/');
             } else {
                 Event::fire('admin.log', array('fail', 'Content id: ' . $id));

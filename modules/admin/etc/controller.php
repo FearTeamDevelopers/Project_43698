@@ -13,13 +13,6 @@ use THCFrame\Core\StringMethods;
 class Controller extends BaseController
 {
 
-    /**
-     * Store security context object
-     * @var type 
-     * @read
-     */
-    protected $_security;
-
     const SUCCESS_MESSAGE_1 = ' has been successfully created';
     const SUCCESS_MESSAGE_2 = 'All changes were successfully saved';
     const SUCCESS_MESSAGE_3 = ' has been successfully deleted';
@@ -36,6 +29,27 @@ class Controller extends BaseController
     const ERROR_MESSAGE_5 = 'Required fields are not valid';
     const ERROR_MESSAGE_6 = 'Access denied';
 
+    /**
+     * Store security context object
+     * @var type 
+     * @read
+     */
+    protected $_security;
+    
+    /**
+     * Store initialized cache object
+     * @var type 
+     * @read
+     */
+    protected $_cache;
+    
+    /**
+     * Store configuration
+     * @var type 
+     * @read
+     */
+    protected $_config;
+    
     /**
      * 
      * @param type $string
@@ -59,6 +73,8 @@ class Controller extends BaseController
         parent::__construct($options);
 
         $this->_security = Registry::get('security');
+        $this->_cache = Registry::get('cache');
+        $this->_config = Registry::get('configuration');
 
         // schedule disconnect from database 
         Events::add('framework.controller.destruct.after', function($name) {
@@ -75,7 +91,7 @@ class Controller extends BaseController
         $session = Registry::get('session');
         
         //This line should be present only for DEV env
-        $this->_security->forceLogin(1);
+        //$this->_security->forceLogin(1);
         
         $user = $this->_security->getUser();
 
@@ -276,12 +292,11 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $user = $this->_security->getUser();
 
         if ($view) {
-            $view->set('authUser', $user)
-                    ->set('env', ENV);
-            $view->set('isMember', $this->isMember())
+            $view->set('authUser', $this->_security->getUser())
+                    ->set('env', ENV)
+                    ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
@@ -289,9 +304,9 @@ class Controller extends BaseController
         }
 
         if ($layoutView) {
-            $layoutView->set('authUser', $user)
-                    ->set('env', ENV);
-            $layoutView->set('isMember', $this->isMember())
+            $layoutView->set('authUser', $this->_security->getUser())
+                    ->set('env', ENV)
+                    ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
