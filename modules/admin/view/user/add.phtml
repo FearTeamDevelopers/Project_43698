@@ -4,12 +4,9 @@
 </ul>
 
 <div class="content">
-
-    <form class="stdform stdform2 cropit-form" method="post" action="#" enctype="multipart/form-data">
-        <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
+    <form class="stdform stdform2 cropit-form" method="post" action="#">
         <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
         <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
-        <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
 
         <div class="contenttitle radiusbottom0">
             <h2 class="form"><span>Osobní údaje</span></h2>
@@ -37,33 +34,17 @@
             </span>
         </p>
         <p>
-            <label>Profil</label>
+            <label>Telefon*</label>
             <span class="field">
-                <textarea rows="20" name="text" id="ckeditor">{echo isset($user)? $user->profile: ""}</textarea>
-                {if isset($errors["profile"])}
-                <label class="error">{echo join("<br/>", $errors["profile"])}</label>
+                <input required type="tel" name="phone" class="longinput" value="{echo isset($user)? $user->phoneNumber: ""}" />
+                {if isset($errors["phoneNumber"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["phoneNumber"])}
+                </label>
                 {/if}
             </span>
         </p>
-        <div class="par">
-            <label>Profilová fotka*<small>*.jpg, *.jpeg, *.png, *.gif<br/>Max. 15MB</small></label>
-            <div id="image-cropper" class="field">
-                <input type="file" class="cropit-image-input" accept="image/*"/>
-                <div class="cropit-image-preview-container">
-                    <div class="cropit-image-background-container">
-                        <img class="cropit-image-background" />
-                    </div>
-                    <div class="cropit-image-preview-portrait"></div>
-                </div>
-
-                <input type="range" class="cropit-image-zoom-input" />
-                {if isset($errors["croppedimage"])}
-                <label class="error">
-                    {echo join("<br/>", $errors["croppedimage"])}
-                </label>
-                {/if}
-            </div>
-        </div>
+        
         <br/>
         <div class="contenttitle radiusbottom0">
             <h2 class="form"><span>Přihlašovací údaje</span></h2>

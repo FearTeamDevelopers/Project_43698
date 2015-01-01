@@ -12,6 +12,11 @@ nav
          a(href='/galerie') Galerie
       li
          a(href='#', title='Hledat').fi-magnifying-glass#displaySearch
+      |{if !isset($authUser)}
       li
-         a(href='/login', title='Přihlásit se').fi-torso
+         a(href='/prihlasit', title='Přihlásit se').fi-torso
+      |{/if}{else}
+      li
+         a(href='/odhlasit', title='Přihlásit se').fi-blind
+      |{/else}
 

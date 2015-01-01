@@ -36,8 +36,7 @@ html
         link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
         script(type='text/javascript', src='/public/js/plugins/modernizr.js')
 
-
-            link(rel='canonical' href='{echo $canonical}')
+        link(rel='canonical' href='{echo $canonical}')
         | {if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
         | {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
         title {echo $metatitle}
@@ -46,7 +45,7 @@ html
             .row.searchWrapper
                 .large-3.small-6.medium-4.centerBlock
                     form.fulltextsearch(method='get', action='/hledat')
-                        input(type='text', placeholder='Prohledat hastrmana...').small-10.left
+                        input(type='text',name='str', title='Pole nemůže být prázdné', placeholder='Prohledat hastrmana...' required).small-10.left
                         a#hledatHastrman(href='#', title='Hledat').fi-magnifying-glass.left
                         a.close(href='#', title='Zavřít').fi-x-circle
             header.row
@@ -67,11 +66,11 @@ html
                 header
                     h3 Kontakty
                 .large-4.small-12.medium-12.columns.borderRight
-                    p Potápěčské centrum HASTRMAN <br> Mládežnická 1275<br>293 01 Mladá Boleslav<br>E-mail: info@hastrman.cz<br>Tel: Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br><br>Najdete nás podle mapy
+                    p Potápěčské centrum HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: info@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 600<br/><br/>Najdete nás podle mapy
                 .large-4.columns.borderRight
-                    p Klub sportovních potápěčů HASTRMAN <br>Mládežnická 1275<br>293 01 Mladá Boleslav<br>Tel: Jiří Nový (603 482 708)<br>novy@hastrman.cz<br>Bohumír Kuhn (603 161 417)<br>Jaromír Dítě (608 550 600)<br> E-mail: klub@hastrman.cz
+                    p Klub sportovních potápěčů HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: klub@hastrman.cz<br/>Jiří Nový - 603 482 708<br/>novy@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 600
                 .large-4.columns
-                    p HASTRMAN APNEA tým<br> Mládežnická 1275 <br> 293 01 Mladá Boleslav<br><br>Tel: Jan Tichý (721 863 728)<br>E-mail: apnea@hastrman.cz
+                    p HASTRMAN APNEA tým<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: apnea@hastrman.cz<br/>Jan Tichý - 721 863 728
         //
           JS scripts
         script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')

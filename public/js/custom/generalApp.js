@@ -1,22 +1,24 @@
 jQuery.noConflict();
 
-
 jQuery(document).ready(function () {
 
-
-     jQuery('.sluzby').click(function(event){
-         event.preventDefault();
+    jQuery('.sluzby').click(function (event) {
+        event.preventDefault();
         jQuery('#dropdown').toggle('slow');
     });
-    jQuery('#displaySearch').click(function(event){
+    jQuery('.dropdown').click(function (event) {
+        event.preventDefault();
+        jQuery(this).children('ul.submenu').toggle('slow');
+    });
+    jQuery('#displaySearch').click(function (event) {
         event.preventDefault();
         jQuery('.searchWrapper').toggle('slow');
     });
-    jQuery('.close').click(function(event){
+    jQuery('.close').click(function (event) {
         event.preventDefault();
         jQuery('.searchWrapper').hide('slow');
     });
-    jQuery('.closeNotif').click(function(event){
+    jQuery('.closeNotif').click(function (event) {
         event.preventDefault();
         jQuery('.notificationWrapper').hide('slow');
     });
@@ -42,7 +44,7 @@ jQuery(document).ready(function () {
     jQuery('.ajax-button').click(function () {
         var href = jQuery(this).attr('href');
         var val = jQuery(this).val();
-        
+
         jQuery('#dialog').load(href).dialog({
             title: val,
             width: '550px',
@@ -56,11 +58,11 @@ jQuery(document).ready(function () {
         });
     });
 
-    jQuery('#hledat').click(function(event){
+    jQuery('#hledat').click(function (event) {
         event.preventDefault();
         jQuery('.search').submit();
     });
-    jQuery('#hledatHastrman').click(function(event){
+    jQuery('#hledatHastrman').click(function (event) {
         event.preventDefault();
         jQuery('.fulltextsearch').submit();
     });
@@ -73,7 +75,7 @@ jQuery(function () {
         responsive: true,
         circular: true,
         items: {
-            width:400,
+            width: 400,
             height: 300,
             visible: {
                 min: 1,
@@ -100,7 +102,7 @@ jQuery(function () {
         responsive: true,
         circular: true,
         items: {
-            width:200,
+            width: 200,
             height: 150,
             visible: {
                 min: 3,

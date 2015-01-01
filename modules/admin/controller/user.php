@@ -7,15 +7,13 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Security\PasswordManager;
 
 /**
- * Description of Admin_Controller_User
- *
  * 
  */
 class Admin_Controller_User extends Controller
 {
 
     /**
-     * 
+     * Login into administration
      */
     public function login()
     {
@@ -60,7 +58,7 @@ class Admin_Controller_User extends Controller
     }
 
     /**
-     * 
+     * Logout from administration
      */
     public function logout()
     {
@@ -70,6 +68,8 @@ class Admin_Controller_User extends Controller
     }
 
     /**
+     * Get list users with basic roles
+     * 
      * @before _secured, _admin
      */
     public function index()
@@ -86,6 +86,8 @@ class Admin_Controller_User extends Controller
     }
 
     /**
+     * Create new user
+     * 
      * @before _secured, _admin
      */
     public function add()
@@ -120,7 +122,7 @@ class Admin_Controller_User extends Controller
                 'lastname' => RequestMethods::post('lastname'),
                 'email' => RequestMethods::post('email'),
                 'phoneNumber' => RequestMethods::post('phone'),
-                'emailActivationToken' => '',
+                'emailActivationToken' => null,
                 'password' => $hash,
                 'salt' => $salt,
                 'active' => true,
@@ -143,6 +145,8 @@ class Admin_Controller_User extends Controller
     }
 
     /**
+     * Edit user currently logged in
+     * 
      * @before _secured, _participant
      */
     public function updateProfile()
@@ -210,8 +214,10 @@ class Admin_Controller_User extends Controller
     }
 
     /**
+     * Edit existing user
+     * 
      * @before _secured, _admin
-     * @param type $id
+     * @param int   $id     user id
      */
     public function edit($id)
     {
@@ -285,9 +291,10 @@ class Admin_Controller_User extends Controller
     }
 
     /**
+     * Delete existing user
      * 
      * @before _secured, _admin
-     * @param type $id
+     * @param int   $id     user id
      */
     public function delete($id)
     {

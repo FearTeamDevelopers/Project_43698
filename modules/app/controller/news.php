@@ -2,7 +2,6 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
-use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -11,7 +10,7 @@ class App_Controller_News extends Controller
 {
 
     /**
-     * Check if are sets specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values
      */
     private function _checkMetaData($layoutView, App_Model_News $object)
     {
@@ -36,16 +35,16 @@ class App_Controller_News extends Controller
     }
 
     /**
+     * Get list of news
      * 
-     * @param type $page
+     * @param int $page
      */
     public function index($page = 1)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $config = Registry::get('configuration');
 
-        $articlesPerPage = $config->news_per_page;
+        $articlesPerPage = $this->getConfig()->news_per_page;
 
         if($page <= 0){
             $page = 1;
@@ -59,7 +58,7 @@ class App_Controller_News extends Controller
         
         $content = $this->getCache()->get('news-' . $page);
         
-        if ($content !== null) {
+        if (null !== $content) {
             $news = $content;
         } else {
             $news = App_Model_News::fetchOldWithLimit($articlesPerPage, $page);
@@ -73,24 +72,11 @@ class App_Controller_News extends Controller
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
-        if ($newsPageCount > 1) {
-            $prevPage = $page - 1;
-            $nextPage = $page + 1;
-
-            if ($nextPage > $newsPageCount) {
-                $nextPage = 0;
-            }
-
-            $layoutView
-                    ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', '/novinky/p/' . $prevPage)
-                    ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', '/novinky/p/' . $nextPage);
-        }
+        $this->_pagerMetaLinks($newsPageCount, $page, '/novinky/p/');
 
         $view->set('news', $news)
                 ->set('currentpage', $page)
-                ->set('path', "novinky")
+                ->set('path', '/novinky')
                 ->set('pagecount', $newsPageCount);
 
         $layoutView->set('canonical', $canonical)
@@ -98,8 +84,9 @@ class App_Controller_News extends Controller
     }
 
     /**
+     * Show news detail
      * 
-     * @param type $urlKey
+     * @param string $urlKey
      */
     public function detail($urlKey)
     {

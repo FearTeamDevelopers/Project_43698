@@ -2,7 +2,6 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
-use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -11,7 +10,7 @@ class App_Controller_Action extends Controller
 {
 
     /**
-     * Check if are sets specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values
      */
     private function _checkMetaData($layoutView, App_Model_Action $object)
     {
@@ -36,16 +35,16 @@ class App_Controller_Action extends Controller
     }
     
     /**
+     * Get list of actions
      * 
-     * @param type $page
+     * @param int $page
      */
     public function index($page = 1)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $config = Registry::get('configuration');
 
-        $articlesPerPage = $config->actions_per_page;
+        $articlesPerPage = $this->getConfig()->actions_per_page;
 
         if($page <= 0){
             $page = 1;
@@ -59,7 +58,7 @@ class App_Controller_Action extends Controller
 
         $content = $this->getCache()->get('akce-' . $page);
         
-        if ($content !== null) {
+        if (null !== $content) {
             $actions = $content;
         } else {
             $actions = App_Model_Action::fetchOldWithLimit($articlesPerPage, $page);
@@ -73,23 +72,10 @@ class App_Controller_Action extends Controller
         );
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
 
-        if ($actionsPageCount > 1) {
-            $prevPage = $page - 1;
-            $nextPage = $page + 1;
-
-            if ($nextPage > $actionsPageCount) {
-                $nextPage = 0;
-            }
-
-            $layoutView
-                    ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', '/akce/p/' . $prevPage)
-                    ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', '/akce/p/' . $nextPage);
-        }
+        $this->_pagerMetaLinks($actionsPageCount, $page, '/akce/p/');
 
         $view->set('actions', $actions)
-                ->set('path', "akce")
+                ->set('path', '/akce')
                 ->set('currentpage', $page)
                 ->set('pagecount', $actionsPageCount);
 
@@ -98,8 +84,9 @@ class App_Controller_Action extends Controller
     }
 
     /**
+     * Show action detail
      * 
-     * @param type $urlKey
+     * @param string $urlKey
      */
     public function detail($urlKey)
     {

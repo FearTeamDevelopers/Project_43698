@@ -38,6 +38,20 @@ class Controller extends BaseController
     protected $_security;
 
     /**
+     * Store initialized cache object
+     * @var type 
+     * @read
+     */
+    protected $_cache;
+    
+    /**
+     * Store configuration
+     * @var type 
+     * @read
+     */
+    protected $_config;
+    
+    /**
      * @read
      * @var type 
      */
@@ -94,6 +108,8 @@ class Controller extends BaseController
         parent::__construct($options);
 
         $this->_security = Registry::get('security');
+        $this->_cache = Registry::get('cache');
+        $this->_config = Registry::get('configuration');
 
         // schedule disconnect from database 
         Events::add('framework.controller.destruct.after', function($name) {
@@ -160,7 +176,7 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
         
-        if (RequestMethods::server('HTTP_HOST') !== null) {
+        if (null !== RequestMethods::server('HTTP_HOST')) {
             $view->warningMessage(self::ERROR_MESSAGE_6);
             $this->_willRenderActionView = false;
             self::redirect('/search/');

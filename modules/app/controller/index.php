@@ -12,7 +12,7 @@ class App_Controller_Index extends Controller
 {
 
     /**
-     * Check if are sets specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values
      */
     private function _checkMetaData($layoutView, Model $object)
     {
@@ -34,7 +34,7 @@ class App_Controller_Index extends Controller
     }
 
     /**
-     * 
+     * Landing page
      */
     public function index()
     {
@@ -45,7 +45,7 @@ class App_Controller_Index extends Controller
 
         $cachedNews = $this->getCache()->get('index-news');
         
-        if($cachedNews !== null){
+        if(null !== $cachedNews){
             $news = $cachedNews;
             unset($cachedNews);
         }else{
@@ -55,7 +55,7 @@ class App_Controller_Index extends Controller
         
         $cachedActions = $this->getCache()->get('index-actions');
         
-        if($cachedActions !== null){
+        if(null !== $cachedActions){
             $actions = $cachedActions;
             unset($cachedActions);
         }else{
@@ -65,7 +65,7 @@ class App_Controller_Index extends Controller
         
         $cachedReports = $this->getCache()->get('index-reports');
         
-        if($cachedReports !== null){
+        if(null !== $cachedReports){
             $reports = $cachedReports;
             unset($cachedReports);
         }else{
@@ -75,7 +75,7 @@ class App_Controller_Index extends Controller
         
         $cachedPartners = $this->getCache()->get('index-partners');
         
-        if($cachedPartners !== null){
+        if(null !== $cachedPartners){
             $partners = $cachedPartners;
             unset($cachedPartners);
         }else{
@@ -96,7 +96,7 @@ class App_Controller_Index extends Controller
     }
 
     /**
-     * 
+     * Default method for content loading
      */
     public function loadContent($urlKey)
     {
@@ -105,7 +105,7 @@ class App_Controller_Index extends Controller
 
         $content = $this->getCache()->get('content_' . $urlKey);
 
-        if ($content !== null) {
+        if (null !== $content) {
             $content = $content;
         } else {
             $content = App_Model_PageContent::fetchByUrlKey($urlKey);
@@ -123,27 +123,49 @@ class App_Controller_Index extends Controller
     }
 
     /**
-     * 
+     * Custom 404 page
      */
     public function notFound()
     {
+        $canonical = 'http://' . $this->getServerHost().'/nenalezeno';
         
+        $this->getLayoutView()
+                ->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Stránka nenalezena');
     }
 
     /**
-     * 
+     * Search in application, exclude advertisements
      */
-    public function search()
+    public function search($page = 1)
     {
         $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+        $articlesPerPage = $this->getConfig()->search_results_per_page;
         
-        $url = 'http://'.$this->getServerHost().'/dosearch';
+        if($page <= 0){
+            $page = 1;
+        }
+        
+        $canonical = 'http://' . $this->getServerHost() . '/hledat';
+        
+        $requestUrl = 'http://'.$this->getServerHost().'/dosearch/'.$page;
         $parameters = array('str' => RequestMethods::get('str'));
-
+        
         $request = new Request();
-        $response = $request->request('post', $url, $parameters);
+        $response = $request->request('post', $requestUrl, $parameters);
         $urls = json_decode($response, true);
+        $articleCount = array_shift($urls);
 
+        $searchPageCount = ceil($articleCount['totalCount'] / $articlesPerPage);
+
+        $this->_pagerMetaLinks($searchPageCount, $page, '/hledat/p/');
+        
         $view->set('urls', $urls);
+        
+        $layoutView->set('canonical', $canonical)
+                ->set('currentpage', $page)
+                ->set('path', '/hledat?'.http_build_query($parameters))
+                ->set('metatitle', 'Hastrman - Hledat');
     }
 }

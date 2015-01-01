@@ -9,7 +9,9 @@ class App_Controller_Gallery extends Controller
 {
 
     /**
+     * Get list of galleries
      * 
+     * @param int $page
      */
     public function index($page = 1)
     {
@@ -28,7 +30,7 @@ class App_Controller_Gallery extends Controller
         
         $content = $this->getCache()->get('galerie-'.$page);
 
-        if ($content !== null) {
+        if (null !== $content) {
             $galleries = $content;
             unset($content);
         } else {
@@ -42,23 +44,11 @@ class App_Controller_Gallery extends Controller
         );
         $galleryPageCount = ceil($galleryCount / 30);
 
-        if ($galleryPageCount > 1) {
-            $prevPage = $page - 1;
-            $nextPage = $page + 1;
-
-            if ($nextPage > $galleryPageCount) {
-                $nextPage = 0;
-            }
-
-            $layoutView
-                    ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', '/galerie/p/' . $prevPage)
-                    ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', '/galerie/p/' . $nextPage);
-        }
-
+        $this->_pagerMetaLinks($galleryPageCount, $page, '/galerie/p/');
+        
         $view->set('galleries', $galleries)
                 ->set('currentpage', $page)
+                ->set('path', '/galerie')
                 ->set('pagecount', $galleryPageCount);
 
         $layoutView->set('canonical', $canonical)
@@ -66,8 +56,9 @@ class App_Controller_Gallery extends Controller
     }
 
     /**
+     * Show gallery detail
      * 
-     * @param type $urlKey
+     * @param string $urlKey
      */
     public function detail($urlKey)
     {

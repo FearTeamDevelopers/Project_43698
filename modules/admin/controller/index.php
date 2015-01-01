@@ -9,6 +9,8 @@ class Admin_Controller_Index extends Controller
 {
 
     /**
+     * Get some basic info for dashboard
+     * 
      * @before _secured, _participant
      */
     public function index()

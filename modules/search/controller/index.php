@@ -52,12 +52,13 @@ class Search_Controller_Index extends Controller
     );
 
     /**
+     * Get weight for specific term
      * 
-     * @param type $term
-     * @param type $occurence
-     * @param type $title
-     * @param type $url
-     * @return type
+     * @param string    $term
+     * @param int       $occurence
+     * @param string    $title
+     * @param string    $url
+     * @return int
      */
     private function _getWeight($term, $occurence, $title, $url)
     {
@@ -84,11 +85,12 @@ class Search_Controller_Index extends Controller
     }
 
     /**
+     * Clean string. Cleaned string contains only [a-z0-9\s]
      * 
-     * @param type $str
-     * @param type $stopWordsCs
-     * @param type $stopWordsEn
-     * @return type
+     * @param string     $str
+     * @param null|array $stopWordsCs
+     * @param null|array $stopWordsEn
+     * @return string
      */
     private function _cleanString($str, $stopWordsCs = null, $stopWordsEn = null)
     {
@@ -96,7 +98,7 @@ class Search_Controller_Index extends Controller
         $cleanStr = strtolower(strip_tags(trim($cleanStr)));
         $cleanStr = preg_replace('/[^a-z0-9\s]+/', ' ', $cleanStr);
 
-        if ($stopWordsCs !== null && $stopWordsEn !== null) {
+        if (null !== $stopWordsCs && null !== $stopWordsEn) {
             $cleanStr = preg_replace('/\b(' . $stopWordsCs . ')\b/', ' ', $cleanStr);
             $cleanStr = preg_replace('/\b(' . $stopWordsEn . ')\b/', ' ', $cleanStr);
         }
@@ -108,6 +110,8 @@ class Search_Controller_Index extends Controller
     }
 
     /**
+     * Get search index log and controll panel for search module
+     * 
      * @before _secured, _admin
      */
     public function index()
@@ -120,6 +124,8 @@ class Search_Controller_Index extends Controller
     }
 
     /**
+     * Completly delete and create new search index
+     * 
      * @before _cron
      */
     public function buildIndex()
@@ -149,7 +155,7 @@ class Search_Controller_Index extends Controller
             $articles = $database->execute($sql);
             $wordsCount = 0;
 
-            if ($articles !== null) {
+            if (null !== $articles) {
                 foreach ($articles as $article) {
                     $superText = '';
 
@@ -199,9 +205,10 @@ class Search_Controller_Index extends Controller
     }
 
     /**
+     * Manualy build index for specific table
      * 
      * @before _secured, _admin
-     * @param type $table
+     * @param string    $table      table name
      */
     public function updateIndex($table)
     {
@@ -219,24 +226,23 @@ class Search_Controller_Index extends Controller
         $stopWordsEn = implode('|', $this->stopwords_en);
 
         $database = Registry::get('database');
+        
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 1, ?, now(), default)";
+        $deleteSql = "DELETE FROM tb_searchindex WHERE sourceModel=?";
 
         $starttime = microtime(true);
-
         $variables = $this->_textSource[$table];
 
-        $deleteSql = "DELETE FROM tb_searchindex WHERE sourceModel=?";
-        $database->execute($deleteSql, $variables['model']);
-
-        $sql = "SELECT " . implode(', ', $variables['columns'])
+        $selectSql = "SELECT " . implode(', ', $variables['columns'])
                 . " FROM " . $table
                 . " WHERE " . implode(' AND ', $variables['where']);
 
-        $articles = $database->execute($sql);
+        $database->execute($deleteSql, $variables['model']);
+        $articles = $database->execute($selectSql);
         $wordsCount = 0;
 
-        if ($articles !== null) {
+        if (null !== $articles) {
             foreach ($articles as $article) {
                 $superText = '';
 

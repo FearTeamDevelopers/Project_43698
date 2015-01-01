@@ -26,6 +26,13 @@ class Controller extends BaseController
      * @read
      */
     protected $_cache;
+    
+    /**
+     * Store configuration
+     * @var type 
+     * @read
+     */
+    protected $_config;
 
     /**
      * Store server host name
@@ -61,7 +68,7 @@ class Controller extends BaseController
         $this->_security = Registry::get('security');
         $this->_serverHost = RequestMethods::server('HTTP_HOST');
         $this->_cache = Registry::get('cache');
-        $cfg = Registry::get('configuration');
+        $this->_config = Registry::get('configuration');
 
         // schedule disconnect from database 
         Events::add('framework.controller.destruct.after', function($name) {
@@ -71,17 +78,17 @@ class Controller extends BaseController
 
         $metaData = $this->getCache()->get('global_meta_data');
 
-        if ($metaData !== null) {
+        if (null !== $metaData) {
             $metaData = $metaData;
         } else {
             $metaData = array(
-                'metadescription' => $cfg->meta_description,
-                'metarobots' => $cfg->meta_robots,
-                'metatitle' => $cfg->meta_title,
-                'metaogurl' => $cfg->meta_og_url,
-                'metaogtype' => $cfg->meta_og_type,
-                'metaogimage' => $cfg->meta_og_image,
-                'metaogsitename' => $cfg->meta_og_site_name
+                'metadescription' => $this->getConfig()->meta_description,
+                'metarobots' => $this->getConfig()->meta_robots,
+                'metatitle' => $this->getConfig()->meta_title,
+                'metaogurl' => $this->getConfig()->meta_og_url,
+                'metaogtype' => $this->getConfig()->meta_og_type,
+                'metaogimage' => $this->getConfig()->meta_og_image,
+                'metaogsitename' => $this->getConfig()->meta_og_site_name
             );
 
             $this->getCache()->set('global_meta_data', $metaData);
@@ -112,6 +119,30 @@ class Controller extends BaseController
     }
 
     /**
+     * 
+     * @param type $pageCount
+     * @param type $page
+     * @param type $path
+     */
+    protected function _pagerMetaLinks($pageCount, $page, $path)
+    {
+        if ($pageCount > 1) {
+            $prevPage = $page - 1;
+            $nextPage = $page + 1;
+
+            if ($nextPage > $pageCount) {
+                $nextPage = 0;
+            }
+
+            $this->getLayoutView()
+                    ->set('pagedprev', $prevPage)
+                    ->set('pagedprevlink', $path . $prevPage)
+                    ->set('pagednext', $nextPage)
+                    ->set('pagednextlink', $path . $nextPage);
+        }
+    }
+    
+    /**
      * @protected
      */
     public function _secured()
@@ -120,7 +151,7 @@ class Controller extends BaseController
         $user = $this->_security->getUser();
 
         if (!$user) {
-            self::redirect('/login');
+            self::redirect('/prihlasit');
         }
 
         //30min inactivity till logout
@@ -130,7 +161,7 @@ class Controller extends BaseController
             $view = $this->getActionView();
 
             $view->infoMessage('Byl jste odhlášen z důvodu dlouhé neaktivity');
-            self::redirect('/logout');
+            self::redirect('/odhlasit');
         }
     }
 

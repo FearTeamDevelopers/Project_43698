@@ -7,7 +7,7 @@ section.wrapper.bazar
          ul
             li
                a(href='/bazar/pridat').fi-plus Nový inzerát
-            |{if $user}
+            |{if isset($authUser)}
             li
                a(href='/bazar/moje-inzeraty').fi-page-copy Moje inzeráty
             |{/if}

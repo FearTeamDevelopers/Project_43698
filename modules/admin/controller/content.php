@@ -13,8 +13,9 @@ class Admin_Controller_Content extends Controller
 {
 
     /**
+     * Check whether unique content identifier already exist or not
      * 
-     * @param type $key
+     * @param string $key
      * @return boolean
      */
     private function _checkUrlKey($key)
@@ -29,6 +30,8 @@ class Admin_Controller_Content extends Controller
     }
     
     /**
+     * Get list of all content pages
+     * 
      * @before _secured, _participant
      */
     public function index()
@@ -41,6 +44,8 @@ class Admin_Controller_Content extends Controller
     }
 
     /**
+     * Create new page
+     * 
      * @before _secured, _admin
      */
     public function add()
@@ -91,7 +96,10 @@ class Admin_Controller_Content extends Controller
     }
     
     /**
+     * Edit existing page
+     * 
      * @before _secured, _admin
+     * @param int   $id     page id
      */
     public function edit($id)
     {
@@ -148,6 +156,8 @@ class Admin_Controller_Content extends Controller
     }
     
     /**
+     * Return list of pages to insert page link to content
+     * 
      * @before _secured, _participant
      */
     public function insertToContent()

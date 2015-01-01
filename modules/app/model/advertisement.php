@@ -226,7 +226,7 @@ class App_Model_Advertisement extends Model
         $adArr = self::initialize($query);
         $ad = array_shift($adArr);
 
-        if ($ad !== null) {
+        if (null !== $ad) {
             $ad->messages = App_Model_AdMessage::all(array('adId = ?' => $ad->getId()));
             $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
         }
@@ -383,7 +383,7 @@ class App_Model_Advertisement extends Model
         $adArr = self::initialize($query);
         $ad = array_shift($adArr);
 
-        if ($ad !== null) {
+        if (null !== $ad) {
             $ad->messages = App_Model_AdMessage::all(array('adId = ?' => $ad->getId()));
             $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
         }

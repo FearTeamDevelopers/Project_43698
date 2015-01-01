@@ -9,8 +9,20 @@ section.wrapper.login
 
                h2.fi-torso Přihlášení
             form(method='POST' action='#')
-               input(type='email' name='email' placeholder='Váš@email.cz')
-               input(type='password' name='password' placeholder='Vaše heslo')
+               |{if isset($errors["account_error"])}
+               label.error.fi-alert
+                  |{echo join("<br/>", $errors["account_error"])}
+               |{/if}
+               input(type='email' name='email' placeholder='Váš@email.cz' required)
+               |{if isset($errors["email_error"])}
+               label.error.fi-alert
+                  |{echo join("<br/>", $errors["email_error"])}
+               |{/if}
+               input(type='password' name='password' placeholder='Vaše heslo' required)
+               |{if isset($errors["password_error"])}
+               label.error.fi-alert
+                  |{echo join("<br/>", $errors["password_error"])}
+               |{/if}
                input(type='submit' name='submitLogin' value='Přihlásit')
                input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
 

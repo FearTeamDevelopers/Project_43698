@@ -14,6 +14,7 @@ class Admin_Controller_Report extends Controller
 {
 
     /**
+     * Check whether user has access to report or not
      * 
      * @param App_Model_Report $report
      * @return boolean
@@ -29,6 +30,7 @@ class Admin_Controller_Report extends Controller
     }
     
     /**
+     * Check whether report unique identifier already exist or not
      * 
      * @param type $key
      * @return boolean
@@ -45,6 +47,9 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Get list of all actions. Loaded via datatables ajax.
+     * For more check load function.
+     * 
      * @before _secured, _participant
      */
     public function index()
@@ -53,6 +58,8 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Create new report
+     * 
      * @before _secured, _participant
      */
     public function add()
@@ -147,7 +154,10 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Edit existing report
+     * 
      * @before _secured, _participant
+     * @param int   $id     report id
      */
     public function edit($id)
     {
@@ -257,7 +267,10 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Delete existing report
+     * 
      * @before _secured, _participant
+     * @param int   $id     report id
      */
     public function delete($id)
     {
@@ -287,8 +300,10 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Delete report image
+     * 
      * @before _secured, _participant
-     * @param type $id
+     * @param int   $id     report id
      */
     public function deleteMainPhoto($id)
     {
@@ -326,7 +341,10 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Approve new report
+     * 
      * @before _secured, _admin
+     * @param int   $id     report id
      */
     public function approveReport($id)
     {
@@ -358,7 +376,10 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Reject new report
+     * 
      * @before _secured, _admin
+     * @param int   $id     report id
      */
     public function rejectReport($id)
     {
@@ -390,6 +411,8 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Return list of reports to insert report link to content
+     * 
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -403,6 +426,8 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Execute basic operation over multiple actions
+     * 
      * @before _secured, _admin
      */
     public function massAction()
@@ -592,6 +617,8 @@ class Admin_Controller_Report extends Controller
     }
 
     /**
+     * Response for ajax call from datatables plugin
+     * 
      * @before _secured, _participant
      */
     public function load()
@@ -680,7 +707,7 @@ class Admin_Controller_Report extends Controller
         $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
 
         $returnArr = array();
-        if ($reports !== null) {
+        if (null !== $reports) {
             foreach ($reports as $report) {
                 $label = '';
                 if ($report->active) {

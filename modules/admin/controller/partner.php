@@ -7,14 +7,14 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
 
 /**
- * Description of UserController
- *
  * 
  */
 class Admin_Controller_Partner extends Controller
 {
 
     /**
+     * Get list of all partners
+     * 
      * @before _secured, _admin
      */
     public function index()
@@ -27,6 +27,8 @@ class Admin_Controller_Partner extends Controller
     }
 
     /**
+     * Create new partner
+     * 
      * @before _secured, _admin
      */
     public function add()
@@ -92,8 +94,10 @@ class Admin_Controller_Partner extends Controller
     }
 
     /**
+     * Edit existing partner
+     * 
      * @before _secured, _admin
-     * @param type $id
+     * @param int   $id     partner id
      */
     public function edit($id)
     {
@@ -166,9 +170,10 @@ class Admin_Controller_Partner extends Controller
     }
 
     /**
+     * Delete existing partner
      * 
      * @before _secured, _admin
-     * @param type $id
+     * @param int   $id     partner id
      */
     public function delete($id)
     {
@@ -196,10 +201,10 @@ class Admin_Controller_Partner extends Controller
     }
 
     /**
-     * Ajax
+     * Delete existing partner logo
      * 
      * @before _secured, _admin
-     * @param type $id
+     * @param int   $id     partner id
      */
     public function deleteLogo($id)
     {
@@ -229,6 +234,8 @@ class Admin_Controller_Partner extends Controller
     }
 
     /**
+     * Execute basic operation over multiple partners
+     * 
      * @before _secured, _admin
      */
     public function massAction()

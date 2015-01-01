@@ -23,7 +23,7 @@ class App_Controller_System extends Controller
     }
 
     /**
-     * 
+     * Screen resolution logging
      */
     public function logresolution()
     {

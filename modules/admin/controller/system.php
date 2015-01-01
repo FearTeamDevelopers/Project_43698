@@ -24,6 +24,8 @@ class Admin_Controller_System extends Controller
     }
 
     /**
+     * Ability to clear cache from administration
+     * 
      * @before _secured, _admin
      */
     public function clearCache()
@@ -40,7 +42,7 @@ class Admin_Controller_System extends Controller
     }
 
     /**
-     * Create and download db bakcup
+     * Create db bakcup
      * 
      * @before _secured, _admin
      */
@@ -63,6 +65,8 @@ class Admin_Controller_System extends Controller
     }
 
     /**
+     * Get admin log
+     * 
      * @before _secured, _superadmin
      */
     public function showAdminLog()
@@ -73,6 +77,8 @@ class Admin_Controller_System extends Controller
     }
 
     /**
+     * Edit application settings
+     * 
      * @before _secured, _admin
      */
     public function settings()
@@ -111,6 +117,8 @@ class Admin_Controller_System extends Controller
     }
 
     /**
+     * Get profiler result
+     * 
      * @before _secured
      */
     public function showProfiler()
@@ -122,6 +130,8 @@ class Admin_Controller_System extends Controller
     }
 
     /**
+     * Generate sitemap.xml
+     * 
      * @before _secured, _admin
      */
     public function generateSitemap()
@@ -142,7 +152,7 @@ class Admin_Controller_System extends Controller
 
         $pageContent = App_Model_PageContent::all(array('active = ?' => true));
         
-        if($pageContent !== null){
+        if(null !== $pageContent){
             foreach ($pageContent as $content){
                 $pageContentXml .= "<url><loc>http://{$host}/{$content}</loc></url>";
             }
@@ -182,7 +192,7 @@ class Admin_Controller_System extends Controller
         ini_set('max_execution_time', 1800);
         ini_set('memory_limit', '256M');
 
-        $ROW_COUNT = 450;
+        $ROW_COUNT = 100;
 
         $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
 

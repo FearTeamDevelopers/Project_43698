@@ -5,7 +5,7 @@ section.wrapper.login
             header
                h2.fi-check Registrace
             form(method='post',action='#')
-               input(type='text',placeholder='Jméno', name='firstname' required)
+               input(type='text',placeholder='Jméno',value!='{echo isset($user)? $user->firstname: ""}', name='firstname' required)
                |{if isset($errors["firstname"])}
                label.error.fi-alert
                   |{echo join("<br/>", $errors["firstname"])}

@@ -14,11 +14,10 @@ class App_Controller_Advertisement extends Controller
 {
 
     /**
+     * Clean string. Cleaned string contains only [a-z0-9\s]
      * 
-     * @param type $str
-     * @param type $stopWordsCs
-     * @param type $stopWordsEn
-     * @return type
+     * @param string $str
+     * @return string
      */
     private function _cleanString($str)
     {
@@ -32,6 +31,7 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Prepare email body
      * 
      * @param App_Model_Advertisement $ad
      * @param App_Model_AdMessage $message
@@ -52,32 +52,9 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Check whether ad unique identifier already exist or not
      * 
-     * @param type $adsPageCount
-     * @param type $page
-     * @param type $path
-     */
-    private function _prepareMetaLinks($adsPageCount, $page, $path)
-    {
-        if ($adsPageCount > 1) {
-            $prevPage = $page - 1;
-            $nextPage = $page + 1;
-
-            if ($nextPage > $adsPageCount) {
-                $nextPage = 0;
-            }
-
-            $this->getLayoutView()
-                    ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', $path . $prevPage)
-                    ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', $path . $nextPage);
-        }
-    }
-
-    /**
-     * 
-     * @param type $str
+     * @param string $str
      * @return boolean
      */
     private function _checkAdKey($str)
@@ -92,7 +69,7 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
-     * 
+     * Get list of ads
      */
     public function index($page = 1)
     {
@@ -116,7 +93,7 @@ class App_Controller_Advertisement extends Controller
 
         $content = $this->getCache()->get('bazar-' . $page);
 
-        if ($content !== null) {
+        if (null !== $content) {
             $ads = $content;
         } else {
             $ads = App_Model_Advertisement::fetchAdsActive($adsPerPage, $page);
@@ -131,7 +108,7 @@ class App_Controller_Advertisement extends Controller
 
         $adsPageCount = ceil($adsCount / $adsPerPage);
 
-        $this->_prepareMetaLinks($adsPageCount, $page, '/bazar/p/');
+        $this->_pagerMetaLinks($adsPageCount, $page, '/bazar/p/');
 
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
@@ -143,8 +120,9 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Ads filter
      * 
-     * @param type $page
+     * @param int $page
      */
     public function filter($page = 1)
     {
@@ -198,7 +176,7 @@ class App_Controller_Advertisement extends Controller
 
         $adsPageCount = ceil($adsCount / $adsPerPage);
 
-        $this->_prepareMetaLinks($adsPageCount, $page, '/bazar/filtr/p/');
+        $this->_pagerMetaLinks($adsPageCount, $page, '/bazar/filtr/p/');
 
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
@@ -212,7 +190,7 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
-     * 
+     * Get list of ads created by user currently logged id
      */
     public function listByUser($page = 1)
     {
@@ -237,7 +215,7 @@ class App_Controller_Advertisement extends Controller
 
         $adsPageCount = ceil($adsCount / $adsPerPage);
 
-        $this->_prepareMetaLinks($adsPageCount, $page, '/bazar/moje-inzeraty/p/');
+        $this->_pagerMetaLinks($adsPageCount, $page, '/bazar/moje-inzeraty/p/');
 
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
@@ -249,8 +227,9 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Show ad detail
      * 
-     * @param type $uniquekey
+     * @param string    $uniqueKey      ad key
      */
     public function detail($uniquekey)
     {
@@ -282,7 +261,9 @@ class App_Controller_Advertisement extends Controller
 
             if ($message->validate()) {
                 require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                $transport = Swift_MailTransport::newInstance();
+                $transport = Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
+                                ->setUsername('info@fear-team.cz')
+                                ->setPassword('ThcMInfo-2014*');
                 $mailer = Swift_Mailer::newInstance($transport);
 
                 $email = Swift_Message::newInstance()
@@ -291,7 +272,7 @@ class App_Controller_Advertisement extends Controller
                         ->setBody($this->_getEmailBody($ad, $message));
 
                 if ($message->getSendEmailCopy() == 1) {
-                    $email->setTo($message->getMsEmail(), $ad->getEmail());
+                    $email->setTo(array($message->getMsEmail(), $ad->getEmail()));
                 } else {
                     $email->setTo($ad->getEmail());
                 }
@@ -309,34 +290,50 @@ class App_Controller_Advertisement extends Controller
             }
         }
     }
-
+    
     /**
+     * Search in ads
      * 
+     * @param int $page
      */
-    public function search()
+    public function search($page = 1)
     {
-        if ($this->checkCSRFToken() !== true) {
-            self::redirect('/bazar');
-        }
-
-        $db = Registry::get('database');
-        $ssql = "SELECT *, SUM(MATCH(title, content, keywords) AGAINST(? IN BOOLEAN MODE)) as score "
-                . "FROM tb_advertisement "
-                . "WHERE active=1 AND expirationDate >= " . date('Y-m-d H:i:s') . " MATCH(title, content, keywords) AGAINST(? IN BOOLEAN MODE) "
-                . "ORDER BY score DESC, created DESC";
-
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
         $query = $this->_cleanString(RequestMethods::get('adstr'));
-        $words = explode(' ', $query);
+        $articlesPerPage = $this->getConfig()->bazaar_search_results_per_page;
 
-        foreach ($words as &$word) {
-            $word = '+' . $word;
+        $searchResultCached = $this->getCache()->get('bazar_search_' . $page . '_' . str_replace(' ', '_', substr($query, 0, 45)));
+
+        if (null !== $searchResultCached) {
+            $searchResult = $searchResultCached;
+        } else {
+            $db = Registry::get('database');
+            $ssql = "SELECT *, SUM(MATCH(title, content, keywords) AGAINST(? IN BOOLEAN MODE)) as score "
+                    . "FROM tb_advertisement "
+                    . "WHERE active=1 AND expirationDate >= " . date('Y-m-d H:i:s') . " MATCH(title, content, keywords) AGAINST(? IN BOOLEAN MODE) "
+                    . "ORDER BY score DESC, created DESC "
+                    . "LIMIT {$page}, {$articlesPerPage}";
+
+            $words = explode(' ', $query);
+
+            foreach ($words as &$word) {
+                $word = '+' . $word;
+            }
+
+            $searchCond = '(' . implode(' ', $words) . ') ("' . $query . '")';
+            $searchResult = $db->execute($ssql, $searchCond, $searchCond);
+            var_dump($searchResult);die;
         }
-
-        $searchCond = '(' . implode(' ', $words) . ') ("' . $query . '")';
-        $result = $db->execute($ssql, $searchCond, $searchCond);
+        
+        $view->set('result', $searchResult)
+                ->set('currentpage', $page);
+        $layoutView->set('metatitle', 'Hastrman - Bazar - Hledat');
     }
 
     /**
+     * Create new ad
+     * 
      * @before _secured, _member
      */
     public function add()
@@ -358,14 +355,12 @@ class App_Controller_Advertisement extends Controller
                 $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
             }
 
-            $cfg = Registry::get('configuration');
-
             $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
+                'thumbWidth' => $this->getConfig()->thumb_width,
+                'thumbHeight' => $this->getConfig()->thumb_height,
+                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
             $fileErrors = $fileManager->uploadImage('uploadfile', 'ads', time() . '_', true)->getUploadErrors();
@@ -375,7 +370,7 @@ class App_Controller_Advertisement extends Controller
                 $uploadErrors += $fileErrors;
             }
 
-            $adTtl = $cfg->bazar_ad_ttl;
+            $adTtl = $this->getConfig()->bazar_ad_ttl;
             $date = new DateTime();
             $date->add(new DateInterval('P' . (int) $adTtl . 'D'));
             $expirationDate = $date->format('Y-m-d');
@@ -414,9 +409,9 @@ class App_Controller_Advertisement extends Controller
                             if ($adImage->validate()) {
                                 $adImageId = $adImage->save();
 
-                                Event::fire('admin.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $id));
+                                Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $id));
                             } else {
-                                Event::fire('admin.log', array('fail', 'Upload photo for ad ' . $id));
+                                Event::fire('app.log', array('fail', 'Upload photo for ad ' . $id));
                                 $uploadErrors += $adImage->getErrors();
                             }
                         }
@@ -425,22 +420,22 @@ class App_Controller_Advertisement extends Controller
                     $errors['uploadfile'] = $uploadErrors;
 
                     if (empty($errors['uploadfile'])) {
-                        Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                        Event::fire('app.log', array('success', 'Ad id: ' . $id));
                         $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     } else {
-                        Event::fire('admin.log', array('fail'));
+                        Event::fire('app.log', array('fail'));
                         $view->set('ad', $ad)
                                 ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                                 ->set('errors', $errors + $ad->getErrors());
                     }
                 } else {
-                    Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                    Event::fire('app.log', array('success', 'Ad id: ' . $id));
                     $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('app.log', array('fail'));
                 $view->set('ad', $ad)
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $ad->getErrors());
@@ -449,8 +444,10 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Edit existing ad
+     * 
      * @before _secured, _member
-     * @param type $uniqueKey
+     * @param string    $uniqueKey      ad key
      */
     public function edit($uniqueKey)
     {
@@ -477,14 +474,12 @@ class App_Controller_Advertisement extends Controller
                 $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
             }
 
-            $cfg = Registry::get('configuration');
-
             $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
+                'thumbWidth' => $this->getConfig()->thumb_width,
+                'thumbHeight' => $this->getConfig()->thumb_height,
+                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
             $fileErrors = $fileManager->uploadImage('uploadfile', 'ads', time() . '_', true)->getUploadErrors();
@@ -525,9 +520,9 @@ class App_Controller_Advertisement extends Controller
                                 if ($adImage->validate()) {
                                     $adImageId = $adImage->save();
 
-                                    Event::fire('admin.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $ad->getId()));
+                                    Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $ad->getId()));
                                 } else {
-                                    Event::fire('admin.log', array('fail', 'Upload photo for ad ' . $ad->getId()));
+                                    Event::fire('app.log', array('fail', 'Upload photo for ad ' . $ad->getId()));
                                     $uploadErrors += $adImage->getErrors();
                                 }
                             }
@@ -536,15 +531,15 @@ class App_Controller_Advertisement extends Controller
                         $errors['uploadfile'] = $uploadErrors;
 
                         if (empty($errors['uploadfile'])) {
-                            Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                            Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
                             $view->successMessage(self::SUCCESS_MESSAGE_2);
                             self::redirect('/bazar/r/' . $ad->getUniqueKey());
                         } else {
-                            Event::fire('admin.log', array('fail'));
+                            Event::fire('app.log', array('fail'));
                             $view->set('errors', $errors + $ad->getErrors());
                         }
                     } else {
-                        Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                        Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
                         $view->successMessage(self::SUCCESS_MESSAGE_2 . ', ale více fotek už není možné nahrát');
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     }
@@ -561,8 +556,10 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Delete existing ad
+     * 
      * @before _secured, _member
-     * @param type $uniqueKey
+     * @param string    $uniqueKey      ad key
      */
     public function delete($uniqueKey)
     {
@@ -585,8 +582,10 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Delete ad image
+     * 
      * @before _secured, _member
-     * @param type $id
+     * @param int   $id     image id
      */
     public function deleteAdImage($id)
     {
@@ -615,8 +614,10 @@ class App_Controller_Advertisement extends Controller
     }
 
     /**
+     * Create request for availability extend
+     * 
      * @before _secured, _member
-     * @param type $uniqueKey
+     * @param string    $uniqueKey      ad key
      */
     public function sendAvailabilityExtendRequest($uniqueKey)
     {

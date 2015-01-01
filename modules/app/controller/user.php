@@ -7,21 +7,19 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Core\Rand;
 
 /**
- * Description of App_Controller_User
- *
  * 
  */
 class App_Controller_User extends Controller
 {
 
     /**
-     * 
+     * App module login
      */
     public function login()
     {
         $view = $this->getActionView();
 
-        $canonical = 'http://' . $this->getServerHost() . '/login';
+        $canonical = 'http://' . $this->getServerHost() . '/prihlasit';
 
         $this->getLayoutView()
                 ->set('metatitle', 'Hastrman - Přihlásit se')
@@ -29,7 +27,7 @@ class App_Controller_User extends Controller
 
         if (RequestMethods::post('submitLogin')) {
             if ($this->checkCSRFToken() !== true) {
-                self::redirect('/login');
+                self::redirect('/prihlasit');
             }
             
             $email = RequestMethods::post('email');
@@ -69,7 +67,7 @@ class App_Controller_User extends Controller
     }
 
     /**
-     * 
+     * App module logout
      */
     public function logout()
     {
@@ -81,7 +79,7 @@ class App_Controller_User extends Controller
     }
 
     /**
-     * 
+     * Registration. Create only members without access into administration
      */
     public function registration()
     {
@@ -115,8 +113,16 @@ class App_Controller_User extends Controller
 
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
-            $actToken = Rand::randStr(50);
+            $verifyEmail = $this->getConfig()->registration_verif_email;
             
+            if ($verifyEmail) {
+                $active = false;
+                $actToken = Rand::randStr(50);
+            }else{
+                $active = true;
+                $actToken = null;
+            }
+
             $user = new App_Model_User(array(
                 'firstname' => RequestMethods::post('firstname'),
                 'lastname' => RequestMethods::post('lastname'),
@@ -125,32 +131,42 @@ class App_Controller_User extends Controller
                 'password' => $hash,
                 'salt' => $salt,
                 'role' => 'role_member',
-                'active' => false,
+                'active' => $active,
                 'emailActivationToken' => $actToken
             ));
 
             if (empty($errors) && $user->validate()) {
                 $uid = $user->save();
                 
-                require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                $transport = Swift_MailTransport::newInstance();
-                $mailer = Swift_Mailer::newInstance($transport);
+                if ($verifyEmail) {
+                    require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+                    $transport = Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
+                            ->setUsername('info@fear-team.cz')
+                            ->setPassword('ThcMInfo-2014*');
 
-                $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
-                        . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
-                        . '<a href="/aktivovatucet/'.$actToken.'">Aktivovat účet</a><br/><br/>'
-                        . 'S pozdravem,<br/> Hastrmani';
+                    $mailer = Swift_Mailer::newInstance($transport);
+
+                    $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
+                            . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
+                            . '<a href="http://www.hastrman.cz/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
+                            . 'S pozdravem,<br/>Hastrmani';
+
+                    $regEmail = Swift_Message::newInstance()
+                            ->setSubject('Hastrman - Registrace')
+                            ->setFrom('info@fear-team.cz')
+                            ->setTo($user->getEmail())
+                            ->setBody($emailBody, 'text/html');
+                    //$mailer->send($regEmail);
+                }
+
+                Event::fire('app.log', array('success', 'User Id: '.$uid));
                 
-                $email = Swift_Message::newInstance()
-                        ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
-                        ->setFrom('bazar@hastrman.cz')
-                        ->setTo($user->getEmail())
-                        ->setBody($emailBody);
+                if ($verifyEmail) {
+                    $view->successMessage('Registrace byla úspěšná. Na uvedený email byl zaslán odkaz k aktivaci účtu.');
+                }else{
+                    $view->successMessage('Registrace byla úspěšná');
+                }
 
-                $mailer->send($email);
-
-                Event::fire('admin.log', array('success', 'User Id: '.$uid));
-                $view->successMessage('Registrace byla úspěšná');
                 self::redirect('/');
             } else {
                 $view->set('errors', $errors + $user->getErrors())
@@ -160,6 +176,8 @@ class App_Controller_User extends Controller
     }
 
     /**
+     * Edit user currently logged in
+     * 
      * @before _secured, _member
      */
     public function profile()
@@ -225,8 +243,9 @@ class App_Controller_User extends Controller
     }
     
     /**
+     * Activate account via activation link send by email
      * 
-     * @param type $key
+     * @param string    $key    activation token
      */
     public function activateAccount($key)
     {
@@ -240,16 +259,16 @@ class App_Controller_User extends Controller
         }
         
         $user->active = true;
-        $user->emailActivationToken = '';
+        $user->emailActivationToken = null;
         
         if($user->validate()){
             $user->save();
             
-            Event::fire('admin.log', array('success', 'User Id: '.$user->getId()));
+            Event::fire('app.log', array('success', 'User Id: '.$user->getId()));
             $view->successMessage('Účet byl aktivován');
             self::redirect('/');
         }else{
-            Event::fire('admin.log', array('fail', 'User Id: '.$user->getId()));
+            Event::fire('app.log', array('fail', 'User Id: '.$user->getId()));
             $view->warningMessage(self::ERROR_MESSAGE_1);
             self::redirect('/');
         }

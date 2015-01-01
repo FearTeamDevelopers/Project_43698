@@ -1,6 +1,6 @@
 section.wrapper.blue.filter
    .row
-      |{if $path=='bazar' | $path=='filtr'}
+      |{if $path=='/bazar' | $path=='/bazar/filtr'}
       form.filtr(method ='POST' action='/bazar/filtr')
          select(name='bftype')
             option(value='0') Typ
@@ -14,7 +14,7 @@ section.wrapper.blue.filter
          input(type='submit' name='zobrazit' value='Zobrazit')
          input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
       |{/if}
-      form.search(method='POST' action='/prohledatbazar')
-         input(type='text' placeholder='vyhledat v bazaru...')
+      form.search(method='GET' action='/bazar/hledat')
+         input(type='text' placeholder='vyhledat v bazaru...' name='adstr' required)
          a#hledat(href='#').fi-magnifying-glass
          input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")

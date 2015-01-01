@@ -24,10 +24,11 @@ class Search_Etc_Module extends Module
      */
     protected $_routes = array(
         array(
-            'pattern' => '/dosearch',
+            'pattern' => '/dosearch/:page',
             'module' => 'search',
             'controller' => 'search',
-            'action' => 'doSearch'
+            'action' => 'doSearch',
+            'args' => ':page'
         ),
         array(
             'pattern' => '/s/buildindex',

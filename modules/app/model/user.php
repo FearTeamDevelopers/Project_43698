@@ -15,7 +15,7 @@ class App_Model_User extends BasicUser
      * @length 40
      *
      * @validate required, alpha, min(3), max(40)
-     * @label jmeno
+     * @label jméno
      */
     protected $_firstname;
 

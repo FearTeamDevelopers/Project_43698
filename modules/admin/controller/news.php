@@ -13,6 +13,7 @@ class Admin_Controller_News extends Controller
 {
 
     /**
+     * Check whether user has access to news or not
      * 
      * @param App_Model_News $news
      * @return boolean
@@ -28,6 +29,7 @@ class Admin_Controller_News extends Controller
     }
     
     /**
+     * Check whether news unique identifier already exist or not
      * 
      * @param type $key
      * @return boolean
@@ -44,6 +46,9 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Get list of all actions. Loaded via datatables ajax.
+     * For more check load function.
+     * 
      * @before _secured, _participant
      */
     public function index()
@@ -52,6 +57,8 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Create new news
+     * 
      * @before _secured, _participant
      */
     public function add()
@@ -113,7 +120,10 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Edit existing news
+     * 
      * @before _secured, _participant
+     * @param int   $id     news id
      */
     public function edit($id)
     {
@@ -185,7 +195,10 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Delete existing news
+     * 
      * @before _secured, _participant
+     * @param int   $id     news id
      */
     public function delete($id)
     {
@@ -215,7 +228,10 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Approve new news
+     * 
      * @before _secured, _admin
+     * @param int   $id     news id
      */
     public function approveNews($id)
     {
@@ -247,7 +263,10 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Reject new news
+     * 
      * @before _secured, _admin
+     * @param int   $id     news id
      */
     public function rejectNews($id)
     {
@@ -279,6 +298,8 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Return list of news to insert news link to content
+     * 
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -292,6 +313,8 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Execute basic operation over multiple news
+     * 
      * @before _secured, _admin
      */
     public function massAction()
@@ -478,6 +501,8 @@ class Admin_Controller_News extends Controller
     }
 
     /**
+     * Response for ajax call from datatables plugin
+     * 
      * @before _secured, _participant
      */
     public function load()
@@ -566,7 +591,7 @@ class Admin_Controller_News extends Controller
         $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
 
         $returnArr = array();
-        if ($news !== null) {
+        if (null !== $news) {
             foreach ($news as $_news) {
                 $label = '';
                 if ($_news->active) {

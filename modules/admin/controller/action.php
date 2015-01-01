@@ -13,6 +13,7 @@ class Admin_Controller_Action extends Controller
 {
 
     /**
+     * Check whether user has access to action or not
      * 
      * @param App_Model_Action $action
      * @return boolean
@@ -28,8 +29,9 @@ class Admin_Controller_Action extends Controller
     }
     
     /**
+     * Check whether action unique identifier already exist or not
      * 
-     * @param type $key
+     * @param string $key
      * @return boolean
      */
     private function _checkUrlKey($key)
@@ -44,6 +46,9 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Get list of all actions. Loaded via datatables ajax.
+     * For more check load function.
+     * 
      * @before _secured, _participant
      */
     public function index()
@@ -52,6 +57,8 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Create new action
+     * 
      * @before _secured, _participant
      */
     public function add()
@@ -118,7 +125,10 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Edit existing action
+     * 
      * @before _secured, _participant
+     * @param int   $id     action id
      */
     public function edit($id)
     {
@@ -196,7 +206,10 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Delete existing action
+     * 
      * @before _secured, _participant
+     * @param int   $id     action id
      */
     public function delete($id)
     {
@@ -226,7 +239,10 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Approve new action
+     * 
      * @before _secured, _admin
+     * @param int   $id     action id
      */
     public function approveAction($id)
     {
@@ -258,7 +274,10 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Reject new action
+     * 
      * @before _secured, _admin
+     * @param int   $id     action id
      */
     public function rejectAction($id)
     {
@@ -290,6 +309,8 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Return list of actions to insert action link to content
+     * 
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -303,6 +324,8 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Execute basic operation over multiple actions
+     * 
      * @before _secured, _admin
      */
     public function massAction()
@@ -493,6 +516,8 @@ class Admin_Controller_Action extends Controller
     }
 
     /**
+     * Response for ajax call from datatables plugin
+     * 
      * @before _secured, _participant
      */
     public function load()
@@ -581,7 +606,7 @@ class Admin_Controller_Action extends Controller
         $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
 
         $returnArr = array();
-        if ($actions !== null) {
+        if (null !== $actions) {
             foreach ($actions as $action) {
                 $label = '';
                 if ($action->active) {

@@ -13,8 +13,9 @@ class Admin_Controller_Gallery extends Controller
 {
 
     /**
+     * Check whether gallery unique identifier already exist or not
      * 
-     * @param type $key
+     * @param string $key
      * @return boolean
      */
     private function _checkUrlKey($key)
@@ -29,6 +30,7 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
+     * Check whether user has access to gallery or not
      * 
      * @param App_Model_Gallery $gallery
      * @return boolean
@@ -44,7 +46,7 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Action method returns list of all galleries
+     * Get list of all gelleries
      * 
      * @before _secured, _participant
      */
@@ -58,7 +60,7 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Action method shows and processes form used for new gallery creation
+     * Create new gallery
      * 
      * @before _secured, _participant
      */
@@ -109,11 +111,10 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Method shows detail of specific gallery based on param id. 
-     * From here can user upload photos and videos into gallery.
+     * Show detail of existing gallery
      * 
      * @before _secured, _participant
-     * @param int $id
+     * @param int   $id     gallery id
      */
     public function detail($id)
     {
@@ -131,11 +132,10 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Action method shows and processes form used for editing specific 
-     * collection based on param id
+     * Edit existing gallery
      * 
      * @before _secured, _participant
-     * @param int $id
+     * @param int   $id     gallery id
      */
     public function edit($id)
     {
@@ -197,12 +197,10 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Action method shows and processes form used for deleting specific 
-     * collection based on param id. If is collection delete confirmed, 
-     * there is option used for deleting all photos in collection.
+     * Delete existing gallery and all photos (files and db)
      * 
      * @before _secured, _participant
-     * @param int $id   collection id
+     * @param int   $id     gallery id
      */
     public function delete($id)
     {
@@ -275,6 +273,8 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
+     * Return list of galleries to insert gallery link to content
+     * 
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -288,11 +288,10 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Action method shows and processes form used for uploading photos into
-     * collection specified by param id
+     * Upload photo into gallery
      * 
      * @before _secured, _participant
-     * @param int $id
+     * @param int   $id     gallery id
      */
     public function addPhoto($id)
     {
@@ -339,7 +338,7 @@ class Admin_Controller_Gallery extends Controller
             $fileErrors = $fileManager->uploadImage('uploadfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
-            if(!empty($fileErrors)){
+            if (!empty($fileErrors)) {
                 $uploadErrors += $fileErrors;
             }
 
@@ -373,7 +372,7 @@ class Admin_Controller_Gallery extends Controller
                     }
                 }
             }
-            
+
             $errors['uploadfile'] = $uploadErrors;
             if (empty($errors['uploadfile'])) {
                 $view->successMessage(self::SUCCESS_MESSAGE_7);
@@ -385,10 +384,10 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Method is called via ajax and deletes photo specified by param id
+     * Delete photo
      * 
      * @before _secured, _participant
-     * @param int $id
+     * @param int   $id     photo id
      */
     public function deletePhoto($id)
     {
@@ -396,16 +395,14 @@ class Admin_Controller_Gallery extends Controller
         $this->willRenderLayoutView = false;
 
         $photo = App_Model_Photo::first(
-                        array('id = ?' => $id), 
-                        array('id', 'imgMain', 'imgThumb', 'galleryId')
+                        array('id = ?' => $id), array('id', 'imgMain', 'imgThumb', 'galleryId')
         );
 
         if (null === $photo) {
             echo self::ERROR_MESSAGE_2;
         } else {
             $gallery = App_Model_Gallery::first(
-                        array('id = ?' => (int) $photo->getGalleryId()), 
-                        array('id', 'userId')
+                            array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
             );
 
             if (null === $gallery) {
@@ -432,25 +429,23 @@ class Admin_Controller_Gallery extends Controller
     }
 
     /**
-     * Method is called via ajax and activate or deactivate photo specified by
-     * param id
+     * Change photo state (active/inactive)
      * 
      * @before _secured, _participant
-     * @param int $id   photo id
+     * @param int   $id     photo id
      */
     public function changePhotoStatus($id)
     {
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        $photo = App_Model_Photo::first(array('id = ?' => (int)$id));
+        $photo = App_Model_Photo::first(array('id = ?' => (int) $id));
 
         if (null === $photo) {
             echo self::ERROR_MESSAGE_2;
         } else {
             $gallery = App_Model_Gallery::first(
-                        array('id = ?' => (int) $photo->getGalleryId()), 
-                        array('id', 'userId')
+                            array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
             );
 
             if (null === $gallery) {
@@ -460,7 +455,7 @@ class Admin_Controller_Gallery extends Controller
             if (!$this->_checkAccess($gallery)) {
                 echo self::ERROR_MESSAGE_4;
             }
-            
+
             if (!$photo->active) {
                 $photo->active = true;
 

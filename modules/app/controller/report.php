@@ -2,7 +2,6 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
-use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -11,7 +10,7 @@ class App_Controller_Report extends Controller
 {
 
     /**
-     * Check if are sets specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values
      */
     private function _checkMetaData($layoutView, App_Model_Report $object)
     {
@@ -40,16 +39,16 @@ class App_Controller_Report extends Controller
     }
 
     /**
+     * Get list of reports
      * 
-     * @param type $page
+     * @param int $page
      */
     public function index($page = 1)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $config = Registry::get('configuration');
 
-        $articlesPerPage = $config->reports_per_page;
+        $articlesPerPage = $this->getConfig()->reports_per_page;
 
         if($page <= 0){
             $page = 1;
@@ -63,7 +62,7 @@ class App_Controller_Report extends Controller
         
         $content = $this->getCache()->get('report-' . $page);
 
-        if ($content !== null) {
+        if (null !== $content) {
             $reports = $content;
         } else {
             $reports = App_Model_Report::fetchOldWithLimit($articlesPerPage, $page);
@@ -77,24 +76,11 @@ class App_Controller_Report extends Controller
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
-        if ($reportsPageCount > 1) {
-            $prevPage = $page - 1;
-            $nextPage = $page + 1;
-
-            if ($nextPage > $reportsPageCount) {
-                $nextPage = 0;
-            }
-
-            $layoutView
-                    ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', '/reportaze/p/' . $prevPage)
-                    ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', '/reportaze/p/' . $nextPage);
-        }
-
+        $this->_pagerMetaLinks($reportsPageCount, $page, '/reportaze/p/');
+        
         $view->set('reports', $reports)
                 ->set('currentpage', $page)
-                ->set('path', "reportaze")
+                ->set('path', '/reportaze')
                 ->set('pagecount', $reportsPageCount);
 
         $layoutView->set('canonical', $canonical)
@@ -102,8 +88,9 @@ class App_Controller_Report extends Controller
     }
 
     /**
+     * Show report detail
      * 
-     * @param type $urlKey
+     * @param string $urlKey
      */
     public function detail($urlKey)
     {

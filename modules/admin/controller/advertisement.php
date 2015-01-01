@@ -12,8 +12,9 @@ class Admin_Controller_Advertisement extends Controller
 {
 
     /**
+     * Check whether unique ad section identifier already exist or not
      * 
-     * @param type $key
+     * @param string $key
      * @return boolean
      */
     private function _checkSectionUrlKey($key)
@@ -28,6 +29,8 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Get list of all advertisements
+     * 
      * @before _secured, _participant
      */
     public function index()
@@ -38,6 +41,8 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Get list of advertisement sections
+     * 
      * @before _secured, _participant
      */
     public function sections()
@@ -48,7 +53,10 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Show detail of existing ad
+     * 
      * @before _secured, _participant
+     * @param int   $id     ad id
      */
     public function detail($id)
     {
@@ -64,7 +72,10 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Delete existing ad
+     * 
      * @before _secured, _admin
+     * @param int   $id     ad id
      */
     public function delete($id)
     {
@@ -90,7 +101,10 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Change ad state (active/inactive)
+     * 
      * @before _secured, _admin
+     * @param int   $id     ad id
      */
     public function changeState($id)
     {
@@ -121,7 +135,10 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Delete image from ad
+     * 
      * @before _secured, _admin
+     * @param int   $imageId     image id
      */
     public function deleteAdImage($imageId)
     {
@@ -159,6 +176,8 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Create new section for advertisements
+     * 
      * @before _secured, _admin
      */
     public function addSection()
@@ -201,7 +220,10 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Edit existing advertisement section
+     * 
      * @before _secured, _admin
+     * @param int   $id     section id
      */
     public function editSection($id)
     {
@@ -246,7 +268,10 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Delete existing advertisement section
+     * 
      * @before _secured, _admin
+     * @param int   $id     section id
      */
     public function deleteSection($id)
     {
@@ -271,7 +296,10 @@ class Admin_Controller_Advertisement extends Controller
     }
 
     /**
+     * Extend ad availability for specific amount of days
+     * 
      * @before _secured, _admin
+     * @param int   $id     ad id
      */
     public function extendAvailability($id)
     {
