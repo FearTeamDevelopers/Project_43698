@@ -165,7 +165,8 @@ class App_Controller_Index extends Controller
         
         $layoutView->set('canonical', $canonical)
                 ->set('currentpage', $page)
-                ->set('path', '/hledat?'.http_build_query($parameters))
+                ->set('pagerpathprefix', '/hledat')
+                ->set('pagerpathpostfix', '?'.http_build_query($parameters))
                 ->set('metatitle', 'Hastrman - Hledat');
     }
 }

@@ -76,7 +76,7 @@ class App_Controller_News extends Controller
 
         $view->set('news', $news)
                 ->set('currentpage', $page)
-                ->set('path', '/novinky')
+                ->set('pagerpathprefix', '/novinky')
                 ->set('pagecount', $newsPageCount);
 
         $layoutView->set('canonical', $canonical)

@@ -3,14 +3,41 @@ section.wrapper.blue.filter
       |{if $path=='/bazar' | $path=='/bazar/filtr'}
       form.filtr(method ='POST' action='/bazar/filtr')
          select(name='bftype')
+            |{if isset($bftype)}
+            |{if $bftype == 'nabidka'}
+            option(value='0') Typ
+            option(value='nabidka', selected) Nabídka
+            option(value='poptavka') Poptávka
+            |{/if}{elseif $bftype == 'poptavka'}
+            option(value='0') Typ
+            option(value='nabidka') Nabídka
+            option(value='poptavka', selected) Poptávka
+            |{/elseif}{else}
+            option(value='0', selected) Typ
+            option(value='nabidka') Nabídka
+            option(value='poptavka') Poptávka
+            |{/else}
+            |{/if}{else}
             option(value='0') Typ
             option(value='nabidka') Nabídka
             option(value='poptavka') Poptávka
+            |{/else}
          select(name='bfsection')
+            |{if isset($bfsection)}
+            option(value='0') Sekce
+            | {foreach $ad in $adsections}
+            |{if $ad->urlKey == $bfsection}
+            option(value!='{echo $ad->urlKey}', selected) {echo $ad->title}
+            |{/if}{else}
+            option(value!='{echo $ad->urlKey}') {echo $ad->title}
+            |{/else}
+            | {/foreach}
+            |{/if}{else}
             option(value='0') Sekce
             | {foreach $ad in $adsections}
             option(value!='{echo $ad->urlKey}') {echo $ad->title}
             | {/foreach}
+            |{/else}
          input(type='submit' name='zobrazit' value='Zobrazit')
          input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
       |{/if}

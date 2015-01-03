@@ -112,7 +112,7 @@ class App_Controller_Advertisement extends Controller
 
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
-                ->set('path', '/bazar')
+                ->set('pagerpathprefix', '/bazar')
                 ->set('pagecount', $adsPageCount);
 
         $layoutView->set('canonical', $canonical)
@@ -180,7 +180,7 @@ class App_Controller_Advertisement extends Controller
 
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
-                ->set('path', '/bazar/filtr')
+                ->set('pagerpathprefix', '/bazar/filtr')
                 ->set('pagecount', $adsPageCount)
                 ->set('bftype', $type)
                 ->set('bfsection', $section);
@@ -219,7 +219,7 @@ class App_Controller_Advertisement extends Controller
 
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
-                ->set('path', '/bazar/moje-inzeraty')
+                ->set('pagerpathprefix', '/bazar/moje-inzeraty')
                 ->set('pagecount', $adsPageCount);
 
         $layoutView->set('canonical', $canonical)
@@ -229,7 +229,7 @@ class App_Controller_Advertisement extends Controller
     /**
      * Show ad detail
      * 
-     * @param string    $uniqueKey      ad key
+     * @param string    $uniquekey      ad key
      */
     public function detail($uniquekey)
     {
@@ -328,7 +328,9 @@ class App_Controller_Advertisement extends Controller
         
         $view->set('result', $searchResult)
                 ->set('currentpage', $page);
-        $layoutView->set('metatitle', 'Hastrman - Bazar - Hledat');
+        $layoutView->set('metatitle', 'Hastrman - Bazar - Hledat')
+                ->set('pagerpathprefix', '/prohledatbazar')
+                ->set('pagerpathpostfix', '?'.http_build_query($query));
     }
 
     /**

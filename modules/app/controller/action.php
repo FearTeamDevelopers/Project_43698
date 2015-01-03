@@ -75,7 +75,7 @@ class App_Controller_Action extends Controller
         $this->_pagerMetaLinks($actionsPageCount, $page, '/akce/p/');
 
         $view->set('actions', $actions)
-                ->set('path', '/akce')
+                ->set('pagerpathprefix', '/akce')
                 ->set('currentpage', $page)
                 ->set('pagecount', $actionsPageCount);
 
