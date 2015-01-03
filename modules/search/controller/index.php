@@ -26,28 +26,28 @@ class Search_Controller_Index extends Controller
             'where' => array('active = 1', 'approved = 1', 'archive = 0'),
             'path' => '/akce/r/',
             'identifier' => 'urlKey',
-            'columns' => array('urlKey', 'keywords', 'metaDescription', 'title'),
+            'columns' => array('urlKey', 'keywords', 'metaDescription', 'title', 'created'),
             'textColumns' => array('keywords', 'metaDescription')),
         'tb_report' => array(
             'model' => 'App_Model_Report',
             'where' => array('active = 1', 'approved = 1', 'archive = 0'),
             'path' => '/reportaze/r/',
             'identifier' => 'urlKey',
-            'columns' => array('urlKey', 'keywords', 'metaDescription', 'title'),
+            'columns' => array('urlKey', 'keywords', 'metaDescription', 'title', 'created'),
             'textColumns' => array('keywords', 'metaDescription')),
         'tb_pagecontent' => array(
             'model' => 'App_Model_Pagecontent',
             'where' => array('active = 1'),
             'path' => '/page/',
             'identifier' => 'urlKey',
-            'columns' => array('urlKey', 'metaDescription', 'title', 'keywords'),
+            'columns' => array('urlKey', 'metaDescription', 'title', 'keywords', 'created'),
             'textColumns' => array('keywords', 'metaDescription')),
         'tb_news' => array(
             'model' => 'App_Model_News',
             'where' => array('active = 1', 'approved = 1', 'archive = 0'),
             'path' => '/novinky/r/',
             'identifier' => 'urlKey',
-            'columns' => array('urlKey', 'keywords', 'metaDescription', 'title'),
+            'columns' => array('urlKey', 'keywords', 'metaDescription', 'title', 'created'),
             'textColumns' => array('keywords', 'metaDescription'))
     );
 
@@ -137,7 +137,7 @@ class Search_Controller_Index extends Controller
         $stopWordsEn = implode('|', $this->stopwords_en);
 
         $database = Registry::get('database');
-        $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, now(), default)";
+        $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, 'cron', 0, ?, now(), default)";
         $prepareIdSql = "ALTER TABLE tb_searchindex auto_increment = 1";
         $truncateSql = "TRUNCATE tb_searchindex";
@@ -180,7 +180,7 @@ class Search_Controller_Index extends Controller
                         $wordsCount++;
                         $weight = $this->_getWeight($word, $occ, $title, $path);
 
-                        $database->execute($insertSql, $variables['model'], $word, $path, $title, $occ, $weight);
+                        $database->execute($insertSql, $variables['model'], $word, $path, $title, $article['metaDescription'], $article['created'], $occ, $weight);
                     }
 
                     unset($words);
@@ -227,7 +227,7 @@ class Search_Controller_Index extends Controller
 
         $database = Registry::get('database');
         
-        $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, now(), default)";
+        $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 1, ?, now(), default)";
         $deleteSql = "DELETE FROM tb_searchindex WHERE sourceModel=?";
 
@@ -268,7 +268,7 @@ class Search_Controller_Index extends Controller
 
                     $weight = $this->_getWeight($word, $occ, $title, $path);
 
-                    $database->execute($insertSql, $variables['model'], $word, $path, $title, $occ, $weight);
+                    $database->execute($insertSql, $variables['model'], $word, $path, $title, $article['metaDescription'], $article['created'], $occ, $weight);
                 }
 
                 unset($words);

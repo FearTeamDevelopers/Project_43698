@@ -156,7 +156,7 @@ class App_Controller_Index extends Controller
         $response = $request->request('post', $requestUrl, $parameters);
         $urls = json_decode($response, true);
         $articleCount = array_shift($urls);
-
+        var_dump($urls);die;
         $searchPageCount = ceil($articleCount['totalCount'] / $articlesPerPage);
 
         $this->_pagerMetaLinks($searchPageCount, $page, '/hledat/p/');

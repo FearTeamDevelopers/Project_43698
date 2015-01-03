@@ -29,10 +29,22 @@ class App_Etc_Module extends Module
      */
     protected $_routes = array(
         array(
+            'pattern' => '/hledat',
+            'module' => 'app',
+            'controller' => 'index',
+            'action' => 'search'
+        ),
+        array(
             'pattern' => '/admin',
             'module' => 'admin',
             'controller' => 'index',
             'action' => 'index'
+        ),
+        array(
+            'pattern' => '/bazar/hledat',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'search'
         ),
         array(
             'pattern' => '/page/:urlkey',
@@ -151,6 +163,13 @@ class App_Etc_Module extends Module
             'module' => 'app',
             'controller' => 'advertisement',
             'action' => 'filter',
+            'args' => ':page'
+        ),
+        array(
+            'pattern' => '/bazar/hledat/p/:page',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'search',
             'args' => ':page'
         ),
         array(

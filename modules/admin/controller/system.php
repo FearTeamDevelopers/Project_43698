@@ -191,7 +191,7 @@ class Admin_Controller_System extends Controller
         ini_set('max_execution_time', 1800);
         ini_set('memory_limit', '256M');
 
-        $ROW_COUNT = 100;
+        $ROW_COUNT = 250;
 
         $content = App_Model_PageContent::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
 

@@ -68,6 +68,24 @@ class Search_Model_Searchindex extends Model
     /**
      * @column
      * @readwrite
+     * @type text
+     * @length 256
+     * 
+     * @validate alphanumeric
+     * @label source meta description
+     */
+    protected $_sourceMetaDescription;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type datetime
+     */
+    protected $_sourceCreated;
+    
+    /**
+     * @column
+     * @readwrite
      * @type integer
      * 
      * @validate numeric, max(8)

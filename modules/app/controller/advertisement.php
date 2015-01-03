@@ -303,7 +303,7 @@ class App_Controller_Advertisement extends Controller
         $query = $this->_cleanString(RequestMethods::get('adstr'));
         $articlesPerPage = $this->getConfig()->bazaar_search_results_per_page;
 
-        $searchResultCached = $this->getCache()->get('bazar_search_' . $page . '_' . str_replace(' ', '_', substr($query, 0, 45)));
+        $searchResultCached = $this->getCache()->get('bazar_search_' . str_replace(' ', '_', substr($query, 0, 45)));
 
         if (null !== $searchResultCached) {
             $searchResult = $searchResultCached;

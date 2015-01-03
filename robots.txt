@@ -1,7 +1,10 @@
 User-Agent: *
-Disallow: /admin
-Disallow: /admin/
+Disallow: /hledat
+Disallow: /hledat/*
+Disallow: /bazar/hledat
+Disallow: /bazar/hledat/*
+Disallow: /admin*
 Disallow: /login
 Disallow: /temp/
 Disallow: /tests/
-Disallow: /application/
+Disallow: /application*

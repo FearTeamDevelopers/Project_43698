@@ -47,7 +47,8 @@ class Search_Controller_Search extends Controller
             $searchReturnArr = $searchResultCached;
         } else {
             $words = explode(' ', $cleanStr);
-            $searchQuery = Search_Model_Searchindex::getQuery(array('DISTINCT (si.pathToSource)', 'si.sourceTitle'));
+            $searchQuery = Search_Model_Searchindex::getQuery(
+                    array('DISTINCT (si.pathToSource)', 'si.sourceTitle', 'si.sourceMetaDescription', 'si.sourceCreated'));
 
             foreach ($words as $key => $word) {
                 if (strlen($word) < 3) {
@@ -74,7 +75,8 @@ class Search_Controller_Search extends Controller
                 call_user_func_array(array($searchQuery, 'wheresql'), $paramArr);
 
                 $searchQuery->order('si.weight', 'DESC')
-                        ->order('si.occurence', 'DESC');
+                        ->order('si.occurence', 'DESC')
+                        ->limit(200);
                 $searchResult = Search_Model_Searchindex::initialize($searchQuery);
 
                 $searchReturnArr = array();
@@ -82,7 +84,9 @@ class Search_Controller_Search extends Controller
                     $searchReturnArr['totalCount'] = count($searchResult);
                     
                     foreach ($searchResult as $model) {
-                        $searchReturnArr[strval($model->getSourceTitle())] = strval($model->getPathToSource());
+                        $searchReturnArr[strval($model->getSourceTitle())] = array('path' => $model->getPathToSource(), 
+                                                                                    'meta' => $model->getSourceMetaDescription(),
+                                                                                    'created' => $model->getSourceCreated());
                     }
                 }
 
@@ -90,7 +94,7 @@ class Search_Controller_Search extends Controller
             }
         }
         
-        $slicedReturnArr = array_slice($searchReturnArr, (int)$articlesPerPage * ((int)$page-1), $articlesPerPage);
+        $slicedReturnArr = array_slice($searchReturnArr, (int)$articlesPerPage * ((int)$page-1), $articlesPerPage+1);
 
         echo json_encode($slicedReturnArr);
     }

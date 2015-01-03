@@ -36,7 +36,7 @@ html
         link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
         script(type='text/javascript', src='/public/js/plugins/modernizr.js')
 
-        link(rel='canonical' href='{echo $canonical}')
+        | {if isset($canonical)}link(rel='canonical' href='{echo $canonical}'){/if}
         | {if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
         | {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
         title {echo $metatitle}

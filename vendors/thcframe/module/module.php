@@ -129,7 +129,7 @@ class Module extends Base
                 
                 $cache->set('core_redirects', $redirects);
             }
-            
+
             return $redirects;
         } else {
             return array();
