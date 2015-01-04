@@ -77,7 +77,7 @@ class App_Controller_Advertisement extends Controller
         $layoutView = $this->getLayoutView();
         $adsPerPage = 10;
 
-        $adSections = App_Model_AdSection::fetchAllActive();
+        $adSections = App_Model_AdSection::all(array('active = ?' => true));
 
         $view->set('adsections', $adSections);
 
@@ -134,7 +134,7 @@ class App_Controller_Advertisement extends Controller
         $layoutView = $this->getLayoutView();
         $adsPerPage = 10;
 
-        $adSections = App_Model_AdSection::fetchAllActive();
+        $adSections = App_Model_AdSection::all(array('active = ?' => true));
         $view->set('adsections', $adSections);
 
         $type = RequestMethods::post('bftype');
@@ -303,34 +303,38 @@ class App_Controller_Advertisement extends Controller
         $query = $this->_cleanString(RequestMethods::get('adstr'));
         $articlesPerPage = $this->getConfig()->bazaar_search_results_per_page;
 
-        $searchResultCached = $this->getCache()->get('bazar_search_' . str_replace(' ', '_', substr($query, 0, 45)));
+        $db = Registry::get('database');
+        $sqlTemplate = "SELECT uniqueKey, adtype, userAlias, title, price, created, MATCH(title, content, keywords) AGAINST( %s IN BOOLEAN MODE) as score "
+                . "FROM tb_advertisement "
+                . "WHERE active=1 AND expirationDate >= '%s' AND MATCH(title, content, keywords) AGAINST( %s IN BOOLEAN MODE) "
+                . "ORDER BY score DESC, created DESC "
+                . "LIMIT %s, %s";
 
-        if (null !== $searchResultCached) {
-            $searchResult = $searchResultCached;
-        } else {
-            $db = Registry::get('database');
-            $ssql = "SELECT *, SUM(MATCH(title, content, keywords) AGAINST(? IN BOOLEAN MODE)) as score "
-                    . "FROM tb_advertisement "
-                    . "WHERE active=1 AND expirationDate >= " . date('Y-m-d H:i:s') . " MATCH(title, content, keywords) AGAINST(? IN BOOLEAN MODE) "
-                    . "ORDER BY score DESC, created DESC "
-                    . "LIMIT {$page}, {$articlesPerPage}";
+        $words = explode(' ', $query);
 
-            $words = explode(' ', $query);
-
-            foreach ($words as &$word) {
-                $word = '+' . $word;
-            }
-
-            $searchCond = '(' . implode(' ', $words) . ') ("' . $query . '")';
-            $searchResult = $db->execute($ssql, $searchCond, $searchCond);
-            var_dump($searchResult);die;
+        foreach ($words as &$word) {
+            $word = '+' . $word;
         }
+
+        $searchCond = "'".implode(' ', $words) . ' "' . $query . '"\'';
+        $sql = sprintf($sqlTemplate, $searchCond, date('Y-m-d'), $searchCond, $page-1, $articlesPerPage);
+        $searchResult = $db->execute($sql);
         
+        $rows = array();
+
+        for ($i = 0; $i < $searchResult->num_rows; $i++) {
+            $rows[] = $searchResult->fetch_array(MYSQLI_ASSOC);
+        }
+
+        print('<pre>'.print_r($rows, true).'</pre>');
+        //var_dump($searchResult);
+        die;
+
         $view->set('result', $searchResult)
                 ->set('currentpage', $page);
         $layoutView->set('metatitle', 'Hastrman - Bazar - Hledat')
                 ->set('pagerpathprefix', '/prohledatbazar')
-                ->set('pagerpathpostfix', '?'.http_build_query($query));
+                ->set('pagerpathpostfix', '?' . http_build_query($query));
     }
 
     /**

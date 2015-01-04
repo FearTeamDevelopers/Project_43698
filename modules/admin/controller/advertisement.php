@@ -311,8 +311,7 @@ class Admin_Controller_Advertisement extends Controller
         if (NULL === $ad) {
             echo self::ERROR_MESSAGE_2;
         } else {
-            $cfg = Registry::get('configuration');
-            $adTtl = $cfg->bazar_ad_ttl;
+            $adTtl = $this->getConfig()->bazar_ad_ttl;
             
             $date = new DateTime();
             $date->add(new DateInterval('P'.(int)$adTtl.'D'));

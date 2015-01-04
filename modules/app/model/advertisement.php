@@ -71,7 +71,7 @@ class App_Model_Advertisement extends Model
      * @validate required, alpha, max(15)
      * @label typ
      */
-    protected $_adtype;
+    protected $_adType;
 
     /**
      * @column
@@ -150,14 +150,20 @@ class App_Model_Advertisement extends Model
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_created;
 
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_modified;
 
@@ -199,7 +205,9 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('adv.*', '(SELECT COUNT(adm.id) FROM `tb_admessage` adm where adm.adId = adv.id)' => 'messageCount'))
+        $query = self::getQuery(array('adv.id','adv.title', 'adv.adType','adv.expirationDate',
+                                'adv.active','adv.created','adv.hasAvailabilityRequest',
+                                '(SELECT COUNT(adm.id) FROM `tb_admessage` adm where adm.adId = adv.id)' => 'messageCount'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -241,7 +249,8 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchAdsActive($adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.*'))
+        $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+                                'adv.title', 'adv.price', 'adv.created'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
@@ -264,14 +273,15 @@ class App_Model_Advertisement extends Model
     public static function fetchActiveByType($type, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.*'))
+            $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+                                'adv.title', 'adv.price', 'adv.created'))
                     ->join('tb_user', 'adv.userId = us.id', 'us', 
                             array('us.firstname', 'us.lastname'))
                     ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                             array('ads.title' => 'sectionTitle'))
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
-                    ->where('adv.adtype = ?', $type)
+                    ->where('adv.adType = ?', $type)
                     ->order('adv.created', 'desc')
                     ->limit((int)$adsPerPage, (int)$page);
 
@@ -313,7 +323,8 @@ class App_Model_Advertisement extends Model
     public static function fetchActiveByTypeSection($type, $section, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.*'))
+            $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+                                'adv.title', 'adv.price', 'adv.created'))
                     ->join('tb_user', 'adv.userId = us.id', 'us', 
                             array('us.firstname', 'us.lastname'))
                     ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -321,7 +332,7 @@ class App_Model_Advertisement extends Model
                     ->where('ads.urlKey = ?', $section)
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
-                    ->where('adv.adtype = ?', $type)
+                    ->where('adv.adType = ?', $type)
                     ->order('adv.created', 'desc')
                     ->limit((int)$adsPerPage, (int)$page);
 
@@ -354,7 +365,7 @@ class App_Model_Advertisement extends Model
                     ->where('ads.urlKey = ?', $section)
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
-                    ->where('adv.adtype = ?', $type);
+                    ->where('adv.adType = ?', $type);
 
             $arr = self::initialize($query);
             $obj = array_shift($arr);
@@ -399,7 +410,8 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.*'))
+        $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+                                'adv.title', 'adv.price', 'adv.created'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 

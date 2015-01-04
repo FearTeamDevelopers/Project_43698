@@ -41,7 +41,7 @@
           <h4>{echo $ad->title}</h4>
         </div>
       </div>
-      <div class="info">{if $ad->adtype=='tender'}
+      <div class="info">{if $ad->adType=="tender"}
         <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
         <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a>
       </div>

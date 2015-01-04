@@ -325,14 +325,13 @@ class Admin_Controller_Gallery extends Controller
                 self::redirect('/admin/gallery/');
             }
             $errors = $uploadErrors = array();
-            $cfg = Registry::get('configuration');
 
             $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
+                'thumbWidth' => $this->getConfig()->thumb_width,
+                'thumbHeight' => $this->getConfig()->thumb_height,
+                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
             $fileErrors = $fileManager->uploadImage('uploadfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
@@ -374,6 +373,7 @@ class Admin_Controller_Gallery extends Controller
             }
 
             $errors['uploadfile'] = $uploadErrors;
+            
             if (empty($errors['uploadfile'])) {
                 $view->successMessage(self::SUCCESS_MESSAGE_7);
                 self::redirect('/admin/gallery/detail/' . $gallery->getId());

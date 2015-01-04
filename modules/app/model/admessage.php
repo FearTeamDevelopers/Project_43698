@@ -87,14 +87,20 @@ class App_Model_AdMessage extends Model
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_created;
 
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_modified;
 

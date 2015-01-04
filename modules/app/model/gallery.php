@@ -117,14 +117,20 @@ class App_Model_Gallery extends Model
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_created;
 
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_modified;
 

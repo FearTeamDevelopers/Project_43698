@@ -44,14 +44,12 @@ class Admin_Controller_Partner extends Controller
 
             $errors = array();
 
-            $cfg = Registry::get('configuration');
-
             $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
+                'thumbWidth' => $this->getConfig()->thumb_width,
+                'thumbHeight' => $this->getConfig()->thumb_height,
+                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
             $fileErrors = $fileManager->uploadImage('logo', 'partners', time() . '_', false)->getUploadErrors();
@@ -120,14 +118,12 @@ class Admin_Controller_Partner extends Controller
             }
 
             if ($partner->logo == '') {
-                $cfg = Registry::get('configuration');
-
                 $fileManager = new FileManager(array(
-                    'thumbWidth' => $cfg->thumb_width,
-                    'thumbHeight' => $cfg->thumb_height,
-                    'thumbResizeBy' => $cfg->thumb_resizeby,
-                    'maxImageWidth' => $cfg->photo_maxwidth,
-                    'maxImageHeight' => $cfg->photo_maxheight
+                    'thumbWidth' => $this->getConfig()->thumb_width,
+                    'thumbHeight' => $this->getConfig()->thumb_height,
+                    'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                    'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                    'maxImageHeight' => $this->getConfig()->photo_maxheight
                 ));
 
                 $fileErrors = $fileManager->uploadImage('logo', 'partners', time() . '_', false)->getUploadErrors();

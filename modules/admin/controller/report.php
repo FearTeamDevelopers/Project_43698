@@ -81,14 +81,12 @@ class Admin_Controller_Report extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
-            $cfg = Registry::get('configuration');
-
             $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
+                'thumbWidth' => $this->getConfig()->thumb_width,
+                'thumbHeight' => $this->getConfig()->thumb_height,
+                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
             $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
@@ -122,7 +120,7 @@ class Admin_Controller_Report extends Controller
                 'userId' => $this->getUser()->getId(),
                 'userAlias' => $this->getUser()->getWholeName(),
                 'urlKey' => $urlKey,
-                'approved' => $cfg->report_autopublish,
+                'approved' => $this->getConfig()->report_autopublish,
                 'archive' => 0,
                 'shortBody' => $shortText,
                 'body' => RequestMethods::post('text'),
@@ -191,14 +189,12 @@ class Admin_Controller_Report extends Controller
                 $errors['title'] = array('This title is already used');
             }
 
-            $cfg = Registry::get('configuration');
-
             $fileManager = new FileManager(array(
-                'thumbWidth' => $cfg->thumb_width,
-                'thumbHeight' => $cfg->thumb_height,
-                'thumbResizeBy' => $cfg->thumb_resizeby,
-                'maxImageWidth' => $cfg->photo_maxwidth,
-                'maxImageHeight' => $cfg->photo_maxheight
+                'thumbWidth' => $this->getConfig()->thumb_width,
+                'thumbHeight' => $this->getConfig()->thumb_height,
+                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
             $imgMain = $imgThumb = '';
@@ -630,7 +626,7 @@ class Admin_Controller_Report extends Controller
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
 
         if ($search != '') {
-            $whereCond = "rp.created='?' OR rp.expirationDate='?' "
+            $whereCond = "rp.created LIKE '%%?%%' OR rp.expirationDate LIKE '%%?%%' "
                     . "OR rp.userAlias LIKE '%%?%%' OR rp.title LIKE '%%?%%'";
 
             $query = App_Model_Report::getQuery(

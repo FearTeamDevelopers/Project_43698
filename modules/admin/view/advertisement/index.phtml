@@ -36,7 +36,7 @@
                     <tr>
                         <td>{echo $ad->getTitle()}</td>
                         <td>{echo $ad->firstname." ".$ad->lastname}</td>
-                        <td>{if $ad->getType()=="tender"}Nabídka{/if}{else}Poptávka{/else}</td>
+                        <td>{if $ad->getAdType()=="tender"}Nabídka{/if}{else}Poptávka{/else}</td>
                         <td>{echo $ad->sectionTitle}</td>
                         <td>{echo $ad->getExpirationDate()}</td>
                         <td>{echo $ad->messageCount}</td>

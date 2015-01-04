@@ -47,7 +47,7 @@ class Search_Etc_Observer implements SubscriberInterface
             $paramStr = '';
         }
 
-        $log = new Admin_Model_AdminLog(array(
+        $log = new Search_Model_AdminLog(array(
             'userId' => 'searchjob',
             'module' => $module,
             'controller' => $controller,

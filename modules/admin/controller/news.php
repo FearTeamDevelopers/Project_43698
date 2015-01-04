@@ -514,7 +514,7 @@ class Admin_Controller_News extends Controller
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
 
         if ($search != '') {
-            $whereCond = "nw.created='?' OR nw.expirationDate='?' "
+            $whereCond = "nw.created LIKE '%%?%%' OR nw.expirationDate LIKE '%%?%%' "
                     . "OR nw.userAlias LIKE '%%?%%' OR nw.title LIKE '%%?%%'";
 
             $query = App_Model_News::getQuery(

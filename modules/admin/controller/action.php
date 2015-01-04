@@ -529,7 +529,7 @@ class Admin_Controller_Action extends Controller
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
 
         if ($search != '') {
-            $whereCond = "ac.created='?' OR ac.expirationDate='?' "
+            $whereCond = "ac.created LIKE '%%?%%' OR ac.expirationDate LIKE '%%?%%' "
                     . "OR ac.userAlias LIKE '%%?%%' OR ac.title LIKE '%%?%%'";
 
             $query = App_Model_Action::getQuery(
