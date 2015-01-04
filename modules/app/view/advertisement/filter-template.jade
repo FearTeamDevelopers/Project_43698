@@ -1,6 +1,6 @@
 section.wrapper.blue.filter
    .row
-      |{if $path=='/bazar' | $path=='/bazar/filtr'}
+      |{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
       form.filtr(method ='POST' action='/bazar/filtr')
          select(name='bftype')
             |{if isset($bftype)}

@@ -1,6 +1,7 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function () {
+    
 
     jQuery('.sluzby').click(function (event) {
         event.preventDefault();
@@ -30,6 +31,22 @@ jQuery(document).ready(function () {
             jQuery('body').append(msg);
         });
     });
+    jQuery('#openEdit').click(function (event) {
+        event.preventDefault();
+        jQuery('#info').hide('slow');
+        jQuery('#edit').show('slow');
+    });
+    jQuery('#closeEdit').click(function (event) {
+        event.preventDefault();
+        jQuery('#info').toggle('slow');
+        jQuery('#edit').toggle('slow');
+    });
+
+    if(jQuery('.notificationWrapper .notification').is(':visible')){
+        setTimeout(function(){
+            jQuery('.notificationWrapper .notification').hide("slow");
+        }, 10000);
+    }
 
     /* GLOBAL SCRIPTS */
 
@@ -60,7 +77,7 @@ jQuery(document).ready(function () {
     
     /* ---------------------- UPLOAD FORMS --------------------------------*/
     jQuery('.uploadForm .multi_upload').click(function () {
-        if (jQuery('.uploadForm .file_inputs input[type=file]').length < 7) {
+        if (jQuery('.uploadForm .file_inputs input[type=file]').length < 3) {
             jQuery('.uploadForm .file_inputs input[type=file]')
                     .last()
                     .after('<input type="file" name="uploadfile[]" accept="image/*"/>');

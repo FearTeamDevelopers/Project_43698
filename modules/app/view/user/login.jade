@@ -3,10 +3,6 @@ section.wrapper.login
       .small-12.columns
          .container
             header
-               .loginInfo
-                  p.fi-info Pro přidání nového inzerátu musíte být přihlášen(a) <br/> Pokud nemáte účet, prosím
-                     a(href='/registrace')  zaregistrujte se nyní
-
                h2.fi-torso Přihlášení
             form(method='POST' action='#')
                |{if isset($errors["account_error"])}

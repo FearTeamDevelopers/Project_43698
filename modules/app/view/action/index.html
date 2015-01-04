@@ -16,12 +16,10 @@ Created by Slamic on 26.12.2014.
         <p>{echo $action->shortBody}</p><a href="/akce/r/$action->urlKey">čti více</a>
       </div>
     </article>{/foreach}
-  </section>
-  <!--Created by Slamic on 28.12.2014.
-  -->{if  $pagecount > 1}
+  </section>{if  $pagecount > 1}
   <section class="pager row">
-    {if $currentpage != 1}
-    {if $currentpage !=2}<a href="{echo $path}/p/1"><<</a><a href="{echo $path}/p/{echo $currentpage-1}"><</a><a href="{echo $path}/p/{echo $currentpage-2}">{echo $currentpage - 2}</a>{/if}<a href="{echo $path}/p/{echo $currentpage-1}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $path}/p/{echo $currentpage+1}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $path}/p/{echo $currentpage+2}">{echo $currentpage + 2}</a><a href="{echo $path}/p/{echo $currentpage+1}">></a><a href="{echo $path}/p/{echo $pagecount}">>></a>{/if}
+    {if $currentpage !=1}
+    {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
     {/if}
   </section>{/if}
 </section>

@@ -4,12 +4,16 @@
 		.row.container
 			header
 				h3 Reportáže
+
 			.container-box
+				| {foreach $img in $adimg}
+				img(src!='{echo $img->imgMain}')
+				| {/foreach}
 				|{foreach $report in $reports}
 				a(href!='/reportaze/r/{echo $report->urlKey}')
 					|{if $report_i == 0}
 					article.report.large-9.medium-12.small-12
-						img(src!='{echo $report->imgThumb}')
+						img(src!='{echo $report->imgMain}')
 						.info
 							h2 {echo $report->title}
 							span {echo date("d.m. Y H:i", strtotime($report->created)).", ".$report->userAlias}

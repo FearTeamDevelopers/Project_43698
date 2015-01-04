@@ -1,21 +1,40 @@
 
 <section class="wrapper blue filter">
-  <div class="row">{if $path=='bazar' | $path=='filtr'}
+  <div class="row">{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
     <form method="POST" action="/bazar/filtr" class="filtr">
       <select name="bftype">
+        {if isset($bftype)}
+        {if $bftype == 'nabidka'}
+        <option value="0">Typ</option>
+        <option value="nabidka" selected="selected">Nabídka</option>
+        <option value="poptavka">Poptávka</option>{/if}{elseif $bftype == 'poptavka'}
         <option value="0">Typ</option>
         <option value="nabidka">Nabídka</option>
-        <option value="poptavka">Poptávka</option>
+        <option value="poptavka" selected="selected">Poptávka</option>{/elseif}{else}
+        <option value="0" selected="selected">Typ</option>
+        <option value="nabidka">Nabídka</option>
+        <option value="poptavka">Poptávka</option>{/else}
+        {/if}{else}
+        <option value="0">Typ</option>
+        <option value="nabidka">Nabídka</option>
+        <option value="poptavka">Poptávka</option>{/else}
       </select>
-      <select name="bfsection">
+      <select name="bfsection">{if isset($bfsection)}
+        <option value="0">Sekce</option>{foreach $ad in $adsections}
+        {if $ad->urlKey == $bfsection}
+        <option value="{echo $ad->urlKey}" selected="selected">{echo $ad->title}</option>{/if}{else}
+        <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/else}
+        {/foreach}
+        {/if}{else}
         <option value="0">Sekce</option>{foreach $ad in $adsections}
         <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/foreach}
+        {/else}
       </select>
       <input type="submit" name="zobrazit" value="Zobrazit"/>
       <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
     </form>{/if}
-    <form method="POST" action="/prohledatbazar" class="search">
-      <input type="text" placeholder="vyhledat v bazaru..."/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
+    <form method="GET" action="/bazar/hledat" class="search">
+      <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
       <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
     </form>
   </div>
@@ -41,17 +60,15 @@
           <h4>{echo $ad->title}</h4>
         </div>
       </div>
-      <div class="info">{if $ad->adType=="tender"}
+      <div class="info">{if $ad->adType=='tender'}
         <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
         <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a>
       </div>
     </article>{/foreach}
-  </div>
-  <!--Created by Slamic on 28.12.2014.
-  -->{if  $pagecount > 1}
+  </div>{if  $pagecount > 1}
   <section class="pager row">
-    {if $currentpage != 1}
-    {if $currentpage !=2}<a href="{echo $path}/p/1"><<</a><a href="{echo $path}/p/{echo $currentpage-1}"><</a><a href="{echo $path}/p/{echo $currentpage-2}">{echo $currentpage - 2}</a>{/if}<a href="{echo $path}/p/{echo $currentpage-1}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $path}/p/{echo $currentpage+1}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $path}/p/{echo $currentpage+2}">{echo $currentpage + 2}</a><a href="{echo $path}/p/{echo $currentpage+1}">></a><a href="{echo $path}/p/{echo $pagecount}">>></a>{/if}
+    {if $currentpage !=1}
+    {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
     {/if}
   </section>{/if}
 </section>

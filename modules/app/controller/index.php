@@ -86,7 +86,7 @@ class App_Controller_Index extends Controller
             );
             $this->getCache()->set('index-partners', $partners);
         }
-            
+
         $view->set('news', $news)
                 ->set('actions', $actions)
                 ->set('partners', $partners)

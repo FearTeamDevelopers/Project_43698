@@ -191,6 +191,8 @@ class App_Controller_Advertisement extends Controller
 
     /**
      * Get list of ads created by user currently logged id
+     *
+     * @before _secured, _member
      */
     public function listByUser($page = 1)
     {
@@ -212,12 +214,13 @@ class App_Controller_Advertisement extends Controller
 
         $ads = App_Model_Advertisement::fetchActiveByUser($userId, $adsPerPage, $page);
         $adsCount = App_Model_Advertisement::countActiveByUser($userId);
-
+        $adImages = App_Model_AdImage::all(array());
         $adsPageCount = ceil($adsCount / $adsPerPage);
 
         $this->_pagerMetaLinks($adsPageCount, $page, '/bazar/moje-inzeraty/p/');
 
         $view->set('ads', $ads)
+            ->set('adimg', $adImages)
                 ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/bazar/moje-inzeraty')
                 ->set('pagecount', $adsPageCount);
@@ -327,7 +330,6 @@ class App_Controller_Advertisement extends Controller
         }
 
         print('<pre>'.print_r($rows, true).'</pre>');
-        //var_dump($searchResult);
         die;
 
         $view->set('result', $searchResult)
@@ -346,7 +348,10 @@ class App_Controller_Advertisement extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $adSections = App_Model_AdSection::all(array('active = ?' => true));
+
+        $view->set('adsections', $adSections)
+            ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddAdvertisement')) {
             if ($this->checkCSRFToken() !== true &&
@@ -388,10 +393,10 @@ class App_Controller_Advertisement extends Controller
                 'userId' => $this->getUser()->getId(),
                 'sectionId' => RequestMethods::post('section'),
                 'uniqueKey' => $uniqueKey,
-                'adtype' => RequestMethods::post('type'),
+                'adType' => RequestMethods::post('type'),
                 'userAlias' => $this->getUser()->getWholeName(),
                 'content' => RequestMethods::post('content'),
-                'price' => RequestMethods::post('price', 0),
+                'price' => RequestMethods::post('price', 1),
                 'expirationDate' => $expirationDate,
                 'keywords' => $keywords
             ));
@@ -436,6 +441,7 @@ class App_Controller_Advertisement extends Controller
                                 ->set('errors', $errors + $ad->getErrors());
                     }
                 } else {
+
                     Event::fire('app.log', array('success', 'Ad id: ' . $id));
                     $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
@@ -466,7 +472,11 @@ class App_Controller_Advertisement extends Controller
             self::redirect('/bazar');
         }
 
-        $view->set('ad', $ad);
+        $adSections = App_Model_AdSection::all(array('active = ?' => true));
+
+        $view->set('adsections', $adSections)
+            ->set('submstoken', $this->mutliSubmissionProtectionToken())
+            ->set('ad', $ad);
 
         if (RequestMethods::post('submitEditAdvertisement')) {
             if ($this->checkCSRFToken() !== true) {

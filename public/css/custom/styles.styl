@@ -6,6 +6,12 @@ html {
 h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 	font-family: 'Ubuntu', sans-serif !important;
 }
+.singlePage{
+	min-height 550px
+}
+.centerBlock
+	display block
+	margin 0 auto
 
 // DEFAULT - nastaveni
 @import "/stylus/default/colors"
@@ -27,9 +33,7 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 .clear-all{
 	clear both
 }
-.centerBlock
-	display block
-	margin 0 auto
+
 .searchWrapper{
 	display none
 	.fulltextsearch{
@@ -60,6 +64,11 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 }
 
 .notificationWrapper{
+	width 100%
+	position fixed
+	z-index 11111
+	top 100px
+	background transparent
 	.notification{
 		position relative
 		padding 5px
@@ -188,31 +197,31 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 	}
 }
 
-
-.bazar
-	.container{
-		.buttonWrapper{
-			li{
-				list-style none
-				display inline
-				margin-right 30px
-				a{
-					color #ffffff
-					background defaultBLue
-					padding 8px 12px
-					border-radius 5px
-					border 1px solid defaultGreen
-					&:hover{
-						color defaultGreen
-					}
-				}
-				a::before{
-					padding-right 5px
-					margin-right 5px
-					border-right 1px dotted white
-				}
+.buttonWrapper{
+	li{
+		list-style none
+		display inline
+		margin-right 30px
+		a{
+			color #ffffff
+			background defaultBLue
+			padding 8px 12px
+			border-radius 5px
+			border 1px solid defaultGreen
+			&:hover{
+				color defaultGreen
 			}
 		}
+		a::before{
+			  padding-right 5px
+			  margin-right 5px
+			  border-right 1px dotted white
+		  }
+	}
+}
+.bazar
+	.container{
+
 		article{
 			position relative
 			display block
@@ -262,6 +271,8 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 				padding 0
 				background defaultBLue
 				img{
+					min-width 200px
+					min-height 400px
 					width 100%
 				}
 			}
@@ -463,6 +474,111 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 					background white
 				}
 			}
+		}
+	}
+}
+.profil{
+	#edit{
+		display none
+	}
+	#closeEdit{
+		position absolute
+		background defaultBLue
+		right -20px
+		top 10px
+		width 30px
+		height 40px
+		line-height 40px
+		border-radius 5px
+		text-align center
+		color red
+		font-size 21pt
+		z-index 2
+		&:hover{
+			color defaultGreen
+			right -21px
+			top 11px
+		}
+	}
+	.buttonWrapper{
+		padding-top 80px
+	}
+	article{
+		background defaultBLue
+		padding .875rem
+		margin-bottom 30px
+		position relative
+	}
+
+
+}
+table{
+	width 100%
+}
+form{
+	width 100%
+
+	table{
+		input[type=text], input[type=tel], input[type=email], input[type=password], select,textarea, input[type=file]{
+			margin 0
+		}
+		margin 0 auto
+		tr td{
+			vertical-align middle
+		}
+		textarea{
+			resize vertical
+			max-height 400px
+		}
+	}
+}
+.field{
+	a{
+		color #ffffff
+
+		&:before{
+			margin-bottom 15px
+			size = 25;
+			halfsize = size/2;
+			width size px
+			height size px
+			line-height size px
+			padding 0
+			border-radius halfsize px
+			text-align center
+			background defaultBLue
+
+		}
+		&:hover{
+			color defaultGreen
+		}
+	}
+}
+.more{
+	position relative
+	text-align center
+	width 100%
+	height 40px;
+	line-height 40px;
+	background defaultGreen
+	color white
+	border none
+	span{
+		height 40px
+		line-height 40px
+		width 100%
+		color white
+	}
+	&.blue:hover{
+		background white
+		span{
+			color black
+		}
+	}
+	&:hover{
+		background headerColor
+		span{
+			color white
 		}
 	}
 }

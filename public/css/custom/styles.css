@@ -15,6 +15,13 @@ ul,
 li {
   font-family: 'Ubuntu', sans-serif !important;
 }
+.singlePage {
+  min-height: 550px;
+}
+.centerBlock {
+  display: block;
+  margin: 0 auto;
+}
 html {
   min-height: 100%;
 }
@@ -298,7 +305,7 @@ footer.wrapper .container header h3 {
 }
 footer.wrapper .container p {
   width: 280px;
-  height: 250px;
+  height: 280px;
   margin: 0 auto;
   border-bottom: 1px dotted #1dd2af;
   text-align: center;
@@ -314,31 +321,6 @@ footer.wrapper .container p {
   width: 140px;
   margin: 0 auto;
   margin-top: 1.875rem;
-}
-.homepage section.wrapper .moreWrap .more {
-  position: relative;
-  text-align: center;
-  height: 40px;
-  line-height: 40px;
-  background: #1dd2af;
-}
-.homepage section.wrapper .moreWrap .more span {
-  height: 40px;
-  line-height: 40px;
-  width: 100%;
-  color: #fff;
-}
-.homepage section.wrapper .moreWrap .more.blue:hover {
-  background: #fff;
-}
-.homepage section.wrapper .moreWrap .more.blue:hover span {
-  color: #000;
-}
-.homepage section.wrapper .moreWrap .more:hover {
-  background: rgba(57,76,95,0.8);
-}
-.homepage section.wrapper .moreWrap .more:hover span {
-  color: #fff;
 }
 .homepage section.wrapper .container header h3 {
   width: 25%;
@@ -667,10 +649,6 @@ section.wrapper.report .container {
 .clear-all {
   clear: both;
 }
-.centerBlock {
-  display: block;
-  margin: 0 auto;
-}
 .searchWrapper {
   display: none;
 }
@@ -698,6 +676,13 @@ section.wrapper.report .container {
 }
 .searchWrapper .fulltextsearch a:hover {
   color: #1dd2af;
+}
+.notificationWrapper {
+  width: 100%;
+  position: fixed;
+  z-index: 11111;
+  top: 100px;
+  background: transparent;
 }
 .notificationWrapper .notification {
   position: relative;
@@ -821,22 +806,22 @@ section.wrapper.report .container {
   top: 50px;
   transition: top 0.8s ease;
 }
-.bazar .container .buttonWrapper li {
+.buttonWrapper li {
   list-style: none;
   display: inline;
   margin-right: 30px;
 }
-.bazar .container .buttonWrapper li a {
+.buttonWrapper li a {
   color: #fff;
   background: #394c5f;
   padding: 8px 12px;
   border-radius: 5px;
   border: 1px solid #1dd2af;
 }
-.bazar .container .buttonWrapper li a:hover {
+.buttonWrapper li a:hover {
   color: #1dd2af;
 }
-.bazar .container .buttonWrapper li a::before {
+.buttonWrapper li a::before {
   padding-right: 5px;
   margin-right: 5px;
   border-right: 1px dotted #fff;
@@ -892,6 +877,8 @@ section.wrapper.report .container {
   background: #394c5f;
 }
 .bazar .container article .imgWrapper img {
+  min-width: 200px;
+  min-height: 400px;
   width: 100%;
 }
 .bazar .container article .nazev {
@@ -1079,4 +1066,104 @@ section.wrapper.report .container {
   border-color: #394c5f;
   color: #394c5f;
   background: #fff;
+}
+.profil #edit {
+  display: none;
+}
+.profil #closeEdit {
+  position: absolute;
+  background: #394c5f;
+  right: -20px;
+  top: 10px;
+  width: 30px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 5px;
+  text-align: center;
+  color: #f00;
+  font-size: 21pt;
+  z-index: 2;
+}
+.profil #closeEdit:hover {
+  color: #1dd2af;
+  right: -21px;
+  top: 11px;
+}
+.profil .buttonWrapper {
+  padding-top: 80px;
+}
+.profil article {
+  background: #394c5f;
+  padding: 0.875rem;
+  margin-bottom: 30px;
+  position: relative;
+}
+table {
+  width: 100%;
+}
+form {
+  width: 100%;
+}
+form table {
+  margin: 0 auto;
+}
+form table input[type=text],
+form table input[type=tel],
+form table input[type=email],
+form table input[type=password],
+form table select,
+form table textarea,
+form table input[type=file] {
+  margin: 0;
+}
+form table tr td {
+  vertical-align: middle;
+}
+form table textarea {
+  resize: vertical;
+  max-height: 400px;
+}
+.field a {
+  color: #fff;
+}
+.field a:before {
+  margin-bottom: 15px;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  padding: 0;
+  border-radius: 12.5px;
+  text-align: center;
+  background: #394c5f;
+}
+.field a:hover {
+  color: #1dd2af;
+}
+.more {
+  position: relative;
+  text-align: center;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  background: #1dd2af;
+  color: #fff;
+  border: none;
+}
+.more span {
+  height: 40px;
+  line-height: 40px;
+  width: 100%;
+  color: #fff;
+}
+.more.blue:hover {
+  background: #fff;
+}
+.more.blue:hover span {
+  color: #000;
+}
+.more:hover {
+  background: rgba(57,76,95,0.8);
+}
+.more:hover span {
+  color: #fff;
 }

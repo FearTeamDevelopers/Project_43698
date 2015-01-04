@@ -30,13 +30,15 @@ html
         link(href='/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css', media='screen', rel='stylesheet', type='text/css')
         link(href='/public/css/foundation/foundation.css', rel='stylesheet')
         link(href='/public/css/foundation/foundation-icons.css', rel='stylesheet')
-        link(href='/public/css/plugins/jquery.bxslider.css', media='screen', rel='stylesheet', type='text/css')
+        link(href='/public/css/plugins/lightbox2.min.css')
         link(href='/public/css/custom/styles.css', media='screen', rel='stylesheet', type='text/css')
-        link(href='/public/css/plugins/jquery.lightbox-0.5.css')
+
         link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
         script(type='text/javascript', src='/public/js/plugins/modernizr.js')
 
-        | {if isset($canonical)}link(rel='canonical' href='{echo $canonical}'){/if}
+        | {if isset($canonical)}
+        link(rel='canonical' href='{echo $canonical}')
+        |{/if}
         | {if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
         | {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
         title {echo $metatitle}
@@ -54,7 +56,8 @@ html
                         h1 Hastrman
                 .small-12.medium-12.large-8.columns.navWrapper
                     include menu.jade
-
+            a(data-lightbox='bla' href='/public/uploads/images/1333777.jpg')
+                img(src='/public/uploads/images/1333777.jpg')
             .row
                 .large-8.medium-12.small-12.columns.right#dropdown
                     include submenu.jade
@@ -75,10 +78,9 @@ html
           JS scripts
         script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
         script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')
-        script(type='text/javascript', src='/public/js/plugins/jquery.bxslider.js')
-        script(type='text/javascript', src='/public/js/plugins/jquery.lightbox-0.5.min.js')
         script(type='text/javascript', src='/public/js/custom/generalApp.js')
         script(type='text/javascript', src='/public/js/foundation.min.js')
         script(type='text/javascript', src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
+        script(type='text/javascript', src='/public/js/plugins/lightbox.min.js')
         //
           End JS scripts

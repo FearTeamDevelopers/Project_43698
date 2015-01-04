@@ -249,7 +249,7 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchAdsActive($adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
                                 'adv.title', 'adv.price', 'adv.created'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
@@ -273,7 +273,7 @@ class App_Model_Advertisement extends Model
     public static function fetchActiveByType($type, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+            $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
                                 'adv.title', 'adv.price', 'adv.created'))
                     ->join('tb_user', 'adv.userId = us.id', 'us', 
                             array('us.firstname', 'us.lastname'))
@@ -323,7 +323,7 @@ class App_Model_Advertisement extends Model
     public static function fetchActiveByTypeSection($type, $section, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+            $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
                                 'adv.title', 'adv.price', 'adv.created'))
                     ->join('tb_user', 'adv.userId = us.id', 'us', 
                             array('us.firstname', 'us.lastname'))
@@ -410,7 +410,7 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
                                 'adv.title', 'adv.price', 'adv.created'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
@@ -420,7 +420,14 @@ class App_Model_Advertisement extends Model
                 ->where('adv.active = ?', true)
                 ->limit((int)$adsPerPage, (int)$page);
 
-        return self::initialize($query);
+        $ads = self::initialize($query);
+        if(null !== $ads){
+            foreach($ads as &$ad){
+                $ad->images = App_Model_AdImage::all(array('adId = ?' => $ad->getId()));
+            }
+        }
+
+        return $ads;
     }
     
     /**
