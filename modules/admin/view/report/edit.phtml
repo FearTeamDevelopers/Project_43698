@@ -11,9 +11,11 @@
             <h2 class="table"><span>Základní info</span></h2>
         </div><!--contenttitle-->
 
-        <form class="stdform stdform2" method="post" action="#" enctype="multipart/form-data">
+        <form class="stdform stdform2 cropit-form" method="post" action="#" enctype="multipart/form-data">
             <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+            <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
+            
             <p>
                 <label>Název*</label>
                 <span class="field">
@@ -141,7 +143,7 @@
                 <label>Meta-název</label>
                 <span class="field">
                     <input type="text" name="metatitle" class="longinput" value="{echo $report->metaTitle}" 
-                           placeholder="Výchozí hodnota: stejný jako Název" />
+                           placeholder="Výchozí hodnota: stejná jako Název" />
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}

@@ -11,3 +11,4 @@
 /.idea/
 /.htaccess_backup.txt
 /public/js/plugins/filemanager/files/
+/prepros.cfg
