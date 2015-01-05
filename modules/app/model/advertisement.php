@@ -249,7 +249,7 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchAdsActive($adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
                                 'adv.title', 'adv.price', 'adv.created'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
@@ -273,7 +273,7 @@ class App_Model_Advertisement extends Model
     public static function fetchActiveByType($type, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+            $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
                                 'adv.title', 'adv.price', 'adv.created'))
                     ->join('tb_user', 'adv.userId = us.id', 'us', 
                             array('us.firstname', 'us.lastname'))
@@ -323,7 +323,7 @@ class App_Model_Advertisement extends Model
     public static function fetchActiveByTypeSection($type, $section, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+            $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
                                 'adv.title', 'adv.price', 'adv.created'))
                     ->join('tb_user', 'adv.userId = us.id', 'us', 
                             array('us.firstname', 'us.lastname'))
@@ -410,7 +410,7 @@ class App_Model_Advertisement extends Model
      */
     public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
+        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias', 
                                 'adv.title', 'adv.price', 'adv.created'))
                 ->join('tb_user', 'adv.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))

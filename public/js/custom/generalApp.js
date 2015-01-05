@@ -30,7 +30,7 @@ jQuery(document).ready(function () {
             jQuery('body').append(msg);
         });
     });
-
+    
     /* GLOBAL SCRIPTS */
 
     jQuery('.datepicker').datepicker({

@@ -144,8 +144,10 @@ jQuery(document).ready(function () {
                 modal: true,
                 buttons: {
                     "Smazat": function () {
+                        jQuery("#loader, .loader").show();
                         jQuery.post(url, {csrf: csrf}, function (msg) {
                             if (msg == 'success') {
+                                jQuery("#loader, .loader").hide();
                                 parentTr.fadeOut();
                             } else {
                                 alert(msg);
@@ -176,6 +178,7 @@ jQuery(document).ready(function () {
                 modal: true,
                 buttons: {
                     "Ano": function () {
+                        jQuery("#loader, .loader").show();
                         jQuery.post(url, {csrf: csrf}, function (msg) {
                             if (msg == 'success') {
                                 location.reload();
@@ -615,8 +618,10 @@ jQuery(document).ready(function () {
             modal: true,
             buttons: {
                 "Smazat": function () {
+                    jQuery("#loader, .loader").show();
                     jQuery.post(url, {csrf: csrf}, function (msg) {
                         if (msg == 'success') {
+                            jQuery("#loader, .loader").hide();
                             parent.hide('explode', 500);
                         } else {
                             alert(msg);
@@ -668,8 +673,10 @@ jQuery(document).ready(function () {
             modal: true,
             buttons: {
                 "Smazat": function () {
+                    jQuery("#loader, .loader").show();
                     jQuery.post(url, {csrf: csrf}, function (msg) {
                         if (msg == 'success') {
+                            jQuery("#loader, .loader").hide();
                             parentTr.fadeOut();
                         } else {
                             alert(msg);
@@ -700,6 +707,7 @@ jQuery(document).ready(function () {
             modal: true,
             buttons: {
                 "Ano": function () {
+                    jQuery("#loader, .loader").show();
                     jQuery.post(url, {csrf: csrf}, function (msg) {
                         if (msg == 'success') {
                             location.reload();
@@ -721,6 +729,7 @@ jQuery(document).ready(function () {
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
+        jQuery("#loader, .loader").show();
         jQuery.post(url, {csrf: csrf}, function (msg) {
             if (msg == 'active' || msg == 'inactive') {
                 location.reload();

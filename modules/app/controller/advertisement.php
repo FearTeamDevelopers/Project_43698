@@ -191,6 +191,8 @@ class App_Controller_Advertisement extends Controller
 
     /**
      * Get list of ads created by user currently logged id
+     * 
+     * @before _secured, _member
      */
     public function listByUser($page = 1)
     {
@@ -304,7 +306,7 @@ class App_Controller_Advertisement extends Controller
         $articlesPerPage = $this->getConfig()->bazaar_search_results_per_page;
 
         $db = Registry::get('database');
-        $sqlTemplate = "SELECT uniqueKey, adtype, userAlias, title, price, created, MATCH(title, content, keywords) AGAINST( %s IN BOOLEAN MODE) as score "
+        $sqlTemplate = "SELECT uniqueKey, adType, userAlias, title, price, created, MATCH(title, content, keywords) AGAINST( %s IN BOOLEAN MODE) as score "
                 . "FROM tb_advertisement "
                 . "WHERE active=1 AND expirationDate >= '%s' AND MATCH(title, content, keywords) AGAINST( %s IN BOOLEAN MODE) "
                 . "ORDER BY score DESC, created DESC "
@@ -330,10 +332,10 @@ class App_Controller_Advertisement extends Controller
         //var_dump($searchResult);
         die;
 
-        $view->set('result', $searchResult)
+        $view->set('result', $rows)
                 ->set('currentpage', $page);
         $layoutView->set('metatitle', 'Hastrman - Bazar - Hledat')
-                ->set('pagerpathprefix', '/prohledatbazar')
+                ->set('pagerpathprefix', '/bazar/hledat')
                 ->set('pagerpathpostfix', '?' . http_build_query($query));
     }
 
@@ -346,7 +348,10 @@ class App_Controller_Advertisement extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $adSections = App_Model_AdSection::all(array('active = ?' => true));
+
+        $view->set('adsections', $adSections)
+                ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddAdvertisement')) {
             if ($this->checkCSRFToken() !== true &&
@@ -388,7 +393,7 @@ class App_Controller_Advertisement extends Controller
                 'userId' => $this->getUser()->getId(),
                 'sectionId' => RequestMethods::post('section'),
                 'uniqueKey' => $uniqueKey,
-                'adtype' => RequestMethods::post('type'),
+                'adType' => RequestMethods::post('type'),
                 'userAlias' => $this->getUser()->getWholeName(),
                 'content' => RequestMethods::post('content'),
                 'price' => RequestMethods::post('price', 0),
@@ -466,7 +471,10 @@ class App_Controller_Advertisement extends Controller
             self::redirect('/bazar');
         }
 
-        $view->set('ad', $ad);
+        $adSections = App_Model_AdSection::all(array('active = ?' => true));
+
+        $view->set('adsections', $adSections)
+                ->set('ad', $ad);
 
         if (RequestMethods::post('submitEditAdvertisement')) {
             if ($this->checkCSRFToken() !== true) {
@@ -499,7 +507,7 @@ class App_Controller_Advertisement extends Controller
 
             $ad->title = RequestMethods::post('title');
             $ad->uniqueKey = $uniqueKey;
-            $ad->adtype = RequestMethods::post('type');
+            $ad->adType = RequestMethods::post('type');
             $ad->sectionId = RequestMethods::post('section');
             $ad->content = RequestMethods::post('content');
             $ad->price = RequestMethods::post('price', 0);
