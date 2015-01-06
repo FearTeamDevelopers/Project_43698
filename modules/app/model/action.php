@@ -27,7 +27,7 @@ class App_Model_Action extends Model
      * @type integer
      * 
      * @validate numeric, max(8)
-     * @label autor
+     * @label id autora
      */
     protected $_userId;
 

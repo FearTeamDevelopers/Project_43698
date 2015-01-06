@@ -1,7 +1,7 @@
 section.wrapper.blue.filter
    .row
       |{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
-      form.filtr(method ='POST' action='/bazar/filtr')
+      form.filtr(method ='get' action='/bazar/filtr')
          select(name='bftype')
             |{if isset($bftype)}
             |{if $bftype == 'nabidka'}
@@ -39,9 +39,7 @@ section.wrapper.blue.filter
             | {/foreach}
             |{/else}
          input(type='submit' name='zobrazit' value='Zobrazit')
-         input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
       |{/if}
       form.search(method='GET' action='/bazar/hledat')
          input(type='text' placeholder='vyhledat v bazaru...' name='adstr' required)
          a#hledat(href='#').fi-magnifying-glass
-         input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")

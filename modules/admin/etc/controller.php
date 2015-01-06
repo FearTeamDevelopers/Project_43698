@@ -91,7 +91,7 @@ class Controller extends BaseController
         $session = Registry::get('session');
         
         //This line should be present only for DEV env
-        $this->_security->forceLogin(1);
+        //$this->_security->forceLogin(1);
         
         $user = $this->_security->getUser();
 
@@ -99,8 +99,8 @@ class Controller extends BaseController
             self::redirect('/admin/login');
         }
 
-        //30min inactivity till logout
-        if (time() - $session->get('lastActive') < 1800) {
+        //60min inactivity till logout
+        if (time() - $session->get('lastActive') < 3600) {
             $session->set('lastActive', time());
         } else {
             $view = $this->getActionView();

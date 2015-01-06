@@ -26,10 +26,11 @@
     <link href="/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css" media="screen" rel="stylesheet" type="text/css">
     <link href="/public/css/foundation/foundation.css" rel="stylesheet">
     <link href="/public/css/foundation/foundation-icons.css" rel="stylesheet">
-    <link href="/public/css/plugins/lightbox2.min.css">
+    <link href="/public/css/plugins/lightbox2.css" rel="stylesheet">
     <link href="/public/css/custom/styles.css" media="screen" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Ubuntu:400,700" rel="stylesheet" type="text/css">
-    <script type="text/javascript" src="/public/js/plugins/modernizr.js"></script>{if isset($canonical)}
+    <script type="text/javascript" src="/public/js/plugins/modernizr.js"></script>
+    {if isset($canonical)}
     <link rel="canonical" href="{echo $canonical}">{/if}
     {if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
     {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
@@ -61,7 +62,7 @@
             </ul>
           </nav>
         </div>
-      </header><a data-lightbox="bla" href="/public/uploads/1333777.jpg"><img src="/public/uploads/1333777.jpg"></a>
+      </header>
       <div class="row">
         <div id="dropdown" class="large-8 medium-12 small-12 columns right">
           <div class="submenu">
@@ -127,14 +128,16 @@
         </div>
       </div>
     </footer>
+    <div id="dialog" title="Chcete pokračovat?"><p></p></div>
+
     <!--JS scripts
     -->
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
-    <script type="text/javascript" src="/public/js/custom/generalApp.js"></script>
     <script type="text/javascript" src="/public/js/foundation.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js"></script>
     <script type="text/javascript" src="/public/js/plugins/lightbox.min.js"></script>
+    <script type="text/javascript" src="/public/js/custom/generalApp.js"></script>
     <!--End JS scripts
     -->
   </body>

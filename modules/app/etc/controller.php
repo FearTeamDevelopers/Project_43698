@@ -161,7 +161,8 @@ class Controller extends BaseController
             $view = $this->getActionView();
 
             $view->infoMessage('Byl jste odhlášen z důvodu dlouhé neaktivity');
-            self::redirect('/odhlasit');
+            $this->_security->logout();
+            self::redirect('/');
         }
     }
 

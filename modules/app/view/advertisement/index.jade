@@ -15,9 +15,11 @@ section.wrapper.bazar
         article.medium-6.column.left
             .imgWrapper
                 | {script $images=$ad->getImages()}
-                | {script $image=$images[0]}
-                a(rel="lightbox", href!="{echo $image->imgMain}")
-                    img(src!='{echo $image->imgThumb}')
+                | {if !empty($images)}
+                | {script $image=array_shift($images)}
+                a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->imgMain}")
+                    img(src!="{echo $image->imgThumb}")
+                | {/if}
             .nazev
                 .nazevWrapper
                     h4 {echo $ad->title}

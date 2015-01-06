@@ -15,8 +15,8 @@ section.wrapper.bazar
             | {script $images=$ad->getImages()}
             | {if !empty($images)}
             | {script $image=array_shift($images)}
-            a(data-lightbox='img' data-title='pls work' href!="{echo $image->imgMain}")
-               img(src!='{echo $image->imgThumb}')
+            a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->imgMain}")
+                img(src!="{echo $image->imgThumb}")
             | {/if}
          .nazev
             .nazevWrapper
@@ -39,7 +39,7 @@ section.wrapper.bazar
 
          a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->uniqueKey}', title='Upravit')
          a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->uniqueKey}', title='Požádat o prodloužení')
-         a.buttonTab.delete.ajaxDelete.fi-trash(href!='/bazar/smazat/{echo $ad->uniqueKey}', title='Smazat')
+         a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->uniqueKey}', title='Smazat')
       | {/foreach}
       |{/if}
       |{else}

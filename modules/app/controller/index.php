@@ -161,12 +161,13 @@ class App_Controller_Index extends Controller
 
         $this->_pagerMetaLinks($searchPageCount, $page, '/hledat/p/');
         
-        $view->set('urls', $urls);
+        $view->set('urls', $urls)
+                ->set('currentpage', $page)
+                ->set('pagecount', $searchPageCount)
+                ->set('pagerpathprefix', '/hledat')
+                ->set('pagerpathpostfix', '?'.http_build_query($parameters));
         
         $layoutView->set('canonical', $canonical)
-                ->set('currentpage', $page)
-                ->set('pagerpathprefix', '/hledat')
-                ->set('pagerpathpostfix', '?'.http_build_query($parameters))
                 ->set('metatitle', 'Hastrman - Hledat');
     }
 }

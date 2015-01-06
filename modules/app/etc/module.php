@@ -47,6 +47,12 @@ class App_Etc_Module extends Module
             'action' => 'search'
         ),
         array(
+            'pattern' => '/bazar/filtr',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'filter'
+        ),
+        array(
             'pattern' => '/page/:urlkey',
             'module' => 'app',
             'controller' => 'index',

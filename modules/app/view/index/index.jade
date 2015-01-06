@@ -6,9 +6,6 @@
 				h3 Reportáže
 
 			.container-box
-				| {foreach $img in $adimg}
-				img(src!='{echo $img->imgMain}')
-				| {/foreach}
 				|{foreach $report in $reports}
 				a(href!='/reportaze/r/{echo $report->urlKey}')
 					|{if $report_i == 0}

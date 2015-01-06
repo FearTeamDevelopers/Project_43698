@@ -67,6 +67,27 @@ class App_Controller_Advertisement extends Controller
             return false;
         }
     }
+    
+    /**
+     * Check if are set specific metadata or leave their default values
+     */
+    private function _checkMetaData($layoutView, App_Model_Advertisement $object)
+    {
+        $uri = RequestMethods::server('REQUEST_URI');
+
+        if ($object->getMetaTitle() != '') {
+            $layoutView->set('metatitle', $object->getTitle());
+        }
+
+        $canonical = 'http://' . $this->getServerHost() . '/bazar/r/' . $object->getUniqueKey();
+
+        $layoutView->set('canonical', $canonical)
+                ->set('article', 1)
+                ->set('articlecreated', $object->getCreated())
+                ->set('articlemodified', $object->getModified())
+                ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
+                ->set('metaogtype', 'article');
+    }
 
     /**
      * Get list of ads
@@ -126,10 +147,6 @@ class App_Controller_Advertisement extends Controller
      */
     public function filter($page = 1)
     {
-        if ($this->checkCSRFToken() !== true) {
-            self::redirect('/bazar');
-        }
-
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         $adsPerPage = 10;
@@ -137,9 +154,11 @@ class App_Controller_Advertisement extends Controller
         $adSections = App_Model_AdSection::all(array('active = ?' => true));
         $view->set('adsections', $adSections);
 
-        $type = RequestMethods::post('bftype');
-        $section = RequestMethods::post('bfsection');
+        $type = RequestMethods::get('bftype');
+        $section = RequestMethods::get('bfsection');
 
+        $httpQuery = '?'.http_build_query(array('bftype' => $type, 'bfsection' => $section));
+        
         if ($page <= 0) {
             $page = 1;
         }
@@ -150,6 +169,11 @@ class App_Controller_Advertisement extends Controller
             $canonical = 'http://' . $this->getServerHost() . '/bazar/filtr/p/' . $page;
         }
 
+        if($type == '0' && $section == '0'){
+            $this->_willRenderActionView = false;
+            self::redirect('/bazar');
+        }
+        
         if ($section == '0') {
             if ($type == 'nabidka') {
                 $ads = App_Model_Advertisement::fetchActiveByType('tender', $adsPerPage, $page);
@@ -169,8 +193,8 @@ class App_Controller_Advertisement extends Controller
                 $ads = App_Model_Advertisement::fetchActiveByTypeSection('demand', $section, $adsPerPage, $page);
                 $adsCount = App_Model_Advertisement::countActiveByTypeSection('demand', $section);
             } else {
-                $this->_willRenderActionView = false;
-                self::redirect('/bazar/nenalezeno');
+                $ads = App_Model_Advertisement::fetchActiveBySection($section, $adsPerPage, $page);
+                $adsCount = App_Model_Advertisement::countActiveBySection($section);
             }
         }
 
@@ -181,6 +205,7 @@ class App_Controller_Advertisement extends Controller
         $view->set('ads', $ads)
                 ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/bazar/filtr')
+                ->set('pagerpathpostfix', $httpQuery)
                 ->set('pagecount', $adsPageCount)
                 ->set('bftype', $type)
                 ->set('bfsection', $section);
@@ -214,13 +239,12 @@ class App_Controller_Advertisement extends Controller
 
         $ads = App_Model_Advertisement::fetchActiveByUser($userId, $adsPerPage, $page);
         $adsCount = App_Model_Advertisement::countActiveByUser($userId);
-        $adImages = App_Model_AdImage::all(array());
+
         $adsPageCount = ceil($adsCount / $adsPerPage);
 
         $this->_pagerMetaLinks($adsPageCount, $page, '/bazar/moje-inzeraty/p/');
 
         $view->set('ads', $ads)
-            ->set('adimg', $adImages)
                 ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/bazar/moje-inzeraty')
                 ->set('pagecount', $adsPageCount);
@@ -237,20 +261,24 @@ class App_Controller_Advertisement extends Controller
     public function detail($uniquekey)
     {
         $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
         $ad = App_Model_Advertisement::fetchActiveByKey($uniquekey);
 
         if ($ad === null) {
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             $this->_willRenderActionView = false;
             self::redirect('/nenalezeno');
         }
 
+        $this->_checkMetaData($layoutView, $ad);
+        
         $view->set('ad', $ad)
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
-
+        
         if (RequestMethods::post('submitAdReply')) {
             if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
-                self::redirect('/bazar/r/' . RequestMethods::post('aduniquekey'));
+                self::redirect('/bazar/r/' . $ad->getUniqueKey());
             }
 
             $message = new App_Model_AdMessage(array(
@@ -286,6 +314,7 @@ class App_Controller_Advertisement extends Controller
                 $message->save();
 
                 $view->successMessage('Dotaz byl úspěšně odeslán');
+                self::redirect('/bazar/r/' . $ad->getUniqueKey());
             } else {
                 $view->set('errors', $message->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
@@ -332,11 +361,16 @@ class App_Controller_Advertisement extends Controller
         print('<pre>'.print_r($rows, true).'</pre>');
         die;
 
+        $canonical = 'http://' . $this->getServerHost() . '/bazar/hledat';
+        
         $view->set('result', $rows)
-                ->set('currentpage', $page);
-        $layoutView->set('metatitle', 'Hastrman - Bazar - Hledat')
+                ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/bazar/hledat')
                 ->set('pagerpathpostfix', '?' . http_build_query($query));
+        
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Bazar - Hledat');
+               
     }
 
     /**
@@ -469,6 +503,7 @@ class App_Controller_Advertisement extends Controller
 
         if (NULL === $ad) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
             self::redirect('/bazar');
         }
 
@@ -504,6 +539,7 @@ class App_Controller_Advertisement extends Controller
                 $uploadErrors += $fileErrors;
             }
 
+            $price = RequestMethods::post('price', 0) == 'Dohodou' ? 0: RequestMethods::post('price', 0);
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $ad->title = RequestMethods::post('title');
@@ -511,7 +547,7 @@ class App_Controller_Advertisement extends Controller
             $ad->adType = RequestMethods::post('type');
             $ad->sectionId = RequestMethods::post('section');
             $ad->content = RequestMethods::post('content');
-            $ad->price = RequestMethods::post('price', 0);
+            $ad->price = $price;
             $ad->keywords = $keywords;
 
             if (empty($errors) && $ad->validate()) {

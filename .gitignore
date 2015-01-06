@@ -3,6 +3,7 @@
 /application/configuration/dbschema.sql
 /application/configuration/update.sql
 /application/logs/
+/public/js/custom/min/
 /public/uploads/
 /temp/cache/
 /temp/db/

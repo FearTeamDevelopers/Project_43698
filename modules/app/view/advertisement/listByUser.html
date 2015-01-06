@@ -1,7 +1,8 @@
 
 <section class="wrapper blue filter">
-  <div class="row">{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
-    <form method="POST" action="/bazar/filtr" class="filtr">
+  <div class="row">
+      {if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
+    <form method="get" action="/bazar/filtr" class="filtr">
       <select name="bftype">
         {if isset($bftype)}
         {if $bftype == 'nabidka'}
@@ -31,11 +32,10 @@
         {/else}
       </select>
       <input type="submit" name="zobrazit" value="Zobrazit"/>
-      <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
-    </form>{/if}
+    </form>
+      {/if}
     <form method="GET" action="/bazar/hledat" class="search">
       <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
-      <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
     </form>
   </div>
 </section>
@@ -53,7 +53,8 @@
       <div class="imgWrapper">
         {script $images=$ad->getImages()}
         {if !empty($images)}
-        {script $image=array_shift($images)}<a data-lightbox="img" data-title="pls work" href="{echo $image->imgMain}"><img src="{echo $image->imgThumb}"/></a>{/if}
+        {script $image=array_shift($images)}
+        <a data-lightbox="img" data-title="pls work" href="{echo $image->imgMain}"><img src="{echo $image->imgThumb}"/></a>{/if}
       </div>
       <div class="nazev">
         <div class="nazevWrapper">

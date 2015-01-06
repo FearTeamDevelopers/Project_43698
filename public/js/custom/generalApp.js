@@ -101,9 +101,9 @@ jQuery(document).ready(function () {
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
-        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat v mazání?');
+        jQuery('#dialog p').text('Opravdu chcete pokračovat v mazání?');
 
-        jQuery('#deleteDialog').dialog({
+        jQuery('#dialog').dialog({
             resizable: false,
             width: 350,
             height: 200,
@@ -133,9 +133,9 @@ jQuery(document).ready(function () {
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
-        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat?');
+        jQuery('#dialog p').text('Opravdu chcete pokračovat?');
 
-        jQuery('#deleteDialog').dialog({
+        jQuery('#dialog').dialog({
             resizable: false,
             width: 350,
             height: 200,
