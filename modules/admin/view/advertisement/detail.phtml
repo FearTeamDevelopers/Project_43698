@@ -58,9 +58,10 @@
                     {/if}{else}
                 <li class="photoinactive">
                     {/else}
-                    <img src="{echo $photo->imgThumb}" alt="" height="120px" />
+                    <a href="{echo $photo->imgMain}" data-lightbox="ad_photos_{echo $ad->getId()}">
+                        <img src="{echo $photo->imgThumb}" alt="" height="140px" />
+                    </a>
                     <span>
-                        <a href="{echo $photo->imgMain}" class="view"></a>
                         <a href="/admin/advertisement/deleteadimage/{echo $photo->id}" class="delete" value="Smazat"></a>
                     </span>
                 </li>

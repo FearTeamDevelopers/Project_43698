@@ -30,7 +30,7 @@
                 {foreach $partner in $partners}
                     <tr>
                         <td class="center">
-                            <a href="{echo $partner->getLogo()}" class="view">
+                            <a href="{echo $partner->getLogo()}" data-lightbox="partner_log_{echo $partner->getId()}">
                                 <img src="{echo $partner->getLogo()}" alt="{echo $partner->getTitle()}" height="50px" />
                             </a>
                         </td>

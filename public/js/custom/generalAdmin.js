@@ -24,7 +24,6 @@ jQuery(document).ready(function () {
         }
     });
 
-    jQuery('a.view').lightBox();
     jQuery('#tabs, .tabs').tabs();
 
     jQuery('#image-cropper, #image-cropper2').cropit({
