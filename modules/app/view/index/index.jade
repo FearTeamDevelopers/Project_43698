@@ -14,7 +14,7 @@
 						.info
 							h2 {echo $report->title}
 							span {echo date("d.m. Y H:i", strtotime($report->created)).", ".$report->userAlias}
-							p {echo $report->shortBody}
+							p {echo html_entity_decode($report->shortBody)}
 					|{/if}{else}
 					article.report.large-3.medium-4.small-6
 
@@ -44,7 +44,7 @@
 						header
 							a(href!='/novinky/r/{echo $new->urlKey}')
 								h4 {echo $new->title}
-						p {echo $new->shortBody}
+						p {echo html_entity_decode($new->shortBody)}
 				| {/foreach}
 			.moreWrap
 				a(href='/novinky')
@@ -64,7 +64,7 @@
 							header
 								h4 {echo $action->title}
 								span.datum {echo $action->startDate}
-							p {echo $action->shortBody}
+							p {echo html_entity_decode($action->shortBody)}
 					|{/foreach}
 			.moreWrap
 				a(href='/akce')

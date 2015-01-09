@@ -9,6 +9,6 @@ section.wrapper.reports
             .info
                h2 {echo $report->title}
                span {echo $report->created.", ".$report->userAlias}
-               p {echo $report->shortBody}
+               p {echo html_entity_decode($report->shortBody)}
       |{/foreach}
    include ../components/pager

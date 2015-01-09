@@ -9,9 +9,9 @@ section.wrapper.akce
       article
          header
             h3 {echo $action->title}
-            span autor: {echo $action->userAlias}
+            span Autor: {echo $action->userAlias}
          .body
-            p {echo $action->shortBody}
+            p {echo html_entity_decode($action->shortBody)}
             a(href!='/akce/r/$action->urlKey') čti více
       |{/foreach}
    include ../components/pager

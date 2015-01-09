@@ -1,6 +1,7 @@
 .page
    section.wrapper
       .row.container
+         a(href!="/admin/news/{echo $act}/") Zpět do administrace
          header
             h1 {echo $news->title}
             span Autor: {echo $news->userAlias}<br/>

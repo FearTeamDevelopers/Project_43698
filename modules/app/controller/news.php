@@ -2,6 +2,7 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -101,5 +102,29 @@ class App_Controller_News extends Controller
         
         $this->_checkMetaData($layoutView, $news);
         $view->set('news', $news);
+    }
+    
+    /**
+     * Preview of news created in administration but not saved into db
+     * 
+     * @before _secured, _participant
+     */
+    public function preview()
+    {
+        $view = $this->getActionView();
+        $session = Registry::get('session');
+        
+        $news = $session->get('newsPreview');
+        
+        if(null === $news){
+            $this->_willRenderActionView = false;
+            $view->warningMessage(self::ERROR_MESSAGE_2);
+            self::redirect('/admin/news/');
+        }
+        
+        $act = RequestMethods::get('action');
+        
+        $view->set('news', $news)
+            ->set('act', $act);
     }
 }

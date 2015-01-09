@@ -2,6 +2,7 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -103,4 +104,27 @@ class App_Controller_Action extends Controller
         $view->set('action', $action);
     }
 
+    /**
+     * Preview of action created in administration but not saved into db
+     * 
+     * @before _secured, _participant
+     */
+    public function preview()
+    {
+        $view = $this->getActionView();
+        $session = Registry::get('session');
+        
+        $action = $session->get('actionPreview');
+        
+        if(null === $action){
+            $this->_willRenderActionView = false;
+            $view->warningMessage(self::ERROR_MESSAGE_2);
+            self::redirect('/admin/action/');
+        }
+        
+        $act = RequestMethods::get('action');
+        
+        $view->set('action', $action)
+            ->set('act', $act);
+    }
 }

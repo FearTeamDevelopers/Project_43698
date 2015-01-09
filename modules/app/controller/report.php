@@ -2,6 +2,7 @@
 
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -107,4 +108,28 @@ class App_Controller_Report extends Controller
         $view->set('report', $report);
     }
 
+    /**
+     * Preview of report created in administration but not saved into db
+     * 
+     * @before _secured, _participant
+     */
+    public function preview()
+    {
+        $view = $this->getActionView();
+        $session = Registry::get('session');
+        
+        $report = $session->get('reportPreview');
+        
+        if(null === $report){
+            $this->_willRenderActionView = false;
+            $view->warningMessage(self::ERROR_MESSAGE_2);
+            self::redirect('/admin/report/');
+        }
+        
+        $act = RequestMethods::get('action');
+        
+        $view->set('report', $report)
+            ->set('act', $act);
+    }
+    
 }

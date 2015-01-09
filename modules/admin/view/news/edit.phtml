@@ -16,7 +16,7 @@
             <p>
                 <label>Název*</label>
                 <span class="field">
-                    <input type="text" name="title" class="longinput" value="{echo $news->title}" />
+                    <input type="text" name="title" class="longinput" value="{echo $news->title}" required/>
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
@@ -35,7 +35,7 @@
                 <label>Zobrazovat do*</label>
                 <span class="field">
                     <input type="text" name="expiration" class="longinput datepicker" 
-                           value="{echo $news->expirationDate}"/>
+                           value="{echo $news->expirationDate}" required/>
                     {if isset($errors["expirationDate"])}
                     <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
                     {/if}
@@ -169,6 +169,7 @@
 
             <p class="stdformbutton">
                 <input name="submitEditNews" type="submit" value="Uložit" class="submit radius2" />
+                <input name="submitPreviewNews" type="submit" value="Zobrazit náhled" class="submit radius2" />
             </p>
         </form>
     </div>

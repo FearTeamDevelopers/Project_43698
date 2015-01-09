@@ -1,0 +1,14 @@
+
+<section class="wrapper report">
+  <div class="row"></div>
+  <a href="/admin/report/{echo $act}/">Zpet do administrace</a>
+  <header class="row">
+    <div class="imgWrapper"><img src="$report->imgMain"/></div>
+    <div class="reportInfo">
+      <h2>{echo $report->title}</h2><span>{echo $report->created}<br/></span><small><span>Autor:</span></small><span>{echo " ".$report->userAlias}</span>
+    </div>
+  </header>
+  <div class="page row">
+    <div class="container">{echo $report->body}</div>
+  </div>
+</section>

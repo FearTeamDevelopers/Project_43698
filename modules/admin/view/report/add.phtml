@@ -18,7 +18,7 @@
             <p>
                 <label>Název*</label>
                 <span class="field">
-                    <input type="text" name="title" class="longinput" value="{echo isset($report)? $report->title: ""}" />
+                    <input type="text" name="title" class="longinput" value="{echo isset($report)? $report->title: ""}" required/>
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
@@ -37,7 +37,7 @@
                 <label>Zobrazovat do*</label>
                 <span class="field">
                     <input type="text" name="expiration" class="longinput datepicker" 
-                           value="{echo isset($report)? $report->expirationDate: ""}"/>
+                           value="{echo isset($report)? $report->expirationDate: ""}" required/>
                     {if isset($errors["expirationDate"])}
                     <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
                     {/if}
@@ -120,10 +120,15 @@
             <div class="contenttitle radiusbottom0">
                 <h2 class="table"><span>Pozadí pro reportáž</span></h2>
             </div><!--contenttitle-->
-
             <div class="par">
                 <label>Foto*<small>*.jpg, *.jpeg, *.png, *.gif<br/>Max. 15MB</small></label>
-                <div id="image-cropper" class="field">
+                {if isset($report) && $report->imgMain != ""}
+                <span class="field" id="currentLogo">
+                    <img src="{echo $report->imgThumb}" alt="" height="100" />
+                    <a href="/admin/report/deletemainphoto/{echo $report->id}" class="btn btn3 btn_trash deleteImg" title="Smazat"></a>
+                </span>
+
+                <div id="image-cropper" class="uploadNewImage nodisplay field">
                     <input type="file" class="cropit-image-input" accept="image/*"/>
                     <div class="cropit-image-preview-container">
                         <div class="cropit-image-background-container">
@@ -139,10 +144,29 @@
                     </label>
                     {/if}
                 </div>
+                {/if}{else}
+                <div id="image-cropper" class="uploadNewImage field">
+                    <input type="file" class="cropit-image-input" accept="image/*"/>
+                    <div class="cropit-image-preview-container">
+                        <div class="cropit-image-background-container">
+                            <img class="cropit-image-background" />
+                        </div>
+                        <div class="cropit-image-preview"></div>
+                    </div>
+
+                    <input type="range" class="cropit-image-zoom-input" />
+                    {if isset($errors["croppedimage"])}
+                    <label class="error">
+                        {echo join("<br/>", $errors["croppedimage"])}
+                    </label>
+                    {/if}
+                </div>
+                {/else}
             </div>
 
             <p class="stdformbutton">
                 <input name="submitAddReport" type="submit" value="Uložit" class="submit radius2" />
+                <input name="submitPreviewReport" type="submit" value="Zobrazit náhled" class="submit radius2" />
                 <input type="reset" class="reset radius2" value="Reset" />
             </p>
         </form>

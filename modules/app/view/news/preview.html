@@ -1,9 +1,10 @@
-
 <div class="page">
   <section class="wrapper">
     <div class="row container">
+        <a href="/admin/news/{echo $act}/">Zpet do administrace</a>
       <header>
-        <h1>{echo $news->title}</h1><span>autor: {echo $news->userAlias}<br/></span>
+        <h1>{echo $news->title}</h1>
+        <span>autor: {echo $news->userAlias}<br/></span>
       </header>
         {$news->body}
     </div>

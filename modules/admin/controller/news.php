@@ -12,6 +12,8 @@ use THCFrame\Core\StringMethods;
 class Admin_Controller_News extends Controller
 {
 
+    private $_errors = array();
+
     /**
      * Check whether user has access to news or not
      * 
@@ -20,14 +22,14 @@ class Admin_Controller_News extends Controller
      */
     private function _checkAccess(App_Model_News $news)
     {
-        if($this->_security->isGranted('role_admin') === true ||
-                $news->getUserId() == $this->getUser()->getId()){
+        if ($this->_security->isGranted('role_admin') === true ||
+                $news->getUserId() == $this->getUser()->getId()) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     /**
      * Check whether news unique identifier already exist or not
      * 
@@ -43,6 +45,99 @@ class Admin_Controller_News extends Controller
         } else {
             return false;
         }
+    }
+
+    /**
+     * Create and return new news object
+     * 
+     * @return \App_Model_News
+     */
+    private function _createObject()
+    {
+        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+
+        if (!$this->_checkUrlKey($urlKey)) {
+            $this->_errors['title'] = array('This title is already used');
+        }
+
+        $autoApprove = Registry::get('configuration')->news_autopublish;
+
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+
+        $news = new App_Model_News(array(
+            'title' => RequestMethods::post('title'),
+            'userId' => $this->getUser()->getId(),
+            'userAlias' => $this->getUser()->getWholeName(),
+            'urlKey' => $urlKey,
+            'approved' => $autoApprove,
+            'archive' => 0,
+            'shortBody' => $shortText,
+            'body' => RequestMethods::post('text'),
+            'expirationDate' => RequestMethods::post('expiration'),
+            'rank' => RequestMethods::post('rank', 1),
+            'keywords' => $keywords,
+            'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
+            'metaDescription' => RequestMethods::post('metadescription')
+        ));
+        
+        return $news;
+    }
+
+    /**
+     * Edit existing news object
+     * 
+     * @param App_Model_News $object
+     * @return App_Model_News
+     */
+    private function _editObject(App_Model_News $object)
+    {
+        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+
+        if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
+            $this->_errors['title'] = array('This title is already used');
+        }
+
+        if (null === $object->userId) {
+            $object->userId = $this->getUser()->getId();
+            $object->userAlias = $this->getUser()->getWholeName();
+        }
+
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+
+        $object->title = RequestMethods::post('title');
+        $object->urlKey = $urlKey;
+        $object->expirationDate = RequestMethods::post('expiration');
+        $object->body = RequestMethods::post('text');
+        $object->shortBody = $shortText;
+        $object->rank = RequestMethods::post('rank', 1);
+        $object->active = RequestMethods::post('active');
+        $object->approved = RequestMethods::post('approve');
+        $object->archive = RequestMethods::post('archive');
+        $object->keywords = $keywords;
+        $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
+        $object->metaDescription = RequestMethods::post('metadescription');
+        
+        return $object;
+    }
+
+    /**
+     * Check if there is object used for preview saved in session
+     * 
+     * @return App_Model_News
+     */
+    private function _checkForObject()
+    {
+        $session = Registry::get('session');
+        $news = $session->get('newsPreview');
+        $session->erase('newsPreview');
+
+        return $news;
     }
 
     /**
@@ -65,6 +160,12 @@ class Admin_Controller_News extends Controller
     {
         $view = $this->getActionView();
 
+        $news = $this->_checkForObject();
+        
+        if(null !== $news){
+            $view->set('news', $news);
+        }
+        
         $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddNews')) {
@@ -73,46 +174,38 @@ class Admin_Controller_News extends Controller
                 self::redirect('/admin/news/');
             }
 
-            $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $news = $this->_createObject();
 
-            if (!$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('This title is already used');
-            }
-
-            $autoApprove = Registry::get('configuration')->news_autopublish;
-
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                    array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
-
-            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-            
-            $news = new App_Model_News(array(
-                'title' => RequestMethods::post('title'),
-                'userId' => $this->getUser()->getId(),
-                'userAlias' => $this->getUser()->getWholeName(),
-                'urlKey' => $urlKey,
-                'approved' => $autoApprove,
-                'archive' => 0,
-                'shortBody' => $shortText,
-                'body' => RequestMethods::post('text'),
-                'expirationDate' => RequestMethods::post('expiration'),
-                'rank' => RequestMethods::post('rank', 1),
-                'keywords' => $keywords,
-                'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-                'metaDescription' => RequestMethods::post('metadescription')
-            ));
-
-            if (empty($errors) && $news->validate()) {
+            if (empty($this->_errors) && $news->validate()) {
                 $id = $news->save();
-
                 $this->getCache()->invalidate();
+
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/news/');
             } else {
                 Event::fire('admin.log', array('fail'));
-                $view->set('errors', $errors + $news->getErrors())
+                $view->set('errors', $this->_errors + $news->getErrors())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('news', $news);
+            }
+        }
+        
+        if (RequestMethods::post('submitPreviewNews')) {
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                self::redirect('/admin/news/');
+            }
+
+            $news = $this->_createObject();
+
+            if (empty($this->_errors) && $news->validate()) {
+                $session = Registry::get('session');
+                $session->set('newsPreview', $news);
+                
+                self::redirect('/news/preview?action=add');
+            } else {
+                $view->set('errors', $this->_errors + $news->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('news', $news);
             }
@@ -129,67 +222,62 @@ class Admin_Controller_News extends Controller
     {
         $view = $this->getActionView();
 
-        $news = App_Model_News::first(array('id = ?' => (int) $id));
+        $news = $this->_checkForObject();
+        
+        if (null !== $news) {
+            $view->set('news', $news);
+        } else {
+            $news = App_Model_News::first(array('id = ?' => (int) $id));
 
-        if (null === $news) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/news/');
+            if (null === $news) {
+                $view->warningMessage(self::ERROR_MESSAGE_2);
+                $this->_willRenderActionView = false;
+                self::redirect('/admin/news/');
+            }
+
+            if (!$this->_checkAccess($news)) {
+                $view->warningMessage(self::ERROR_MESSAGE_4);
+                $this->_willRenderActionView = false;
+                self::redirect('/admin/news/');
+            }
+
+            $view->set('news', $news);
         }
-
-        if (!$this->_checkAccess($news)) {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/news/');
-        }
-
-        $view->set('news', $news);
 
         if (RequestMethods::post('submitEditNews')) {
             if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
-            $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $news = $this->_editObject($news);
 
-            if ($news->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('This title is already used');
-            }
-
-            if (null === $news->userId) {
-                $news->userId = $this->getUser()->getId();
-                $news->userAlias = $this->getUser()->getWholeName();
-            }
-
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                    array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
-
-            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-            
-            $news->title = RequestMethods::post('title');
-            $news->urlKey = $urlKey;
-            $news->expirationDate = RequestMethods::post('expiration');
-            $news->body = RequestMethods::post('text');
-            $news->shortBody = $shortText;
-            $news->rank = RequestMethods::post('rank', 1);
-            $news->active = RequestMethods::post('active');
-            $news->approved = RequestMethods::post('approve');
-            $news->archive = RequestMethods::post('archive');
-            $news->keywords = $keywords;
-            $news->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-            $news->metaDescription = RequestMethods::post('metadescription');
-
-            if (empty($errors) && $news->validate()) {
+            if (empty($this->_errors) && $news->validate()) {
                 $news->save();
-
                 $this->getCache()->invalidate();
+                
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/news/');
             } else {
                 Event::fire('admin.log', array('fail', 'News id: ' . $id));
-                $view->set('errors', $errors + $news->getErrors());
+                $view->set('errors', $this->_errors + $news->getErrors());
+            }
+        }
+        
+        if (RequestMethods::post('submitPreviewNews')) {
+            if ($this->checkCSRFToken() !== true) {
+                self::redirect('/admin/news/');
+            }
+
+            $action = $this->_editObject($news);
+
+            if (empty($this->_errors) && $action->validate()) {
+                $session = Registry::get('session');
+                $session->set('newsPreview', $news);
+                
+                self::redirect('/news/preview?action=edit');
+            } else {
+                $view->set('errors', $this->_errors + $news->getErrors());
             }
         }
     }
@@ -607,8 +695,8 @@ class Admin_Controller_News extends Controller
                 } else {
                     $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
                 }
-                
-                if($this->getUser()->getId() == $_news->getUserId()){
+
+                if ($this->getUser()->getId() == $_news->getUserId()) {
                     $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
                 }
 

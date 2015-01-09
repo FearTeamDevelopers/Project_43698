@@ -12,6 +12,8 @@ use THCFrame\Core\StringMethods;
 class Admin_Controller_Action extends Controller
 {
 
+    private $_errors = array();
+    
     /**
      * Check whether user has access to action or not
      * 
@@ -44,7 +46,111 @@ class Admin_Controller_Action extends Controller
             return false;
         }
     }
+    
+    /**
+     * Create and return new action object
+     * 
+     * @return \App_Model_Action
+     */
+    private function _createObject()
+    {
+        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
+        if (!$this->_checkUrlKey($urlKey)) {
+            $this->_errors['title'] = array('This title is already used');
+        }
+
+        $autoApprove = Registry::get('configuration')->action_autopublish;
+
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+        );
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+
+        $action = new App_Model_Action(array(
+            'title' => RequestMethods::post('title'),
+            'userId' => $this->getUser()->getId(),
+            'userAlias' => $this->getUser()->getWholeName(),
+            'urlKey' => $urlKey,
+            'approved' => $autoApprove,
+            'archive' => 0,
+            'shortBody' => $shortText,
+            'body' => RequestMethods::post('text'),
+            'expirationDate' => RequestMethods::post('expiration'),
+            'rank' => RequestMethods::post('rank', 1),
+            'startDate' => RequestMethods::post('datestart'),
+            'endDate' => RequestMethods::post('dateend'),
+            'startTime' => RequestMethods::post('timestart'),
+            'endTime' => RequestMethods::post('timeend'),
+            'keywords' => $keywords,
+            'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
+            'metaDescription' => RequestMethods::post('metadescription')
+        ));
+
+        return $action;
+    }
+    
+    /**
+     * Edit existing action object
+     * 
+     * @param App_Model_Action $object
+     * @return App_Model_Action
+     */
+    private function _editObject(App_Model_Action $object)
+    {
+        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+
+        if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
+            $this->_errors['title'] = array('This title is already used');
+        }
+
+        if (null === $object->userId) {
+            $object->userId = $this->getUser()->getId();
+            $object->userAlias = $this->getUser()->getWholeName();
+        }
+
+        $shortText = str_replace(
+                array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+        );
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+
+        $object->title = RequestMethods::post('title');
+        $object->urlKey = $urlKey;
+        $object->expirationDate = RequestMethods::post('expiration');
+        $object->body = RequestMethods::post('text');
+        $object->shortBody = $shortText;
+        $object->rank = RequestMethods::post('rank', 1);
+        $object->startDate = RequestMethods::post('datestart');
+        $object->endDate = RequestMethods::post('dateend');
+        $object->startTime = RequestMethods::post('timestart');
+        $object->endTime = RequestMethods::post('timeend');
+        $object->active = RequestMethods::post('active');
+        $object->approved = RequestMethods::post('approve');
+        $object->archive = RequestMethods::post('archive');
+        $object->keywords = $keywords;
+        $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
+        $object->metaDescription = RequestMethods::post('metadescription');
+
+        return $object;
+    }
+
+    /**
+     * Check if there is object used for preview saved in session
+     * 
+     * @return App_Model_Action
+     */
+    private function _checkForObject()
+    {
+        $session = Registry::get('session');
+        $action = $session->get('actionPreview');
+        $session->erase('actionPreview');
+        
+        return $action;
+    }
+    
     /**
      * Get list of all actions. Loaded via datatables ajax.
      * For more check load function.
@@ -64,6 +170,12 @@ class Admin_Controller_Action extends Controller
     public function add()
     {
         $view = $this->getActionView();
+        
+        $action = $this->_checkForObject();
+        
+        if(null !== $action){
+            $view->set('action', $action);
+        }
 
         $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
@@ -73,42 +185,9 @@ class Admin_Controller_Action extends Controller
                 self::redirect('/admin/action/');
             }
 
-            $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $action = $this->_createObject();
 
-            if (!$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('This title is already used');
-            }
-
-            $autoApprove = Registry::get('configuration')->action_autopublish;
-
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                    array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-            );
-            
-            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-            $action = new App_Model_Action(array(
-                'title' => RequestMethods::post('title'),
-                'userId' => $this->getUser()->getId(),
-                'userAlias' => $this->getUser()->getWholeName(),
-                'urlKey' => $urlKey,
-                'approved' => $autoApprove,
-                'archive' => 0,
-                'shortBody' => $shortText,
-                'body' => RequestMethods::post('text'),
-                'expirationDate' => RequestMethods::post('expiration'),
-                'rank' => RequestMethods::post('rank', 1),
-                'startDate' => RequestMethods::post('datestart'),
-                'endDate' => RequestMethods::post('dateend'),
-                'startTime' => RequestMethods::post('timestart'),
-                'endTime' => RequestMethods::post('timeend'),
-                'keywords' => $keywords,
-                'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-                'metaDescription' => RequestMethods::post('metadescription')
-            ));
-
-            if (empty($errors) && $action->validate()) {
+            if (empty($this->_errors) && $action->validate()) {
                 $id = $action->save();
                 $this->getCache()->invalidate();
 
@@ -117,7 +196,27 @@ class Admin_Controller_Action extends Controller
                 self::redirect('/admin/action/');
             } else {
                 Event::fire('admin.log', array('fail'));
-                $view->set('errors', $errors + $action->getErrors())
+                $view->set('errors', $this->_errors + $action->getErrors())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('action', $action);
+            }
+        }
+        
+        if (RequestMethods::post('submitPreviewAction')) {
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                self::redirect('/admin/action/');
+            }
+
+            $action = $this->_createObject();
+
+            if (empty($this->_errors) && $action->validate()) {
+                $session = Registry::get('session');
+                $session->set('actionPreview', $action);
+                
+                self::redirect('/action/preview?action=add');
+            } else {
+                $view->set('errors', $this->_errors + $action->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('action', $action);
             }
@@ -134,64 +233,37 @@ class Admin_Controller_Action extends Controller
     {
         $view = $this->getActionView();
 
-        $action = App_Model_Action::first(array('id = ?' => (int) $id));
+        $action = $this->_checkForObject();
 
-        if (null === $action) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/action/');
+        if (null !== $action) {
+            $view->set('action', $action);
+        } else {
+
+            $action = App_Model_Action::first(array('id = ?' => (int) $id));
+
+            if (null === $action) {
+                $view->warningMessage(self::ERROR_MESSAGE_2);
+                $this->_willRenderActionView = false;
+                self::redirect('/admin/action/');
+            }
+
+            if (!$this->_checkAccess($action)) {
+                $view->warningMessage(self::ERROR_MESSAGE_4);
+                $this->_willRenderActionView = false;
+                self::redirect('/admin/action/');
+            }
+
+            $view->set('action', $action);
         }
-
-        if (!$this->_checkAccess($action)) {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/action/');
-        }
-
-        $view->set('action', $action);
 
         if (RequestMethods::post('submitEditAction')) {
             if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
-            $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $action = $this->_editObject($action);
 
-            if ($action->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('This title is already used');
-            }
-
-            if (null === $action->userId) {
-                $action->userId = $this->getUser()->getId();
-                $action->userAlias = $this->getUser()->getWholeName();
-            }
-
-            $shortText = str_replace(
-                    array('(!read_more_link!)', '(!read_more_title!)'), 
-                    array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-            );
-
-            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-            
-            $action->title = RequestMethods::post('title');
-            $action->urlKey = $urlKey;
-            $action->expirationDate = RequestMethods::post('expiration');
-            $action->body = RequestMethods::post('text');
-            $action->shortBody = $shortText;
-            $action->rank = RequestMethods::post('rank', 1);
-            $action->startDate = RequestMethods::post('datestart');
-            $action->endDate = RequestMethods::post('dateend');
-            $action->startTime = RequestMethods::post('timestart');
-            $action->endTime = RequestMethods::post('timeend');
-            $action->active = RequestMethods::post('active');
-            $action->approved = RequestMethods::post('approve');
-            $action->archive = RequestMethods::post('archive');
-            $action->keywords = $keywords;
-            $action->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-            $action->metaDescription = RequestMethods::post('metadescription');
-
-            if (empty($errors) && $action->validate()) {
+            if (empty($this->_errors) && $action->validate()) {
                 $action->save();
                 $this->getCache()->invalidate();
 
@@ -200,7 +272,24 @@ class Admin_Controller_Action extends Controller
                 self::redirect('/admin/action/');
             } else {
                 Event::fire('admin.log', array('fail', 'Action id: ' . $id));
-                $view->set('errors', $errors + $action->getErrors());
+                $view->set('errors', $this->_errors + $action->getErrors());
+            }
+        }
+        
+        if (RequestMethods::post('submitPreviewAction')) {
+            if ($this->checkCSRFToken() !== true) {
+                self::redirect('/admin/action/');
+            }
+
+            $action = $this->_editObject($action);
+
+            if (empty($this->_errors) && $action->validate()) {
+                $session = Registry::get('session');
+                $session->set('actionPreview', $action);
+                
+                self::redirect('/action/preview?action=edit');
+            } else {
+                $view->set('errors', $this->_errors + $action->getErrors());
             }
         }
     }

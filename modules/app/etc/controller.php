@@ -194,6 +194,33 @@ class Controller extends BaseController
     }
 
     /**
+     * @protected
+     */
+    public function _participant()
+    {
+        $view = $this->getActionView();
+
+        if ($this->_security->getUser() && $this->_security->isGranted('role_participant') !== true) {
+            $view->warningMessage(self::ERROR_MESSAGE_6);
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/');
+        }
+    }
+
+    /**
+     * 
+     * @return boolean
+     */
+    protected function isParticipant()
+    {
+        if ($this->_security->getUser() && $this->_security->isGranted('role_participant') === true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
      * load user from security context
      */
     public function getUser()

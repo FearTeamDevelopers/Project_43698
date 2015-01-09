@@ -6,9 +6,9 @@ section.wrapper.novinky
         article
             header
                 h3 {echo $new->title}
-                span autor: {echo $new->userAlias}
+                span Autor: {echo $new->userAlias}
             .body
-                p {echo $new->shortBody}
+                p {echo html_entity_decode($new->shortBody)}
                 a(href!='/novinky/r/$new->urlKey') čti více
         | {/foreach}
     include ../components/pager

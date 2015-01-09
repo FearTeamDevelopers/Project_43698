@@ -13,6 +13,8 @@ use THCFrame\Core\StringMethods;
 class Admin_Controller_Report extends Controller
 {
 
+    private $_errors = array();
+            
     /**
      * Check whether user has access to report or not
      * 
@@ -45,6 +47,166 @@ class Admin_Controller_Report extends Controller
             return false;
         }
     }
+    
+    /**
+     * Create and return new report object
+     * 
+     * @return \App_Model_Report
+     */
+    private function _createObject()
+    {
+        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+
+        if (!$this->_checkUrlKey($urlKey)) {
+            $this->_errors['title'] = array('This title is already used');
+        }
+
+        $fileManager = new FileManager(array(
+            'thumbWidth' => $this->getConfig()->thumb_width,
+            'thumbHeight' => $this->getConfig()->thumb_height,
+            'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+            'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+            'maxImageHeight' => $this->getConfig()->photo_maxheight
+        ));
+
+        $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
+        $files = $fileManager->getUploadedFiles();
+
+        if (!empty($fileErrors)) {
+            $this->_errors['croppedimage'] = $fileErrors;
+        }
+
+        if (!empty($files)) {
+            foreach ($files as $i => $file) {
+                if ($file instanceof \THCFrame\Filesystem\Image) {
+                    $imgMain = trim($file->getFilename(), '.');
+                    $imgThumb = trim($file->getThumbname(), '.');
+                    break;
+                }
+            }
+        } else {
+            $imgMain = '';
+            $imgThumb = '';
+        }
+
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+        );
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+
+        $report = new App_Model_Report(array(
+            'title' => RequestMethods::post('title'),
+            'userId' => $this->getUser()->getId(),
+            'userAlias' => $this->getUser()->getWholeName(),
+            'urlKey' => $urlKey,
+            'approved' => $this->getConfig()->report_autopublish,
+            'archive' => 0,
+            'shortBody' => $shortText,
+            'body' => RequestMethods::post('text'),
+            'expirationDate' => RequestMethods::post('expiration'),
+            'rank' => RequestMethods::post('rank', 1),
+            'keywords' => $keywords,
+            'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
+            'metaDescription' => RequestMethods::post('metadescription'),
+            'metaImage' => $imgMain,
+            'photoName' => $urlKey,
+            'imgMain' => $imgMain,
+            'imgThumb' => $imgThumb
+        ));
+
+        return $report;
+    }
+    
+    /**
+     * Edit existing report object
+     * 
+     * @param App_Model_Report $object
+     * @return \App_Model_Report
+     */
+    private function _editObject(App_Model_Report $object)
+    {
+        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+
+        if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
+            $this->_errors['title'] = array('This title is already used');
+        }
+
+        $fileManager = new FileManager(array(
+            'thumbWidth' => $this->getConfig()->thumb_width,
+            'thumbHeight' => $this->getConfig()->thumb_height,
+            'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+            'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+            'maxImageHeight' => $this->getConfig()->photo_maxheight
+        ));
+
+        $imgMain = $imgThumb = '';
+        if ($object->imgMain == '') {
+            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
+
+            if (!empty($fileErrors)) {
+                $this->_errors['croppedimage'] = $fileErrors;
+            }
+
+            if (!empty($files)) {
+                foreach ($files as $i => $file) {
+                    if ($file instanceof \THCFrame\Filesystem\Image) {
+                        $imgMain = trim($file->getFilename(), '.');
+                        $imgThumb = trim($file->getThumbname(), '.');
+                        break;
+                    }
+                }
+            }
+        } else {
+            $imgMain = $object->imgMain;
+            $imgThumb = $object->imgThumb;
+        }
+
+        if (null === $object->userId) {
+            $object->userId = $this->getUser()->getId();
+            $object->userAlias = $this->getUser()->getWholeName();
+        }
+
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+        );
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
+
+        $object->title = RequestMethods::post('title');
+        $object->urlKey = $urlKey;
+        $object->expirationDate = RequestMethods::post('expiration');
+        $object->body = RequestMethods::post('text');
+        $object->shortBody = $shortText;
+        $object->rank = RequestMethods::post('rank', 1);
+        $object->active = RequestMethods::post('active');
+        $object->approved = RequestMethods::post('approve');
+        $object->archive = RequestMethods::post('archive');
+        $object->keywords = $keywords;
+        $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
+        $object->metaDescription = RequestMethods::post('metadescription');
+        $object->metaImage = $imgMain;
+        $object->photoName = $urlKey;
+        $object->imgMain = $imgMain;
+        $object->imgThumb = $imgThumb;
+
+        return $object;
+    }
+    
+    /**
+     * Check if there is object used for preview saved in session
+     * 
+     * @return App_Model_Report
+     */
+    private function _checkForObject()
+    {
+        $session = Registry::get('session');
+        $report = $session->get('reportPreview');
+        $session->erase('reportPreview');
+        
+        return $report;
+    }
 
     /**
      * Get list of all actions. Loaded via datatables ajax.
@@ -65,6 +227,12 @@ class Admin_Controller_Report extends Controller
     public function add()
     {
         $view = $this->getActionView();
+        
+        $report = $this->_checkForObject();
+        
+        if(null !== $report){
+            $view->set('report', $report);
+        }
 
         $view->set('submstoken', $this->mutliSubmissionProtectionToken());
 
@@ -74,68 +242,9 @@ class Admin_Controller_Report extends Controller
                 self::redirect('/admin/report/');
             }
 
-            $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $report = $this->_createObject();
 
-            if (!$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('This title is already used');
-            }
-
-            $fileManager = new FileManager(array(
-                'thumbWidth' => $this->getConfig()->thumb_width,
-                'thumbHeight' => $this->getConfig()->thumb_height,
-                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
-                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-                'maxImageHeight' => $this->getConfig()->photo_maxheight
-            ));
-
-            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
-            $files = $fileManager->getUploadedFiles();
-
-            if (!empty($fileErrors)) {
-                $errors['croppedimage'] = $fileErrors;
-            }
-
-            if (!empty($files)) {
-                foreach ($files as $i => $file) {
-                    if ($file instanceof \THCFrame\Filesystem\Image) {
-                        $imgMain = trim($file->getFilename(), '.');
-                        $imgThumb = trim($file->getThumbname(), '.');
-                        break;
-                    }
-                }
-            } else {
-                $imgMain = '';
-                $imgThumb = '';
-            }
-
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                    array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-            );
-            
-            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-            $report = new App_Model_Report(array(
-                'title' => RequestMethods::post('title'),
-                'userId' => $this->getUser()->getId(),
-                'userAlias' => $this->getUser()->getWholeName(),
-                'urlKey' => $urlKey,
-                'approved' => $this->getConfig()->report_autopublish,
-                'archive' => 0,
-                'shortBody' => $shortText,
-                'body' => RequestMethods::post('text'),
-                'expirationDate' => RequestMethods::post('expiration'),
-                'rank' => RequestMethods::post('rank', 1),
-                'keywords' => $keywords,
-                'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-                'metaDescription' => RequestMethods::post('metadescription'),
-                'metaImage' => $imgMain,
-                'photoName' => $urlKey,
-                'imgMain' => $imgMain,
-                'imgThumb' => $imgThumb
-            ));
-
-            if (empty($errors) && $report->validate()) {
+            if (empty($this->_errors) && $report->validate()) {
                 $id = $report->save();
 
                 $this->getCache()->invalidate();
@@ -144,7 +253,27 @@ class Admin_Controller_Report extends Controller
                 self::redirect('/admin/report/');
             } else {
                 Event::fire('admin.log', array('fail'));
-                $view->set('errors', $errors + $report->getErrors())
+                $view->set('errors', $this->_errors + $report->getErrors())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('report', $report);
+            }
+        }
+        
+         if (RequestMethods::post('submitPreviewReport')) {
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                self::redirect('/admin/report/');
+            }
+
+            $report = $this->_createObject();
+
+            if (empty($this->_errors) && $report->validate()) {
+                $session = Registry::get('session');
+                $session->set('reportPreview', $report);
+                
+                self::redirect('/report/preview?action=add');
+            } else {
+                $view->set('errors', $this->_errors + $report->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('report', $report);
             }
@@ -161,103 +290,63 @@ class Admin_Controller_Report extends Controller
     {
         $view = $this->getActionView();
 
-        $report = App_Model_Report::first(array('id = ?' => (int) $id));
+        $report = $this->_checkForObject();
+        
+        if (null !== $report) {
+            $view->set('report', $report);
+        } else {
 
-        if (null === $report) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/report/');
+            $report = App_Model_Report::first(array('id = ?' => (int) $id));
+
+            if (null === $report) {
+                $view->warningMessage(self::ERROR_MESSAGE_2);
+                $this->_willRenderActionView = false;
+                self::redirect('/admin/report/');
+            }
+
+            if (!$this->_checkAccess($report)) {
+                $view->warningMessage(self::ERROR_MESSAGE_4);
+                $this->_willRenderActionView = false;
+                self::redirect('/admin/report/');
+            }
+
+            $view->set('report', $report);
         }
-
-        if (!$this->_checkAccess($report)) {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/report/');
-        }
-
-        $view->set('report', $report);
 
         if (RequestMethods::post('submitEditReport')) {
             if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/report/');
             }
 
-            $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $report = $this->_editObject($report);
 
-            if ($report->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('This title is already used');
-            }
-
-            $fileManager = new FileManager(array(
-                'thumbWidth' => $this->getConfig()->thumb_width,
-                'thumbHeight' => $this->getConfig()->thumb_height,
-                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
-                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-                'maxImageHeight' => $this->getConfig()->photo_maxheight
-            ));
-
-            $imgMain = $imgThumb = '';
-            if ($report->imgMain == '') {
-                $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
-                $files = $fileManager->getUploadedFiles();
-
-                if (!empty($fileErrors)) {
-                    $errors['croppedimage'] = $fileErrors;
-                }
-
-                if (!empty($files)) {
-                    foreach ($files as $i => $file) {
-                        if ($file instanceof \THCFrame\Filesystem\Image) {
-                            $imgMain = trim($file->getFilename(), '.');
-                            $imgThumb = trim($file->getThumbname(), '.');
-                            break;
-                        }
-                    }
-                }
-            } else {
-                $imgMain = $report->imgMain;
-                $imgThumb = $report->imgThumb;
-            }
-
-            if (null === $report->userId) {
-                $report->userId = $this->getUser()->getId();
-                $report->userAlias = $this->getUser()->getWholeName();
-            }
-
-            $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                    array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-            );
-            
-            $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-            $report->title = RequestMethods::post('title');
-            $report->urlKey = $urlKey;
-            $report->expirationDate = RequestMethods::post('expiration');
-            $report->body = RequestMethods::post('text');
-            $report->shortBody = $shortText;
-            $report->rank = RequestMethods::post('rank', 1);
-            $report->active = RequestMethods::post('active');
-            $report->approved = RequestMethods::post('approve');
-            $report->archive = RequestMethods::post('archive');
-            $report->keywords = $keywords;
-            $report->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-            $report->metaDescription = RequestMethods::post('metadescription');
-            $report->metaImage = $imgMain;
-            $report->photoName = $urlKey;
-            $report->imgMain = $imgMain;
-            $report->imgThumb = $imgThumb;
-
-            if (empty($errors) && $report->validate()) {
+            if (empty($this->_errors) && $report->validate()) {
                 $report->save();
-
                 $this->getCache()->invalidate();
+                
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/report/');
             } else {
                 Event::fire('admin.log', array('fail', 'Report id: ' . $id));
-                $view->set('errors', $errors + $report->getErrors());
+                $view->set('errors', $this->_errors + $report->getErrors());
+            }
+        }
+        
+        if (RequestMethods::post('submitPreviewReport')) {
+            if ($this->checkCSRFToken() !== true) {
+                self::redirect('/admin/report/');
+            }
+
+            $report = $this->_editObject($report);
+
+            if (empty($this->_errors) && $report->validate()) {
+                $session = Registry::get('session');
+                $session->set('reportPreview', $report);
+                
+                self::redirect('/report/preview?action=edit');
+            } else {
+                $view->set('errors', $this->_errors + $report->getErrors());
             }
         }
     }
