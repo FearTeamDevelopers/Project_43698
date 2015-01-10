@@ -8,6 +8,6 @@
     </div>
   </header>
   <div class="page row">
-    <div class="container">{echo $report->body}</div>
+    <div class="container">{echo html_entity_decode($report->body)}</div>
   </div>
 </section>

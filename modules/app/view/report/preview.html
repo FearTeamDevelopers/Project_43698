@@ -1,7 +1,6 @@
 
 <section class="wrapper report">
-  <div class="row"></div>
-  <a href="/admin/report/{echo $act}/">Zpet do administrace</a>
+  <div class="row"><a href="/admin/report/{echo $act}/">Zpět do administrace</a></div>
   <header class="row">
     <div class="imgWrapper"><img src="$report->imgMain"/></div>
     <div class="reportInfo">
@@ -9,6 +8,6 @@
     </div>
   </header>
   <div class="page row">
-    <div class="container">{echo $report->body}</div>
+    <div class="container">{echo html_entity_decode($report->body)}</div>
   </div>
 </section>

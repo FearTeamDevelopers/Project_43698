@@ -15,27 +15,33 @@ section.wrapper.bazar
             | {script $images=$ad->getImages()}
             | {if !empty($images)}
             | {script $image=array_shift($images)}
-            a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->imgMain}")
+            a(data-lightbox!="{echo $ad->getId()}" href!="{echo $image->imgMain}")
                 img(src!="{echo $image->imgThumb}")
             | {/if}
          .nazev
             .nazevWrapper
                h4 {echo $ad->title}
-         .info
-            | {if $ad->adType=='tender'}
-            center
-               span.nabidka Nabídka <br/>
-            |{/if}{else}
-            center
-               span.poptavka Poptávka <br/>
-            |{/else}
-            small
-               span sekce:
-            span {echo " ".$ad->sectionTitle}<br/>
-            small
-               span cena:
-            span.price {echo " "}cena? <br/>
-            a(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
+         .infoWrapper
+            .info
+               | {if $ad->adType=='tender'}
+               center
+                  span.nabidka Nabídka <br/>
+               |{/if}{else}
+               center
+                  span.poptavka Poptávka <br/>
+               |{/else}
+               small
+                  span sekce:
+               span {echo " ".$ad->sectionTitle}<br/>
+               small
+                  span cena:
+               |{if $ad->price == "1"}
+               span.price {echo " na dohodě"}<br/>
+               |{/if}
+               |{else}
+               span.price {echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/>
+               |{/else}
+               a.bla(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
 
          a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->uniqueKey}', title='Upravit')
          a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->uniqueKey}', title='Požádat o prodloužení')

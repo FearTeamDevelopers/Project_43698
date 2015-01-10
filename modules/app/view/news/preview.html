@@ -1,12 +1,10 @@
+
 <div class="page">
   <section class="wrapper">
-    <div class="row container">
-        <a href="/admin/news/{echo $act}/">Zpet do administrace</a>
+    <div class="row container"><a href="/admin/news/{echo $act}/">Zpět do administrace</a>
       <header>
-        <h1>{echo $news->title}</h1>
-        <span>autor: {echo $news->userAlias}<br/></span>
-      </header>
-        {$news->body}
+        <h1>{echo $news->title}</h1><span>Autor: {echo $news->userAlias}<br/></span>
+      </header>{echo html_entity_decode($news->body)}
     </div>
   </section>
 </div>

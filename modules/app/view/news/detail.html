@@ -3,9 +3,8 @@
   <section class="wrapper">
     <div class="row container">
       <header>
-        <h1>{echo $news->title}</h1><span>autor: {echo $news->userAlias}<br/></span>
-      </header>
-        {$news->body}
+        <h1>{echo $news->title}</h1><span>Autor: {echo $news->userAlias}<br/></span>
+      </header>{echo html_entity_decode($news->body)}
     </div>
   </section>
 </div>

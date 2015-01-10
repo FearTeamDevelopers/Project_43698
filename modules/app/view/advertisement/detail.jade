@@ -1,3 +1,83 @@
-//
-   Created by Slamic on 29.12.2014.
+section.wrapper.bazar.detail
+   header.row
+      h2 {echo $ad->title}
+   .row.container
+      .buttonWrapper
+         ul
+            li
+               a(href='/bazar').fi-arrow-left Bazar
+      article.large-12
+         .row
+            |{script $images=$ad->getImages()}
+            |{if !empty($images)}
+            .large-7.medium-7.small-12.column
+               .images.large-12
+                  |{foreach $image in $images}
+                  |{if $image_i == 0}
+                  .mainImage.large-12
+                     img(src!='{echo $image->imgMain}')
+                  |{if count($images)>1}
+                  a(href='#').fi-arrow-down zobrazit více fotek
+                  |{/if}
+                  |{/if}{else}
 
+                  .thumbImage.large-5.small-12.medium-6.column.left
+                     img(src!='{echo $image->imgThumb}')
+
+                  |{/else}
+                  |{/foreach}
+            |{/if}
+            |{if !empty($images)}
+            .large-5.medium-5.small-12.column
+               .info
+                  span {echo $ad->userAlias} <br/>
+                  small
+                     span sekce:
+                  span {echo " ".$ad->sectionTitle}<br/>
+                  small
+                     span cena:
+                     |{if $ad->price == "1"}
+                  span.price {echo " na dohodě"}<br/>
+                  |{/if}
+                  |{else}
+                  span.price {echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/>
+                  |{/else}
+            |{/if}
+            |{else}
+            .large-12.column
+               .info
+                  span {echo $ad->userAlias} <br/>
+                  small
+                     span sekce:
+                  span {echo " ".$ad->sectionTitle}<br/>
+                  small
+                     span cena:
+                     |{if $ad->price == "1"}
+                  span.price {echo " na dohodě"}<br/>
+                  |{/if}
+                  |{else}
+                  span.price {echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/>
+                  |{/else}
+            |{/else}
+         .row
+            .large-12.column
+               .info.description
+                  p {echo $ad->content} <br/>
+                  .large-4.medium-6.small-12.centerBlock.mv10
+                     a.sendEmail(href='#sendEmail')
+                        .more.blue
+                           span Odpovědět na Inzerát
+      .row
+         .large-6.medium-9.small-12.centerBlock
+            form#sendEmail.mv30(method='post', action='#')
+               label Jméno:
+                  input(type="text" name='name' required)
+               label Email:
+                  input(type="email" name='email' required)
+               label Text:
+                  textarea(name='message' rows=6 required)
+               label Chcete poslat kopii na svůj email?
+                  input(type="checkbox" name='getemailcopy')
+               a.submitEmail(href='#')
+                  .more
+                     span Odeslat

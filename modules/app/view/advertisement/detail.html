@@ -1,0 +1,69 @@
+
+<section class="wrapper bazar detail">
+  <header class="row">
+    <h2>{echo $ad->title}</h2>
+  </header>
+  <div class="row container">
+    <div class="buttonWrapper">
+      <ul>
+        <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>
+      </ul>
+    </div>
+    <article class="large-12">
+      <div class="row">
+        {script $images=$ad->getImages()}
+        {if !empty($images)}
+        <div class="large-7 medium-7 small-12 column">
+          <div class="images large-12">
+            {foreach $image in $images}
+            {if $image_i == 0}
+            <div class="mainImage large-12"><img src="{echo $image->imgMain}"/></div>{if count($images)>1}<a href="#" class="fi-arrow-down">zobrazit více fotek</a>{/if}
+            {/if}{else}
+            <div class="thumbImage large-5 small-12 medium-6 column left"><img src="{echo $image->imgThumb}"/></div>{/else}
+            {/foreach}
+          </div>
+        </div>{/if}
+        {if !empty($images)}
+        <div class="large-5 medium-5 small-12 column">
+          <div class="info"><span>{echo $ad->userAlias} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span>{if $ad->price == "1"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
+            {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}
+          </div>
+        </div>{/if}
+        {else}
+        <div class="large-12 column">
+          <div class="info"><span>{echo $ad->userAlias} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span>{if $ad->price == "1"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
+            {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}
+          </div>
+        </div>{/else}
+      </div>
+      <div class="row">
+        <div class="large-12 column">
+          <div class="info description">
+            <p>{echo $ad->content} <br/></p>
+            <div class="large-4 medium-6 small-12 centerBlock mv10"><a href="#sendEmail" class="sendEmail">
+                <div class="more blue"><span>Odpovědět na Inzerát</span></div></a></div>
+          </div>
+        </div>
+      </div>
+    </article>
+    <div class="row">
+      <div class="large-6 medium-9 small-12 centerBlock">
+        <form id="sendEmail" method="post" action="#" class="mv30">
+          <label>Jméno:
+            <input type="text" name="name" required="required"/>
+          </label>
+          <label>Email:
+            <input type="email" name="email" required="required"/>
+          </label>
+          <label>Text:
+            <textarea name="message" rows="6" required="required"></textarea>
+          </label>
+          <label>Chcete poslat kopii na svůj email?
+            <input type="checkbox" name="getemailcopy"/>
+          </label><a href="#" class="submitEmail">
+            <div class="more"><span>Odeslat</span></div></a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

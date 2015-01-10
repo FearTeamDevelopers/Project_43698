@@ -1,7 +1,6 @@
 
 <section class="wrapper blue filter">
-  <div class="row">
-      {if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
+  <div class="row">{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
     <form method="get" action="/bazar/filtr" class="filtr">
       <select name="bftype">
         {if isset($bftype)}
@@ -32,8 +31,7 @@
         {/else}
       </select>
       <input type="submit" name="zobrazit" value="Zobrazit"/>
-    </form>
-      {/if}
+    </form>{/if}
     <form method="GET" action="/bazar/hledat" class="search">
       <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
     </form>
@@ -54,17 +52,19 @@
       <div class="imgWrapper">
         {script $images=$ad->getImages()}
         {if !empty($images)}
-        {script $image=array_shift($images)}
-        <a data-lightbox="img" data-title="pls work" href="{echo $image->imgMain}"><img src="{echo $image->imgThumb}"/></a>{/if}
+        {script $image=array_shift($images)}<a data-lightbox="{echo $ad->getId()}" data-title="{echo $image->getPhotoName()}" href="{echo $image->imgMain}"><img src="{echo $image->imgThumb}"/></a>{/if}
       </div>
       <div class="nazev">
         <div class="nazevWrapper">
           <h4>{echo $ad->title}</h4>
         </div>
       </div>
-      <div class="info">{if $ad->adType=='tender'}
-        <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
-        <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->uniqueKey}">zobrazit podrobnosti</a>
+      <div class="infoWrapper">
+        <div class="info">{if $ad->adType=='tender'}
+          <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
+          <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small>{if $ad->price == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
+          {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->uniqueKey}" class="bla">zobrazit podrobnosti</a>
+        </div>
       </div>
     </article>{/foreach}
   </div>{if  $pagecount > 1}

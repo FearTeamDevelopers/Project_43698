@@ -1,8 +1,29 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function () {
-    
 
+    var options = { $AutoPlay: true };
+    var jssor_slider1 = new $JssorSlider$('slider1_container', options);
+    jQuery('.sendEmail').click(function(){
+        if(jQuery('.sendEmail span').text() == "Odpovědět na Inzerát"){
+            jQuery('.sendEmail span').text('Zavřít');
+        }else{
+            jQuery('.sendEmail span').text('Odpovědět na Inzerát');
+        }
+        if(jQuery('article').hasClass('arrow_box')){
+            jQuery('article').removeClass('arrow_box');
+        }else{
+            jQuery('article').addClass('arrow_box');
+        }
+
+        jQuery('#sendEmail').toggle('slow');
+    });
+
+    jQuery('.images a').click(function(e){
+        e.preventDefault();
+        jQuery(this).hide();
+        jQuery('.thumbImage').show('slow');
+    });
     jQuery('.sluzby').click(function (event) {
         event.preventDefault();
         jQuery('#dropdown').toggle('slow');
