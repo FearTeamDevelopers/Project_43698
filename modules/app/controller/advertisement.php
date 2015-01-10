@@ -408,7 +408,7 @@ class App_Controller_Advertisement extends Controller
                 'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
-            $fileErrors = $fileManager->uploadImage('uploadfile', 'ads', time() . '_', true)->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/'.$this->getUser()->getId(), time() . '_', true)->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
@@ -430,7 +430,7 @@ class App_Controller_Advertisement extends Controller
                 'adType' => RequestMethods::post('type'),
                 'userAlias' => $this->getUser()->getWholeName(),
                 'content' => RequestMethods::post('content'),
-                'price' => RequestMethods::post('price', 1),
+                'price' => RequestMethods::post('price', 0),
                 'expirationDate' => $expirationDate,
                 'keywords' => $keywords
             ));
@@ -532,14 +532,14 @@ class App_Controller_Advertisement extends Controller
                 'maxImageHeight' => $this->getConfig()->photo_maxheight
             ));
 
-            $fileErrors = $fileManager->uploadImage('uploadfile', 'ads', time() . '_', true)->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/'.$this->getUser()->getId(), time() . '_', true)->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
                 $uploadErrors += $fileErrors;
             }
 
-            $price = RequestMethods::post('price', 0) == 'Dohodou' ? 0: RequestMethods::post('price', 0);
+            $price = RequestMethods::post('price', 0);
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $ad->title = RequestMethods::post('title');
