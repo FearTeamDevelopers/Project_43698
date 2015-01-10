@@ -131,7 +131,7 @@ class Search_Controller_Index extends Controller
     public function buildIndex()
     {
         Event::fire('search.log', array('success', 'Building search index'));
-        ini_set('max_execution_time', 1800);
+        //ini_set('max_execution_time', 1800);
 
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
@@ -201,7 +201,7 @@ class Search_Controller_Index extends Controller
         $time = round(microtime(true) - $starttime, 2);
         Event::fire('search.log', array('success', 'Search index built in ' . $time . ' sec'));
         
-        ini_set('max_execution_time', 30);
+        //ini_set('max_execution_time', 30);
     }
 
     /**
