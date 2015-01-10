@@ -539,7 +539,6 @@ class App_Controller_Advertisement extends Controller
                 $uploadErrors += $fileErrors;
             }
 
-            $price = RequestMethods::post('price', 0);
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $ad->title = RequestMethods::post('title');
@@ -547,7 +546,7 @@ class App_Controller_Advertisement extends Controller
             $ad->adType = RequestMethods::post('type');
             $ad->sectionId = RequestMethods::post('section');
             $ad->content = RequestMethods::post('content');
-            $ad->price = $price;
+            $ad->price = RequestMethods::post('price', 0);
             $ad->keywords = $keywords;
 
             if (empty($errors) && $ad->validate()) {
