@@ -187,6 +187,9 @@ body {
 .content {
   width: 100%;
 }
+.topPanel {
+  background: #394c5f !important;
+}
 .topPanel header {
   margin-top: 0;
   padding: 0;
@@ -240,10 +243,44 @@ body {
   padding-left: 20px;
   padding-right: 20px;
   border: 0;
+  position: relative;
+}
+.topPanel header .navWrapper nav ul li a {
+  z-index: 110000;
 }
 .topPanel header .navWrapper nav ul li:last-child {
   border: 0px;
   padding-right: 0;
+}
+.topPanel header .navWrapper nav ul li:hover ul {
+  display: block;
+}
+.topPanel header .navWrapper nav ul li ul {
+  position: absolute;
+  z-index: 10;
+  top: 18px;
+  left: -10px;
+  margin: 0;
+  padding: 0 20px 10px;
+  background: #394c5f;
+  display: none;
+}
+.topPanel header .navWrapper nav ul li ul li {
+  float: left;
+  border: 0;
+  display: block;
+  height: auto;
+  line-height: 1.5;
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+.topPanel header .navWrapper nav ul li ul li:first-child {
+  padding-top: 10px;
+}
+.topPanel header .navWrapper nav ul li ul li a {
+  white-space: nowrap;
+  font-size: 1em;
 }
 .topPanel header .navWrapper nav ul a {
   color: #fff;
@@ -661,8 +698,8 @@ section.wrapper.report .container {
 }
 .searchWrapper .fulltextsearch .close {
   position: absolute;
-  top: 0;
-  right: -25px;
+  top: 14px;
+  right: -55px;
 }
 .searchWrapper .fulltextsearch .close:hover {
   color: #f00;
@@ -879,7 +916,6 @@ section.wrapper.report .container {
 }
 .bazar .container article .imgWrapper img {
   min-width: 200px;
-  min-height: 400px;
   width: 100%;
 }
 .bazar .container article .nazev {

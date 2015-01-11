@@ -1,0 +1,20 @@
+section.wrapper.pageSearch.singlePage
+   |{if empty($urls)}
+   header.row
+      h2 Hledaný výraz nenalezen
+   | {/if}
+   |{else}
+   header.row
+      h2 Výsledky hledání
+   section.row.container
+      .large-12.medium-12.small-12.column
+         |{foreach $url in $urls}
+         article
+            a(href!="{echo $url['path']}")
+               h3 {echo $url_i}
+            small
+               span {echo date("d.m. Y H:i", strtotime($url['created']))} <br/>
+            p {echo $url['meta']} SAFKJASDK ASDKF JAKSDFJ KASDFJ KASDFJ ASD FJASD FJŮASDJF KLŮASDJF KLASDJF KADLSJ FKALSDFJ LASDŮF JSLŮF JASLDFJ ASDŮ FJASDŮ FJASDŮF JASDŮF J
+         |{/foreach}
+   |{/else}
+

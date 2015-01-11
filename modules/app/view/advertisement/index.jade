@@ -12,7 +12,7 @@ section.wrapper.bazar
                     a(href='/bazar/moje-inzeraty').fi-page-copy Moje inzeráty
                 |{/if}
         |{foreach $ad in $ads}
-        article.medium-6.column.left
+        article.large-6.small-12.medium-6.column.left
             .imgWrapper
                 | {script $images=$ad->getImages()}
                 | {if !empty($images)}
@@ -30,7 +30,8 @@ section.wrapper.bazar
                         span.nabidka Nabídka <br/>
                     |{/if}{else}
                     center
-                        span.poptavka Poptávka <br/>
+                        span.poptavka Poptávka <br/>                                                    Aliaška
+
                     |{/else}
                     span {echo " ".$ad->userAlias}<br/>
                     small
