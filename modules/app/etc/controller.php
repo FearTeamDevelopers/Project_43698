@@ -56,7 +56,7 @@ class Controller extends BaseController
      * @read
      */
     protected $_serverHost;
-
+    
     /**
      * 
      * @param type $options
@@ -69,13 +69,13 @@ class Controller extends BaseController
         $this->_serverHost = RequestMethods::server('HTTP_HOST');
         $this->_cache = Registry::get('cache');
         $this->_config = Registry::get('configuration');
-
+        
         // schedule disconnect from database 
         Events::add('framework.controller.destruct.after', function($name) {
             $database = Registry::get('database');
             $database->disconnect();
         });
-
+        
         $metaData = $this->getCache()->get('global_meta_data');
 
         if (null !== $metaData) {
@@ -299,6 +299,7 @@ class Controller extends BaseController
             $view->set('authUser', $this->_security->getUser())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
+                    ->set('isParticipant', $this->isParticipant())
                     ->set('token', $this->_security->getCSRF()->getToken());
         }
 
@@ -306,6 +307,7 @@ class Controller extends BaseController
             $layoutView->set('authUser', $this->_security->getUser())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
+                    ->set('isParticipant', $this->isParticipant())
                     ->set('token', $this->_security->getCSRF()->getToken());
         }
 

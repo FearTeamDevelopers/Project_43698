@@ -72,8 +72,8 @@ class Controller extends Base
     /**
      * @readwrite
      */
-    protected $_defaultExtension = 'phtml';
-
+    protected $_defaultExtension = array('phtml', 'html');
+    
     /**
      * @readwrite
      */
@@ -137,10 +137,10 @@ class Controller extends Base
         $router = Registry::get('router');
 
         if (!empty($configuration->view)) {
-            $this->defaultExtension = $configuration->view->extension;
+            $this->defaultExtension = explode(',', $configuration->view->extension);
             $this->defaultLayout = $configuration->view->layout;
-            $this->mobileLayout = $configuration->view->mobilelayout;
-            $this->tabletLayout = $configuration->view->tabletlayout;
+            $this->mobileLayout = $configuration->view->mobileLayout;
+            $this->tabletLayout = $configuration->view->tabletLayout;
             $this->defaultPath = $configuration->view->path;
         } else {
             throw new \Exception('Error in configuration file');
@@ -162,20 +162,33 @@ class Controller extends Base
         }
 
         $defaultPath = sprintf($this->defaultPath, $module);
-        $defaultExtension = $this->defaultExtension;
-
+        
         //create view instances
         if ($this->willRenderLayoutView) {
+            foreach ($this->defaultExtension as $ext) {
+                if(file_exists(APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}")){
+                    $viewFile = APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}";
+                    break;
+                }
+            }
+
             $view = new View(array(
-                'file' => APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$defaultExtension}"
+                'file' => $viewFile
             ));
 
             $this->layoutView = $view;
         }
 
         if ($this->willRenderActionView) {
+            foreach ($this->defaultExtension as $ext) {
+                if(file_exists(APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}")){
+                    $viewFile = APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}";
+                    break;
+                }
+            }
+            
             $view = new View(array(
-                'file' => APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$defaultExtension}"
+                'file' => $viewFile
             ));
 
             $this->actionView = $view;

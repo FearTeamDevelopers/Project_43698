@@ -62,7 +62,8 @@
       <div class="infoWrapper">
         <div class="info">{if $ad->adType=='tender'}
           <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
-          <center><span class="poptavka">Poptávka <br/>                                                    Aliaška</span></center>{/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small>{if $ad->price == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
+          <center><span class="poptavka">Poptávka <br/></span></center>
+          {/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small>{if $ad->price == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
           {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->uniqueKey}" class="bla">zobrazit podrobnosti</a>
         </div>
       </div>

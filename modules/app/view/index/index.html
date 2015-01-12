@@ -70,7 +70,7 @@
       <div class="container-box partneri">
         <div id="carousel2">{foreach $partner in $partners}
           <article class="partner"><img src="{echo $partner->logo}"/>
-            <div class="info"><a href="{echo $partner->web}">{echo $partner->title}</a></div>
+              <div class="info"><a href="{echo $partner->web}" target="_blank">{echo $partner->title}</a></div>
           </article>{/foreach}
         </div>
       </div>
