@@ -76,6 +76,7 @@ class App_Controller_Gallery extends Controller
         $view->set('gallery', $gallery);
 
         $layoutView->set('canonical', $canonical)
+                ->set('includejssorslider', 1)
                 ->set('metatitle', 'Hastrman - Galerie - ' . $gallery->getTitle());
     }
 

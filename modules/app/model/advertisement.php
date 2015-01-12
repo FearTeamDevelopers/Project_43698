@@ -479,6 +479,7 @@ class App_Model_Advertisement extends Model
                         array('ads.title' => 'sectionTitle'))
                 ->where('adv.userId = ?', $userId)
                 ->where('adv.active = ?', true)
+                ->order('adv.created', 'desc')
                 ->limit((int)$adsPerPage, (int)$page);
 
         $ads = self::initialize($query);

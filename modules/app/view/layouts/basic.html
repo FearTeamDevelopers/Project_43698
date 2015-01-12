@@ -29,7 +29,8 @@
     <link href="/public/css/plugins/lightbox.css" rel="stylesheet">
     <link href="/public/css/custom/styles.css" media="screen" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Ubuntu:400,700" rel="stylesheet" type="text/css">
-    <script type="text/javascript" src="/public/js/plugins/modernizr.js"></script>{if isset($canonical)}<link rel="canonical" href="{echo $canonical}">{/if}
+    
+    {if isset($canonical)}<link rel="canonical" href="{echo $canonical}">{/if}
     {if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
     {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
     <title>{echo $metatitle}</title>
@@ -49,16 +50,18 @@
         <div class="small-12 medium-12 large-8 columns navWrapper">
           <nav>
             <ul>
-              <li><a href="#">O nás</a>
+              <li><a href="/o-nas">O nás</a>
                 <ul>
                   <li><a href="/o-nas">Potápěčské centrum</a></li>
                   <li><a href="/klub-hastrman">Klub sportovních potápěčů</a></li>
+                  <li><a href="/apnea-tym">Hastrman apnea tým</a></li>
                 </ul>
               </li>
-              <li><a href="#">Apnea</a>
+              <li><a href="#">Články</a>
                 <ul>
-                  <li><a href="/apnea-diving-international">Apnea diving international</a></li>
-                  <li><a href="/apnea-tym">Hastrman apnea team</a></li>
+                  <li><a href="/novinky">Novinky</a></li>
+                  <li><a href="/reportaze">Reportáže</a></li>
+                  <li><a href="/akce">Akce</a></li>
                 </ul>
               </li>
               <li><a href="#" class="sluzby">Služby</a></li>
@@ -143,10 +146,14 @@
     -->
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/public/js/plugins/modernizr.js"></script>
     <script type="text/javascript" src="/public/js/foundation.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js"></script>
     <script type="text/javascript" src="/public/js/plugins/lightbox.min.js"></script>
+    {if isset($includejssorslider)}
     <script type="text/javascript" src="/public/js/plugins/jssor.slider.mini.js"></script>
+    <script type="text/javascript" src="/public/js/custom/jssor.slider.init.js"></script>
+    {/if}
     <script type="text/javascript" src="/public/js/custom/generalApp.js"></script>
     <!--End JS scripts
     -->
