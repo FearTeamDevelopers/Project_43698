@@ -107,7 +107,6 @@ body {
   width: 100%;
   position: relative;
   background: rgba(255,255,255,0.7);
-  overflow: hidden;
 }
 .wrapper.blue {
   background: rgba(57,76,95,0.8);
@@ -1082,11 +1081,15 @@ section.wrapper.report .container {
 }
 .filter form.filtr {
   width: 50%;
+  height: 50px;
+  line-height: 50px;
   float: left;
 }
 .filter form.filtr select {
   float: left;
+  margin-top: 5px;
   width: 25%;
+  margin-bottom: 0;
   margin-left: 2%;
   font-family: 'Ubuntu', sans-serif !important;
 }
@@ -1097,6 +1100,7 @@ section.wrapper.report .container {
   font-size: 0.875rem;
   padding: 0 0.5rem;
   margin-left: 2%;
+  margin-bottom: 0;
   color: #fff;
   background: #1dd2af;
   border: 2px outset #fff;
@@ -1114,12 +1118,15 @@ section.wrapper.report .container {
 .filter form.search input[type=text] {
   width: 70%;
   margin-right: 5%;
+  margin-top: 5px;
+  margin-bottom: 0;
   float: left;
 }
 .filter form.search a {
   float: left;
   width: 10%;
   margin-right: 5%;
+  margin-top: 5px;
 }
 .filter form.search a:before {
   height: 2.3112rem;

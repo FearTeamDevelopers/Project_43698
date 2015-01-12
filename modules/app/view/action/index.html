@@ -10,10 +10,10 @@ Created by Slamic on 26.12.2014.
   <section class="row container">{foreach $action in $actions}
     <article>
       <header>
-        <h3>{echo $action->title}</h3><span>autor: {echo $action->userAlias}</span>
+        <h3>{echo $action->title}</h3><span>Autor: {echo $action->userAlias}</span>
       </header>
       <div class="body">
-        <p>{echo $action->shortBody}</p><a href="/akce/r/$action->urlKey">čti více</a>
+        <p>{echo html_entity_decode($action->shortBody)}</p><a href="/akce/r/$action->urlKey">čti více</a>
       </div>
     </article>{/foreach}
   </section>{if  $pagecount > 1}

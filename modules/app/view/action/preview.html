@@ -1,16 +1,10 @@
+
 <div class="page">
   <section class="wrapper">
-    <div class="row container">
-        <a href="/admin/action/{echo $act}/">Zpet do administrace</a>
+    <div class="row container"><a href="/admin/action/{echo $act}/">Zpět do administrace</a>
       <header>
-        <h1>{echo $action->title}</h1>
-        <span>autor: {echo $action->userAlias}<br/></span>
-        <span>od: <strong>{echo $action->startDate}</strong><br/></span>
-        <span>do: <strong>{echo $action->endDate}</strong><br/></span>
-        <span>od: <strong>{echo $action->startTime}</strong><br/></span>
-        <span>do: <strong>{echo $action->endTime}</strong><br/></span>
-      </header>
-        {$action->body}
+        <h1>{echo $action->title}</h1><span>Autor: {echo $action->userAlias}<br/></span><span>Datum: <strong>{echo date("d.m. Y", strtotime($action->startDate))}</strong> - <strong>{echo date("d.m. Y", strtotime($action->endDate))}</strong><br/></span><span>Čas: <strong>{echo $action->startTime}</strong> - <strong>{echo $action->endTime}</strong><br/></span>
+      </header>{echo html_entity_decode($action->body)}
     </div>
   </section>
 </div>
