@@ -1,0 +1,18 @@
+section.wrapper.bazar
+   |{if empty($result)}
+   header.row
+      h2 Hledaný výraz nenalezen
+   | {/if}
+   |{else}
+   header.row
+      h2 Výsledky hledání v bazaru
+   section.row.container
+      .large-12.medium-12.small-12.column
+         |{foreach $url in $result}
+         article
+            a(href!="{echo $url['path']}")
+               h3 {echo $url_i}
+            small
+               span {echo date("d.m. Y H:i", strtotime($url['created']))} <br/>
+         |{/foreach}
+   |{/else}
