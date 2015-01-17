@@ -82,7 +82,7 @@
 					article.partner
 						img(src!='{echo $partner->logo}')
 						.info
-							a(href!="{echo $partner->web}") {echo $partner->title}
+							a(href!="{echo $partner->web}", target='_blank') {echo $partner->title}
 					|{/foreach}
 	|{/if}
 

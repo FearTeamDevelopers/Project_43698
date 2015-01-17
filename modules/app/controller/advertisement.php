@@ -41,12 +41,14 @@ class App_Controller_Advertisement extends Controller
     {
         $body = '<div>'
                 . '<strong>Dotaz k inzerátu<strong><br/>'
-                . 'Byl odeslán následující dotaz k inzerátu na serveru <a href="http://' . $this->getServerHost() . '">Hastrman</a>:'
+                . 'Byl odeslán následující dotaz k inzerátu na serveru <a href="http://' . $this->getServerHost() . '">Hastrman.cz</a>:'
                 . '<br/><br/>'
                 . 'Inzerát: <a href="http://' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a><br/>'
                 . 'Jméno: ' . $message->getMsAuthor() . '<br/>'
                 . 'Email: ' . $message->getMsEmail() . '<br/>'
-                . 'Text: <br/>' . $message->getMessage() . '<br/>';
+                . 'Text: <br/>' . $message->getMessage() . '</div>'
+                . '<br/><br/>'
+                . 'S pozdravem<br/>tým Hastrman';
 
         return $body;
     }
@@ -67,7 +69,7 @@ class App_Controller_Advertisement extends Controller
             return false;
         }
     }
-    
+
     /**
      * Check if are set specific metadata or leave their default values
      */
@@ -157,8 +159,8 @@ class App_Controller_Advertisement extends Controller
         $type = RequestMethods::get('bftype');
         $section = RequestMethods::get('bfsection');
 
-        $httpQuery = '?'.http_build_query(array('bftype' => $type, 'bfsection' => $section));
-        
+        $httpQuery = '?' . http_build_query(array('bftype' => $type, 'bfsection' => $section));
+
         if ($page <= 0) {
             $page = 1;
         }
@@ -169,11 +171,11 @@ class App_Controller_Advertisement extends Controller
             $canonical = 'http://' . $this->getServerHost() . '/bazar/filtr/p/' . $page;
         }
 
-        if($type == '0' && $section == '0'){
+        if ($type == '0' && $section == '0') {
             $this->_willRenderActionView = false;
             self::redirect('/bazar');
         }
-        
+
         if ($section == '0') {
             if ($type == 'nabidka') {
                 $ads = App_Model_Advertisement::fetchActiveByType('tender', $adsPerPage, $page);
@@ -271,10 +273,10 @@ class App_Controller_Advertisement extends Controller
         }
 
         $this->_checkMetaData($layoutView, $ad);
-        
+
         $view->set('ad', $ad)
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
-        
+
         if (RequestMethods::post('submitAdReply')) {
             if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
@@ -293,8 +295,8 @@ class App_Controller_Advertisement extends Controller
             if ($message->validate()) {
                 require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
                 $transport = Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
-                                ->setUsername('info@fear-team.cz')
-                                ->setPassword('ThcMInfo-2014*');
+                        ->setUsername('info@fear-team.cz')
+                        ->setPassword('ThcMInfo-2014*');
                 $mailer = Swift_Mailer::newInstance($transport);
 
                 $email = Swift_Message::newInstance()
@@ -322,7 +324,7 @@ class App_Controller_Advertisement extends Controller
             }
         }
     }
-    
+
     /**
      * Search in ads
      * 
@@ -348,29 +350,28 @@ class App_Controller_Advertisement extends Controller
             $word = '+' . $word;
         }
 
-        $searchCond = "'".implode(' ', $words) . ' "' . $query . '"\'';
-        $sql = sprintf($sqlTemplate, $searchCond, date('Y-m-d'), $searchCond, $page-1, $articlesPerPage);
+        $searchCond = "'" . implode(' ', $words) . ' "' . $query . '"\'';
+        $sql = sprintf($sqlTemplate, $searchCond, date('Y-m-d'), $searchCond, $page - 1, $articlesPerPage);
         $searchResult = $db->execute($sql);
-        
+
         $rows = array();
 
         for ($i = 0; $i < $searchResult->num_rows; $i++) {
             $rows[] = $searchResult->fetch_array(MYSQLI_ASSOC);
         }
 
-        print('<pre>'.print_r($rows, true).'</pre>');
+        print('<pre>' . print_r($rows, true) . '</pre>');
         die;
 
         $canonical = 'http://' . $this->getServerHost() . '/bazar/hledat';
-        
+
         $view->set('result', $rows)
                 ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/bazar/hledat')
                 ->set('pagerpathpostfix', '?' . http_build_query($query));
-        
+
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar - Hledat');
-               
     }
 
     /**
@@ -400,21 +401,6 @@ class App_Controller_Advertisement extends Controller
                 $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
             }
 
-            $fileManager = new FileManager(array(
-                'thumbWidth' => $this->getConfig()->thumb_width,
-                'thumbHeight' => $this->getConfig()->thumb_height,
-                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
-                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-                'maxImageHeight' => $this->getConfig()->photo_maxheight
-            ));
-
-            $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/'.$this->getUser()->getId(), time() . '_', true)->getUploadErrors();
-            $files = $fileManager->getUploadedFiles();
-
-            if (!empty($fileErrors)) {
-                $uploadErrors += $fileErrors;
-            }
-
             $adTtl = $this->getConfig()->bazar_ad_ttl;
             $date = new DateTime();
             $date->add(new DateInterval('P' . (int) $adTtl . 'D'));
@@ -438,9 +424,24 @@ class App_Controller_Advertisement extends Controller
             if (empty($errors) && $ad->validate()) {
                 $id = $ad->save();
 
+                $fileManager = new FileManager(array(
+                    'thumbWidth' => $this->getConfig()->thumb_width,
+                    'thumbHeight' => $this->getConfig()->thumb_height,
+                    'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                    'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                    'maxImageHeight' => $this->getConfig()->photo_maxheight
+                ));
+
+                $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $this->getUser()->getId(), time() . '_', true)->getUploadErrors();
+                $files = $fileManager->getUploadedFiles();
+
+                if (!empty($fileErrors)) {
+                    $uploadErrors += $fileErrors;
+                }
+
                 if (!empty($files)) {
                     $files = array_slice($files, 0, 3);
-                    
+
                     foreach ($files as $i => $file) {
                         if ($file instanceof \THCFrame\Filesystem\Image) {
                             $adImage = new App_Model_AdImage(array(
@@ -524,21 +525,6 @@ class App_Controller_Advertisement extends Controller
                 $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
             }
 
-            $fileManager = new FileManager(array(
-                'thumbWidth' => $this->getConfig()->thumb_width,
-                'thumbHeight' => $this->getConfig()->thumb_height,
-                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
-                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-                'maxImageHeight' => $this->getConfig()->photo_maxheight
-            ));
-
-            $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/'.$this->getUser()->getId(), time() . '_', true)->getUploadErrors();
-            $files = $fileManager->getUploadedFiles();
-
-            if (!empty($fileErrors)) {
-                $uploadErrors += $fileErrors;
-            }
-
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $ad->title = RequestMethods::post('title');
@@ -551,6 +537,21 @@ class App_Controller_Advertisement extends Controller
 
             if (empty($errors) && $ad->validate()) {
                 $ad->save();
+
+                $fileManager = new FileManager(array(
+                    'thumbWidth' => $this->getConfig()->thumb_width,
+                    'thumbHeight' => $this->getConfig()->thumb_height,
+                    'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                    'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                    'maxImageHeight' => $this->getConfig()->photo_maxheight
+                ));
+
+                $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $this->getUser()->getId(), time() . '_', true)->getUploadErrors();
+                $files = $fileManager->getUploadedFiles();
+
+                if (!empty($fileErrors)) {
+                    $uploadErrors += $fileErrors;
+                }
 
                 if (!empty($files)) {
                     $currentPhotoCount = App_Model_AdImage::count(array('adId = ?' => $ad->getId()), array('id'));
