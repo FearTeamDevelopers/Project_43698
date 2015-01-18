@@ -6,7 +6,7 @@ use THCFrame\Core\Inspector;
 use THCFrame\Core\StringMethods;
 use THCFrame\Core\Exception as Exception;
 use THCFrame\Registry\Registry;
-use THCFrame\Configuration\Model\Config as Config;
+use THCFrame\Configuration\Model\ConfigModel as Config;
 
 /**
  * Base class can create getters/setters simply by adding comments around the

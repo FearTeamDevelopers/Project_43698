@@ -6,6 +6,7 @@ use THCFrame\Events\Events as Events;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Core\StringMethods;
 
 /**
  * Module specific controller class extending framework controller class
@@ -114,7 +115,7 @@ class Controller extends BaseController
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
-        $return = trim(trim($cleaned), '-');
+        $return = mb_ereg_replace('[\-]+','-',trim(trim($cleaned), '-'));
         return strtolower($return);
     }
 

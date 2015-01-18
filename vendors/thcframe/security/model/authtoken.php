@@ -10,10 +10,10 @@ use THCFrame\Model\Model;
  * SQL code: 
  * CREATE TABLE `tb_authtoken` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `userId` INT UNSIGNED NOT NULL DEFAULT 0,
+  `userId` INT UNSIGNED,
   `token` varchar(130) NOT NULL DEFAULT '',
-  `created` datetime DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `created` varchar(22) DEFAULT NULL,
+  `modified` varchar(22) DEFAULT NULL,
   PRIMARY KEY (`id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  */

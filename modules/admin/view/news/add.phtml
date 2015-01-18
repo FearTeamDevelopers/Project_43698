@@ -15,7 +15,7 @@
             <p>
                 <label>Název*</label>
                 <span class="field">
-                    <input type="text" name="title" class="longinput" value="{echo isset($news)? $news->title: ""}" required/>
+                    {echo \Admin\Helper\FormPrinter::textInput('title', array($news,'title'), true)}
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
@@ -24,19 +24,9 @@
             <p>
                 <label>Pořadí<small>Max. 99</small></label>
                 <span class="field">
-                    <input type="text" name="rank" class="longinput" value="{echo isset($news)? $news->rank: 1}"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('rank', array($news,'rank',1))}
                     {if isset($errors["rank"])}
                     <label class="error">{echo join("<br/>", $errors["rank"])}</label>
-                    {/if}
-                </span>
-            </p>
-            <p>
-                <label>Zobrazovat do*</label>
-                <span class="field">
-                    <input type="text" name="expiration" class="longinput datepicker" 
-                           value="{echo isset($news)? $news->expirationDate: ""}" required/>
-                    {if isset($errors["expirationDate"])}
-                    <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
                     {/if}
                 </span>
             </p>
@@ -85,8 +75,7 @@
             <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    <input type="text" name="metatitle" class="longinput" value="{echo isset($news)? $news->metaTitle: ""}" 
-                           placeholder="Výchozí hodnota: stejná jako Název"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($news,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -95,7 +84,7 @@
             <p>
                 <label>Meta-popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput" >{echo isset($news)? $news->metaDescription: ""}</textarea>
+                    <textarea rows="5" name="metadescription" class="longinput" >{echo \Admin\Helper\FormPrinter::iset($news,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -105,8 +94,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    <input type="text" name="keywords" class="longinput" value="{echo isset($news)? $news->keywords: ""}" 
-                           placeholder="Oddělovač: mezera"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($news,'keywords'), false, 'longinput', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}

@@ -36,7 +36,7 @@ class ConfigAuthentication extends Base implements AuthenticationInterface
         
         foreach ($this->_users as $user) {
             list($username, $hash, $role) = explode(':', $user);
-            $newUser = new \App_Model_User(array(
+            $newUser = new \App\Model\UserModel(array(
                 'active' => true,
                 'email' => trim($username),
                 'username' => trim($username),

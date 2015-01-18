@@ -30,9 +30,12 @@ if (version_compare(phpversion(), '5.4', '<')) {
 //setcookie('XDEBUG_PROFILE', 1, time()+1800);
 //setcookie('XDEBUG_PROFILE', '', time()-1800);
 
+//register modules
+$modules = array('App', 'Admin', 'Search');
+
 //core
 require(APP_PATH.'/vendors/thcframe/core/core.php');
-THCFrame\Core\Core::initialize();
+THCFrame\Core\Core::initialize($modules);
 
 //plugins
 $path = APP_PATH . '/application/plugins';
@@ -43,10 +46,6 @@ foreach ($iterator as $item) {
         include($path . '/' . $item->getFilename() . '/initialize.php');
     }
 }
-
-//register modules
-$modules = array('App', 'Admin', 'Search');
-THCFrame\Core\Core::registerModules($modules);
 
 //internal profiler
 $profiler = THCFrame\Profiler\Profiler::getInstance();

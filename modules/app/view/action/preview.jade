@@ -4,7 +4,11 @@
          a(href!="/admin/action/{echo $act}/") Zpět do administrace
          header
             h1 {echo $action->title}
-            span Autor: {echo $action->userAlias}<br/>
-            span Datum: <strong>{echo date("d.m. Y", strtotime($action->startDate))}</strong> - <strong>{echo date("d.m. Y", strtotime($action->endDate))}</strong><br/>
+            span {echo \App\Helper\DateFormater::t2d($new->created).", ".$action->userAlias}
+            br
+            span Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->startDate)}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->endDate)}</strong>
+            br
+            |{if !empty($action->startTime)}
             span Čas: <strong>{echo $action->startTime}</strong> - <strong>{echo $action->endTime}</strong><br/>
+            |{/if}
          |{echo html_entity_decode($action->body)}

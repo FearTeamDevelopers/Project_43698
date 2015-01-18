@@ -1,17 +1,16 @@
-//
-   Created by Slamic on 26.12.2014.
-
 section.wrapper.akce
    header.row
       h2 akce
    section.row.container
+      |{if !empty($actions)}
       |{foreach $action in $actions}
       article
          header
             h3 {echo $action->title}
-            span Autor: {echo $action->userAlias}
+            span {echo \App\Helper\DateFormater::t2d($action->created).", ".$action->userAlias}
          .body
-            p {echo html_entity_decode($action->shortBody)}
+            div {echo html_entity_decode($action->shortBody)}
             a(href!='/akce/r/$action->urlKey') čti více
       |{/foreach}
+      |{/if}
    include ../components/pager

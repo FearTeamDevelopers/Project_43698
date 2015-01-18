@@ -236,7 +236,7 @@ class Core
      * @return type
      * @throws Exception
      */
-    public static function initialize()
+    public static function initialize($modules)
     {
         if (!defined('APP_PATH')) {
             throw new Exception('APP_PATH not defined');
@@ -255,17 +255,19 @@ class Core
 
         // Autoloader
         $prefixes = array(
-            APP_PATH . DIRECTORY_SEPARATOR . 'vendors',
-            APP_PATH . DIRECTORY_SEPARATOR . 'application',
-            APP_PATH . DIRECTORY_SEPARATOR . 'modules',
-            APP_PATH . DIRECTORY_SEPARATOR . 'public',
-        );
+            'THCFrame' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors'. DIRECTORY_SEPARATOR .'thcframe',
+            'IDS' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors'. DIRECTORY_SEPARATOR .'ids',
+            'Swift' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors'. DIRECTORY_SEPARATOR .'swiftmailer'
+            );
 
         require_once APP_PATH . '/vendors/thcframe/core/autoloader.php';
         self::$_autoloader = new Autoloader();
-        self::$_autoloader->addPrefixes($prefixes);
         self::$_autoloader->register();
-
+        self::$_autoloader->addNamespaces($prefixes);
+        
+        //register modules
+        self::registerModules($modules);
+        
         // Logger
         $logger = new Logger();
         self::$_logger = $logger->initialize();
@@ -365,7 +367,8 @@ class Core
         if (array_key_exists(ucfirst($moduleName), self::$_modules)) {
             throw new \THCFrame\Module\Exception\Multiload(sprintf('Module %s has been alerady loaded', ucfirst($moduleName)));
         } else {
-            $moduleClass = ucfirst($moduleName) . '_Etc_Module';
+            self::$_autoloader->addNamespace(ucfirst($moduleName), MODULES_PATH. DIRECTORY_SEPARATOR.strtolower($moduleName));
+            $moduleClass = ucfirst($moduleName)."\Etc\ModuleConfig";
 
             try {
                 $moduleObject = new $moduleClass();
@@ -484,7 +487,7 @@ class Core
      */
     public static function getFrameworkVersion()
     {
-        return '1.2.2';
+        return '1.2.4';
     }
 
 }

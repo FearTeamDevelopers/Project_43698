@@ -119,7 +119,6 @@ jQuery(document).ready(function () {
             null,
             null,
             null,
-            null,
             {"bSortable": false},
             {"bSortable": false},
             {"bSortable": false}

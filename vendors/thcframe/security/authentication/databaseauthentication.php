@@ -37,7 +37,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      * @var boolean 
      */
     protected $_bruteForceDetection = true;
-    
+
     /**
      * It denotes the # of maximum attempts for login using the password. 
      * If this limit exceeds and this happens within a very short amount 
@@ -84,10 +84,9 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
     public function __construct($options = array())
     {
         parent::__construct($options);
-        
+
         $this->name = $options['credentials']->name;
         $this->pass = $options['credentials']->pass;
-        
     }
 
     /**
@@ -103,16 +102,16 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
         $errMessage = sprintf('%s and/or password are incorrect', ucfirst($this->_name));
         $errMessageNotActive = 'Account is not active';
 
-        $user = \App_Model_User::first(array(
+        $user = \App\Model\UserModel::first(array(
                     "{$this->_name} = ?" => $name
         ));
 
         if ($user === null) {
             throw new Exception\UserNotExists($errMessage);
         }
-        
+
         $passVerify = PasswordManager::validatePassword($pass, $user->getPassword(), $user->getSalt());
-        
+
         if ($passVerify === true) {
             if ($user instanceof AdvancedUser) {
                 if (!$user->isActive()) {
@@ -130,7 +129,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
 
                     $user->password = null;
                     $user->salt = null;
-                    
+
                     return $user;
                 }
             } elseif ($user instanceof BasicUser) {
@@ -142,10 +141,10 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                     $user->setLastLoginAttempt(0);
                     $user->setFirstLoginAttempt(0);
                     $user->save();
-                    
+
                     $user->password = null;
                     $user->salt = null;
-                    
+
                     return $user;
                 }
             } else {
@@ -156,9 +155,9 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                 if ($this->isBruteForce($user)) {
                     $identifier = $this->_name;
                     Core::getLogger()->log(sprintf('Brute Force Attack Detected for account %s', $user->$identifier));
-                    
+
                     throw new Exception\BruteForceAttack('WARNING: Brute Force Attack Detected. We Recommend you use captcha.');
-                }else{
+                } else {
                     throw new Exception\WrongPassword($errMessage);
                 }
             } else {

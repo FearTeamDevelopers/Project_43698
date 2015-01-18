@@ -2,13 +2,15 @@ section.wrapper.reports
    header.row
       h2 Reportáže
    .row
+      |{if !empty($reports)}
       |{foreach $report in $reports}
       a(href!='/reportaze/r/{echo $report->urlKey}')
          article.report.medium-4.left
             img(src!='{echo $report->imgThumb}')
             .info
                h2 {echo $report->title}
-               span {echo $report->created.", ".$report->userAlias}
-               p {echo html_entity_decode($report->shortBody)}
+               span {echo \App\Helper\DateFormater::t2d($report->created).", ".$report->userAlias}
+               div {echo html_entity_decode($report->shortBody)}
       |{/foreach}
+      |{/if}
    include ../components/pager

@@ -1,21 +1,26 @@
-
 <section class="wrapper novinky">
-  <header class="row">
-    <h2>Novinky</h2>
-  </header>
-  <section class="row container">{foreach $new in $news}
-    <article>
-      <header>
-        <h3>{echo $new->title}</h3><span>Autor: {echo $new->userAlias}</span>
-      </header>
-      <div class="body">
-        <p>{echo html_entity_decode($new->shortBody)}</p><a href="/novinky/r/$new->urlKey">čti více</a>
-      </div>
-    </article>{/foreach}
-  </section>{if  $pagecount > 1}
-  <section class="pager row">
-    {if $currentpage !=1}
-    {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
-    {/if}
-  </section>{/if}
+    <header class="row">
+        <h2>Novinky</h2>
+    </header>
+    <section class="row container">
+        {if !empty($news)}
+        {foreach $new in $news}
+        <article>
+            <header>
+                <h3>{echo $new->title}</h3>
+                <span>{echo \App\Helper\DateFormater::t2d($new->created).", ".$new->userAlias}</span>
+            </header>
+            <div class="body">
+                <div>{echo html_entity_decode($new->shortBody)}</div>
+                <a href="/novinky/r/$new->urlKey">čti více</a>
+            </div>
+        </article>
+        {/foreach}
+        {/if}
+    </section>{if  $pagecount > 1}
+    <section class="pager row">
+        {if $currentpage !=1}
+        {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
+        {/if}
+    </section>{/if}
 </section>

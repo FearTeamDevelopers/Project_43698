@@ -35,21 +35,21 @@ class Controller extends BaseController
      * @read
      */
     protected $_security;
-    
+
     /**
      * Store initialized cache object
      * @var type 
      * @read
      */
     protected $_cache;
-    
+
     /**
      * Store configuration
      * @var type 
      * @read
      */
     protected $_config;
-    
+
     /**
      * 
      * @param type $string
@@ -60,7 +60,7 @@ class Controller extends BaseController
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
-        $return = trim(trim($cleaned), '-');
+        $return = mb_ereg_replace('[\-]+','-',trim(trim($cleaned), '-'));
         return strtolower($return);
     }
 
@@ -89,13 +89,15 @@ class Controller extends BaseController
     public function _secured()
     {
         $session = Registry::get('session');
-        
+
         //This line should be present only for DEV env
         //$this->_security->forceLogin(1);
-        
+
         $user = $this->_security->getUser();
 
         if (!$user) {
+            $this->_willRenderActionView = false;
+            $this->_willRenderLayoutView = false;
             self::redirect('/admin/login');
         }
 
@@ -136,7 +138,7 @@ class Controller extends BaseController
             return false;
         }
     }
-    
+
     /**
      * @protected
      */

@@ -34,14 +34,14 @@
             <td><span>Jméno:</span></td>
             <td>{if isset($errors["firstname"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["firstname"])}</label>{/if}
-              <input type="text" value="{echo isset($user)? $user->firstname: ""}" name="firstname" required="required"/>
+              {echo \App\Helper\FormPrinter::textInput('firstname', array($user,'firstname'), true, '')}
             </td>
           </tr>
           <tr>
             <td><span>Příjmení:</span></td>
             <td>{if isset($errors["lastname"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["lastname"])}</label>{/if}
-              <input type="text" name="lastname" value="{echo isset($user)? $user->lastname: ""}" required="required"/>
+              {echo \App\Helper\FormPrinter::textInput('lastname', array($user,'lastname'), true, '')}
             </td>
           </tr>
           <tr>

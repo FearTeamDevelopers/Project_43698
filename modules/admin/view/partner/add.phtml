@@ -16,8 +16,7 @@
         <p>
             <label>Partner*</label>
             <span class="field">
-                <input type="text" required name="title" class="longinput" 
-                       value="{echo isset($partner)? $partner->title: ""}"/>
+                {echo \Admin\Helper\FormPrinter::textInput('title', array($partner,'title'), true)}
                 {if isset($errors["title"])}
                 <label class="error">{echo join("<br/>", $errors["title"])}</label>
                 {/if}
@@ -54,7 +53,7 @@
         <p>
             <label>Pořadí<small>Max. 99</small></label>
             <span class="field">
-                <input type="text" name="rank" class="longinput" value="{echo isset($partner)? $partner->rank: 1}"/>
+                {echo \Admin\Helper\FormPrinter::textInput('rank', array($partner,'rank',1))}
                 {if isset($errors["rank"])}
                 <label class="error">{echo join("<br/>", $errors["rank"])}</label>
                 {/if}

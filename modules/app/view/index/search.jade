@@ -13,8 +13,9 @@ section.wrapper.pageSearch.singlePage
             a(href!="{echo $url['path']}")
                h3 {echo $url_i}
             small
-               span {echo date("d.m. Y H:i", strtotime($url['created']))} <br/>
-            p {echo $url['meta']} SAFKJASDK ASDKF JAKSDFJ KASDFJ KASDFJ ASD FJASD FJŮASDJF KLŮASDJF KLASDJF KADLSJ FKALSDFJ LASDŮF JSLŮF JASLDFJ ASDŮ FJASDŮ FJASDŮF JASDŮF J
+               span {echo \App\Helper\DateFormater::t2dt($url['created'])}
+               br
+            div {echo $url['meta']}
          |{/foreach}
    |{/else}
 

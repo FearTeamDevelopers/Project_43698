@@ -137,7 +137,7 @@ class PasswordManager extends Base
     {
         $newSalt = Rand::randStr(40);
 
-        $user = \App_Model_User::first(array(
+        $user = \App\Model\UserModel::first(array(
                     'salt = ?' => $newSalt
         ));
 
@@ -147,7 +147,7 @@ class PasswordManager extends Base
             for ($i = 0; $i < 100; $i++) {
                 $newSalt = Rand::randStr(40);
 
-                $user = \App_Model_User::first(array(
+                $user = \App\Model\UserModel::first(array(
                             'salt = ?' => $newSalt
                 ));
 

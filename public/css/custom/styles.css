@@ -149,8 +149,8 @@ body {
   margin-top: 1.5em;
 }
 .wrapper section.row.container article .body p {
-  height: 50px;
-  line-height: 25px;
+  height: auto;
+  line-height: 22px;
   overflow: hidden;
 }
 .wrapper section.row.container article .body a {
@@ -207,9 +207,9 @@ body {
 .topPanel header a h1:after {
   content: ' ';
   background: url("../../images/Logo_Hastrmnek.png") no-repeat;
-  background-size: 300px 300px;
-  width: 300px;
-  height: 300px;
+  background-size: 230px 215px;
+  width: 240px;
+  height: 240px;
   position: absolute;
   top: 291px;
   left: -245px;
@@ -467,12 +467,12 @@ footer.wrapper .container p {
   border-width: 4px;
 }
 .homepage section.wrapper .container .container-box #carousel a p {
-  height: 150px;
+  height: auto;
   overflow: hidden;
-  line-height: 25px;
+  line-height: 22px;
 }
 .homepage section.wrapper .container .container-box #carousel a header {
-  margin-bottom: 2em;
+  margin-bottom: 1em;
 }
 .homepage section.wrapper .container .container-box #carousel a header h4 {
   margin-bottom: 0;
@@ -647,9 +647,9 @@ section.wrapper.report header .reportInfo h2 {
   color: #fff;
   width: 100%;
   margin: 0;
-  margin-top: 20px;
+  margin-top: 10px;
   padding: 0;
-  padding-bottom: 35px;
+  padding-bottom: 20px;
   border: 0;
 }
 section.wrapper.report header .reportInfo span {

@@ -255,7 +255,7 @@ class Security extends Base implements SecurityInterface
      */
     public function forceLogin($userId)
     {
-        $user = \App_Model_User::first(array('id = ?' => (int)$userId));
+        $user = \App\Model\UserModel::first(array('id = ?' => (int)$userId));
         
         if($user === null){
             throw new Exception\UserNotExists('User not found');

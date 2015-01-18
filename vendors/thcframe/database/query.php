@@ -206,7 +206,7 @@ class Query extends Base
         }
 
         $input = sprintf($template, $joinedFields, $this->from, $this->alias, $join, $where, $groupBy, $having, $order, $limit);
-        $output = preg_replace('/\s+/', ' ', $input);
+        $output = mb_ereg_replace('\s+', ' ', $input);
         return $output;
     }
 
@@ -230,7 +230,7 @@ class Query extends Base
         $values = join(', ', $values);
 
         $input = sprintf($template, $this->from, $fields, $values);
-        $output = preg_replace('/\s+/', ' ', $input);
+        $output = mb_ereg_replace('\s+', ' ', $input);
         return $output;
     }
 
@@ -269,7 +269,8 @@ class Query extends Base
         }
 
         $input = sprintf($template, $this->from, $parts, $where, $limit);
-        $output = preg_replace('/\s+/', ' ', $input);
+        $output = mb_ereg_replace('\s+', ' ', $input);
+        
         return $output;
     }
 
@@ -300,7 +301,7 @@ class Query extends Base
         }
 
         $input = sprintf($template, $this->from, $where, $limit);
-        $output = preg_replace('/\s+/', ' ', $input);
+        $output = mb_ereg_replace('\s+', ' ', $input);
         return $output;
     }
 
@@ -601,7 +602,7 @@ class Query extends Base
             throw new Exception\Argument('Invalid argument');
         }
 
-        $arguments[0] = preg_replace('#\?#', '%s', $arguments[0]);
+        $arguments[0] = mb_ereg_replace('\?', '%s', $arguments[0]);
 
         foreach (array_slice($arguments, 1, null, true) as $i => $parameter) {
             $arguments[$i] = $this->_quote($arguments[$i]);
@@ -630,7 +631,7 @@ class Query extends Base
         }
 
         $connector = $this->getConnector();
-        $arguments[0] = preg_replace('#\?#', '%s', $arguments[0]);
+        $arguments[0] = mb_ereg_replace('\?', '%s', $arguments[0]);
 
         foreach (array_slice($arguments, 1, null, true) as $i => $parameter) {
             $arguments[$i] = $connector->escape($arguments[$i]);
@@ -654,7 +655,7 @@ class Query extends Base
             throw new Exception\Argument('Invalid argument');
         }
 
-        $arguments[0] = preg_replace('#\?#', '%s', $arguments[0]);
+        $arguments[0] = mb_ereg_replace('\?', '%s', $arguments[0]);
 
         foreach (array_slice($arguments, 1, null, true) as $i => $parameter) {
             $arguments[$i] = $this->_quote($arguments[$i]);

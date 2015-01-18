@@ -15,7 +15,7 @@
             <p>
                 <label>Název*</label>
                 <span class="field">
-                    <input type="text" name="title" class="longinput" value="{echo isset($action)? $action->title: ""}" required/>
+                    {echo \Admin\Helper\FormPrinter::textInput('title', array($action,'title'), true)}
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
@@ -24,26 +24,16 @@
             <p>
                 <label>Pořadí<small>Max. 99</small></label>
                 <span class="field">
-                    <input type="text" name="rank" class="longinput" value="{echo isset($action)? $action->rank: 1}"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('rank', array($action,'rank',1))}
                     {if isset($errors["rank"])}
                     <label class="error">{echo join("<br/>", $errors["rank"])}</label>
                     {/if}
                 </span>
             </p>
             <p>
-                <label>Zobrazovat do*</label>
-                <span class="field">
-                    <input type="text" name="expiration" class="longinput datepicker" 
-                           value="{echo isset($action)? $action->expirationDate: ""}" required/>
-                    {if isset($errors["expirationDate"])}
-                    <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
-                    {/if}
-                </span>
-            </p>
-            <p>
                 <label>Teaser*<small>Max. 750 znaků</small></label>
                 <span class="field">
-                    <textarea rows="20" name="shorttext" id="ckeditor2">{echo isset($action)? $action->shortBody: ""}</textarea>
+                    <textarea rows="20" name="shorttext" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($action,'shortBody')}</textarea>
                     {if isset($errors["shortBody"])}
                     <label class="error">{echo join("<br/>", $errors["shortBody"])}</label>
                     {/if}
@@ -62,7 +52,7 @@
             <p>
                 <label>Text*</label>
                 <span class="field">
-                    <textarea rows="20" name="text" id="ckeditor">{echo isset($action)? $action->body: ""}</textarea>
+                    <textarea rows="20" name="text" id="ckeditor">{echo \Admin\Helper\FormPrinter::iset($action,'body')}</textarea>
                     {if isset($errors["body"])}
                     <label class="error">{echo join("<br/>", $errors["body"])}</label>
                     {/if}
@@ -80,10 +70,9 @@
             <p>
                 <label>Datum - začátek</label>
                 <span class="field">
-                    Datum: <input type="text" name="datestart" class="microinput datepicker2" 
-                                  value="{echo isset($action)? $action->startDate: ""}"/>
-                    Čas: <input type="time" name="timestart" class="microinput" 
-                                value="{echo isset($action)? $action->startTime: ""}"/>
+                    Datum: {echo \Admin\Helper\FormPrinter::textInput('datestart', array($action,'startDate'), false, 'microinput datepicker2')}
+                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timestart', array($action,'startTime'), false, 'microinput')}
+
                     {if isset($errors["startDate"])}
                     <label class="error">{echo join("<br/>", $errors["startDate"])}</label>
                     {/if}
@@ -95,10 +84,9 @@
             <p>
                 <label>Datum - konec</label>
                 <span class="field">
-                    Datum: <input type="text" name="dateend" class="microinput datepicker3" 
-                                  value="{echo isset($action)? $action->endDate: ""}"/>
-                    Čas: <input type="time" name="timeend" class="microinput" 
-                                value="{echo isset($action)? $action->endTime: ""}"/>
+                    Datum: {echo \Admin\Helper\FormPrinter::textInput('dateend', array($action,'endDate'), false, 'microinput datepicker3')}
+                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timeend', array($action,'endTime'), false, 'microinput')}
+
                     {if isset($errors["endDate"])}
                     <label class="error">{echo join("<br/>", $errors["endDate"])}</label>
                     {/if}
@@ -115,8 +103,7 @@
             <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    <input type="text" name="metatitle" class="longinput" value="{echo isset($action)? $action->metaTitle: ""}" 
-                           placeholder="Výchozí hodnota: stejná jako Název"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($action,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -125,7 +112,7 @@
             <p>
                 <label>Meta-popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput" >{echo isset($action)? $action->metaDescription: ""}</textarea>
+                    <textarea rows="5" name="metadescription" class="longinput" >{echo \Admin\Helper\FormPrinter::iset($action,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -135,8 +122,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    <input type="text" name="keywords" class="longinput" value="{echo isset($action)? $action->keywords: ""}" 
-                           placeholder="Oddělovač: mezera"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($action,'keywords'), false, 'longinput', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}
