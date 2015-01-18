@@ -13,7 +13,7 @@
 						img(src!='{echo $report->imgMain}')
 						.info
 							h2 {echo $report->title}
-							span {echo date("d.m. Y H:i", strtotime($report->created)).", ".$report->userAlias}
+							span {echo \App\Helper\DateFormater::t2dt($report->created).", ".$report->userAlias}
 							p {echo html_entity_decode($report->shortBody)}
 					|{/if}{else}
 					article.report.large-3.medium-4.small-6
@@ -21,7 +21,7 @@
 						img(src!='{echo $report->imgThumb}')
 						.info
 							h3 {echo $report->title}
-							span {echo date("d.m. Y H:i", strtotime($report->created))}<br/>
+							span {echo \App\Helper\DateFormater::t2dt($report->created)}<br/>
 							span {echo $report->userAlias}
 
 					|{/else}
@@ -63,7 +63,7 @@
 						article
 							header
 								h4 {echo $action->title}
-								span.datum {echo $action->startDate}
+								span.datum Kdy: {echo \App\Helper\DateFormater::t2d($action->startDate)}
 							p {echo html_entity_decode($action->shortBody)}
 					|{/foreach}
 			.moreWrap

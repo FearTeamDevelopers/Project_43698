@@ -8,9 +8,11 @@
         </header>
         <form method="post" action="#">{if isset($errors["firstname"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["firstname"])}</label>{/if}
-          <input type="text" placeholder="Jméno" value="{echo isset($user)? $user->firstname: ""}" name="firstname" required="required"/>{if isset($errors["lastname"])}
+          {echo \App\Helper\FormPrinter::textInput('firstname', array($user,'firstname'), true, '', 'Jméno')}
+          {if isset($errors["lastname"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["lastname"])}</label>{/if}
-          <input type="text" placeholder="Příjmení" name="lastname" value="{echo isset($user)? $user->lastname: ""}" required="required"/>{if isset($errors["phoneNumber"])}
+          {echo \App\Helper\FormPrinter::textInput('lastname', array($user,'lastname'), true, '', 'Příjmení')}
+          {if isset($errors["phoneNumber"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
           <input type="tel" placeholder="Kontaktní telefon" name="phone" value="{echo isset($user)? $user->phoneNumber: ""}" required="required"/>{if isset($errors["email"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["email"])}</label>{/if}

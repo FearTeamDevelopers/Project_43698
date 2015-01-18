@@ -18,7 +18,7 @@
             <p>
                 <label>Název*</label>
                 <span class="field">
-                    <input type="text" name="title" class="longinput" value="{echo isset($report)? $report->title: ""}" required/>
+                    {echo \Admin\Helper\FormPrinter::textInput('title', array($report,'title'), true)}
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
@@ -27,19 +27,9 @@
             <p>
                 <label>Pořadí<small>Max. 99</small></label>
                 <span class="field">
-                    <input type="text" name="rank" class="longinput" value="{echo isset($report)? $report->rank: 1}"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('rank', array($report,'rank',1))}
                     {if isset($errors["rank"])}
                     <label class="error">{echo join("<br/>", $errors["rank"])}</label>
-                    {/if}
-                </span>
-            </p>
-            <p>
-                <label>Zobrazovat do*</label>
-                <span class="field">
-                    <input type="text" name="expiration" class="longinput datepicker" 
-                           value="{echo isset($report)? $report->expirationDate: ""}" required/>
-                    {if isset($errors["expirationDate"])}
-                    <label class="error">{echo join("<br/>", $errors["expirationDate"])}</label>
                     {/if}
                 </span>
             </p>
@@ -88,8 +78,7 @@
             <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    <input type="text" name="metatitle" class="longinput" value="{echo isset($report)? $report->metaTitle: ""}" 
-                           placeholder="Výchozí hodnota: stejná jako Název"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($report,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -98,7 +87,7 @@
             <p>
                 <label>Meta-popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput" >{echo isset($report)? $report->metaDescription: ""}</textarea>
+                    <textarea rows="5" name="metadescription" class="longinput" >{echo \Admin\Helper\FormPrinter::iset($report,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -108,8 +97,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    <input type="text" name="keywords" value="{echo isset($report)? $report->keywords: ""}" 
-                           class="longinput" placeholder="Oddělovač: mezera"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($report,'keywords'), false, 'longinput', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}
@@ -125,7 +113,7 @@
                 {if isset($report) && $report->imgMain != ""}
                 <span class="field" id="currentLogo">
                     <img src="{echo $report->imgThumb}" alt="" height="100" />
-                    <a href="/admin/report/deletemainphoto/{echo $report->id}" class="btn btn3 btn_trash deleteImg" title="Smazat"></a>
+                    <a href="/admin/report/previewdeletephoto/" class="btn btn3 btn_trash deleteImg" title="Smazat"></a>
                 </span>
 
                 <div id="image-cropper" class="uploadNewImage nodisplay field">

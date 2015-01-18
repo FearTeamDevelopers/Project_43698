@@ -150,8 +150,8 @@ final class Dispatcher extends Base
             throw new Exception\Controller(sprintf('Disallowed characters in class name %s', $class));
         }
 
-        $file_name = strtolower("./modules/{$module}/controller/{$class}.php");
-        $class = ucfirst($module) . '_Controller_' . ucfirst($class);
+        $file_name = strtolower("./modules/{$module}/controller/{$class}controller.php");
+        $class = "\\".ucfirst($module)."\Controller\\".ucfirst($class).'Controller';
 
         if (FALSE === file_exists($file_name)) {
             throw new Exception\Controller(sprintf('Class file %s not found', $file_name));

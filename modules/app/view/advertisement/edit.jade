@@ -10,7 +10,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["title"])}
                         label.error {echo join("<br/>", $errors["title"])}
                         |{/if}
-                        input(type='text', name='title', required, pattern=".{5,}", title='min. 5 znaků', value!='{echo $ad->title}')
+                        input(type='text', name='title', required, pattern=".{5,}", title='min. 5 znaků', value!="{echo \\App\\Helper\\FormPrinter::iset($ad,'title')}")
                 tr
                     td
                         span Sekce
@@ -42,7 +42,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["content"])}
                         label.error {echo join("<br/>", $errors["content"])}
                         |{/if}
-                        textarea(name='content', required, rows=8, value!='{echo $ad->content}')
+                        textarea(name='content', required, rows=8, value!="{echo \\App\\Helper\\FormPrinter::iset($ad,'content')}")
                 tr
                     td
                         span Klíčová slova
@@ -50,7 +50,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["keywords"])}
                         label.error {echo join("<br/>", $errors["keywords"])}
                         |{/if}
-                        input(type='text', name='keywords', placeholder="Pro rychlejší vyhledávání v bazaru", required, value!='{echo $ad->keywords}')
+                        |{echo \App\Helper\FormPrinter::textInput('keywords', array($ad,'keywords'), true, '', "Pro rychlejší vyhledávání v bazaru")}
                 tr
                     td
                         span Cena

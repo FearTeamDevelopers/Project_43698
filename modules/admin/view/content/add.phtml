@@ -16,7 +16,7 @@
             <p>
                 <label>Název stránky*</label>
                 <span class="field">
-                    <input type="text" name="page" class="longinput" value="{echo isset($content)? $content->title: ""}"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('page', array($content,'title'), true)}
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
@@ -47,8 +47,8 @@
             <p>
                 <label>Meta-Název</label>
                 <span class="field" >
-                    <input class="longinput" type="text" name="metatitle" value="{echo isset($content)? $content->metaTitle: ""}" 
-                           placeholder="Výchozí hodnota: stejná jako Název stránky" />
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($content,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
+
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -57,7 +57,7 @@
             <p>
                 <label>Meta-Popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput">{echo isset($content)? $content->metaDescription: ""}</textarea>
+                    <textarea rows="5" name="metadescription" class="longinput">{echo \Admin\Helper\FormPrinter::iset($content,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -66,8 +66,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    <input type="text" name="keywords" value="{echo isset($content)? $content->keywords: ""}" 
-                           placeholder="Oddělovač: mezera"/>
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($content,'keywords'), false, 'longinput', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}

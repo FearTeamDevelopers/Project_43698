@@ -6,7 +6,7 @@ use THCFrame\Configuration as Configuration;
 use THCFrame\Configuration\Exception;
 use THCFrame\Core\ArrayMethods;
 use THCFrame\Registry\Registry;
-use THCFrame\Configuration\Model\Config;
+use THCFrame\Configuration\Model\ConfigModel;
 
 /**
  * Ini configuration class
@@ -187,7 +187,7 @@ class Ini extends Configuration\Driver
      */
     public function extendForDbConfig()
     {
-        $ca = Config::all();
+        $ca = ConfigModel::all();
 
         if ($ca !== null) {
             foreach ($ca as $key => $value) {

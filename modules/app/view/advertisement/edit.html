@@ -8,7 +8,7 @@
           <td><span>Název</span></td>
           <td>{if isset($errors["title"])}
             <label class="error">{echo join("<br/>", $errors["title"])}</label>{/if}
-            <input type="text" name="title" required="required" pattern=".{5,}" title="min. 5 znaků" value="{echo $ad->title}"/>
+            <input type="text" name="title" required="required" pattern=".{5,}" title="min. 5 znaků" value="{echo \App\Helper\FormPrinter::iset($ad,'title')}"/>
           </td>
         </tr>
         <tr>
@@ -38,14 +38,14 @@
           <td><span>Obsah</span></td>
           <td>{if isset($errors["content"])}
             <label class="error">{echo join("<br/>", $errors["content"])}</label>{/if}
-            <textarea name="content" required="required" rows="8" value="{echo $ad->content}"></textarea>
+            <textarea name="content" required="required" rows="8" value="{echo \App\Helper\FormPrinter::iset($ad,'content')}"></textarea>
           </td>
         </tr>
         <tr>
           <td><span>Klíčová slova</span></td>
           <td>{if isset($errors["keywords"])}
             <label class="error">{echo join("<br/>", $errors["keywords"])}</label>{/if}
-            <input type="text" name="keywords" placeholder="Pro rychlejší vyhledávání v bazaru" required="required" value="{echo $ad->keywords}"/>
+            {echo \App\Helper\FormPrinter::textInput('keywords', array($ad,'keywords'), true, '', "Pro rychlejší vyhledávání v bazaru")}
           </td>
         </tr>
         <tr>

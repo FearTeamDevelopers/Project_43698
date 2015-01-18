@@ -3,5 +3,5 @@
       .row.container
          header
             h1 {echo $news->title}
-            span Autor: {echo $news->userAlias}<br/>
+            span {echo \App\Helper\DateFormater::t2d($new->created).", ".$news->userAlias}
          |{echo html_entity_decode($news->body)}

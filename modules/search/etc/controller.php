@@ -95,7 +95,7 @@ class Controller extends BaseController
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
-        $return = trim(trim($cleaned), '-');
+        $return = mb_ereg_replace('[\-]+','-',trim(trim($cleaned), '-'));
         return strtolower($return);
     }
 
@@ -124,15 +124,14 @@ class Controller extends BaseController
     public function _secured()
     {
         $session = Registry::get('session');
-
         $user = $this->_security->getUser();
 
         if (!$user) {
             self::redirect('/admin/login');
         }
 
-        //30min inactivity till logout
-        if (time() - $session->get('lastActive') < 1800) {
+        //60min inactivity till logout
+        if (time() - $session->get('lastActive') < 3600) {
             $session->set('lastActive', time());
         } else {
             $view = $this->getActionView();

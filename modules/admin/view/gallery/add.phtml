@@ -13,7 +13,7 @@
         <p>
             <label>Název*</label>
             <span class="field">
-                <input class="longinput" type="text" name="title" value="{echo isset($gallery)? $gallery->title: ""}" />
+                {echo \Admin\Helper\FormPrinter::textInput('title', array($gallery,'title'), true)}
                 {if isset($errors["title"])}
                 <label class="error">{echo join("<br/>", $errors["title"])}</label>
                 {/if}
@@ -31,7 +31,7 @@
         <p>
             <label>Popis*</label>
             <span class="field">
-                <textarea class="longinput" name="description" id="ckeditor2">{echo isset($gallery)? $gallery->description: ""}</textarea>
+                <textarea class="longinput" name="description" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($gallery,'description')}</textarea>
                 {if isset($errors["description"])}
                 <label class="error">{echo join("<br/>", $errors["description"])}</label>
                 {/if}
@@ -40,8 +40,9 @@
         <p>
             <label>Pořadí<small>Max. 99</small></label>
             <span class="field">
-                <input type="text" name="rank" class="longinput" value="{echo isset($gallery)? $gallery->rank: 1}"/>
-                {if isset($errors["rank"])}
+                {echo \Admin\Helper\FormPrinter::textInput('rank', array($gallery,'rank',1))}
+
+s                {if isset($errors["rank"])}
                 <label class="error">{echo join("<br/>", $errors["rank"])}</label>
                 {/if}
             </span>

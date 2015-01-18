@@ -1,21 +1,20 @@
 
-<!--
-Created by Slamic on 26.12.2014.
-
--->
 <section class="wrapper akce">
   <header class="row">
     <h2>akce</h2>
   </header>
-  <section class="row container">{foreach $action in $actions}
+  <section class="row container">
+    {if !empty($actions)}
+    {foreach $action in $actions}
     <article>
       <header>
-        <h3>{echo $action->title}</h3><span>Autor: {echo $action->userAlias}</span>
+        <h3>{echo $action->title}</h3><span>{echo \App\Helper\DateFormater::t2d($action->created).", ".$action->userAlias}</span>
       </header>
       <div class="body">
-        <p>{echo html_entity_decode($action->shortBody)}</p><a href="/akce/r/$action->urlKey">čti více</a>
+        <div>{echo html_entity_decode($action->shortBody)}</div><a href="/akce/r/$action->urlKey">čti více</a>
       </div>
     </article>{/foreach}
+    {/if}
   </section>{if  $pagecount > 1}
   <section class="pager row">
     {if $currentpage !=1}

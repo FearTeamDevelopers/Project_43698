@@ -107,8 +107,8 @@ class Model extends Base
         ),
         'html' => array(
             'handler' => '_validateHtml',
-            'message_en' => 'The {0} field can contain these tags only (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td)',
-            'message_cs' => 'Pole {0} může obsahovat následující html tagy (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td)'
+            'message_en' => 'The {0} field can contain these tags only (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td,br,hr)',
+            'message_cs' => 'Pole {0} může obsahovat následující html tagy (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td,br,hr)'
         ),
         'path' => array(
             'handler' => '_validatePath',
@@ -200,8 +200,8 @@ class Model extends Base
             return true;
         } else {
             $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
-            return StringMethods::match($value, '#((<|&lt;)(strong|em|s|p|div|a|img|table|tr|td|thead|tbody|ol|li|ul|caption|span)(>|&gt;)'
-                            . "[a-zá-žA-ZÁ-Ž0-9{$pattern}]+(<|&lt;)/\2(>|&gt;))*"
+            return StringMethods::match($value, '#((<|&lt;)(strong|em|s|p|div|a|img|table|tr|td|thead|tbody|ol|li|ul|caption|span|br|hr)(\/)?(>|&gt;)'
+                            . "[a-zá-žA-ZÁ-Ž0-9{$pattern}]+)*"
                             . "[a-zá-žA-ZÁ-Ž0-9{$pattern}]+#");
         }
     }
@@ -600,17 +600,9 @@ class Model extends Base
         if (empty($this->_table)) {
             $tablePrefix = Registry::get('configuration')->database->tablePrefix;
 
-            if (strpos(get_class($this), '_') !== false) {
-                list($module, $type, $name) = explode('_', get_class($this));
-
-                if (strtolower($type) == 'model' && !empty($name)) {
-                    $this->_table = strtolower($tablePrefix . $name);
-                } else {
-                    throw new Exception\Implementation('Model is not valid THCFrame\Model\Model');
-                }
-            } elseif (preg_match('#^thcframe(.*)model(.*)$#i', get_class($this))) {
+            if (preg_match('#model#i', get_class($this))) {
                 $parts = array_reverse(explode('\\', get_class($this)));
-                $this->_table = strtolower($tablePrefix . $parts[0]);
+                $this->_table = strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0]));
             } else {
                 throw new Exception\Implementation('Model is not valid THCFrame\Model\Model');
             }
@@ -679,7 +671,7 @@ class Model extends Base
                 $propertyMeta = $inspector->getPropertyMeta($property);
 
                 if (!empty($propertyMeta['@column'])) {
-                    $name = preg_replace('#^_#', '', $property);
+                    $name = mb_ereg_replace('^_', '', $property);
                     $primary = !empty($propertyMeta['@primary']);
                     $type = $first($propertyMeta, '@type');
                     $length = $first($propertyMeta, '@length');
@@ -1055,4 +1047,8 @@ class Model extends Base
         return !count($this->errors);
     }
 
+    public function __toString()
+    {
+        return get_class($this);
+    }
 }

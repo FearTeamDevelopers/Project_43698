@@ -3,7 +3,7 @@
   <section class="wrapper">
     <div class="row container">
       <header>
-        <h1>{echo $action->title}</h1><span>Autor: {echo $action->userAlias}<br/></span><span>Datum: <strong>{echo date("d.m. Y", strtotime($action->startDate))}</strong> - <strong>{echo date("d.m. Y", strtotime($action->endDate))}</strong><br/></span><span>Čas: <strong>{echo $action->startTime}</strong> - <strong>{echo $action->endTime}</strong><br/></span>
+        <h1>{echo $action->title}</h1><span>{echo \App\Helper\DateFormater::t2d($new->created).", ".$action->userAlias}</span><br/><span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->startDate)}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->endDate)}</strong></span><br/>{if !empty($action->startTime)}<span>Čas: <strong>{echo $action->startTime}</strong> - <strong>{echo $action->endTime}</strong><br/></span>{/if}
       </header>{echo html_entity_decode($action->body)}
     </div>
   </section>

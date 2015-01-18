@@ -20,6 +20,9 @@ section.wrapper.login
                   |{echo join("<br/>", $errors["password_error"])}
                |{/if}
                input(type='submit' name='submitLogin' value='Přihlásit')
+               |<br/><br/>
+               span Nemáte účet? 
+                    a(href='/registrace') Registrace zde
                input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
 
 

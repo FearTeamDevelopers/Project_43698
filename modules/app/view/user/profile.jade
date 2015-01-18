@@ -36,7 +36,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         | {echo join("<br/>", $errors["firstname"])}
                      | {/if}
-                     input(type='text',value!='{echo isset($user)? $user->firstname: ""}', name='firstname' required)
+                     |{echo \App\Helper\FormPrinter::textInput('firstname', array($user,'firstname'), true, '')}
                tr
                   td
                      span Příjmení:
@@ -45,8 +45,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["lastname"])}
                      |{/if}
-                     input(type='text', name='lastname',value!='{echo isset($user)? $user->lastname: ""}' required)
-
+                     |{echo \App\Helper\FormPrinter::textInput('lastname', array($user,'lastname'), true, '')}
                tr
                   td
                      span Telefon:

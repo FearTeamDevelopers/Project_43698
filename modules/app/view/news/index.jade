@@ -2,15 +2,17 @@ section.wrapper.novinky
     header.row
         h2 Novinky
     section.row.container
+        |{if !empty($news)}
         | {foreach $new in $news}
         article
             header
                 h3 {echo $new->title}
-                span Autor: {echo $new->userAlias}
+                span {echo \App\Helper\DateFormater::t2d($new->created).", ".$new->userAlias}
             .body
-                p {echo html_entity_decode($new->shortBody)}
+                div {echo html_entity_decode($new->shortBody)}
                 a(href!='/novinky/r/$new->urlKey') čti více
         | {/foreach}
+        |{/if}
     include ../components/pager
 
 

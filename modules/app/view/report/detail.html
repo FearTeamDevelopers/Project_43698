@@ -4,7 +4,9 @@
   <header class="row">
     <div class="imgWrapper"><img src="$report->imgMain"/></div>
     <div class="reportInfo">
-      <h2>{echo $report->title}</h2><span>{echo $report->created}<br/></span><small><span>Autor:</span></small><span>{echo " ".$report->userAlias}</span>
+      <h2>{echo $report->title}</h2>
+      <span>{echo \App\Helper\DateFormater::t2d($report->created)}</span><br/>
+      <small><span>Autor:</span></small><span>{echo " ".$report->userAlias}</span>
     </div>
   </header>
   <div class="page row">
