@@ -11,6 +11,7 @@ section.wrapper.bazar
                 li
                     a(href='/bazar/moje-inzeraty').fi-page-copy Moje inzeráty
                 |{/if}
+        |{if !empty($ads)}
         |{foreach $ad in $ads}
         article.large-6.small-12.medium-6.column.left
             .imgWrapper
@@ -46,4 +47,8 @@ section.wrapper.bazar
                     |{/else}
                     a.bla(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
         |{/foreach}
+        |{/if}{else}
+        article.large-12.small-12.medium-12.column.left
+            h2 Žádné inzeráty nejsou k dispozici
+        |{/else}
     include ../components/pager

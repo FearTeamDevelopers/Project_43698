@@ -47,7 +47,8 @@
         <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>{if $authUser}
         <li><a href="/bazar/moje-inzeraty" class="fi-page-copy">Moje inzeráty</a></li>{/if}
       </ul>
-    </div>{foreach $ad in $ads}
+    </div>{if !empty($ads)}
+    {foreach $ad in $ads}
     <article class="large-6 small-12 medium-6 column left">
       <div class="imgWrapper">
         {script $images=$ad->getImages()}
@@ -62,12 +63,15 @@
       <div class="infoWrapper">
         <div class="info">{if $ad->adType=='tender'}
           <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
-          <center><span class="poptavka">Poptávka <br/></span></center>
-          {/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small>{if $ad->price == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
+          <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small>{if $ad->price == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
           {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->uniqueKey}" class="bla">zobrazit podrobnosti</a>
         </div>
       </div>
     </article>{/foreach}
+    {/if}{else}
+    <article class="large-12 small-12 medium-12 column left">
+      <h2>Žádné inzeráty nejsou k dispozici</h2>
+    </article>{/else}
   </div>{if  $pagecount > 1}
   <section class="pager row">
     {if $currentpage !=1}

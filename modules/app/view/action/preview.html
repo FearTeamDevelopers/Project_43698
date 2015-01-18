@@ -1,15 +1,10 @@
 
 <div class="page">
-    <section class="wrapper">
-        <div class="row container"><a href="/admin/action/{echo $act}/">Zpět do administrace</a>
-            <header>
-                <h1>{echo $action->title}</h1>
-                <span>{echo \App\Helper\DateFormater::t2d($action->created).", ".$action->userAlias}</span><br/>
-                <span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->startDate)}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->endDate)}</strong><br/>
-                {if !empty($action->startTime)}
-                </span><span>Čas: <strong>{echo $action->startTime}</strong> - <strong>{echo $action->endTime}</strong><br/></span>
-                {/if}
-            </header>{echo html_entity_decode($action->body)}
-        </div>
-    </section>
+  <section class="wrapper">
+    <div class="row container"><a href="/admin/action/{echo $act}/">Zpět do administrace</a>
+      <header>
+        <h1>{echo $action->title}</h1><span>{echo \App\Helper\DateFormater::t2d($new->created).", ".$action->userAlias}</span><br/><span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->startDate)}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->endDate)}</strong></span><br/>{if !empty($action->startTime)}<span>Čas: <strong>{echo $action->startTime}</strong> - <strong>{echo $action->endTime}</strong><br/></span>{/if}
+      </header>{echo html_entity_decode($action->body)}
+    </div>
+  </section>
 </div>

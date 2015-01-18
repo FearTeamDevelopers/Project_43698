@@ -25,13 +25,13 @@
         </div>{/if}
         {if !empty($images)}
         <div class="large-5 medium-5 small-12 column">
-          <div class="info"><span>{echo $ad->userAlias} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span>{if $ad->price == "1"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
+          <div class="info"><span>{echo $ad->userAlias} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span>{if $ad->price == "0"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
             {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}
           </div>
         </div>{/if}
         {else}
         <div class="large-12 column">
-          <div class="info"><span>{echo $ad->userAlias} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span>{if $ad->price == "1"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
+          <div class="info"><span>{echo $ad->userAlias} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span>{if $ad->price == "0"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
             {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}
           </div>
         </div>{/else}
@@ -39,7 +39,7 @@
       <div class="row">
         <div class="large-12 column">
           <div class="info description">
-            <div>{echo $ad->content}</div>
+            <div>{echo $ad->content} <br/></div>
             <div class="large-4 medium-6 small-12 centerBlock mv10"><a href="#sendEmail" class="sendEmail">
                 <div class="more blue"><span>Odpovědět na Inzerát</span></div></a></div>
           </div>

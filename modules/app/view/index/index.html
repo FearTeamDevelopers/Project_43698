@@ -50,8 +50,7 @@
         <div id="carousel">{foreach $action in $actions}<a href="/akce/r/{echo $action->urlKey}" class="large-4 medium-6 small-12">
             <article>
               <header>
-                <h4>{echo $action->title}</h4>
-                <span class="datum">Kdy: {echo \App\Helper\DateFormater::t2d($action->startDate)}</span>
+                <h4>{echo $action->title}</h4><span class="datum">Kdy: {echo \App\Helper\DateFormater::t2d($action->startDate)}</span>
               </header>
               <div>{echo html_entity_decode($action->shortBody)}</div>
             </article></a>{/foreach}</div>

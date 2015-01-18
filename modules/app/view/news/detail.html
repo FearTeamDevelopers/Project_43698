@@ -3,8 +3,7 @@
   <section class="wrapper">
     <div class="row container">
       <header>
-        <h1>{echo $news->title}</h1>
-        <span>{echo \App\Helper\DateFormater::t2d($news->created).", ".$news->userAlias}</span><br/>
+        <h1>{echo $news->title}</h1><span>{echo \App\Helper\DateFormater::t2d($new->created).", ".$news->userAlias}</span>
       </header>{echo html_entity_decode($news->body)}
     </div>
   </section>

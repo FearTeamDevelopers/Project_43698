@@ -14,7 +14,7 @@
 						.info
 							h2 {echo $report->title}
 							span {echo \App\Helper\DateFormater::t2dt($report->created).", ".$report->userAlias}
-							p {echo html_entity_decode($report->shortBody)}
+							div {echo html_entity_decode($report->shortBody)}
 					|{/if}{else}
 					article.report.large-3.medium-4.small-6
 
@@ -44,7 +44,7 @@
 						header
 							a(href!='/novinky/r/{echo $new->urlKey}')
 								h4 {echo $new->title}
-						p {echo html_entity_decode($new->shortBody)}
+						div {echo html_entity_decode($new->shortBody)}
 				| {/foreach}
 			.moreWrap
 				a(href='/novinky')
@@ -64,7 +64,7 @@
 							header
 								h4 {echo $action->title}
 								span.datum Kdy: {echo \App\Helper\DateFormater::t2d($action->startDate)}
-							p {echo html_entity_decode($action->shortBody)}
+							div {echo html_entity_decode($action->shortBody)}
 					|{/foreach}
 			.moreWrap
 				a(href='/akce')
