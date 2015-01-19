@@ -6,7 +6,7 @@
 
 {if isset($user)}
 <div class="content">
-    <form class="stdform stdform2 cropit-form" method="post" action="#">
+    <form class="stdform stdform2" method="post" action="#">
         <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
 
         <div class="contenttitle radiusbottom0">
@@ -15,7 +15,7 @@
         <p>
             <label>Jméno*</label>
             <span class="field">
-                <input required type="text" name="firstname" class="longinput" value="{echo $user->firstname}" />
+                {echo \Admin\Helper\FormPrinter::textInput('firstname', array($user,'firstname'), true)}
                 {if isset($errors["firstname"])}
                 <label class="error">
                     {echo join("<br/>", $errors["firstname"])}
@@ -26,7 +26,7 @@
         <p>
             <label>Příjmení*</label>
             <span class="field">
-                <input required type="text" name="lastname" class="longinput" value="{echo $user->lastname}" />
+                {echo \Admin\Helper\FormPrinter::textInput('lastname', array($user,'lastname'), true)}
                 {if isset($errors["lastname"])}
                 <label class="error">
                     {echo join("<br/>", $errors["lastname"])}

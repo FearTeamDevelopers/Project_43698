@@ -49,7 +49,7 @@
         <p>
             <label>WWW*</label>
             <span class="field">
-                <input required type="text" name="web" class="longinput" value="{echo $partner->web}"/>
+                <input required type="url" name="web" class="longinput" value="{echo $partner->web}"/>
                 {if isset($errors["web"])}
                 <label class="error">{echo join("<br/>", $errors["web"])}</label>
                 {/if}
