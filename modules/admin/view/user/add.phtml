@@ -34,9 +34,9 @@
             </span>
         </p>
         <p>
-            <label>Telefon*</label>
+            <label>Telefon</label>
             <span class="field">
-                <input required type="tel" name="phone" class="longinput" value="{echo isset($user)? $user->phoneNumber: ""}" />
+                <input type="tel" name="phone" class="longinput" value="{echo isset($user)? $user->phoneNumber: ""}" />
                 {if isset($errors["phoneNumber"])}
                 <label class="error">
                     {echo join("<br/>", $errors["phoneNumber"])}

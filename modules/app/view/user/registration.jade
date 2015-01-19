@@ -1,6 +1,6 @@
 section.wrapper.login
    .row
-      .small-12.columns
+      .small-12.medium-12.large-12.columns
          .container
             header
                h2.fi-check Registrace
@@ -21,7 +21,7 @@ section.wrapper.login
                label.error.fi-alert
                   |{echo join("<br/>", $errors["phoneNumber"])}
                |{/if}
-               input(type='tel',placeholder='Kontaktní telefon', name='phone',value!='{echo isset($user)? $user->phoneNumber: ""}' required)
+               input(type='tel',placeholder='Kontaktní telefon', name='phone',value!='{echo isset($user)? $user->phoneNumber: ""}')
 
                |{if isset($errors["email"])}
                label.error.fi-alert

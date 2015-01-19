@@ -33,9 +33,9 @@
             </span>
         </p>
         <p>
-            <label>Telefon*</label>
+            <label>Telefon</label>
             <span class="field">
-                <input required type="tel" name="phone" class="longinput" value="{echo $user->phoneNumber}" />
+                <input type="tel" name="phone" class="longinput" value="{echo $user->phoneNumber}" />
                 {if isset($errors["phoneNumber"])}
                 <label class="error">
                     {echo join("<br/>", $errors["phoneNumber"])}
@@ -83,7 +83,7 @@
         </p>
 
         <p class="stdformbutton">
-            <input type="submit" name="submitEditUser" value="Uložit" class="submit radius2" />
+            <input type="submit" name="submitUpdateProfile" value="Uložit" class="submit radius2" />
         </p>
     </form>
 </div>

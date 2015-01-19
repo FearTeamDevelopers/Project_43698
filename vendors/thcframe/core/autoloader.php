@@ -86,6 +86,10 @@ class Autoloader
      */
     public function loadClass($class)
     {
+        if (mb_ereg_match('.*Swift.*', $class)) {
+            return;
+        }
+        
         // the current namespace prefix
         $prefix = $class;
 

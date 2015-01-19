@@ -1,7 +1,7 @@
 
 <section class="wrapper login">
   <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 medium-12 large-12 columns">
       <div class="container">
         <header>
           <h2 class="fi-check">Registrace</h2>
@@ -14,7 +14,7 @@
           {echo \App\Helper\FormPrinter::textInput('lastname', array($user,'lastname'), true, '', 'Příjmení')}
           {if isset($errors["phoneNumber"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
-          <input type="tel" placeholder="Kontaktní telefon" name="phone" value="{echo isset($user)? $user->phoneNumber: ""}" required="required"/>{if isset($errors["email"])}
+          <input type="tel" placeholder="Kontaktní telefon" name="phone" value="{echo isset($user)? $user->phoneNumber: ""}"/>{if isset($errors["email"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["email"])}</label>{/if}
           <input type="email" placeholder="Kontaktní email" name="email" value="{echo isset($user)? $user->email: ""}" required="required"/>{if isset($errors["password"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["password"])}</label>{/if}

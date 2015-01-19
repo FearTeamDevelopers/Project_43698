@@ -54,7 +54,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["phoneNumber"])}
                      |{/if}
-                     input(type='tel', name='phone',value!='{echo isset($user)? $user->phoneNumber: ""}' required)
+                     input(type='tel', name='phone',value!='{echo isset($user)? $user->phoneNumber: ""}')
                tr
                   td
                      span Email:

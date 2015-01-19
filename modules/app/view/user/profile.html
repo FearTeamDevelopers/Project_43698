@@ -48,7 +48,7 @@
             <td><span>Telefon:</span></td>
             <td>{if isset($errors["phoneNumber"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
-              <input type="tel" name="phone" value="{echo isset($user)? $user->phoneNumber: ""}" required="required"/>
+              <input type="tel" name="phone" value="{echo isset($user)? $user->phoneNumber: ""}"/>
             </td>
           </tr>
           <tr>

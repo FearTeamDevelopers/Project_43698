@@ -296,12 +296,12 @@ class AdvertisementController extends Controller
 
             if ($message->validate()) {
                 require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                $transport = Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
+                $transport = \Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
                         ->setUsername('info@fear-team.cz')
-                        ->setPassword('ThcMInfo-2014*');
-                $mailer = Swift_Mailer::newInstance($transport);
+                        ->setPassword('ThcEbmInfo-2015*');
+                $mailer = \Swift_Mailer::newInstance($transport);
 
-                $email = Swift_Message::newInstance()
+                $email = \Swift_Message::newInstance()
                         ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
                         ->setFrom('bazar@hastrman.cz')
                         ->setBody($this->_getEmailBody($ad, $message));
@@ -312,7 +312,7 @@ class AdvertisementController extends Controller
                     $email->setTo($ad->getEmail());
                 }
 
-                //$mailer->send($email);
+                $mailer->send($email);
 
                 $message->messageSent = 1;
                 $message->save();

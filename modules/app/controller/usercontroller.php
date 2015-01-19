@@ -142,23 +142,23 @@ class UserController extends Controller
                 
                 if ($verifyEmail) {
                     require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                    $transport = Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
+                    $transport = \Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
                             ->setUsername('info@fear-team.cz')
-                            ->setPassword('ThcMInfo-2014*');
+                            ->setPassword('ThcEbmInfo-2015*');
 
-                    $mailer = Swift_Mailer::newInstance($transport);
+                    $mailer = \Swift_Mailer::newInstance($transport);
 
                     $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
                             . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
                             . '<a href="http://www.hastrman.cz/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
                             . 'S pozdravem,<br/>Hastrmani';
 
-                    $regEmail = Swift_Message::newInstance()
+                    $regEmail = \Swift_Message::newInstance()
                             ->setSubject('Hastrman - Registrace')
                             ->setFrom('info@fear-team.cz')
                             ->setTo($user->getEmail())
                             ->setBody($emailBody, 'text/html');
-                    //$mailer->send($regEmail);
+                    $mailer->send($regEmail);
                 }
 
                 Event::fire('app.log', array('success', 'User Id: '.$uid));
