@@ -231,7 +231,7 @@ class IndexController extends Controller
         $view = $this->getActionView();
 
         if (!array_key_exists($table, $this->_textSource)) {
-            $view->errorMessage('This table does not exists or content cannot be indexed');
+            $view->errorMessage('This source does not exists or content cannot be indexed');
             self::redirect('/search/');
         }
 
@@ -305,7 +305,7 @@ class IndexController extends Controller
         $time = round(microtime(true) - $starttime, 2);
         Event::fire('search.log', array('success', sprintf('Search index for %s built in %s sec', $table, $time)));
 
-        $view->successMessage(sprintf('Search index for table %s has been successfully built', $table));
+        $view->successMessage(sprintf('Search index for %s has been successfully built', $this->_textSource[$table]['model']));
         self::redirect('/search/');
     }
 
