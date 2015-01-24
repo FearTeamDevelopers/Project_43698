@@ -150,7 +150,7 @@ class UserController extends Controller
 
                     $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
                             . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
-                            . '<a href="http://www.hastrman.cz/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
+                            . '<a href="http://'.$this->getServerHost().'/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
                             . 'S pozdravem,<br/>Hastrmani';
 
                     $regEmail = \Swift_Message::newInstance()
