@@ -95,7 +95,7 @@ class File extends Logger\Driver
         $message = $message . PHP_EOL;
 
         if ($file !== null) {
-            if (strlen($file) > 50) {
+            if (mb_strlen($file) > 50) {
                 $file = trim(substr($file, 0, 50)) . '.log';
             }
 

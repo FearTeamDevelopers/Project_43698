@@ -187,11 +187,11 @@ class Ini extends Configuration\Driver
      */
     public function extendForDbConfig()
     {
-        $ca = ConfigModel::all();
+        $ca = ConfigModel::all(array(), array('xkey', 'value'));
 
         if ($ca !== null) {
             foreach ($ca as $key => $value) {
-                $this->_configArrMerged[$value->xkey] = $value->value;
+                $this->_configArrMerged[$value->getXkey()] = $value->getValue();
             }
 
             $this->_parsed = ArrayMethods::toObject($this->_configArrMerged);

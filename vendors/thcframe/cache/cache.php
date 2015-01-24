@@ -42,15 +42,15 @@ class Cache extends Base
      */
     public function initialize($configuration)
     {
-        Event::fire('framework.cache.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.cache.initialize.before', array($this->_type, $this->_options));
 
-        if (!$this->type) {
+        if (!$this->_type) {
             if (!empty($configuration->cache) && !empty($configuration->cache->type)) {
-                $this->type = $configuration->cache->type;
-                $this->options = (array) $configuration->cache;
+                $this->_type = $configuration->cache->type;
+                $this->_options = (array) $configuration->cache;
             } else {
-                $this->type = 'filecache';
-                $this->options = array(
+                $this->_type = 'filecache';
+                $this->_options = array(
                     'mode' => 'active',
                     'duration' => 1800,
                     'suffix' => 'tmp',
@@ -58,15 +58,15 @@ class Cache extends Base
             }
         }
 
-        Event::fire('framework.cache.initialize.after', array($this->type, $this->options));
+        Event::fire('framework.cache.initialize.after', array($this->_type, $this->_options));
 
-        switch ($this->type) {
+        switch ($this->_type) {
             case 'memcached': {
-                    return new Driver\Memcached($this->options);
+                    return new Driver\Memcached($this->_options);
                     break;
                 }
             case 'filecache': {
-                    return new Driver\Filecache($this->options);
+                    return new Driver\Filecache($this->_options);
                     break;
                 }
             default: {

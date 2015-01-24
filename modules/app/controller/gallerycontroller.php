@@ -58,20 +58,62 @@ class GalleryController extends Controller
     }
 
     /**
-     * Show gallery detail
+     * Show gallery detail with photos displayed in grid
      * 
      * @param string $urlKey
      */
-    public function detail($urlKey)
+    public function detail($urlKey, $page = 1)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
+        $limit = 30;
 
         $gallery = \App\Model\GalleryModel::fetchPublicActiveGalleryByUrlkey($urlKey);
 
         if ($gallery === null) {
             self::redirect('/nenalezeno');
         }
+        
+        $photos = \App\Model\PhotoModel::all(
+                        array('active = ?' => true, 'galleryId = ?' => $gallery->getId()), 
+                        array('*'), 
+                        array('rank' => 'desc', 'created' => 'desc'),
+                        $limit, $page
+                );
+
+        $photosCount = \App\Model\PhotoModel::count(array('active = ?' => true, 'galleryId = ?' => $gallery->getId()));
+        $photosPageCount = ceil($photosCount / 30);
+        
+        $this->_pagerMetaLinks($photosPageCount, $page, '/galerie/'.$gallery->getUrlKey().'/p/');
+        $canonical = 'http://' . $this->getServerHost() . '/galerie/r/' . $gallery->getUrlKey();
+
+        $view->set('gallery', $gallery)
+                ->set('photos', $photos)
+                ->set('currentpage', $page)
+                ->set('pagerpathprefix', '/galerie/'.$gallery->getUrlKey())
+                ->set('pagecount', $photosPageCount);
+
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Galerie - ' . $gallery->getTitle());
+    }
+    
+    /**
+     * Show gallery detail as slide show
+     * 
+     * @param string $urlKey
+     */
+    public function slideShow($urlKey)
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $galleryNoPhotos = \App\Model\GalleryModel::fetchPublicActiveGalleryByUrlkey($urlKey);
+
+        if ($galleryNoPhotos === null) {
+            self::redirect('/nenalezeno');
+        }
+        
+        $gallery = $galleryNoPhotos->getActPhotosForGallery();
 
         $canonical = 'http://' . $this->getServerHost() . '/galerie/r/' . $gallery->getUrlKey();
 

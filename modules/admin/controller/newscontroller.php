@@ -162,11 +162,8 @@ class NewsController extends Controller
 
         $news = $this->_checkForObject();
         
-        if(null !== $news){
-            $view->set('news', $news);
-        }
-        
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('news', $news)
+            ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddNews')) {
             if ($this->checkCSRFToken() !== true &&

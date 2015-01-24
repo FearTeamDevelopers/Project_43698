@@ -255,7 +255,7 @@ class NewsModel extends Model
     {
         $news = self::all(array('active = ?' => true, 'approved = ?' => 1), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
-                array('rank' => 'desc','created' => 'desc'), 
+                array('rank' => 'desc', 'created' => 'desc'), 
                 $limit, $page
         );
         

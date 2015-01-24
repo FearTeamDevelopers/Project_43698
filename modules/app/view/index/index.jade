@@ -4,33 +4,30 @@
 		.row.container
 			header
 				h3 Reportáže
-
 			.container-box
 				|{foreach $report in $reports}
-				a(href!='/reportaze/r/{echo $report->urlKey}')
+				a(href!='/reportaze/r/{echo $report->getUrlKey()}')
 					|{if $report_i == 0}
 					article.report.large-9.medium-12.small-12
-						img(src!='{echo $report->imgMain}')
+						img(src!='{echo $report->getImgMain()}')
 						.info
-							h2 {echo $report->title}
-							span {echo \App\Helper\DateFormater::t2dt($report->created).", ".$report->userAlias}
-							div {echo html_entity_decode($report->shortBody)}
+							h2 {echo $report->getTitle()}
+							span {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2dt($report->getCreated())}
+							div {echo html_entity_decode($report->getShortBody())}
 					|{/if}{else}
 					article.report.large-3.medium-4.small-6
 
 						img(src!='{echo $report->imgThumb}')
 						.info
-							h3 {echo $report->title}
-							span {echo \App\Helper\DateFormater::t2dt($report->created)}<br/>
-							span {echo $report->userAlias}
-
+							h3 {echo $report->getTitle()}
+							span {echo "Vytvořil: ".$report->getUserAlias()}<br/>
+							span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
 					|{/else}
 				|{/foreach}
 		.moreWrap
 			a(href='/reportaze')
 				.more
 					span Zobrazit více
-
 	|{/if}
 	| {if !empty($news)}
 	section.wrapper.blue
@@ -42,9 +39,9 @@
 				.large-6.medium-6.small-12.columns
 					article.indexNew
 						header
-							a(href!='/novinky/r/{echo $new->urlKey}')
-								h4 {echo $new->title}
-						div {echo html_entity_decode($new->shortBody)}
+							a(href!='/novinky/r/{echo $new->getUrlKey()}')
+								h4 {echo $new->getTitle()}
+						div {echo html_entity_decode($new->getShortBody())}
 				| {/foreach}
 			.moreWrap
 				a(href='/novinky')
@@ -59,12 +56,12 @@
 			.container-box#wrapper
 				#carousel
 					|{foreach $action in $actions}
-					a.large-4.medium-6.small-12(href!='/akce/r/{echo $action->urlKey}')
+					a.large-4.medium-6.small-12(href!='/akce/r/{echo $action->getUrlKey()}')
 						article
 							header
-								h4 {echo $action->title}
-								span.datum Kdy: {echo \App\Helper\DateFormater::t2d($action->startDate)}
-							div {echo html_entity_decode($action->shortBody)}
+								h4 {echo $action->getTitle()}
+								span.datum Kdy: {echo \App\Helper\DateFormater::t2d($action->getStartDate())}
+							div {echo html_entity_decode($action->getShortBody())}
 					|{/foreach}
 			.moreWrap
 				a(href='/akce')
@@ -80,9 +77,9 @@
 				#carousel2
 					|{foreach $partner in $partners}
 					article.partner
-						img(src!='{echo $partner->logo}')
+						img(src!='{echo $partner->getLogo()}')
 						.info
-							a(href!="{echo $partner->web}", target='_blank') {echo $partner->title}
+							a(href!="{echo $partner->web}", target='_blank') {echo $partner->getTitle()}
 					|{/foreach}
 	|{/if}
 

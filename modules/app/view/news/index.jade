@@ -6,11 +6,11 @@ section.wrapper.novinky
         | {foreach $new in $news}
         article
             header
-                h3 {echo $new->title}
-                span {echo \App\Helper\DateFormater::t2d($new->created).", ".$new->userAlias}
+                h3 {echo $new->getTitle()}
+                span {echo "Vytvořil: ".$new->getUserAlias().", ".\App\Helper\DateFormater::t2d($new->getCreated())}
             .body
-                div {echo html_entity_decode($new->shortBody)}
-                a(href!='/novinky/r/$new->urlKey') čti více
+                div {echo html_entity_decode($new->getShortBody())}
+                a(href!='/novinky/r/{echo $new->getUrlKey()}') čti více
         | {/foreach}
         |{/if}
     include ../components/pager

@@ -4,13 +4,13 @@ section.wrapper.reports
    .row
       |{if !empty($reports)}
       |{foreach $report in $reports}
-      a(href!='/reportaze/r/{echo $report->urlKey}')
+      a(href!='/reportaze/r/{echo $report->getUrlKey()}')
          article.report.medium-4.left
-            img(src!='{echo $report->imgThumb}')
+            img(src!='{echo $report->getImgThumb()}')
             .info
-               h2 {echo $report->title}
-               span {echo \App\Helper\DateFormater::t2d($report->created).", ".$report->userAlias}
-               div {echo html_entity_decode($report->shortBody)}
+               h2 {echo $report->getTitle()}
+               span {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}
+               div {echo html_entity_decode($report->getShortBody())}
       |{/foreach}
       |{/if}
    include ../components/pager

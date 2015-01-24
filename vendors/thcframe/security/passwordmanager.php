@@ -173,7 +173,7 @@ class PasswordManager extends Base
     public static function entropy($string)
     {
         $h = 0;
-        $size = strlen($string);
+        $size = mb_strlen($string);
 
         //Calculate the occurence of each character and compare that number with 
         //the overall length of the string and put it in the entropy formula
@@ -203,7 +203,7 @@ class PasswordManager extends Base
         $length = (int) $length;
 
         $i = 0;
-        $j = strlen($string);
+        $j = mb_strlen($string);
 
         //Group all the characters into length 1, and calculate their ASCII value. 
         //If they are continous, then they contain ordered characters.
@@ -231,7 +231,7 @@ class PasswordManager extends Base
         $length = (int) $length;
 
         $i = 0;
-        $j = strlen($string);
+        $j = mb_strlen($string);
 
         //group all the characters into length 1, and calculate their positions. 
         //If the positions match with the value $keyboardSet, then they contain keyboard ordered characters
@@ -404,10 +404,10 @@ class PasswordManager extends Base
         $score += $entropy / 4;   //maximum entropy is 8
         
         //check for common patters
-        $ordered = self::hasOrderedCharacters($RawPassword, strlen($RawPassword) / 2);
-        $fullyOrdered = self::hasOrderedCharacters($RawPassword, strlen($RawPassword));
-        $hasKeyboardOrder = self::hasKeyboardOrderedCharacters($RawPassword, strlen($RawPassword) / 2);
-        $keyboardOrdered = self::hasKeyboardOrderedCharacters($RawPassword, strlen($RawPassword));
+        $ordered = self::hasOrderedCharacters($RawPassword, mb_strlen($RawPassword) / 2);
+        $fullyOrdered = self::hasOrderedCharacters($RawPassword, mb_strlen($RawPassword));
+        $hasKeyboardOrder = self::hasKeyboardOrderedCharacters($RawPassword, mb_strlen($RawPassword) / 2);
+        $keyboardOrdered = self::hasKeyboardOrderedCharacters($RawPassword, mb_strlen($RawPassword));
 
         if ($fullyOrdered) {
             $score*=.1;
@@ -509,7 +509,7 @@ class PasswordManager extends Base
         //$char contains the string that has all the letters we can use in a password.
         //The loop pics a character from $char in random and adds that character to the final $pass variable.
         for ($i = 0; $i < $Length; ++$i){
-            $Pass .= $chars[rand(0, strlen($chars) - 1)];
+            $Pass .= $chars[rand(0, mb_strlen($chars) - 1)];
         }
 
         return $Pass;

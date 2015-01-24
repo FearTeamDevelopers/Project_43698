@@ -3,13 +3,14 @@ section.wrapper.report
       a(href!="/admin/report/{echo $act}/") Zpět do administrace
    header.row
       .imgWrapper
-         img(src!='$report->imgMain')
+         img(src!='{echo $report->getImgMain()}')
       .reportInfo
-         h2 {echo $report->title}
-         span {echo \App\Helper\DateFormater::t2d($report->created)}<br/>
+         h2 {echo $report->getTitle()}
+         span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
+         br
          small
             span Autor:
-         span {echo " ".$report->userAlias}
+         span {echo " ".$report->getUserAlias()}
    .page.row
       .container
-         |{echo html_entity_decode($report->body)}
+         |{echo html_entity_decode($report->getBody())}

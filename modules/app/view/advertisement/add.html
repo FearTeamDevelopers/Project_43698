@@ -17,8 +17,8 @@
             <select name="section">
               {foreach $section in $adsections}
               {if isset($ad) && $ad->getSectionId() == $section->getId()}
-              <option value="{echo $section->id}" selected="selected">{echo $section->title}</option>{/if}{else}
-              <option value="{echo $section->id}">{echo $section->title}</option>{/else}
+              <option value="{echo $section->getId()}" selected="selected">{echo $section->getTitle()}</option>{/if}{else}
+              <option value="{echo $section->getId()}">{echo $section->getTitle()}</option>{/else}
               {/foreach}
             </select>
           </td>

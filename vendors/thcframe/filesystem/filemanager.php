@@ -146,7 +146,7 @@ class FileManager extends Base
         $filename = $this->getFileName($file);
         $newFile = dirname($file) . '/' . $filename . '_' . time() . '.' . $ext;
 
-        if (strlen($filename) > 50) {
+        if (mb_strlen($filename) > 50) {
             $newFile = dirname($file) . '/' . substr($filename, 0, 50) . '_' . time() . '.' . $ext;
         }
 
@@ -498,7 +498,7 @@ class FileManager extends Base
                     $extension = $this->getExtension($_FILES[$postField]['name'][$i]);
                     $filename = $this->getNormalizedFileName($_FILES[$postField]['name'][$i]);
 
-                    if (strlen($filename) > 50) {
+                    if (mb_strlen($filename) > 50) {
                         $filename = substr($filename, 0, 50);
                     }
 
@@ -672,7 +672,7 @@ class FileManager extends Base
                     $extension = $this->getExtension($_FILES[$postField]['name'][$i]);
                     $filename = $this->getNormalizedFileName($_FILES[$postField]['name'][$i]);
 
-                    if (strlen($filename) > 50) {
+                    if (mb_strlen($filename) > 50) {
                         $filename = substr($filename, 0, 50);
                     }
 
@@ -713,15 +713,15 @@ class FileManager extends Base
 
                                     $thumb = clone $img;
 
-                                    switch ($this->thumbResizeBy) {
+                                    switch ($this->_thumbResizeBy) {
                                         case 'height':
-                                            $thumb->resizeToHeight($this->thumbHeight)->save($thumbLocName);
+                                            $thumb->resizeToHeight($this->_thumbHeight)->save($thumbLocName);
                                             break;
                                         case 'width':
-                                            $thumb->resizeToWidth($this->thumbWidth)->save($thumbLocName);
+                                            $thumb->resizeToWidth($this->_thumbWidth)->save($thumbLocName);
                                             break;
                                         default:
-                                            $thumb->thumbnail($this->thumbWidth, $this->thumbHeight)->save($thumbLocName);
+                                            $thumb->thumbnail($this->_thumbWidth, $this->_thumbHeight)->save($thumbLocName);
                                             break;
                                     }
 
@@ -817,15 +817,15 @@ class FileManager extends Base
 
                                 $thumb = clone $img;
 
-                                switch ($this->thumbResizeBy) {
+                                switch ($this->_thumbResizeBy) {
                                     case 'height':
-                                        $thumb->resizeToHeight($this->thumbHeight)->save($thumbLocName);
+                                        $thumb->resizeToHeight($this->_thumbHeight)->save($thumbLocName);
                                         break;
                                     case 'width':
-                                        $thumb->resizeToWidth($this->thumbWidth)->save($thumbLocName);
+                                        $thumb->resizeToWidth($this->_thumbWidth)->save($thumbLocName);
                                         break;
                                     default:
-                                        $thumb->thumbnail($this->thumbWidth, $this->thumbHeight)->save($thumbLocName);
+                                        $thumb->thumbnail($this->_thumbWidth, $this->_thumbHeight)->save($thumbLocName);
                                         break;
                                 }
 
@@ -899,15 +899,15 @@ class FileManager extends Base
 
                 $thumb = clone $img;
 
-                switch ($this->thumbResizeBy) {
+                switch ($this->_thumbResizeBy) {
                     case 'height':
-                        $thumb->resizeToHeight($this->thumbHeight)->save($thumbLocName);
+                        $thumb->resizeToHeight($this->_thumbHeight)->save($thumbLocName);
                         break;
                     case 'width':
-                        $thumb->resizeToWidth($this->thumbWidth)->save($thumbLocName);
+                        $thumb->resizeToWidth($this->_thumbWidth)->save($thumbLocName);
                         break;
                     default:
-                        $thumb->thumbnail($this->thumbWidth, $this->thumbHeight)->save($thumbLocName);
+                        $thumb->thumbnail($this->_thumbWidth, $this->_thumbHeight)->save($thumbLocName);
                         break;
                 }
             } else {

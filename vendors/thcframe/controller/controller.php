@@ -137,11 +137,11 @@ class Controller extends Base
         $router = Registry::get('router');
 
         if (!empty($configuration->view)) {
-            $this->defaultExtension = explode(',', $configuration->view->extension);
-            $this->defaultLayout = $configuration->view->layout;
-            $this->mobileLayout = $configuration->view->mobileLayout;
-            $this->tabletLayout = $configuration->view->tabletLayout;
-            $this->defaultPath = $configuration->view->path;
+            $this->_defaultExtension = explode(',', $configuration->view->extension);
+            $this->_defaultLayout = $configuration->view->layout;
+            $this->_mobileLayout = $configuration->view->mobileLayout;
+            $this->_tabletLayout = $configuration->view->tabletLayout;
+            $this->_defaultPath = $configuration->view->path;
         } else {
             throw new \Exception('Error in configuration file');
         }
@@ -153,19 +153,19 @@ class Controller extends Base
 
         $deviceType = $session->get('devicetype');
 
-        if ($deviceType == 'phone' && $this->mobileLayout != '') {
-            $defaultLayout = $this->mobileLayout;
-        } elseif ($deviceType == 'tablet' && $this->tabletLayout != '') {
-            $defaultLayout = $this->tabletLayout;
+        if ($deviceType == 'phone' && $this->_mobileLayout != '') {
+            $defaultLayout = $this->_mobileLayout;
+        } elseif ($deviceType == 'tablet' && $this->_tabletLayout != '') {
+            $defaultLayout = $this->_tabletLayout;
         } else {
-            $defaultLayout = $this->defaultLayout;
+            $defaultLayout = $this->_defaultLayout;
         }
 
-        $defaultPath = sprintf($this->defaultPath, $module);
+        $defaultPath = sprintf($this->_defaultPath, $module);
         
         //create view instances
-        if ($this->willRenderLayoutView) {
-            foreach ($this->defaultExtension as $ext) {
+        if ($this->_willRenderLayoutView) {
+            foreach ($this->_defaultExtension as $ext) {
                 if(file_exists(APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}")){
                     $viewFile = APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}";
                     break;
@@ -176,11 +176,11 @@ class Controller extends Base
                 'file' => $viewFile
             ));
 
-            $this->layoutView = $view;
+            $this->_layoutView = $view;
         }
 
-        if ($this->willRenderActionView) {
-            foreach ($this->defaultExtension as $ext) {
+        if ($this->_willRenderActionView) {
+            foreach ($this->_defaultExtension as $ext) {
                 if(file_exists(APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}")){
                     $viewFile = APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}";
                     break;
@@ -191,7 +191,7 @@ class Controller extends Base
                 'file' => $viewFile
             ));
 
-            $this->actionView = $view;
+            $this->_actionView = $view;
         }
 
         Event::fire('framework.controller.construct.after', array($this->name));
@@ -250,29 +250,27 @@ class Controller extends Base
      */
     public function render()
     {
-        Event::fire('framework.controller.render.before', array($this->name));
+        Event::fire('framework.controller.render.before', array($this->_name));
 
-        $defaultContentType = $this->defaultContentType;
+        $defaultContentType = $this->_defaultContentType;
         $results = null;
 
-        $doAction = $this->willRenderActionView && $this->actionView;
-        $doLayout = $this->willRenderLayoutView && $this->layoutView;
+        $doAction = $this->_willRenderActionView && $this->_actionView;
+        $doLayout = $this->_willRenderLayoutView && $this->_layoutView;
         $profiler = \THCFrame\Profiler\Profiler::getInstance();
 
         try {
             if ($doAction) {
-                $view = $this->actionView;
-                $results = $view->render();
+                $results = $this->_actionView->render();
 
-                $this->actionView
+                $this->_actionView
                         ->template
                         ->implementation
                         ->set('action', $results);
             }
 
             if ($doLayout) {
-                $view = $this->layoutView;
-                $results = $view->render();
+                $results = $this->_layoutView->render();
                 $profiler->stop();
                 
                 //protection against clickjacking
@@ -288,13 +286,13 @@ class Controller extends Base
                 echo $results;
             }
 
-            $this->willRenderLayoutView = false;
-            $this->willRenderActionView = false;
+            $this->_willRenderLayoutView = false;
+            $this->_willRenderActionView = false;
         } catch (\Exception $e) {
             throw new ViewException\Renderer('Invalid layout/template syntax');
         }
 
-        Event::fire('framework.controller.render.after', array($this->name));
+        Event::fire('framework.controller.render.after', array($this->_name));
     }
 
     /**
@@ -302,11 +300,11 @@ class Controller extends Base
      */
     public function __destruct()
     {
-        Event::fire('framework.controller.destruct.before', array($this->name));
+        Event::fire('framework.controller.destruct.before', array($this->_name));
 
         $this->render();
 
-        Event::fire('framework.controller.destruct.after', array($this->name));
+        Event::fire('framework.controller.destruct.after', array($this->_name));
     }
 
 }

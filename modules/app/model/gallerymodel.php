@@ -224,7 +224,7 @@ class GalleryModel extends Model
 
         if (!empty($galleryArr)) {
             $gallery = array_shift($galleryArr);
-            return $gallery->getActPhotosForGallery();
+            return $gallery;
         } else {
             return null;
         }

@@ -230,11 +230,8 @@ class ReportController extends Controller
         
         $report = $this->_checkForObject();
         
-        if(null !== $report){
-            $view->set('report', $report);
-        }
-
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('report', $report)
+            ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddReport')) {
             if ($this->checkCSRFToken() !== true &&

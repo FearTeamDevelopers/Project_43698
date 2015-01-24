@@ -2,6 +2,6 @@
    section.wrapper
       .row.container
          header
-            h1 {echo $news->title}
-            span {echo \App\Helper\DateFormater::t2d($new->created).", ".$news->userAlias}
-         |{echo html_entity_decode($news->body)}
+            h1 {echo $news->getTitle()}
+            span {echo "Vytvořil: ".$news->getUserAlias().", ".\App\Helper\DateFormater::t2d($news->getCreated())}
+         |{echo html_entity_decode($news->getBody())}

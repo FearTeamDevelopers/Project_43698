@@ -2,12 +2,12 @@
    section.wrapper
       .row.container
          header
-            h1 {echo $action->title}
-            span {echo \App\Helper\DateFormater::t2d($new->created).", ".$action->userAlias}
+            h1 {echo $action->getTitle()}
+            span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
             br
-            span Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->startDate)}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->endDate)}</strong>
+            span Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->getStartDate())}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->getEndDate())}</strong>
             br
-            |{if !empty($action->startTime)}
-            span Čas: <strong>{echo $action->startTime}</strong> - <strong>{echo $action->endTime}</strong><br/>
+            |{if !empty($action->getStartTime())}
+            span Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/>
             |{/if}
-         |{echo html_entity_decode($action->body)}
+         |{echo html_entity_decode($action->getBody())}

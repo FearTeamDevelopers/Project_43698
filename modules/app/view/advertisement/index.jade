@@ -18,34 +18,34 @@ section.wrapper.bazar
                 | {script $images=$ad->getImages()}
                 | {if !empty($images)}
                 | {script $image=array_shift($images)}
-                a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->imgMain}")
-                    img(src!="{echo $image->imgThumb}")
+                a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->getImgMain()}")
+                    img(src!="{echo $image->getImgThumb()}")
                 | {/if}
             .nazev
                 .nazevWrapper
-                    h4 {echo $ad->title}
+                    h4 {echo $ad->getTitle()}
             .infoWrapper
                 .info
-                    | {if $ad->adType=='tender'}
+                    | {if $ad->getAdType() =='tender'}
                     center
                         span.nabidka Nabídka <br/>
                     |{/if}{else}
                     center
                         span.poptavka Poptávka <br/>
                     |{/else}
-                    span {echo " ".$ad->userAlias}<br/>
+                    span {echo " ".$ad->getUserAlias()}<br/>
                     small
                         span sekce:
-                    span {echo " ".$ad->sectionTitle}<br/>
+                    span {echo " ".$ad->getSectionTitle()}<br/>
                     small
                         span cena:
-                    |{if $ad->price == "1"}
+                    |{if $ad->getPrice() == "1"}
                     span.price {echo " na dohodě"}<br/>
                     |{/if}
                     |{else}
-                    span.price {echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/>
+                    span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
                     |{/else}
-                    a.bla(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
+                    a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
         |{/foreach}
         |{/if}{else}
         article.large-12.small-12.medium-12.column.left

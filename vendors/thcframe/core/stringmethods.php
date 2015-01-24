@@ -410,12 +410,12 @@ class StringMethods
     {
         if ($considerHtml) {
             // if the plain text is shorter than the maximum length, return the whole text
-            if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
+            if (mb_strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
                 return $text;
             }
             // splits all html-tags to scanable lines
             preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
-            $total_length = strlen($ending);
+            $total_length = mb_strlen($ending);
             $open_tags = array();
             $truncate = '';
             foreach ($lines as $line_matchings) {
@@ -451,7 +451,7 @@ class StringMethods
                         foreach ($entities[0] as $entity) {
                             if ($entity[1] + 1 - $entities_length <= $left) {
                                 $left--;
-                                $entities_length += strlen($entity[0]);
+                                $entities_length += mb_strlen($entity[0]);
                             } else {
                                 // no more characters left
                                 break;
@@ -471,10 +471,10 @@ class StringMethods
                 }
             }
         } else {
-            if (strlen($text) <= $length) {
+            if (mb_strlen($text) <= $length) {
                 return $text;
             } else {
-                $truncate = substr($text, 0, $length - strlen($ending));
+                $truncate = substr($text, 0, $length - mb_strlen($ending));
             }
         }
         // if the words shouldn't be cut in the middle...

@@ -94,8 +94,8 @@ class Image extends Base
      */
     public function __destruct()
     {
-        if ($this->image) {
-            imagedestroy($this->image);
+        if ($this->_image) {
+            imagedestroy($this->_image);
         }
     }
 
@@ -106,11 +106,11 @@ class Image extends Base
      */
     public function getOrientation()
     {
-        if (imagesx($this->image) > imagesy($this->image)) {
+        if (imagesx($this->_image) > imagesy($this->_image)) {
             return 'landscape';
         }
 
-        if (imagesx($this->image) < imagesy($this->image)) {
+        if (imagesx($this->_image) < imagesy($this->_image)) {
             return 'portrait';
         }
 
@@ -177,20 +177,20 @@ class Image extends Base
     public function bestFit($max_width, $max_height)
     {
         // If it already fits, there's nothing to do
-        if ($this->width <= $max_width && $this->height <= $max_height) {
+        if ($this->_width <= $max_width && $this->_height <= $max_height) {
             return $this;
         }
 
         // Determine aspect ratio
-        $aspect_ratio = $this->height / $this->width;
+        $aspect_ratio = $this->_height / $this->_width;
 
         // Make width fit into new dimensions
-        if ($this->width > $max_width) {
+        if ($this->_width > $max_width) {
             $width = $max_width;
             $height = $width * $aspect_ratio;
         } else {
-            $width = $this->width;
-            $height = $this->height;
+            $width = $this->_width;
+            $height = $this->_height;
         }
 
         // Make height fit into new dimensions
@@ -210,7 +210,7 @@ class Image extends Base
      */
     public function brightness($level)
     {
-        imagefilter($this->image, IMG_FILTER_BRIGHTNESS, $this->_inRange($level, -255, 255));
+        imagefilter($this->_image, IMG_FILTER_BRIGHTNESS, $this->_inRange($level, -255, 255));
         return $this;
     }
 
@@ -222,7 +222,7 @@ class Image extends Base
      */
     public function contrast($level)
     {
-        imagefilter($this->image, IMG_FILTER_CONTRAST, $this->_inRange($level, -100, 100));
+        imagefilter($this->_image, IMG_FILTER_CONTRAST, $this->_inRange($level, -100, 100));
         return $this;
     }
 
@@ -238,7 +238,7 @@ class Image extends Base
     {
         $rgba = $this->_normalizeColor($color);
         $alpha = $this->_inRange(127 - (127 * $opacity), 0, 127);
-        imagefilter($this->image, IMG_FILTER_COLORIZE, $this->_inRange($rgba['r'], 0, 255), $this->_inRange($rgba['g'], 0, 255), $this->_inRange($rgba['b'], 0, 255), $alpha);
+        imagefilter($this->_image, IMG_FILTER_COLORIZE, $this->_inRange($rgba['r'], 0, 255), $this->_inRange($rgba['g'], 0, 255), $this->_inRange($rgba['b'], 0, 255), $alpha);
         return $this;
     }
 
@@ -261,7 +261,7 @@ class Image extends Base
                 break;
         }
         for ($i = 0; $i < $passes; $i++) {
-            imagefilter($this->image, $type);
+            imagefilter($this->_image, $type);
         }
         return $this;
     }
@@ -273,7 +273,7 @@ class Image extends Base
      */
     public function desaturate()
     {
-        imagefilter($this->image, IMG_FILTER_GRAYSCALE);
+        imagefilter($this->_image, IMG_FILTER_GRAYSCALE);
         return $this;
     }
 
@@ -284,7 +284,7 @@ class Image extends Base
      */
     public function edges()
     {
-        imagefilter($this->image, IMG_FILTER_EDGEDETECT);
+        imagefilter($this->_image, IMG_FILTER_EDGEDETECT);
         return $this;
     }
 
@@ -295,7 +295,7 @@ class Image extends Base
      */
     public function emboss()
     {
-        imagefilter($this->image, IMG_FILTER_EMBOSS);
+        imagefilter($this->_image, IMG_FILTER_EMBOSS);
         return $this;
     }
 
@@ -306,7 +306,7 @@ class Image extends Base
      */
     public function invert()
     {
-        imagefilter($this->image, IMG_FILTER_NEGATE);
+        imagefilter($this->_image, IMG_FILTER_NEGATE);
         return $this;
     }
 
@@ -317,7 +317,7 @@ class Image extends Base
      */
     public function meanRemove()
     {
-        imagefilter($this->image, IMG_FILTER_MEAN_REMOVAL);
+        imagefilter($this->_image, IMG_FILTER_MEAN_REMOVAL);
         return $this;
     }
 
@@ -328,8 +328,8 @@ class Image extends Base
      */
     public function sepia()
     {
-        imagefilter($this->image, IMG_FILTER_GRAYSCALE);
-        imagefilter($this->image, IMG_FILTER_COLORIZE, 100, 50, 0);
+        imagefilter($this->_image, IMG_FILTER_GRAYSCALE);
+        imagefilter($this->_image, IMG_FILTER_COLORIZE, 100, 50, 0);
         return $this;
     }
 
@@ -340,7 +340,7 @@ class Image extends Base
      */
     public function sketch()
     {
-        imagefilter($this->image, IMG_FILTER_MEAN_REMOVAL);
+        imagefilter($this->_image, IMG_FILTER_MEAN_REMOVAL);
         return $this;
     }
 
@@ -352,7 +352,7 @@ class Image extends Base
      */
     public function smooth($level)
     {
-        imagefilter($this->image, IMG_FILTER_SMOOTH, $this->_inRange($level, -10, 10));
+        imagefilter($this->_image, IMG_FILTER_SMOOTH, $this->_inRange($level, -10, 10));
         return $this;
     }
 
@@ -365,7 +365,7 @@ class Image extends Base
      */
     public function pixelate($block_size = 10)
     {
-        imagefilter($this->image, IMG_FILTER_PIXELATE, $block_size, true);
+        imagefilter($this->_image, IMG_FILTER_PIXELATE, $block_size, true);
         return $this;
     }
 
@@ -379,10 +379,10 @@ class Image extends Base
     public function fill($color = '#000000')
     {
         $rgba = $this->_normalizeColor($color);
-        $fill_color = imagecolorallocatealpha($this->image, $rgba['r'], $rgba['g'], $rgba['b'], $rgba['a']);
-        imagealphablending($this->image, false);
-        imagesavealpha($this->image, true);
-        imagefilledrectangle($this->image, 0, 0, $this->width, $this->height, $fill_color);
+        $fill_color = imagecolorallocatealpha($this->_image, $rgba['r'], $rgba['g'], $rgba['b'], $rgba['a']);
+        imagealphablending($this->_image, false);
+        imagesavealpha($this->_image, true);
+        imagefilledrectangle($this->_image, 0, 0, $this->_width, $this->_height, $fill_color);
 
         return $this;
     }
@@ -395,7 +395,7 @@ class Image extends Base
      */
     public function resizeToHeight($height)
     {
-        $aspect_ratio = $this->height / $this->width;
+        $aspect_ratio = $this->_height / $this->_width;
         $width = $height / $aspect_ratio;
 
         return $this->resize($width, $height);
@@ -409,7 +409,7 @@ class Image extends Base
      */
     public function resizeToWidth($width)
     {
-        $aspect_ratio = $this->height / $this->width;
+        $aspect_ratio = $this->_height / $this->_width;
         $height = $width * $aspect_ratio;
 
         return $this->resize($width, $height);
@@ -424,21 +424,21 @@ class Image extends Base
      */
     public function flip($direction)
     {
-        $new = imagecreatetruecolor($this->width, $this->height);
+        $new = imagecreatetruecolor($this->_width, $this->_height);
         imagealphablending($new, false);
         imagesavealpha($new, true);
 
         if (strtolower($direction) == 'y') {
-            for ($y = 0; $y < $this->height; $y++) {
-                imagecopy($new, $this->image, 0, $y, 0, $this->height - $y - 1, $this->width, 1);
+            for ($y = 0; $y < $this->_height; $y++) {
+                imagecopy($new, $this->_image, 0, $y, 0, $this->_height - $y - 1, $this->_width, 1);
             }
         } else {
-            for ($x = 0; $x < $this->width; $x++) {
-                imagecopy($new, $this->image, $x, 0, $this->width - $x - 1, 0, 1, $this->height);
+            for ($x = 0; $x < $this->_width; $x++) {
+                imagecopy($new, $this->_image, $x, 0, $this->_width - $x - 1, 0, 1, $this->_height);
             }
         }
 
-        $this->image = $new;
+        $this->_image = $new;
 
         return $this;
     }
@@ -454,16 +454,16 @@ class Image extends Base
         $opacity = $this->_inRange($opacity, 0, 1) * 100;
 
         // Make a copy of the image
-        $copy = imagecreatetruecolor($this->width, $this->height);
+        $copy = imagecreatetruecolor($this->_width, $this->_height);
         imagealphablending($copy, false);
         imagesavealpha($copy, true);
-        imagecopy($copy, $this->image, 0, 0, 0, 0, $this->width, $this->height);
+        imagecopy($copy, $this->_image, 0, 0, 0, 0, $this->_width, $this->_height);
 
         // Create transparent layer
-        $this->create($this->width, $this->height, array(0, 0, 0, 127));
+        $this->create($this->_width, $this->_height, array(0, 0, 0, 127));
 
         // Merge with specified opacity
-        $this->_imagecopymergealpha($this->image, $copy, 0, 0, 0, 0, $this->width, $this->height, $opacity);
+        $this->_imagecopymergealpha($this->_image, $copy, 0, 0, 0, 0, $this->_width, $this->_height, $opacity);
         imagedestroy($copy);
 
         return $this;
@@ -484,9 +484,9 @@ class Image extends Base
 
         if ($info['format'] === 'gif') {
             // Preserve transparency in GIFs
-            $transparent_index = imagecolortransparent($this->image);
+            $transparent_index = imagecolortransparent($this->_image);
             if ($transparent_index >= 0) {
-                $transparent_color = imagecolorsforindex($this->image, $transparent_index);
+                $transparent_color = imagecolorsforindex($this->_image, $transparent_index);
                 $transparent_index = imagecolorallocate($new, $transparent_color['red'], $transparent_color['green'], $transparent_color['blue']);
                 imagefill($new, 0, 0, $transparent_index);
                 imagecolortransparent($new, $transparent_index);
@@ -500,12 +500,12 @@ class Image extends Base
         $width = round($width);
         $height = round($height);
         // Resize
-        imagecopyresampled($new, $this->image, 0, 0, 0, 0, $width, $height, $this->width, $this->height);
+        imagecopyresampled($new, $this->_image, 0, 0, 0, 0, $width, $height, $this->_width, $this->_height);
 
         // Update meta data
-        $this->width = $width;
-        $this->height = $height;
-        $this->image = $new;
+        $this->_width = $width;
+        $this->_height = $height;
+        $this->_image = $new;
 
         return $this;
     }
@@ -522,15 +522,15 @@ class Image extends Base
     {
         // Perform the rotation
         $rgba = $this->_normalizeColor($bg_color);
-        $bg_color = imagecolorallocatealpha($this->image, $rgba['r'], $rgba['g'], $rgba['b'], $rgba['a']);
-        $new = imagerotate($this->image, -($this->_inRange($angle, -360, 360)), $bg_color);
+        $bg_color = imagecolorallocatealpha($this->_image, $rgba['r'], $rgba['g'], $rgba['b'], $rgba['a']);
+        $new = imagerotate($this->_image, -($this->_inRange($angle, -360, 360)), $bg_color);
         imagesavealpha($new, true);
         imagealphablending($new, true);
 
         // Update meta data
-        $this->width = imagesx($new);
-        $this->height = imagesy($new);
-        $this->image = $new;
+        $this->_width = imagesx($new);
+        $this->_height = imagesy($new);
+        $this->_image = $new;
 
         return $this;
     }
@@ -547,10 +547,10 @@ class Image extends Base
     public function create($width, $height = null, $color = null)
     {
         $height = $height ? : $width;
-        $this->width = $width;
-        $this->height = $height;
-        $this->image = imagecreatetruecolor($width, $height);
-        $this->originalInfo = array(
+        $this->_width = $width;
+        $this->_height = $height;
+        $this->_image = imagecreatetruecolor($width, $height);
+        $this->_originalInfo = array(
             'width' => $width,
             'height' => $height,
             'orientation' => $this->getOrientation(),
@@ -592,12 +592,12 @@ class Image extends Base
         $new = imagecreatetruecolor($crop_width, $crop_height);
         imagealphablending($new, false);
         imagesavealpha($new, true);
-        imagecopyresampled($new, $this->image, 0, 0, $x1, $y1, $crop_width, $crop_height, $crop_width, $crop_height);
+        imagecopyresampled($new, $this->_image, 0, 0, $x1, $y1, $crop_width, $crop_height, $crop_width, $crop_height);
 
         // Update meta data
-        $this->width = $crop_width;
-        $this->height = $crop_height;
-        $this->image = $new;
+        $this->_width = $crop_width;
+        $this->_height = $crop_height;
+        $this->_image = $new;
 
         return $this;
     }
@@ -616,7 +616,7 @@ class Image extends Base
             throw new Exception\Version('Required extension GD is not loaded.');
         }
 
-        $this->filename = $filename;
+        $this->_filename = $filename;
         return $this->_getMetaData();
     }
 
@@ -635,7 +635,7 @@ class Image extends Base
 
         //remove data URI scheme and spaces from base64 string then decode it
         $this->_imagestring = base64_decode(str_replace(' ', '+', preg_replace('#^data:image/[^;]+;base64,#', '', $base64string)));
-        $this->image = imagecreatefromstring($this->_imagestring);
+        $this->_image = imagecreatefromstring($this->_imagestring);
         return $this->_getMetaData();
     }
 
@@ -649,7 +649,7 @@ class Image extends Base
     public function output($format = null, $quality = null)
     {
         // Determine quality
-        $quality = $quality ? : $this->quality;
+        $quality = $quality ? : $this->_quality;
 
         // Determine mimetype
         switch (strtolower($format)) {
@@ -658,14 +658,14 @@ class Image extends Base
                 break;
             case 'jpeg':
             case 'jpg':
-                imageinterlace($this->image, true);
+                imageinterlace($this->_image, true);
                 $mimetype = 'image/jpeg';
                 break;
             case 'png':
                 $mimetype = 'image/png';
                 break;
             default:
-                $info = (empty($this->_imagestring)) ? getimagesize($this->filename) : getimagesizefromstring($this->_imagestring);
+                $info = (empty($this->_imagestring)) ? getimagesize($this->_filename) : getimagesizefromstring($this->_imagestring);
                 $mimetype = $info['mime'];
                 unset($info);
                 break;
@@ -675,16 +675,16 @@ class Image extends Base
         header('Content-Type: ' . $mimetype);
         switch ($mimetype) {
             case 'image/gif':
-                imagegif($this->image);
+                imagegif($this->_image);
                 break;
             case 'image/jpeg':
-                imagejpeg($this->image, null, round($quality));
+                imagejpeg($this->_image, null, round($quality));
                 break;
             case 'image/png':
-                imagepng($this->image, null, round(9 * $quality / 100));
+                imagepng($this->_image, null, round(9 * $quality / 100));
                 break;
             default:
-                throw new Exception\Type(sprintf('Unsupported image format: %s', $this->filename));
+                throw new Exception\Type(sprintf('Unsupported image format: %s', $this->_filename));
                 break;
         }
 
@@ -702,7 +702,7 @@ class Image extends Base
     public function outputBase64($format = null, $quality = null)
     {
         // Determine quality
-        $quality = $quality ? : $this->quality;
+        $quality = $quality ? : $this->_quality;
 
         // Determine mimetype
         switch (strtolower($format)) {
@@ -711,14 +711,14 @@ class Image extends Base
                 break;
             case 'jpeg':
             case 'jpg':
-                imageinterlace($this->image, true);
+                imageinterlace($this->_image, true);
                 $mimetype = 'image/jpeg';
                 break;
             case 'png':
                 $mimetype = 'image/png';
                 break;
             default:
-                $info = getimagesize($this->filename);
+                $info = getimagesize($this->_filename);
                 $mimetype = $info['mime'];
                 unset($info);
                 break;
@@ -728,16 +728,16 @@ class Image extends Base
         ob_start();
         switch ($mimetype) {
             case 'image/gif':
-                imagegif($this->image);
+                imagegif($this->_image);
                 break;
             case 'image/jpeg':
-                imagejpeg($this->image, null, round($quality));
+                imagejpeg($this->_image, null, round($quality));
                 break;
             case 'image/png':
-                imagepng($this->image, null, round(9 * $quality / 100));
+                imagepng($this->_image, null, round(9 * $quality / 100));
                 break;
             default:
-                throw new Exception\Type(sprintf('Unsupported image format: %s', $this->filename));
+                throw new Exception\Type(sprintf('Unsupported image format: %s', $this->_filename));
                 break;
         }
         $image_data = ob_get_contents();
@@ -759,23 +759,23 @@ class Image extends Base
     public function save($filename = null, $quality = null)
     {
         // Determine quality, filename, and format
-        $quality = $quality ? : $this->quality;
-        $filename = $filename ? StringMethods::removeDiacriticalMarks(str_replace(' ', '_', $filename)) : $this->filename;
+        $quality = $quality ? : $this->_quality;
+        $filename = $filename ? StringMethods::removeDiacriticalMarks(str_replace(' ', '_', $filename)) : $this->_filename;
         $info = $this->getOriginalInfo();
         $format = $this->_fileExt($filename) ? : $info['format'];
 
         // Create the image
         switch (strtolower($format)) {
             case 'gif':
-                $result = imagegif($this->image, $filename);
+                $result = imagegif($this->_image, $filename);
                 break;
             case 'jpg':
             case 'jpeg':
-                imageinterlace($this->image, true);
-                $result = imagejpeg($this->image, $filename, round($quality));
+                imageinterlace($this->_image, true);
+                $result = imagejpeg($this->_image, $filename, round($quality));
                 break;
             case 'png':
-                $result = imagepng($this->image, $filename, round(9 * $quality / 100));
+                $result = imagepng($this->_image, $filename, round(9 * $quality / 100));
                 break;
             default:
                 throw new Exception\Type('Unsupported format');
@@ -784,7 +784,7 @@ class Image extends Base
         if (!$result) {
             throw new Exception\IO(sprintf('Unable to save image: %s', $filename));
         }
-        $this->filename = $filename;
+        $this->_filename = $filename;
         return $this;
     }
 
@@ -817,42 +817,42 @@ class Image extends Base
                 $y = 0 + $y_offset;
                 break;
             case 'top right':
-                $x = $this->width - $overlay->width + $x_offset;
+                $x = $this->_width - $overlay->width + $x_offset;
                 $y = 0 + $y_offset;
                 break;
             case 'top':
-                $x = ($this->width / 2) - ($overlay->width / 2) + $x_offset;
+                $x = ($this->_width / 2) - ($overlay->width / 2) + $x_offset;
                 $y = 0 + $y_offset;
                 break;
             case 'bottom left':
                 $x = 0 + $x_offset;
-                $y = $this->height - $overlay->height + $y_offset;
+                $y = $this->_height - $overlay->height + $y_offset;
                 break;
             case 'bottom right':
-                $x = $this->width - $overlay->width + $x_offset;
-                $y = $this->height - $overlay->height + $y_offset;
+                $x = $this->_width - $overlay->width + $x_offset;
+                $y = $this->_height - $overlay->height + $y_offset;
                 break;
             case 'bottom':
-                $x = ($this->width / 2) - ($overlay->width / 2) + $x_offset;
-                $y = $this->height - $overlay->height + $y_offset;
+                $x = ($this->_width / 2) - ($overlay->width / 2) + $x_offset;
+                $y = $this->_height - $overlay->height + $y_offset;
                 break;
             case 'left':
                 $x = 0 + $x_offset;
-                $y = ($this->height / 2) - ($overlay->height / 2) + $y_offset;
+                $y = ($this->_height / 2) - ($overlay->height / 2) + $y_offset;
                 break;
             case 'right':
-                $x = $this->width - $overlay->width + $x_offset;
-                $y = ($this->height / 2) - ($overlay->height / 2) + $y_offset;
+                $x = $this->_width - $overlay->width + $x_offset;
+                $y = ($this->_height / 2) - ($overlay->height / 2) + $y_offset;
                 break;
             case 'center':
             default:
-                $x = ($this->width / 2) - ($overlay->width / 2) + $x_offset;
-                $y = ($this->height / 2) - ($overlay->height / 2) + $y_offset;
+                $x = ($this->_width / 2) - ($overlay->width / 2) + $x_offset;
+                $y = ($this->_height / 2) - ($overlay->height / 2) + $y_offset;
                 break;
         }
 
         // Perform the overlay
-        $this->_imagecopymergealpha($this->image, $overlay->image, $x, $y, 0, 0, $overlay->width, $overlay->height, $opacity);
+        $this->_imagecopymergealpha($this->_image, $overlay->image, $x, $y, 0, 0, $overlay->width, $overlay->height, $opacity);
 
         return $this;
     }
@@ -876,7 +876,7 @@ class Image extends Base
 
         // Determine text color
         $rgba = $this->_normalizeColor($color);
-        $color = imagecolorallocatealpha($this->image, $rgba['r'], $rgba['g'], $rgba['b'], $rgba['a']);
+        $color = imagecolorallocatealpha($this->_image, $rgba['r'], $rgba['g'], $rgba['b'], $rgba['a']);
 
         // Determine textbox size
         $box = imagettfbbox($font_size, $angle, $font_file, $text);
@@ -893,42 +893,42 @@ class Image extends Base
                 $y = 0 + $y_offset + $box_height;
                 break;
             case 'top right':
-                $x = $this->width - $box_width + $x_offset;
+                $x = $this->_width - $box_width + $x_offset;
                 $y = 0 + $y_offset + $box_height;
                 break;
             case 'top':
-                $x = ($this->width / 2) - ($box_width / 2) + $x_offset;
+                $x = ($this->_width / 2) - ($box_width / 2) + $x_offset;
                 $y = 0 + $y_offset + $box_height;
                 break;
             case 'bottom left':
                 $x = 0 + $x_offset;
-                $y = $this->height - $box_height + $y_offset + $box_height;
+                $y = $this->_height - $box_height + $y_offset + $box_height;
                 break;
             case 'bottom right':
-                $x = $this->width - $box_width + $x_offset;
-                $y = $this->height - $box_height + $y_offset + $box_height;
+                $x = $this->_width - $box_width + $x_offset;
+                $y = $this->_height - $box_height + $y_offset + $box_height;
                 break;
             case 'bottom':
-                $x = ($this->width / 2) - ($box_width / 2) + $x_offset;
-                $y = $this->height - $box_height + $y_offset + $box_height;
+                $x = ($this->_width / 2) - ($box_width / 2) + $x_offset;
+                $y = $this->_height - $box_height + $y_offset + $box_height;
                 break;
             case 'left':
                 $x = 0 + $x_offset;
-                $y = ($this->height / 2) - (($box_height / 2) - $box_height) + $y_offset;
+                $y = ($this->_height / 2) - (($box_height / 2) - $box_height) + $y_offset;
                 break;
             case 'right';
-                $x = $this->width - $box_width + $x_offset;
-                $y = ($this->height / 2) - (($box_height / 2) - $box_height) + $y_offset;
+                $x = $this->_width - $box_width + $x_offset;
+                $y = ($this->_height / 2) - (($box_height / 2) - $box_height) + $y_offset;
                 break;
             case 'center':
             default:
-                $x = ($this->width / 2) - ($box_width / 2) + $x_offset;
-                $y = ($this->height / 2) - (($box_height / 2) - $box_height) + $y_offset;
+                $x = ($this->_width / 2) - ($box_width / 2) + $x_offset;
+                $y = ($this->_height / 2) - (($box_height / 2) - $box_height) + $y_offset;
                 break;
         }
 
         // Add the text
-        imagettftext($this->image, $font_size, $angle, $x, $y, $color, $font_file, $text);
+        imagettftext($this->_image, $font_size, $angle, $x, $y, $color, $font_file, $text);
 
         return $this;
     }
@@ -948,7 +948,7 @@ class Image extends Base
         $height = $height ? : $width;
 
         // Determine aspect ratios
-        $current_aspect_ratio = $this->height / $this->width;
+        $current_aspect_ratio = $this->_height / $this->_width;
         $new_aspect_ratio = $height / $width;
 
         // Fit to height/width
@@ -957,8 +957,8 @@ class Image extends Base
         } else {
             $this->resizeToWidth($width);
         }
-        $left = floor(($this->width / 2) - ($width / 2));
-        $top = floor(($this->height / 2) - ($height / 2));
+        $left = floor(($this->_width / 2) - ($width / 2));
+        $top = floor(($this->_height / 2) - ($height / 2));
 
         // Return trimmed image
         return $this->crop($left, $top, $width + $left, $height + $top);
@@ -986,20 +986,20 @@ class Image extends Base
     {
         //gather meta data
         if (empty($this->_imagestring)) {
-            $info = getimagesize($this->filename);
+            $info = getimagesize($this->_filename);
 
             switch ($info['mime']) {
                 case 'image/gif':
-                    $this->image = imagecreatefromgif($this->filename);
+                    $this->_image = imagecreatefromgif($this->_filename);
                     break;
                 case 'image/jpeg':
-                    $this->image = imagecreatefromjpeg($this->filename);
+                    $this->_image = imagecreatefromjpeg($this->_filename);
                     break;
                 case 'image/png':
-                    $this->image = imagecreatefrompng($this->filename);
+                    $this->_image = imagecreatefrompng($this->_filename);
                     break;
                 default:
-                    throw new Exception\IO(sprintf('Invalid image: %s', $this->filename));
+                    throw new Exception\IO(sprintf('Invalid image: %s', $this->_filename));
                     break;
             }
         } elseif (function_exists('getimagesizefromstring')) {
@@ -1008,21 +1008,21 @@ class Image extends Base
             throw new Exception\Version('PHP 5.4 is required to use method getimagesizefromstring');
         }
 
-        $this->originalInfo = array(
+        $this->_originalInfo = array(
             'width' => $info[0],
             'height' => $info[1],
             'orientation' => $this->getOrientation(),
-            'exif' => function_exists('exif_read_data') && $info['mime'] === 'image/jpeg' && $this->_imagestring === null ? $this->exif = @exif_read_data($this->filename) : null,
+            'exif' => function_exists('exif_read_data') && $info['mime'] === 'image/jpeg' && $this->_imagestring === null ? $this->exif = @exif_read_data($this->_filename) : null,
             'format' => preg_replace('/^image\//', '', $info['mime']),
             'mime' => $info['mime']
         );
 
-        $this->width = $info[0];
-        $this->height = $info[1];
-        $this->format = $this->_originalInfo['format'];
+        $this->_width = $info[0];
+        $this->_height = $info[1];
+        $this->_format = $this->_originalInfo['format'];
 
-        imagesavealpha($this->image, true);
-        imagealphablending($this->image, true);
+        imagesavealpha($this->_image, true);
+        imagealphablending($this->_image, true);
 
         return $this;
     }
@@ -1126,13 +1126,13 @@ class Image extends Base
 
             $color = trim($color, '#');
 
-            if (strlen($color) == 6) {
+            if (mb_strlen($color) == 6) {
                 list($r, $g, $b) = array(
                     $color[0] . $color[1],
                     $color[2] . $color[3],
                     $color[4] . $color[5]
                 );
-            } elseif (strlen($color) == 3) {
+            } elseif (mb_strlen($color) == 3) {
                 list($r, $g, $b) = array(
                     $color[0] . $color[0],
                     $color[1] . $color[1],

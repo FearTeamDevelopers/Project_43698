@@ -76,7 +76,7 @@ class Response extends Base
      */
     public function __toString()
     {
-        return $this->body;
+        return $this->_body;
     }
 
 }

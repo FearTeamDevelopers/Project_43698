@@ -49,16 +49,16 @@ class Module extends Base
     {
         parent::__construct($options);
 
-        Event::fire('framework.module.initialize.before', array($this->moduleName));
+        Event::fire('framework.module.initialize.before', array($this->_moduleName));
 
         $this->addModuleEvents();
 
-        Event::add('framework.router.construct.after', function($router) {
+        Event::add('framework.router.construct.after', function($router){
             $router->addRedirects($this->getRedirects());
             $router->addRoutes($this->getRoutes());
         });
 
-        Event::fire('framework.module.initialize.after', array($this->moduleName));
+        Event::fire('framework.module.initialize.after', array($this->_moduleName));
     }
 
     /**
@@ -113,7 +113,7 @@ class Module extends Base
      */
     public function getRedirects()
     {
-        if ($this->checkForRedirects) {
+        if ($this->_checkForRedirects) {
             $cache = Registry::get('cache');
             
             $cachedRedirects = $cache->get('core_redirects_'.$this->getModuleName());
@@ -121,7 +121,10 @@ class Module extends Base
             if (null !== $cachedRedirects) {
                 $redirects = $cachedRedirects;
             } else {
-                $redirects = RedirectModel::all(array('module = ?' => strtolower($this->getModuleName())));
+                $redirects = RedirectModel::all(
+                                array('module = ?' => strtolower($this->getModuleName())),
+                                array('fromPath', 'toPath')
+                );
 
                 if (null === $redirects) {
                     $redirects = array();

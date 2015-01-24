@@ -65,15 +65,15 @@ class Autoloader
         $base_dir = rtrim($base_dir, DIRECTORY_SEPARATOR) . '/';
 
         // initialize the namespace prefix array
-        if (isset($this->prefixes[$prefix]) === false) {
-            $this->prefixes[$prefix] = array();
+        if (isset($this->_prefixes[$prefix]) === false) {
+            $this->_prefixes[$prefix] = array();
         }
 
         // retain the base directory for the namespace prefix
         if ($prepend) {
-            array_unshift($this->prefixes[$prefix], $base_dir);
+            array_unshift($this->_prefixes[$prefix], $base_dir);
         } else {
-            array_push($this->prefixes[$prefix], $base_dir);
+            array_push($this->_prefixes[$prefix], $base_dir);
         }
     }
 
@@ -129,12 +129,12 @@ class Autoloader
     protected function loadMappedFile($prefix, $relative_class)
     {
         // are there any base directories for this namespace prefix?
-        if (isset($this->prefixes[$prefix]) === false) {
+        if (isset($this->_prefixes[$prefix]) === false) {
             return false;
         }
 
         // look through base directories for this namespace prefix
-        foreach ($this->prefixes[$prefix] as $base_dir) {
+        foreach ($this->_prefixes[$prefix] as $base_dir) {
 
             // replace the namespace prefix with the base directory,
             // replace namespace separators with directory separators

@@ -8,10 +8,10 @@
     {foreach $new in $news}
     <article>
       <header>
-        <h3>{echo $new->title}</h3><span>{echo \App\Helper\DateFormater::t2d($new->created).", ".$new->userAlias}</span>
+        <h3>{echo $new->getTitle()}</h3><span>{echo "Vytvořil: ".$new->getUserAlias().", ".\App\Helper\DateFormater::t2d($new->getCreated())}</span>
       </header>
       <div class="body">
-        <div>{echo html_entity_decode($new->shortBody)}</div><a href="/novinky/r/$new->urlKey">čti více</a>
+        <div>{echo html_entity_decode($new->getShortBody())}</div><a href="/novinky/r/{echo $new->getUrlKey()}">čti více</a>
       </div>
     </article>{/foreach}
     {/if}

@@ -18,9 +18,9 @@ section.wrapper.pridatInzerat.singlePage
                         select(name='section')
                             | {foreach $section in $adsections}
                             | {if $ad->getSectionId() == $section->getId()}
-                            option(value!='{echo $section->id}', selected) {echo $section->title}
+                            option(value!='{echo $section->getId()}', selected) {echo $section->getTitle()}
                             | {/if}{else}
-                            option(value!='{echo $section->id}') {echo $section->title}
+                            option(value!='{echo $section->getId()}') {echo $section->getTitle()}
                             | {/else}
                             | {/foreach}
                 tr
@@ -58,7 +58,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["price"])}
                         label.error {echo join("<br/>", $errors["price"])}
                         |{/if}
-                        input(type='text', name='price', placeholder='při nevyplnění bude hodnota: \"dohodou\"', value!='{echo $ad->price == "0" ? "Dohodou":$ad->price}')
+                        input(type='text', name='price', placeholder='při nevyplnění bude hodnota: \"dohodou\"', value!='{echo $ad->getPrice() == "0" ? "Dohodou":$ad->getPrice()}')
                 tr
                     td
                         span Fotky

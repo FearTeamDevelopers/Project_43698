@@ -3,6 +3,6 @@
       .row.container
          a(href!="/admin/news/{echo $act}/") Zpět do administrace
          header
-            h1 {echo $news->title}
-            span Autor: {echo $news->userAlias}<br/>
-         |{echo html_entity_decode($news->body)}
+            h1 {echo $news->getTitle()}
+            span {echo "Vytvořil: ".$news->getUserAlias().", ".\App\Helper\DateFormater::t2d($news->getCreated())}
+         |{echo html_entity_decode($news->getBody())}

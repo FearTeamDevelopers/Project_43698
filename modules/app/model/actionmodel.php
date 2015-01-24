@@ -278,7 +278,7 @@ class ActionModel extends Model
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
                 array('rank' => 'desc', 'startDate' => 'asc'), 
                 $limit, $page
@@ -297,7 +297,7 @@ class ActionModel extends Model
     {
         $actions = self::all(array('active = ?' => true, 'approved = ?' => 1), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
-                array('rank' => 'desc','startDate' => 'asc'), 
+                array('rank' => 'desc', 'created' => 'desc'), 
                 $limit, $page
         );
         

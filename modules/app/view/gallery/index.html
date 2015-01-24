@@ -5,12 +5,12 @@
   </header>
   <div class="row">
     {if !empty($galleries)}
-    {foreach $gallery in $galleries}<a href="/galerie/r/{echo $gallery->urlKey}" title="{echo $gallery->title}">
+    {foreach $gallery in $galleries}<a href="/galerie/r/{echo $gallery->getUrlKey()}" title="{echo $gallery->getTitle()}">
       <div class="large-3 medium-6 small-12 columns galleryWrapper">
         <article>
           <div class="imgWrapper"><img src="{echo $gallery->getImgThumb()}"/></div>
           <div class="info">
-            <h3>{echo $gallery->title}</h3>
+            <h3>{echo $gallery->getTitle()}</h3>
           </div>
         </article>
       </div></a>{/foreach}

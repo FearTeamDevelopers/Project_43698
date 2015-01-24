@@ -72,7 +72,7 @@ class SystemController extends Controller
     public function showAdminLog()
     {
         $view = $this->getActionView();
-        $log = \Admin\Model\AdminLogModel::all(array(), array('*'), array('created' => 'DESC'));
+        $log = \Admin\Model\AdminLogModel::all(array(), array('*'), array('created' => 'DESC'), 250);
         $view->set('adminlog', $log);
     }
 

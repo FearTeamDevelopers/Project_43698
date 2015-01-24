@@ -4,13 +4,13 @@ section.wrapper.gallery.singlePage
    .row
       |{if !empty($galleries)}
       |{foreach $gallery in $galleries}
-      a(href!='/galerie/r/{echo $gallery->urlKey}' title!='{echo $gallery->title}')
+      a(href!='/galerie/r/{echo $gallery->getUrlKey()}' title!='{echo $gallery->getTitle()}')
          .large-3.medium-6.small-12.columns.galleryWrapper
             article
                .imgWrapper
                   img(src!='{echo $gallery->getImgThumb()}')
                .info
-                  h3 {echo $gallery->title}
+                  h3 {echo $gallery->getTitle()}
       | {/foreach}
       |{/if}{else}
       .large-12.medium-12.small-12.columns

@@ -17,21 +17,21 @@ section.wrapper.bazar
             | {script $images=$ad->getImages()}
             | {if !empty($images)}
             | {script $image=array_shift($images)}
-            a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->imgMain}")
-                img(src!="{echo $image->imgThumb}")
+            a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->getImgMain()}")
+                img(src!="{echo $image->getImgThumb()}")
             | {/if}
          .nazev
-            h4 {echo $ad->title}
+            h4 {echo $ad->getTitle()}
          .info
             small
                span majitel:
-            span {echo " ".$ad->userAlias}<br/>
+            span {echo " ".$ad->getUserAlias()}<br/>
             small
                span sekce:
-            span {echo " ".$ad->sectionTitle}<br/>
+            span {echo " ".$ad->getSectionTitle()}<br/>
             small
                span cena:
             span.price {echo " "}cena? <br/>
-            a(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
+            a(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
       | {/foreach}
    include ../components/pager

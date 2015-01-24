@@ -48,7 +48,7 @@ class Memcached extends Cache\Driver
         $isEmpty = empty($this->_service);
         $isInstance = $this->_service instanceof \Memcache;
 
-        if ($this->isConnected && $isInstance && !$isEmpty) {
+        if ($this->_isConnected && $isInstance && !$isEmpty) {
             return true;
         }
 
@@ -85,7 +85,7 @@ class Memcached extends Cache\Driver
                     $this->host, $this->port
             );
 
-            $this->isConnected = true;
+            $this->_isConnected = true;
         } catch (\Exception $e) {
             throw new Exception\Service('Unable to connect to service');
         }
@@ -102,7 +102,7 @@ class Memcached extends Cache\Driver
     {
         if ($this->_isValidService()) {
             $this->_service->close();
-            $this->isConnected = false;
+            $this->_isConnected = false;
         }
 
         return $this;

@@ -122,22 +122,22 @@ class Request extends Base
         $this->_setOption(CURLOPT_URL, $url)
                 ->_setOption(CURLOPT_HEADER, true)
                 ->_setOption(CURLOPT_RETURNTRANSFER, true)
-                ->_setOption(CURLOPT_USERAGENT, $this->agent);
+                ->_setOption(CURLOPT_USERAGENT, $this->_agent);
 
         if (!empty($parameters)) {
             $this->_setOption(CURLOPT_POSTFIELDS, $parameters);
         }
 
-        if ($this->willFollow) {
+        if ($this->_willFollow) {
             $this->_setOption(CURLOPT_FOLLOWLOCATION, true);
         }
 
-        if ($this->willShareSession) {
+        if ($this->_willShareSession) {
             $this->_setOption(CURLOPT_COOKIE, session_name() . '=' . session_id());
         }
 
-        if ($this->referer) {
-            $this->_setOption(CURLOPT_REFERER, $this->referer);
+        if ($this->_referer) {
+            $this->_setOption(CURLOPT_REFERER, $this->_referer);
         }
 
         foreach ($this->_options as $key => $value) {
@@ -157,7 +157,7 @@ class Request extends Base
     {
         $headers = array();
 
-        foreach ($this->headers as $key => $value) {
+        foreach ($this->_headers as $key => $value) {
             $headers[] = $key . ': ' . $value;
         }
 
@@ -172,7 +172,7 @@ class Request extends Base
     public function __construct($options = array())
     {
         parent::__construct($options);
-        $this->agent = RequestMethods::server('HTTP_USER_AGENT', 'Curl/PHP ' . PHP_VERSION);
+        $this->_agent = RequestMethods::server('HTTP_USER_AGENT', 'Curl/PHP ' . PHP_VERSION);
     }
 
     /**

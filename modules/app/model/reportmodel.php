@@ -301,7 +301,7 @@ class ReportModel extends Model
         $reports = self::all(array('active = ?' => true, 'approved = ?' => 1), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 
                     'imgMain', 'imgThumb', 'photoName'), 
-                array('rank' => 'desc','created' => 'desc'), 
+                array('rank' => 'desc', 'created' => 'desc'), 
                 $limit, $page
         );
         

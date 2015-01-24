@@ -115,7 +115,7 @@ class Router extends Base
 
         Event::fire('framework.router.construct.after', array($this));
 
-        $this->_findRoute($this->url);
+        $this->_findRoute($this->_url);
     }
 
     /**
@@ -246,7 +246,7 @@ class Router extends Base
         $list = array();
 
         foreach ($this->_routes as $route) {
-            $list[$route->pattern] = get_class($route);
+            $list[$route->getPattern()] = get_class($route);
         }
 
         return $list;
@@ -260,7 +260,7 @@ class Router extends Base
     {
         if (!empty($redirects)) {
             foreach ($redirects as $redirect) {
-                $this->_redirects[$redirect->fromPath] = $redirect->toPath;
+                $this->_redirects[$redirect->getFromPath()] = $redirect->getToPath();
             }
         }
     }

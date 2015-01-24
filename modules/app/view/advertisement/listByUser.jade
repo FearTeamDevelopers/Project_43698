@@ -15,15 +15,15 @@ section.wrapper.bazar
             | {script $images=$ad->getImages()}
             | {if !empty($images)}
             | {script $image=array_shift($images)}
-            a(data-lightbox!="{echo $ad->getId()}" href!="{echo $image->imgMain}")
-                img(src!="{echo $image->imgThumb}")
+            a(data-lightbox!="{echo $ad->getId()}" href!="{echo $image->getImgMain()}")
+                img(src!="{echo $image->getImgThumb()}")
             | {/if}
          .nazev
             .nazevWrapper
-               h4 {echo $ad->title}
+               h4 {echo $ad->getTitle()}
          .infoWrapper
             .info
-               | {if $ad->adType=='tender'}
+               | {if $ad->getAdType() =='tender'}
                center
                   span.nabidka Nabídka <br/>
                |{/if}{else}
@@ -32,20 +32,20 @@ section.wrapper.bazar
                |{/else}
                small
                   span sekce:
-               span {echo " ".$ad->sectionTitle}<br/>
+               span {echo " ".$ad->getSectionTitle()}<br/>
                small
                   span cena:
-               |{if $ad->price == "1"}
+               |{if $ad->getPrice() == "1"}
                span.price {echo " na dohodě"}<br/>
                |{/if}
                |{else}
-               span.price {echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/>
+               span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
                |{/else}
-               a.bla(href!='/bazar/r/{echo $ad->uniqueKey}') zobrazit podrobnosti
+               a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
 
-         a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->uniqueKey}', title='Upravit')
-         a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->uniqueKey}', title='Požádat o prodloužení')
-         a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->uniqueKey}', title='Smazat')
+         a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')
+         a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
+         a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->getUniqueKey()}', title='Smazat')
       | {/foreach}
       |{/if}
       |{else}

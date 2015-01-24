@@ -105,7 +105,7 @@ class Template extends Base
         $delimiter = $match["delimiter"];
         $type = $match["type"];
 
-        $start = strlen($type["opener"]);
+        $start = mb_strlen($type["opener"]);
         $end = strpos($source, $type["closer"]);
         $extract = substr($source, $start, $end - $start);
 
@@ -172,7 +172,7 @@ class Template extends Base
             $delimiter = $match["delimiter"];
 
             $opener = strpos($source, $type["opener"]);
-            $closer = strpos($source, $type["closer"]) + strlen($type["closer"]);
+            $closer = strpos($source, $type["closer"]) + mb_strlen($type["closer"]);
 
             if ($opener !== false) {
                 $parts[] = substr($source, 0, $opener);

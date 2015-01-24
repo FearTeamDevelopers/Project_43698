@@ -51,7 +51,7 @@ class View extends Base
     {
         parent::__construct($options);
 
-        Event::fire('framework.view.construct.before', array($this->file));
+        Event::fire('framework.view.construct.before', array($this->_file));
 
         $this->_session = Registry::get('session');
 
@@ -61,7 +61,7 @@ class View extends Base
 
         $this->_checkMessage();
 
-        Event::fire('framework.view.construct.after', array($this->file, $this->template));
+        Event::fire('framework.view.construct.after', array($this->_file, $this->_template));
     }
 
     /**
@@ -121,15 +121,15 @@ class View extends Base
      */
     public function render()
     {
-        Event::fire('framework.view.render.before', array($this->file));
+        Event::fire('framework.view.render.before', array($this->_file));
 
-        if (!file_exists($this->file)) {
+        if (!file_exists($this->_file)) {
             return '';
         }
 
-        return $this->template
-                        ->parse(file_get_contents($this->file))
-                        ->process($this->data);
+        return $this->_template
+                        ->parse(file_get_contents($this->_file))
+                        ->process($this->_data);
     }
 
     /**
@@ -153,8 +153,8 @@ class View extends Base
      */
     public function get($key, $default = '')
     {
-        if (isset($this->data[$key])) {
-            return $this->data[$key];
+        if (isset($this->_data[$key])) {
+            return $this->_data[$key];
         }
         return $default;
     }
@@ -171,14 +171,14 @@ class View extends Base
             throw new Exception\Data('Key must be a string or a number');
         }
 
-        $data = $this->data;
+        $data = $this->_data;
 
         if (!$data) {
             $data = array();
         }
 
         $data[$key] = $value;
-        $this->data = $data;
+        $this->_data = $data;
     }
 
     /**
@@ -207,7 +207,7 @@ class View extends Base
      */
     public function erase($key)
     {
-        unset($this->data[$key]);
+        unset($this->_data[$key]);
         return $this;
     }
 

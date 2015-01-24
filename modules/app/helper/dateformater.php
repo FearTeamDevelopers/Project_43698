@@ -4,6 +4,7 @@ namespace App\Helper;
 
 class DateFormater
 {
+
     const BASE_DATETIME_FORMAT = 'd.m. Y H:i';
     const BASE_DATE_FORMAT = 'd.m. Y';
     const BASE_TIME_FORMAT = 'H:i';
@@ -15,9 +16,13 @@ class DateFormater
      */
     public static function t2dt($texttime)
     {
-        return date(self::BASE_DATETIME_FORMAT, strtotime($texttime));
+        if (!empty($texttime)) {
+            return date(self::BASE_DATETIME_FORMAT, strtotime($texttime));
+        } else {
+            return date(self::BASE_DATETIME_FORMAT, time());
+        }
     }
-    
+
     /**
      * 
      * @param type $texttime
@@ -25,9 +30,13 @@ class DateFormater
      */
     public static function t2d($texttime)
     {
-        return date(self::BASE_DATE_FORMAT, strtotime($texttime));
+        if (!empty($texttime)) {
+            return date(self::BASE_DATE_FORMAT, strtotime($texttime));
+        } else {
+            return date(self::BASE_DATETIME_FORMAT, time());
+        }
     }
-    
+
     /**
      * 
      * @param type $texttime
@@ -35,6 +44,11 @@ class DateFormater
      */
     public static function t2t($texttime)
     {
-        return date(self::BASE_TIME_FORMAT, strtotime($texttime));
+        if (!empty($texttime)) {
+            return date(self::BASE_TIME_FORMAT, strtotime($texttime));
+        } else {
+            return date(self::BASE_DATETIME_FORMAT, time());
+        }
     }
+
 }

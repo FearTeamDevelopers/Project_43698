@@ -118,6 +118,13 @@ class ModuleConfig extends Module
             'args' => ':urlkey'
         ),
         array(
+            'pattern' => '/galerieslideshow/r/:urlkey',
+            'module' => 'app',
+            'controller' => 'gallery',
+            'action' => 'slideShow',
+            'args' => ':urlkey'
+        ),
+        array(
             'pattern' => '/galerie/p/:page',
             'module' => 'app',
             'controller' => 'gallery',
@@ -186,6 +193,13 @@ class ModuleConfig extends Module
             'controller' => 'advertisement',
             'action' => 'listByUser',
             'args' => ':page'
+        ),
+        array(
+            'pattern' => '/galerie/:urlkey/p/:page',
+            'module' => 'app',
+            'controller' => 'gallery',
+            'action' => 'detail',
+            'args' => array(':urlkey',':page')
         )
     );
 

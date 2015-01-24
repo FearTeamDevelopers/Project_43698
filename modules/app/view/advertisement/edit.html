@@ -17,8 +17,8 @@
             <select name="section">
               {foreach $section in $adsections}
               {if $ad->getSectionId() == $section->getId()}
-              <option value="{echo $section->id}" selected="selected">{echo $section->title}</option>{/if}{else}
-              <option value="{echo $section->id}">{echo $section->title}</option>{/else}
+              <option value="{echo $section->getId()}" selected="selected">{echo $section->getTitle()}</option>{/if}{else}
+              <option value="{echo $section->getId()}">{echo $section->getTitle()}</option>{/else}
               {/foreach}
             </select>
           </td>
@@ -52,7 +52,7 @@
           <td><span>Cena</span></td>
           <td>{if isset($errors["price"])}
             <label class="error">{echo join("<br/>", $errors["price"])}</label>{/if}
-            <input type="text" name="price" placeholder="při nevyplnění bude hodnota: &quot;dohodou&quot;" value="{echo $ad->price == "0" ? "Dohodou":$ad->price}"/>
+            <input type="text" name="price" placeholder="při nevyplnění bude hodnota: &quot;dohodou&quot;" value="{echo $ad->getPrice() == "0" ? "Dohodou":$ad->getPrice()}"/>
           </td>
         </tr>
         <tr>

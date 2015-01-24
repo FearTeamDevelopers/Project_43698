@@ -42,17 +42,17 @@ class Configuration extends Base
      */
     public function initialize()
     {
-        Event::fire('framework.configuration.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.configuration.initialize.before', array($this->_type, $this->_options));
 
-        if (!$this->type) {
+        if (!$this->_type) {
             throw new Exception\Argument('Invalid type');
         }
 
-        Event::fire('framework.configuration.initialize.after', array($this->type, $this->options));
+        Event::fire('framework.configuration.initialize.after', array($this->_type, $this->_options));
 
-        switch ($this->type) {
+        switch ($this->_type) {
             case 'ini': {
-                    return new Driver\Ini($this->options);
+                    return new Driver\Ini($this->_options);
                     break;
                 }
             default: {

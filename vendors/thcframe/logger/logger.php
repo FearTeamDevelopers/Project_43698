@@ -42,17 +42,17 @@ class Logger extends Base
      */
     public function initialize()
     {
-        Event::fire('framework.logger.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.logger.initialize.before', array($this->_type, $this->_options));
 
-        $this->type = 'file';
+        $this->_type = 'file';
 
-        if (!$this->type) {
+        if (!$this->_type) {
             throw new Exception\Argument('Error in configuration file');
         }
 
-        Event::fire('framework.logger.initialize.after', array($this->type, $this->options));
+        Event::fire('framework.logger.initialize.after', array($this->_type, $this->_options));
 
-        switch ($this->type) {
+        switch ($this->_type) {
             case 'file': {
                     return new Driver\File();
                     break;

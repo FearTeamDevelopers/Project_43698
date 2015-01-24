@@ -117,7 +117,7 @@ class ActionController extends Controller
         $session = Registry::get('session');
         
         $action = $session->get('actionPreview');
-        
+
         if(null === $action){
             $this->_willRenderActionView = false;
             $view->warningMessage(self::ERROR_MESSAGE_2);

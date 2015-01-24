@@ -18,9 +18,9 @@ section.wrapper.pridatInzerat.singlePage
                         select(name='section')
                             | {foreach $section in $adsections}
                             | {if isset($ad) && $ad->getSectionId() == $section->getId()}
-                            option(value!='{echo $section->id}', selected) {echo $section->title}
+                            option(value!='{echo $section->getId()}', selected) {echo $section->getTitle()}
                             | {/if}{else}
-                            option(value!='{echo $section->id}') {echo $section->title}
+                            option(value!='{echo $section->getId()}') {echo $section->getTitle()}
                             | {/else}
                             | {/foreach}
                 tr

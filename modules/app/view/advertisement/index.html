@@ -22,12 +22,12 @@
       <select name="bfsection">{if isset($bfsection)}
         <option value="0">Sekce</option>{foreach $ad in $adsections}
         {if $ad->urlKey == $bfsection}
-        <option value="{echo $ad->urlKey}" selected="selected">{echo $ad->title}</option>{/if}{else}
-        <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/else}
+        <option value="{echo $ad->getUrlKey()}" selected="selected">{echo $ad->getTitle()}</option>{/if}{else}
+        <option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/else}
         {/foreach}
         {/if}{else}
         <option value="0">Sekce</option>{foreach $ad in $adsections}
-        <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/foreach}
+        <option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/foreach}
         {/else}
       </select>
       <input type="submit" name="zobrazit" value="Zobrazit"/>
@@ -53,18 +53,18 @@
       <div class="imgWrapper">
         {script $images=$ad->getImages()}
         {if !empty($images)}
-        {script $image=array_shift($images)}<a data-lightbox="{echo $ad->getId()}" data-title="{echo $image->getPhotoName()}" href="{echo $image->imgMain}"><img src="{echo $image->imgThumb}"/></a>{/if}
+        {script $image=array_shift($images)}<a data-lightbox="{echo $ad->getId()}" data-title="{echo $image->getPhotoName()}" href="{echo $image->getImgMain()}"><img src="{echo $image->getImgThumb()}"/></a>{/if}
       </div>
       <div class="nazev">
         <div class="nazevWrapper">
-          <h4>{echo $ad->title}</h4>
+          <h4>{echo $ad->getTitle()}</h4>
         </div>
       </div>
       <div class="infoWrapper">
-        <div class="info">{if $ad->adType=='tender'}
+        <div class="info">{if $ad->getAdType() =='tender'}
           <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
-          <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->userAlias}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->sectionTitle}<br/></span><small><span>cena:</span></small>{if $ad->price == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
-          {else}<span class="price">{echo " ".number_format($ad->price, 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->uniqueKey}" class="bla">zobrazit podrobnosti</a>
+          <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->getUserAlias()}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small>{if $ad->getPrice() == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
+          {else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->getUniqueKey()}" class="bla">zobrazit podrobnosti</a>
         </div>
       </div>
     </article>{/foreach}

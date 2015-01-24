@@ -52,7 +52,7 @@ class ActionController extends Controller
     /**
      * Create and return new action object
      * 
-     * @return \\App\Model\ActionModel
+     * @return \App\Model\ActionModel
      */
     private function _createObject()
     {
@@ -173,11 +173,8 @@ class ActionController extends Controller
         
         $action = $this->_checkForObject();
         
-        if(null !== $action){
-            $view->set('action', $action);
-        }
-
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('action', $action)
+            ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddAction')) {
             if ($this->checkCSRFToken() !== true &&
