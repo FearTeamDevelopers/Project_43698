@@ -9,6 +9,7 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Configuration\Model\ConfigModel;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Profiler\Profiler;
+use THCFrame\Router\Model\RedirectModel;
 
 /**
  * 
@@ -143,28 +144,62 @@ class SystemController extends Controller
             xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">'. PHP_EOL;
 
         $xmlEnd = '</urlset>';
 
         $host = RequestMethods::server('HTTP_HOST');
-        $pageContentXml = '';
-
-        $pageContent = \App\Model\PageContentModel::all(array('active = ?' => true));
         
-        if(null !== $pageContent){
-            foreach ($pageContent as $content){
-                $pageContentXml .= "<url><loc>http://{$host}/{$content}</loc></url>";
+        $pageContent = \App\Model\PageContentModel::all(array('active = ?' => true));
+        $redirects = RedirectModel::all(array('module = ?' => 'app'));
+        $news = \App\Model\NewsModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
+        $reports = \App\Model\ReportModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
+        $actions = \App\Model\ActionModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
+        
+        $redirectArr = array();
+        if(null !== $redirects){
+            foreach ($redirects as $redirect){
+                $redirectArr[$redirect->getToPath()] = $redirect->getFromPath();
             }
         }
         
-        $pageContentXml = "<url><loc>http://{$host}</loc></url>"
-                . "<url><loc>http://{$host}/o-nas</loc></url>"
-                . "<url><loc>http://{$host}/cenik</loc></url>"
-                . "<url><loc>http://{$host}/kontakty</loc></url>"
-                . "<url><loc>http://{$host}/reference</loc></url>" . PHP_EOL;
+        $articlesXml = '';
+        $pageContentXml = "<url><loc>http://{$host}</loc></url>". PHP_EOL
+                . "<url><loc>http://{$host}/akce</loc></url>"
+                . "<url><loc>http://{$host}/reportaze</loc></url>"
+                . "<url><loc>http://{$host}/novinky</loc></url>"
+                . "<url><loc>http://{$host}/galerie</loc></url>"
+                . "<url><loc>http://{$host}/bazar</loc></url>". PHP_EOL;
 
-        file_put_contents('./sitemap.xml', $xml . $pageContentXml . $xmlEnd);
+        if (null !== $pageContent) {
+            foreach ($pageContent as $content) {
+                $pageUrl = '/page/'.$content->getUrlKey();
+                if(array_key_exists($pageUrl, $redirectArr)){
+                    $pageUrl = $redirectArr[$pageUrl];
+                }
+                $pageContentXml .= "<url><loc>http://{$host}{$pageUrl}</loc></url>". PHP_EOL;
+            }
+        }
+        
+        if(null !== $news){
+            foreach ($news as $_news){
+                $articlesXml .= "<url><loc>http://{$host}/novinky/r/{$_news->getUrlKey()}</loc></url>". PHP_EOL;
+            }
+        }
+        
+        if(null !== $actions){
+            foreach ($actions as $action){
+                $articlesXml .= "<url><loc>http://{$host}/akce/r/{$action->getUrlKey()}</loc></url>". PHP_EOL;
+            }
+        }
+        
+        if(null !== $reports){
+            foreach ($reports as $report){
+                $articlesXml .= "<url><loc>http://{$host}/reportaze/r/{$report->getUrlKey()}</loc></url>". PHP_EOL;
+            }
+        }
+
+        file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml. $xmlEnd);
 
         Event::fire('admin.log', array('success'));
         $view->successMessage('Soubor sitemap.xml byl aktualizován');
@@ -182,10 +217,10 @@ class SystemController extends Controller
      */
     public function fillDatabase($type)
     {
-        if(ENV !== 'dev'){
+        if (ENV !== 'dev') {
             exit;
         }
-        
+
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
@@ -200,7 +235,7 @@ class SystemController extends Controller
             potápěčská technika jednou z podmínek dosažení nejvyšší míry bezpečnosti vašich ponorů. 
             Kupujte jen takovou výstroj, která tato kriteria splňuje! Pamatujte, že cena je až 
             druhotným ukazatelem ... nebo váš život stojí za pár ušetřených stokorun?';
-        
+
         $LARGE_TEXT = $content->getBody();
         unset($content);
 
