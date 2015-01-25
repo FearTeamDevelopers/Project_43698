@@ -58,14 +58,14 @@ class ModuleConfig extends Module
             'pattern' => '/page/:urlkey',
             'module' => 'app',
             'controller' => 'index',
-            'action' => 'loadContent',
+            'action' => 'loadcontent',
             'args' => ':urlkey'
         ),
         array(
             'pattern' => '/aktivovatucet/:key',
             'module' => 'app',
             'controller' => 'user',
-            'action' => 'activateAccount',
+            'action' => 'activateaccount',
             'args' => ':key'
         ),
         array(
@@ -86,7 +86,7 @@ class ModuleConfig extends Module
             'pattern' => '/bazar/prodlouzit/:uniquekey',
             'module' => 'app',
             'controller' => 'advertisement',
-            'action' => 'sendAvailabilityExtendRequest',
+            'action' => 'sendavailabilityextendrequest',
             'args' => ':uniquekey'
         ),
         array(
@@ -121,7 +121,7 @@ class ModuleConfig extends Module
             'pattern' => '/galerieslideshow/r/:urlkey',
             'module' => 'app',
             'controller' => 'gallery',
-            'action' => 'slideShow',
+            'action' => 'slideshow',
             'args' => ':urlkey'
         ),
         array(
@@ -198,7 +198,7 @@ class ModuleConfig extends Module
             'pattern' => '/bazar/moje-inzeraty/p/:page',
             'module' => 'app',
             'controller' => 'advertisement',
-            'action' => 'listByUser',
+            'action' => 'listbyuser',
             'args' => ':page'
         ),
         array(
