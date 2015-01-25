@@ -1,8 +1,8 @@
-section.wrapper.akce
+section.wrapper.akce.pb
    header.row
       h2 akce
-   section.row.container
       |{if !empty($actions)}
+   section.row.container
       |{foreach $action in $actions}
       article
          header
@@ -12,5 +12,9 @@ section.wrapper.akce
             div {echo html_entity_decode($action->getShortBody())}
             a(href!='/akce/r/{echo $action->getUrlKey()}') čti více
       |{/foreach}
+   .moreWrap.large-2.medium-3.small-6.centerBlock
+      a(href='/archivakci')
+         .more
+            span Zobrazit starší akce
       |{/if}
    include ../components/pager

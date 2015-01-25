@@ -1,0 +1,23 @@
+section.wrapper.galleryDetail.singlePage
+   |{if empty($photos)}
+   header.row
+      h2 V této galerii nejsou žádné fotky
+   |{/if}
+   |{else}
+   header.row
+      h2 {echo $gallery->title}
+   .row
+      .buttonWrapper
+         ul
+            li
+               a(href!='/galerieslideshow/r/{echo $gallery->urlKey}').fi-photo Zobrazit slideshow
+            |{/if}
+      |{foreach $photo in $photos}
+      .image.large-3.medium-6.small-12.columns.left
+         img(src!="{echo $photo->imgMain}")
+      |{/foreach}
+   include ../components/pager
+
+   |{/else}
+
+
