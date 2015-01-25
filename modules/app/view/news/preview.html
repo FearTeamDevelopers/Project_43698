@@ -1,6 +1,6 @@
 
 <div class="page">
-  <section class="wrapper">
+  <section class="wrapper singlePage">
     <div class="row container"><a href="/admin/news/{echo $act}/">Zpět do administrace</a>
       <header>
         <h1>{echo $news->getTitle()}</h1><span>{echo "Vytvořil: ".$news->getUserAlias().", ".\App\Helper\DateFormater::t2d($news->getCreated())}</span>

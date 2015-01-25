@@ -7,6 +7,7 @@
 		background #ffffff
 		border-radius 5px;
 		border 1px solid defaultBLue
+		transition: height 300ms ease;
 		h3{
 			text-align center
 			overflow hidden
@@ -14,7 +15,7 @@
 			white-space nowrap
 		}
 		.imgWrapper{
-			height 80%
+			height 222px
 			overflow hidden
 			img{
 				border-top-left-radius 5px;
@@ -22,10 +23,21 @@
 				height 100%
 			}
 		}
+		.info{
+			h3{
+				padding 5px 10px
+			}
+		}
+
+
 
 		&:hover{
-			height:300px;
-			border-bottom:6px solid defaultBLue
+			background defaultBLue
+			.info{
+				h3{
+					color white
+				}
+			}
 		}
 	}
 }

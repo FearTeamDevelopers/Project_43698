@@ -10,8 +10,7 @@
   <section class="row container">
     <div class="large-12 medium-12 small-12 column">{foreach $url in $urls}
       <article><a href="{echo $url['path']}">
-          <h3>{echo $url_i}</h3></a>
-          <small><span>{echo \App\Helper\DateFormater::t2dt($url['created'])}</span></small><br/>
+          <h3>{echo $url_i}</h3></a><small><span>{echo \App\Helper\DateFormater::t2dt($url['created'])}</span><br/></small>
         <div>{echo $url['meta']}</div>
       </article>{/foreach}
     </div>

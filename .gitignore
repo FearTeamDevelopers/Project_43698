@@ -13,3 +13,4 @@
 /.htaccess_backup.txt
 /public/js/plugins/filemanager/files/
 /prepros.cfg
+/modules/app/view/prepros.cfg
