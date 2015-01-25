@@ -2,10 +2,10 @@
 <section class="wrapper report">
   <div class="row"></div>
   <header class="row">
-    <div class="imgWrapper"><img src="{echo $report->getImgMain()}"/></div>
-    <div class="reportInfo">
-      <h2>{echo $report->getTitle()}</h2><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}<br/></span><small><span>Autor:</span></small><span>{echo " ".$report->getUserAlias()}</span>
+    <div class="reportInfo large-12 column">
+      <h2>{echo $report->title}</h2><span>{echo $report->created}<br/></span><small><span>Autor:</span></small><span>{echo " ".$report->userAlias}</span>
     </div>
+    <div class="imgWrapper large-12"><img src="$report->imgMain"/></div>
   </header>
   <div class="page row">
     <div class="container">{echo html_entity_decode($report->getBody())}</div>

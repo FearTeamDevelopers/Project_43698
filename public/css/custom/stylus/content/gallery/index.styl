@@ -1,0 +1,31 @@
+.gallery{
+	.galleryWrapper{
+		height:300px;
+	}
+	article{
+		height:280px;
+		background #ffffff
+		border-radius 5px;
+		border 1px solid defaultBLue
+		h3{
+			text-align center
+			overflow hidden
+			text-overflow ellipsis
+			white-space nowrap
+		}
+		.imgWrapper{
+			height 80%
+			overflow hidden
+			img{
+				border-top-left-radius 5px;
+				border-top-right-radius 5px;
+				height 100%
+			}
+		}
+
+		&:hover{
+			height:300px;
+			border-bottom:6px solid defaultBLue
+		}
+	}
+}
