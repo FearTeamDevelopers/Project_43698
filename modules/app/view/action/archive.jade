@@ -1,0 +1,16 @@
+section.wrapper.akce
+   header.row
+      h2 akce
+   section.row.container
+      |{if !empty($actions)}
+      |{foreach $action in $actions}
+      article
+         header
+            h3 {echo $action->getTitle()}
+            span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
+         .body
+            div {echo html_entity_decode($action->getShortBody())}
+            a(href!='/akce/r/{echo $action->getUrlKey()}') čti více
+      |{/foreach}
+      |{/if}
+   include ../components/pager

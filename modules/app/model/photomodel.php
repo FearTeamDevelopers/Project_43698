@@ -243,4 +243,21 @@ class PhotoModel extends Model
         }
     }
 
+    /**
+     * 
+     * @param type $galleryId
+     * @param type $limit
+     * @param type $page
+     * @return type
+     */
+    public static function fetchPhotosByGalleryIdPaged($galleryId, $limit = 30, $page = 1)
+    {
+        return self::all(
+                    array('active = ?' => true, 'galleryId = ?' => (int) $galleryId), 
+                    array('*'), 
+                    array('rank' => 'desc', 'created' => 'desc'), 
+                    $limit, $page
+        );
+    }
+
 }

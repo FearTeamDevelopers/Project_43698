@@ -64,15 +64,18 @@ class ActionController extends Controller
         if (null !== $content) {
             $actions = $content;
         } else {
-            $actions = \App\Model\ActionModel::fetchOldWithLimit($articlesPerPage, $page);
+            $actions = \App\Model\ActionModel::fetchActiveWithLimit($articlesPerPage, $page);
 
             $this->getCache()->set('akce-' . $page, $actions);
         }
 
         $actionCount = \App\Model\ActionModel::count(
                         array('active = ?' => true,
-                            'approved = ?' => 1)
+                            'approved = ?' => 1,
+                            'archive = ?' => false,
+                            'startDate >= ?' => date('Y-m-d', time()))
         );
+
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
 
         $this->_pagerMetaLinks($actionsPageCount, $page, '/akce/p/');
@@ -104,6 +107,48 @@ class ActionController extends Controller
 
         $this->_checkMetaData($layoutView, $action);
         $view->set('action', $action);
+    }
+    
+    /**
+     * 
+     * @param type $page
+     */
+    public function archive($page = 1)
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $articlesPerPage = $this->getConfig()->actions_per_page;
+
+        if($page <= 0){
+            $page = 1;
+        }
+        
+        if ($page == 1) {
+            $canonical = 'http://' . $this->getServerHost() . '/archivakci';
+        } else {
+            $canonical = 'http://' . $this->getServerHost() . '/archivakci/p/' . $page;
+        }
+        
+        $actions = \App\Model\ActionModel::fetchOldWithLimit($articlesPerPage, $page);
+
+        $actionCount = \App\Model\ActionModel::count(
+                        array('active = ?' => true,
+                            'approved = ?' => 1,
+                            'startDate <= ?' => date('Y-m-d', time()))
+        );
+
+        $actionsPageCount = ceil($actionCount / $articlesPerPage);
+
+        $this->_pagerMetaLinks($actionsPageCount, $page, '/archivakci/p/');
+
+        $view->set('actions', $actions)
+                ->set('pagerpathprefix', '/archivakci')
+                ->set('currentpage', $page)
+                ->set('pagecount', $actionsPageCount);
+
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Akce - Archiv');
     }
 
     /**

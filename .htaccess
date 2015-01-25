@@ -22,7 +22,7 @@ deny from env=stayout
 ########## HTTPS
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP_HOST} !.*\.dev.*$
-RewriteCond %{REQUEST_URI} ^/(admin|login).*$
+RewriteCond %{REQUEST_URI} ^/(admin|login|prihlasit).*$
 RewriteRule (.*) https://%{HTTP_HOST}/$1 [R=301,L,NC]
 ########## End - HTTPS
 

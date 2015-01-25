@@ -166,6 +166,7 @@ class SystemController extends Controller
         $articlesXml = '';
         $pageContentXml = "<url><loc>http://{$host}</loc></url>". PHP_EOL
                 . "<url><loc>http://{$host}/akce</loc></url>"
+                . "<url><loc>http://{$host}/archivakci</loc></url>"
                 . "<url><loc>http://{$host}/reportaze</loc></url>"
                 . "<url><loc>http://{$host}/novinky</loc></url>"
                 . "<url><loc>http://{$host}/galerie</loc></url>"

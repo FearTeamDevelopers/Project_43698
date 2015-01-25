@@ -146,6 +146,13 @@ class ModuleConfig extends Module
             'args' => ':urlkey'
         ),
         array(
+            'pattern' => '/archivakci/p/:page',
+            'module' => 'app',
+            'controller' => 'action',
+            'action' => 'archive',
+            'args' => ':page'
+        ),
+        array(
             'pattern' => '/reportaze/p/:page',
             'module' => 'app',
             'controller' => 'report',

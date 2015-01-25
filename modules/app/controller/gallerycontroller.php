@@ -74,12 +74,7 @@ class GalleryController extends Controller
             self::redirect('/nenalezeno');
         }
         
-        $photos = \App\Model\PhotoModel::all(
-                        array('active = ?' => true, 'galleryId = ?' => $gallery->getId()), 
-                        array('*'), 
-                        array('rank' => 'desc', 'created' => 'desc'),
-                        $limit, $page
-                );
+        $photos = \App\Model\PhotoModel::fetchPhotosByGalleryIdPaged($gallery->getId(), $limit, $page);
 
         $photosCount = \App\Model\PhotoModel::count(array('active = ?' => true, 'galleryId = ?' => $gallery->getId()));
         $photosPageCount = ceil($photosCount / 30);
