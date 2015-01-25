@@ -1,14 +1,15 @@
 section.wrapper.report
    .row
    header.row
-      .imgWrapper
-         img(src!='$report->imgMain')
-      .reportInfo
+      .reportInfo.large-12.column
          h2 {echo $report->title}
          span {echo $report->created}<br/>
          small
             span Autor:
          span {echo " ".$report->userAlias}
+      .imgWrapper.large-12
+         img(src!='$report->imgMain')
+
    .page.row
       .container
          |{echo html_entity_decode($report->body)}

@@ -1,0 +1,230 @@
+.bazar
+	.container{
+
+		article{
+			position relative
+			display block
+			margin 0 auto
+			height 300px
+			margin-top 1.875rem
+			margin-bottom 1.875rem
+			min-width 500px
+			&:last-child{
+				margin-bottom 60px
+			}
+			.buttonTab{
+				position absolute
+				overflow hidden
+				top 16px
+				text-align center
+				width 35px
+				height 35px
+				background defaultBLue
+				border-radius 5px
+				color #ffffff
+				z-index 2
+				font-size 15pt
+				&:hover{
+					color defaultGreen
+					top 17px
+				}
+				&.delete{
+					right 20px
+					color #CC1100
+					&:hover{
+						color red
+					}
+				}
+				&.edit{
+					right 60px
+				}
+				&.reload{
+					right 100px
+				}
+			}
+			.imgWrapper{
+				width 60%
+				height 300px
+				line-height 300px
+				float left
+				margin 0
+				padding 0
+				background defaultBLue
+				img{
+					min-width 200px
+					width 100%
+				}
+			}
+			.nazev{
+				position absolute
+				top 0
+				width 100%
+				height 40px
+				padding-right 1.875rem
+				z-index 1
+				.nazevWrapper{
+					background rgba(0,0,0,0.6)
+					width 100%
+					height 40px
+				}
+				h4{
+					width 74%
+					color #ffffff
+					white-space nowrap
+					overflow hidden
+					text-overflow ellipsis
+					padding-left 0.875rem
+					height 40px
+					line-height 40px
+					margin 0
+
+				}
+
+			}
+			.infoWrapper{
+				width:40%;
+				overflow:hidden;
+				height:300px;
+			}
+
+			.info{
+
+				background defaultBLue ;
+				padding-top 60px;
+				padding-left 10px
+				padding-right 5px
+				border-left 1px dotted defaultGreen
+				width 100%
+				height 100%
+				float left
+				position relative
+				line-height 2em
+				span, p{
+					color white
+					&.price{
+						color defaultGreen
+						font-weight bold
+						font-size 1.6  em
+					}
+				}
+				small{
+					font-size 80%
+				}
+				center{
+					margin-bottom 1em
+				}
+				.nabidka{
+					text-transform uppercase
+					font-weight bold
+					color greenyellow
+					margin-bottom 1em
+				}
+				.poptavka{
+					text-transform uppercase
+					font-weight bold
+					color orangered
+					margin-bottom 1em
+				}
+				a.bla{
+					position absolute
+					bottom 10px
+					left 0
+					text-decoration underline
+					color #ffffff
+					text-align center
+					width 100%
+					&:hover{
+						color default green
+						text-decoration underline
+					}
+				}
+			}
+		}
+	}
+	&.detail{
+		form{
+			display:none
+		}
+
+		article{
+			height:auto;
+			min-height:300px;
+			min-width:auto;
+			position:relative;
+			background defaultBLue
+			.images{
+				a{
+					margin-left 30px
+					z-index 5
+					color #ffffff
+					text-decoration underline
+					&:hover{
+						color defaultGreen
+					}
+					&:before{
+						padding-right:1em
+						color defaultGreen
+						text-decoration none
+					}
+				}
+				.mainImage{
+					height 400px
+					padding-bottom 10px;
+					position relative
+					overflow hidden
+
+					img{
+						height 100%
+					}
+
+				}
+
+				.thumbImage{
+					display:none;
+					height:100px;
+					background:rgba(0,0,0,0.6)
+					text-align:center
+					img{
+						height  100%;
+						width auto
+					}
+				}
+			}
+			&.arrow_box {
+				position: relative;
+				background: defaultBLue;
+				border: 4px solid defaultBLue;
+				margin-bottom 0
+				&:after, &:before {
+					top: 100%;
+					left: 50%;
+					border: solid transparent;
+					content: " ";
+					height: 0;
+					width: 0;
+					position: absolute;
+					pointer-events: none;
+				}
+				&:after {
+					border-color: rgba(136, 183, 213, 0);
+					border-top-color: defaultBLue;
+					border-width: 30px;
+					margin-left: -30px;
+				}
+				&:before {
+					border-color: rgba(194, 225, 245, 0);
+					border-top-color: defaultBLue;
+					border-width: 36px;
+					margin-left: -36px;
+				}
+			}
+			.info{
+				padding:30px 20px
+				border 0
+				min-width:170px
+				&.description{
+					padding:30px 25px 10px;
+				}
+			}
+		}
+	}
