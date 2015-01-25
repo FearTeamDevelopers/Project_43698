@@ -1,4 +1,3 @@
-.page
-    section.wrapper.singlePage
-        .row.container
-            |{echo html_entity_decode($content->getBody())}
+section.wrapper.singlePage
+    .row.container.loadContent
+        |{echo html_entity_decode($content->getBody())}
