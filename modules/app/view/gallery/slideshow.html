@@ -1,9 +1,14 @@
 <section class="wrapper gallery">
     <header class="row">
-        <h2>{echo $gallery->title}</h2>
+        <h2>{echo $gallery->getTitle()}</h2>
     </header>
     <div class="row">
         <div class="large-12 column mv10">
+            <div class="buttonWrapper">
+                <ul>
+                    <li><a href="/galerie/r/{echo $gallery->getUrlKey()}" class="fi-thumbnails">Zpět k náhledům</a></li>
+                </ul>
+            </div>
             <div id="slider1_container" class="centerBlock" 
                  style="position: relative; top: 0px; left: 0px; width: 900px; height: 606px; background: #191919; overflow: hidden;">
 
@@ -22,8 +27,8 @@
                     {script $images=$gallery->getPhotos()}
                     {foreach $image in $images}
                     <div>
-                        <img u="image" src="{echo $image->imgMain}"/>
-                        <img u="thumb" src="{echo $image->imgThumb}"/>
+                        <img u="image" src="{echo $image->getImgMain()}"/>
+                        <img u="thumb" src="{echo $image->getImgThumb()}"/>
                     </div>
                     {/foreach}
 

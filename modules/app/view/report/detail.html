@@ -3,9 +3,9 @@
   <div class="row"></div>
   <header class="row">
     <div class="reportInfo large-12 column">
-      <h2>{echo $report->title}</h2><span>{echo $report->created}<br/></span><small><span>Autor:</span></small><span>{echo " ".$report->userAlias}</span>
+      <h2>{echo $report->getTitle()}</h2><small><span>Autor:</span></small><span>{echo " ".$report->getUserAlias()}</span><br/><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}</span>
     </div>
-    <div class="imgWrapper large-12"><img src="$report->imgMain"/></div>
+    <div class="imgWrapper large-12"><img src="{echo $report->getImgMain()}"/></div>
   </header>
   <div class="page row">
     <div class="container">{echo html_entity_decode($report->getBody())}</div>

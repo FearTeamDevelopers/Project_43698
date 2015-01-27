@@ -2,22 +2,18 @@ section.wrapper.galleryDetail.singlePage
    |{if empty($photos)}
    header.row
       h2 V této galerii nejsou žádné fotky
-   |{/if}
-   |{else}
+   |{/if}{else}
    header.row
-      h2 {echo $gallery->title}
+      h2 {echo $gallery->getTitle()}
    .row
       .buttonWrapper
          ul
             li
-               a(href!='/galerieslideshow/r/{echo $gallery->urlKey}').fi-photo Zobrazit slideshow
-            |{/if}
+               a(href!='/galerieslideshow/r/{echo $gallery->getUrlKey()}').fi-photo Zobrazit jako slideshow
       |{foreach $photo in $photos}
       .image.large-3.medium-6.small-12.columns.left
-         img(src!="{echo $photo->imgMain}")
+            a(href!="{echo $photo->getImgMain()}" data-lightbox!="gallery_{echo $gallery->getId()}")
+                img(src!="{echo $photo->getImgThumb()}")
       |{/foreach}
    include ../components/pager
-
    |{/else}
-
-

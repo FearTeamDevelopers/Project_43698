@@ -6,6 +6,7 @@ use App\Etc\Controller;
 use THCFrame\Profiler\Profiler;
 use THCFrame\Core\Core;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Events\Events as Event;
 
 /**
  * 
@@ -31,11 +32,53 @@ class SystemController extends Controller
     {
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
-        
+
         $width = RequestMethods::post('scwidth');
         $height = RequestMethods::post('scheight');
-        $res = $width. ' x '.$height;
-        
+        $res = $width . ' x ' . $height;
+
         Core::getLogger()->log($res, FILE_APPEND, true, 'scres.log');
     }
+
+    /**
+     * Form for visitors feedback
+     */
+    public function feedback()
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $canonical = 'http://' . $this->getServerHost() . '/feedback';
+
+        $layoutView->set('canonical', $canonical)
+                ->set('submstoken', $this->mutliSubmissionProtectionToken())
+                ->set('metatitle', 'Hastrman - Feedback');
+
+        if (RequestMethods::post('submitFeedback')) {
+            if ($this->checkCSRFToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                self::redirect('/feedback');
+            }
+            
+            $userAlias = $this->getUser() !== null ? $this->getUser()->getWholeName() : '';
+            $feedback = new \App\Model\FeedbackModel(array(
+                'userAlias' => $userAlias,
+                'message' => RequestMethods::post('message')
+            ));
+
+            if ($feedback->validate()) {
+                $id = $feedback->save();
+
+                Event::fire('app.log', array('success', 'Feedback id: ' . $id));
+                $view->successMessage('Děkujeme za Vaše nápady a návrhy');
+                self::redirect('/');
+            } else {
+                Event::fire('app.log', array('fail'));
+                $view->set('feedback', $feedback)
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('errors', $feedback->getErrors());
+            }
+        }
+    }
+
 }

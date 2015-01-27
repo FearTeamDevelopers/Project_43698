@@ -228,7 +228,7 @@ class SystemController extends Controller
         ini_set('max_execution_time', 1800);
         ini_set('memory_limit', '256M');
 
-        $ROW_COUNT = 100;
+        $ROW_COUNT = 50;
 
         $content = \App\Model\PageContentModel::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
 
@@ -237,7 +237,7 @@ class SystemController extends Controller
             Kupujte jen takovou výstroj, která tato kriteria splňuje! Pamatujte, že cena je až 
             druhotným ukazatelem ... nebo váš život stojí za pár ušetřených stokorun?';
 
-        $LARGE_TEXT = $content->getBody();
+        $LARGE_TEXT = str_replace('h1','h2',$content->getBody());
         unset($content);
 
         $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
@@ -268,6 +268,10 @@ class SystemController extends Controller
 
         if ((int) $type == 2) {
             for ($i = 0; $i < $ROW_COUNT; $i++) {
+                $date = new \DateTime();
+                $date->add(new \DateInterval('P' . (int) $i . 'D'));
+                $startDate = $date->format('Y-m-d');
+            
                 $action = new \App\Model\ActionModel(array(
                     'title' => 'Action-' . $i . '-' . time(),
                     'userId' => 1,
@@ -278,8 +282,8 @@ class SystemController extends Controller
                     'shortBody' => $SHORT_TEXT,
                     'body' => $LARGE_TEXT,
                     'rank' => 1,
-                    'startDate' => '',
-                    'endDate' => '',
+                    'startDate' => $startDate,
+                    'endDate' => $startDate,
                     'startTime' => '',
                     'endTime' => '',
                     'keywords' => 'action',

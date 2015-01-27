@@ -1,14 +1,14 @@
 
 <section class="wrapper akce singlePage">
   <header class="row">
-    <h2>akce</h2>
+    <h2>Archiv akcí</h2>
   </header>
   <section class="row container">
     {if !empty($actions)}
     {foreach $action in $actions}
     <article>
       <header>
-        <h3>{echo $action->getTitle()}</h3><span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span>
+        <h3>{echo $action->getTitle()}</h3><span> <small>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</small></span>
       </header>
       <div class="body">
         <div>{echo html_entity_decode($action->getShortBody())}</div><a href="/akce/r/{echo $action->getUrlKey()}">čti více</a>

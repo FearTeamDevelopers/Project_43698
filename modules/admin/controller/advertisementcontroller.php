@@ -314,8 +314,8 @@ class AdvertisementController extends Controller
         } else {
             $adTtl = $this->getConfig()->bazar_ad_ttl;
             
-            $date = new DateTime();
-            $date->add(new DateInterval('P'.(int)$adTtl.'D'));
+            $date = new \DateTime();
+            $date->add(new \DateInterval('P'.(int)$adTtl.'D'));
             $expirationDate = $date->format('Y-m-d');
 
             $ad->hasAvailabilityRequest = false;

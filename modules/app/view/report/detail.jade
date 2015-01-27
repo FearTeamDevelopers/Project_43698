@@ -2,14 +2,14 @@ section.wrapper.report
    .row
    header.row
       .reportInfo.large-12.column
-         h2 {echo $report->title}
-         span {echo $report->created}<br/>
+         h2 {echo $report->getTitle()}
          small
             span Autor:
-         span {echo " ".$report->userAlias}
+         span {echo " ".$report->getUserAlias()}
+         br
+         span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
       .imgWrapper.large-12
-         img(src!='$report->imgMain')
-
+         img(src!='{echo $report->getImgMain()}')
    .page.row
       .container
          |{echo html_entity_decode($report->getBody())}

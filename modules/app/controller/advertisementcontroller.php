@@ -219,45 +219,6 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Get list of ads created by user currently logged id
-     * 
-     * @before _secured, _member
-     */
-    public function listByUser($page = 1)
-    {
-        $view = $this->getActionView();
-        $layoutView = $this->getLayoutView();
-
-        $userId = $this->getUser()->getId();
-        $adsPerPage = 10;
-
-        if ($page <= 0) {
-            $page = 1;
-        }
-
-        if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray';
-        } else {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray/p/' . $page;
-        }
-
-        $ads = \App\Model\AdvertisementModel::fetchActiveByUser($userId, $adsPerPage, $page);
-        $adsCount = \App\Model\AdvertisementModel::countActiveByUser($userId);
-
-        $adsPageCount = ceil($adsCount / $adsPerPage);
-
-        $this->_pagerMetaLinks($adsPageCount, $page, '/bazar/moje-inzeraty/p/');
-
-        $view->set('ads', $ads)
-                ->set('currentpage', $page)
-                ->set('pagerpathprefix', '/bazar/moje-inzeraty')
-                ->set('pagecount', $adsPageCount);
-
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Bazar - Moje inzeráty');
-    }
-
-    /**
      * Show ad detail
      * 
      * @param string    $uniquekey      ad key
@@ -374,11 +335,16 @@ class AdvertisementController extends Controller
     public function add()
     {
         $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
 
+        $canonical = 'http://' . $this->getServerHost() . '/bazar/pridat';
         $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
 
         $view->set('adsections', $adSections)
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
+        
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Bazar - Nový inzerát');
 
         if (RequestMethods::post('submitAddAdvertisement')) {
             if ($this->checkCSRFToken() !== true &&
@@ -394,8 +360,8 @@ class AdvertisementController extends Controller
             }
 
             $adTtl = $this->getConfig()->bazar_ad_ttl;
-            $date = new DateTime();
-            $date->add(new DateInterval('P' . (int) $adTtl . 'D'));
+            $date = new \DateTime();
+            $date->add(new \DateInterval('P' . (int) $adTtl . 'D'));
             $expirationDate = $date->format('Y-m-d');
 
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -491,9 +457,11 @@ class AdvertisementController extends Controller
     public function edit($uniqueKey)
     {
         $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
 
+        $canonical = 'http://' . $this->getServerHost() . '/bazar/pridat';
         $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
-
+        
         if (NULL === $ad) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
             $this->_willRenderActionView = false;
@@ -504,6 +472,9 @@ class AdvertisementController extends Controller
 
         $view->set('adsections', $adSections)
                 ->set('ad', $ad);
+        
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Bazar - Upravit inzerát');
 
         if (RequestMethods::post('submitEditAdvertisement')) {
             if ($this->checkCSRFToken() !== true) {
@@ -656,6 +627,45 @@ class AdvertisementController extends Controller
         }
     }
 
+    /**
+     * Get list of ads created by user currently logged id
+     * 
+     * @before _secured, _member
+     */
+    public function listByUser($page = 1)
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $userId = $this->getUser()->getId();
+        $adsPerPage = 10;
+
+        if ($page <= 0) {
+            $page = 1;
+        }
+
+        if ($page == 1) {
+            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray';
+        } else {
+            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray/p/' . $page;
+        }
+
+        $ads = \App\Model\AdvertisementModel::fetchActiveByUser($userId, $adsPerPage, $page);
+        $adsCount = \App\Model\AdvertisementModel::countActiveByUser($userId);
+
+        $adsPageCount = ceil($adsCount / $adsPerPage);
+
+        $this->_pagerMetaLinks($adsPageCount, $page, '/bazar/moje-inzeraty/p/');
+
+        $view->set('ads', $ads)
+                ->set('currentpage', $page)
+                ->set('pagerpathprefix', '/bazar/moje-inzeraty')
+                ->set('pagecount', $adsPageCount);
+
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Bazar - Moje inzeráty');
+    }
+    
     /**
      * Create request for availability extend
      * 
