@@ -38,7 +38,7 @@ class DateFormater
     }
 
     /**
-     * 
+     *
      * @param type $texttime
      * @return type
      */
@@ -51,4 +51,29 @@ class DateFormater
         }
     }
 
+    /**
+     *
+     * @param type $date
+     */
+    public static function g2dn($date)
+    {
+        if (!empty($date)) {
+            return date('j', strtotime($date));
+        } else {
+            return date('j', time());
+        }
+    }
+
+    /**
+     *
+     * @param type $date
+     */
+    public static function g2mn($date)
+    {
+        if (!empty($date)) {
+            return strftime('%B', strtotime($date));
+        } else {
+            return strftime('%B', time());
+        }
+    }
 }

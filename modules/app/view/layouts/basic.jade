@@ -7,7 +7,7 @@ html
         | {/if}
         meta(name='viewport', content='width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0')
         meta(name='description', content='{echo $metadescription}')
-        meta(name='author', content='Tomas Hodan')
+        meta(name='author', content='Tomas Hodan, Tomas Slama')
         meta(name='robots', content='{echo $metarobots}')
         | {if isset($article)}
         <meta property="og:title" content="{echo $metatitle}" />
@@ -24,6 +24,7 @@ html
         <meta property="og:description" content="{echo $metadescription}" />
         <meta property="og:type" content="{echo $metaogtype}" />
         <meta property="og:site_name" content="{echo $metaogsitename}" />
+        <meta property="og:image" content="{echo $metaogimage}" />
         | {/else}
 
         link(href='/public/css/custom/reset.css', media='screen', rel='stylesheet', type='text/css')
@@ -61,7 +62,7 @@ html
             footer.wrapper.blue#kontakty
                 .row.container
                     header
-                        h3 Kontakty
+                        h3.fi-telephone Kontakty
                     .large-4.small-12.medium-12.columns.borderRight
                         p Potápěčské centrum HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: info@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 600<br/><br/><a href="https://www.google.cz/maps/place/Mládežnická+1275,+293+01+Mladá+Boleslav/@50.4330411,14.9196529,17z/data=!3m1!4b1!4m2!3m1!1s0x4709544ea3d0d74d:0xcc376964dfa62f6d" target="_blank">Najdete nás podle mapy</a>
                     .large-4.columns.borderRight

@@ -1,0 +1,44 @@
+.akce{
+	.container{
+		overflow auto
+		&:before{
+			content ""
+			display table
+
+		}
+		&:after{
+			content ""
+			display table
+			clear both
+
+		}
+		article{
+			position relative
+			padding-left 110px !important
+			.date{
+				background rgba(0,0,0,0.8)
+				position absolute
+				left 15px
+				top 20px
+				width 80px
+				height 80px
+				text-align center
+				color white
+				.den{
+					width 100%
+					border-bottom 2px solid #ffffff
+					text-align center
+					font-size 24px
+					color white
+				}
+				.mesic{
+					font-size 18px
+					line-height 40px
+					color white
+				}
+			}
+		}
+
+	}
+}
+

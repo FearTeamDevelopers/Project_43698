@@ -3,7 +3,10 @@
 	section.wrapper
 		.row.container
 			header
-				h3 Reportáže
+				h4.fi-alert.feedback
+					a(href="/feedback") Pošlete nám feedback (dočasné)
+				h3.fi-clipboard-notes Reportáže
+
 			.container-box
 				|{foreach $report in $reports}
 				a(href!='/reportaze/r/{echo $report->getUrlKey()}')
@@ -33,11 +36,11 @@
 	section.wrapper.blue
 		.row.container
 			header
-				h3 Novinky
+				h3.fi-results Novinky
 			.container-box
 				| {foreach $new in $news}
 				.large-6.medium-6.small-12.columns
-					article.indexNew
+					article.indexNew.fi-paperclip
 						header
 							a(href!='/novinky/r/{echo $new->getUrlKey()}')
 								h4 {echo $new->getTitle()}
@@ -52,7 +55,7 @@
 	section.wrapper
 		.row.container
 			header
-				h3 Akce
+				h3.fi-compass Akce
 			.container-box#wrapper
 				#carousel
 					|{foreach $action in $actions}
@@ -72,7 +75,7 @@
 	section.wrapper.blue
 		.row.container
 			header
-				h3 Partneři
+				h3.fi-torso-business Partneři
 			.container-box.partneri
 				#carousel2
 					|{foreach $partner in $partners}
