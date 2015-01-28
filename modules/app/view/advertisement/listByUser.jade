@@ -1,5 +1,5 @@
 include filter-template
-section.wrapper.bazar
+section.wrapper.bazar.singlePage
    header.row
       h2 Moje inzeráty
    .row.container
@@ -47,9 +47,8 @@ section.wrapper.bazar
          a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
          a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->getUniqueKey()}', title='Smazat')
       | {/foreach}
-      |{/if}
-      |{else}
-      p Nemáte žádné inzeráty
+      |{/if}{else}
+      h3 Nemáte žádné inzeráty
       |{/else}
    include ../components/pager
 

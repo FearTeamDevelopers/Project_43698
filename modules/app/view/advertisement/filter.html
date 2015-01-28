@@ -30,7 +30,7 @@
         <option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/foreach}
         {/else}
       </select>
-      <input type="submit" name="zobrazit" value="Zobrazit"/>
+      <input type="submit" value="Zobrazit"/>
     </form>{/if}
     <form method="GET" action="/bazar/hledat" class="search">
       <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
@@ -47,8 +47,9 @@
         <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>{if isset($authUser)}
         <li><a href="/bazar/moje-inzeraty" class="fi-page-copy">Moje inzeráty</a></li>{/if}
       </ul>
-    </div>{foreach $ad in $ads}
-    <article class="medium-6 column left">
+    </div>{if !empty($ads)}
+    {foreach $ad in $ads}
+    <article class="large-6 medium-6 small-12 column left">
       <div class="imgWrapper">
         {script $images=$ad->getImages()}
         {if !empty($images)}
@@ -59,6 +60,10 @@
       </div>
       <div class="info"><small><span>majitel:</span></small><span>{echo " ".$ad->getUserAlias()}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small><span class="price">{echo " "}cena? <br/></span><a href="/bazar/r/{echo $ad->getUniqueKey()}">zobrazit podrobnosti</a></div>
     </article>{/foreach}
+    {/if}{else}
+    <article class="large-12 small-12 medium-12 column left">
+      <h2>Žádné inzeráty nejsou k dispozici</h2>
+    </article>{/else}
   </div>{if  $pagecount > 1}
   <section class="pager row">
     {if $currentpage !=1}

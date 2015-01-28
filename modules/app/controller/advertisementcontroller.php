@@ -158,8 +158,8 @@ class AdvertisementController extends Controller
         $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
         $view->set('adsections', $adSections);
 
-        $type = RequestMethods::get('bftype');
-        $section = RequestMethods::get('bfsection');
+        $type = RequestMethods::get('bftype', '0');
+        $section = RequestMethods::get('bfsection', '0');
 
         $httpQuery = '?' . http_build_query(array('bftype' => $type, 'bfsection' => $section));
 

@@ -1,11 +1,14 @@
 section.wrapper.bazar.singlePage
    |{if empty($result)}
    header.row
-      h2 Hledaný výraz nenalezen
+      h2 Hledání v bazaru
+   section.row.container
+      .large-12.medium-12.small-12.column
+            h3 Pro hledaný výraz nebyl nenalezen žádný odkaz
    | {/if}
    |{else}
    header.row
-      h2 Výsledky hledání v bazaru
+      h2 Hledání v bazaru
    section.row.container
       .large-12.medium-12.small-12.column
          |{foreach $url in $result}

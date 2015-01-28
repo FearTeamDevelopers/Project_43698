@@ -30,7 +30,7 @@
         <option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/foreach}
         {/else}
       </select>
-      <input type="submit" name="zobrazit" value="Zobrazit"/>
+      <input type="submit" value="Zobrazit"/>
     </form>{/if}
     <form method="GET" action="/bazar/hledat" class="search">
       <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>

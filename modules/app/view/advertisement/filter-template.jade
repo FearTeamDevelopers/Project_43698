@@ -38,7 +38,7 @@ section.wrapper.blue.filter
             option(value!='{echo $ad->getUrlKey()}') {echo $ad->getTitle()}
             | {/foreach}
             |{/else}
-         input(type='submit' name='zobrazit' value='Zobrazit')
+         input(type='submit' value='Zobrazit')
       |{/if}
       form.search(method='GET' action='/bazar/hledat')
          input(type='text' placeholder='vyhledat v bazaru...' name='adstr' required)
