@@ -4,6 +4,10 @@
 	@import"button-more"
 	.container{
 		header {
+			.feedback{
+				position absolute
+				left 0
+			}
 			h3 {
 				width 25%
 				min-width 150px
@@ -15,6 +19,9 @@
 				border-bottom 2px solid defaultGreen
 				color black
 				font-weight 700
+				&:before{
+					padding-right 1rem
+				}
 			}
 		}
 		@import "reports"
@@ -22,6 +29,15 @@
 			background transparent
 			position relative
 			height 100%
+			&:before{
+				content ""
+				display table
+			}
+			&:after{
+				content ""
+				display table
+				clear both
+			}
 
 			@import "novinky"
 			@import "akce"

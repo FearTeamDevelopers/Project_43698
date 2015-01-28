@@ -1,26 +1,6 @@
-.wrapper section.row.container article 
-    padding na 15px 20px;
-
-.wrapper section.row.container article .body p
-    height na auto;
-
-.wrapper section.row.container article .body
-    margin-top na 1em;
-
-detail reportaze fotka 
-    height auto
-
-.galleryDetail .image img 
-    width na auto
 
 
 
-pridat nejaky margin nebo padding pro loadcontent, novinky a akce
-    jak od menu tak od kontaktu, ale taky mezi header (novinky/akce) a dalsim textem
-
-Akce a archiv akci
-    vedle header pridat ikonu kalendare s cislovkou dne a jmenem mesice kdy se akce kona/konala
-
-Texty v indexu reportazi maji modrou barvu
 Na homepage pridat feedback button s odkazem na /feedback
+
 Otestovat maximalni pocet fotek v inzeratu pri add a edit
