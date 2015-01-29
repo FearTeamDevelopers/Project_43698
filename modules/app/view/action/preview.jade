@@ -1,6 +1,7 @@
 section.wrapper.singlePage
    .row.container
       a(href!="/admin/action/{echo $act}/") Zpět do administrace
+      br
       header
          h1 {echo $action->getTitle()}
          span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
