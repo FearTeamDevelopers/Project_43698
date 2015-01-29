@@ -341,6 +341,7 @@ class AdvertisementController extends Controller
         $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
 
         $view->set('adsections', $adSections)
+                ->set('ad', null)
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
         
         $layoutView->set('canonical', $canonical)

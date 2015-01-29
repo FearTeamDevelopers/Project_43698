@@ -116,7 +116,7 @@ class Module extends Base
         if ($this->_checkForRedirects) {
             $cache = Registry::get('cache');
             
-            $cachedRedirects = $cache->get('core_redirects_'.$this->getModuleName());
+            $cachedRedirects = $cache->get('core_redirects_'.strtolower($this->getModuleName()));
             
             if (null !== $cachedRedirects) {
                 $redirects = $cachedRedirects;
@@ -130,7 +130,7 @@ class Module extends Base
                     $redirects = array();
                 }
                 
-                $cache->set('core_redirects_'.$this->getModuleName(), $redirects);
+                $cache->set('core_redirects_'.strtolower($this->getModuleName()), $redirects);
             }
 
             return $redirects;

@@ -2,11 +2,14 @@
 
 namespace App\Helper;
 
+/**
+ * Helper class for quick date formating
+ */
 class DateFormater
 {
 
-    const BASE_DATETIME_FORMAT = 'j.m. Y H:i';
-    const BASE_DATE_FORMAT = 'j.m. Y';
+    const BASE_DATETIME_FORMAT = 'j.n. Y H:i';
+    const BASE_DATE_FORMAT = 'j.n. Y';
     const BASE_TIME_FORMAT = 'H:i';
 
     /**
@@ -70,10 +73,14 @@ class DateFormater
      */
     public static function g2mn($date)
     {
+        $czechMonths = array(1 => 'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec');
+        
         if (!empty($date)) {
-            return strftime('%B', strtotime($date));
+            $month = date('n', strtotime($date));
+            return $czechMonths[$month];
         } else {
-            return strftime('%B', time());
+            $month = date('n', time());
+            return $czechMonths[$month];
         }
     }
 }

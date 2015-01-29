@@ -50,8 +50,9 @@ class SystemController extends Controller
 
         $canonical = 'http://' . $this->getServerHost() . '/feedback';
 
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+                ->set('feedback', null);
         $layoutView->set('canonical', $canonical)
-                ->set('submstoken', $this->mutliSubmissionProtectionToken())
                 ->set('metatitle', 'Hastrman - Feedback');
 
         if (RequestMethods::post('submitFeedback')) {

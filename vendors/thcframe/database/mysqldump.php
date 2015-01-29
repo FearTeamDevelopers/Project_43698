@@ -69,8 +69,23 @@ class Mysqldump extends Base
                 '-- Generation Time: ' . date('r') . PHP_EOL .
                 '--' . PHP_EOL .
                 "-- Database: `{$this->_database->getSchema()}`" . PHP_EOL .
+                '--' . PHP_EOL .
+                'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL .
                 '--' . PHP_EOL;
         return $header;
+    }
+
+    /**
+     * Returns footer for dump file
+     *
+     * @return string
+     */
+    private function _getFooter()
+    {
+        $footer = '--' . PHP_EOL .
+                'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL .
+                '--' . PHP_EOL;
+        return $footer;
     }
 
     /**
@@ -278,6 +293,7 @@ class Mysqldump extends Base
             }
         }
 
+        $this->_write($this->_getFooter());
         Event::fire('framework.mysqldump.create.after', array($this->_filename));
 
         $this->_close();
