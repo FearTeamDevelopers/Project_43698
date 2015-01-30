@@ -44,7 +44,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["content"])}
                         label.error {echo join("<br/>", $errors["content"])}
                         |{/if}
-                        textarea(name='content', required, rows=8, value!="{echo \\App\\Helper\\FormPrinter::iset($ad,'content')}")
+                        textarea(name='content', required, rows=8) {echo \App\Helper\FormPrinter::iset($ad,'content')}
                 tr
                     td
                         span Klíčová slova

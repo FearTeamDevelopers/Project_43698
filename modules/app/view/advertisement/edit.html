@@ -41,7 +41,7 @@
           <td><span>Obsah</span></td>
           <td>{if isset($errors["content"])}
             <label class="error">{echo join("<br/>", $errors["content"])}</label>{/if}
-            <textarea name="content" required="required" rows="8" value="{echo \App\Helper\FormPrinter::iset($ad,'content')}"></textarea>
+            <textarea name="content" required="required" rows="8">{echo \App\Helper\FormPrinter::iset($ad,'content')}</textarea>
           </td>
         </tr>
         <tr>

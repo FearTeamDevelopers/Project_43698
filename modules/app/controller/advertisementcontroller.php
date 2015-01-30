@@ -238,6 +238,7 @@ class AdvertisementController extends Controller
         $this->_checkMetaData($layoutView, $ad);
 
         $view->set('ad', $ad)
+                ->set('admessage', null)
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAdReply')) {

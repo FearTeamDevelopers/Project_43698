@@ -75,7 +75,7 @@ section.wrapper.bazar.detail.singlePage
                label Email:
                   input(type="email" name='email' required value!="{echo \\App\\Helper\\FormPrinter::iset($admessage,'msEmail')}")
                label Text:
-                  textarea(name='message' rows=6 required){echo \App\Helper\FormPrinter::iset($admessage,'message')}"
+                  textarea(name='message' rows=6 required) {echo \App\Helper\FormPrinter::iset($admessage,'message')}
                label Chcete poslat kopii na svůj email?
                   input(type="checkbox" name='getemailcopy')
                a.submitEmail(href='#')

@@ -1,6 +1,19 @@
 
+padding pro ikony v nadpisech
 
+V layoutu pridat feedback button s odkazem na /feedback
+    z textu udelat button v pravem dolnim rohu (jako je na lolesports.com)
+    v mobilnim rozliseni nezobrazovat
+    z indexu presunuto do layouts/basic.jade na radky 74-75
 
-Na homepage pridat feedback button s odkazem na /feedback
+Detail inzeratu
+    zobrazit title
+    pokud je tam vice fotek, tak je zobrazovat rovnou
+    text inzeratu je fontem asi tak 5 -> zvetsit
+    prava strana inzeratu je jaksi prazdna ??
+    pokud jsem vlastnikem inzeratu rovnou nabidnout moznosti upravy (lista jako je v moje inzeraty
+    fotky v inzeratu nemaj lightbox
 
-Otestovat maximalni pocet fotek v inzeratu pri add a edit
+uprava inzeratu
+    zobrazit nahrane fotky
+    pridat moznost smazat nahrane fotky

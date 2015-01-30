@@ -1,8 +1,5 @@
 
 <section class="wrapper pridatInzerat singlePage">
-  <header class="row">
-    <h2>Nový inzerát</h2>
-  </header>
   <div class="row">
     <form method="post" action="#" enctype="multipart/form-data" class="large-8 medium-10 small-12 centerBlock uploadForm mv30">
       <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
@@ -41,7 +38,7 @@
           <td><span>Obsah</span></td>
           <td>{if isset($errors["content"])}
             <label class="error">{echo join("<br/>", $errors["content"])}</label>{/if}
-            <textarea name="content" required="required" rows="8" value="{echo \App\Helper\FormPrinter::iset($ad,'content')}"></textarea>
+            <textarea name="content" required="required" rows="8">{echo \App\Helper\FormPrinter::iset($ad,'content')}</textarea>
           </td>
         </tr>
         <tr>

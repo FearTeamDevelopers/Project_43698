@@ -8,7 +8,7 @@ section.wrapper.singlePage
                 |{if isset($errors["message"])}
                 label.error {echo join("<br/>", $errors["message"])}
                 |{/if}
-                textarea(name='message', required, rows=6, value!="{echo \\App\\Helper\\FormPrinter::iset($feedback,'message')}")
+                textarea(name='message', required, rows=6) {echo \App\Helper\FormPrinter::iset($feedback,'message')}
                 input(type='submit' name='submitFeedback' value='Odeslat').more
                 input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
                 input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")

@@ -89,7 +89,8 @@ class Controller extends BaseController
                 'metaogurl' => $this->getConfig()->meta_og_url,
                 'metaogtype' => $this->getConfig()->meta_og_type,
                 'metaogimage' => $this->getConfig()->meta_og_image,
-                'metaogsitename' => $this->getConfig()->meta_og_site_name
+                'metaogsitename' => $this->getConfig()->meta_og_site_name,
+                'showfeedback' => $this->getConfig()->show_feedback
             );
 
             $this->getCache()->set('global_meta_data', $metaData);
@@ -102,7 +103,8 @@ class Controller extends BaseController
                 ->set('metaogurl', $metaData['metaogurl'])
                 ->set('metaogtype', $metaData['metaogtype'])
                 ->set('metaogimage', $metaData['metaogimage'])
-                ->set('metaogsitename', $metaData['metaogsitename']);
+                ->set('metaogsitename', $metaData['metaogsitename'])
+                ->set('showfeedback', $metaData['showfeedback']);
     }
 
     /**

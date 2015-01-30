@@ -40,7 +40,7 @@ class FeedbackModel extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html
+     * @validate required, alphanumeric
      * @label text
      */
     protected $_message;

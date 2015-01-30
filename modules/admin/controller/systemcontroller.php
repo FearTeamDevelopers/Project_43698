@@ -10,6 +10,7 @@ use THCFrame\Configuration\Model\ConfigModel;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Profiler\Profiler;
 use THCFrame\Router\Model\RedirectModel;
+use THCFrame\Filesystem\LineCounter;
 
 /**
  * 
@@ -325,4 +326,18 @@ class SystemController extends Controller
         }
     }
 
+    /**
+     * @before _secured, _superadmin
+     */
+    public function linecounter()
+    {
+        $view = $this->getActionView();
+        
+        $counter = new LineCounter();
+        $totalLines = $counter->countLines(APP_PATH);
+        $fileCounter = $counter->getFileCounter();
+        
+        $view->set('totallines', $totalLines)
+                ->set('filecounter', $fileCounter);
+    }
 }
