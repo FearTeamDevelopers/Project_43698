@@ -60,7 +60,7 @@ class Controller extends BaseController
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
-        $return = mb_ereg_replace('[\-]+','-',trim(trim($cleaned), '-'));
+        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
         return strtolower($return);
     }
 
@@ -108,7 +108,8 @@ class Controller extends BaseController
             $view = $this->getActionView();
 
             $view->infoMessage('You has been logged out for long inactivity');
-            self::redirect('/admin/logout');
+            $this->_security->logout();
+            self::redirect('/admin/login');
         }
     }
 
@@ -120,9 +121,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_member') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -147,9 +146,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_participant') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -174,9 +171,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_admin') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -201,9 +196,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 

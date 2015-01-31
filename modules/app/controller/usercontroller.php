@@ -48,14 +48,9 @@ class UserController extends Controller
 
             if (!$error) {
                 try {
-                    $status = $this->getSecurity()->authenticate($email, $password);
-
-                    if ($status === true) {
-                        self::redirect('/muj-profil');
-                    } else {
-                        $view->set('account_error', 'Email a/nebo heslo je špatně');
-                    }
-                } catch (THCFrame\Security\Exception\UserInactive $e){
+                    $this->getSecurity()->authenticate($email, $password);
+                    self::redirect('/muj-profil');
+                } catch (\THCFrame\Security\Exception\UserInactive $e){
                     $view->set('account_error', 'Účet ještě nebyl aktivován');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {

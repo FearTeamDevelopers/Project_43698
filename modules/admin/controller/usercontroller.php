@@ -29,25 +29,19 @@ class UserController extends Controller
             $error = false;
 
             if (empty($email)) {
-                $view->set('account_error', 'Není zadán email');
+                $view->set('account_error', 'Email není vyplňen');
                 $error = true;
             }
 
             if (empty($password)) {
-                $view->set('account_error', 'Není zadáno heslo');
+                $view->set('account_error', 'Heslo není vyplněno');
                 $error = true;
             }
 
             if (!$error) {
                 try {
-                    $security = Registry::get('security');
-                    $status = $security->authenticate($email, $password);
-
-                    if ($status === true) {
-                        self::redirect('/admin/');
-                    } else {
-                        $view->set('account_error', 'Email a/nebo heslo není správně');
-                    }
+                    $this->getSecurity()->authenticate($email, $password);
+                    self::redirect('/admin/');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
@@ -64,8 +58,10 @@ class UserController extends Controller
      */
     public function logout()
     {
-        $security = Registry::get('security');
-        $security->logout();
+        $this->_willRenderActionView = false;
+        $this->_willRenderLayoutView = false;
+
+        $this->getSecurity()->logout();
         self::redirect('/admin/');
     }
 

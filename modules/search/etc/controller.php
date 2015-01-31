@@ -43,14 +43,14 @@ class Controller extends BaseController
      * @read
      */
     protected $_cache;
-    
+
     /**
      * Store configuration
      * @var type 
      * @read
      */
     protected $_config;
-    
+
     /**
      * @read
      * @var type 
@@ -95,7 +95,7 @@ class Controller extends BaseController
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
-        $return = mb_ereg_replace('[\-]+','-',trim(trim($cleaned), '-'));
+        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
         return strtolower($return);
     }
 
@@ -137,7 +137,8 @@ class Controller extends BaseController
             $view = $this->getActionView();
 
             $view->infoMessage('You has been logged out for long inactivity');
-            self::redirect('/admin/logout');
+            $this->_security->logout();
+            self::redirect('/admin/login');
         }
     }
 
@@ -149,9 +150,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_admin') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/search/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -174,11 +173,9 @@ class Controller extends BaseController
     public function _cron()
     {
         $view = $this->getActionView();
-        
+
         if (null !== RequestMethods::server('HTTP_HOST')) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/search/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -203,9 +200,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/search/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -300,16 +295,16 @@ class Controller extends BaseController
 
         if ($view) {
             $view->set('authUser', $user)
-                    ->set('env', ENV);
-            $view->set('isAdmin', $this->isAdmin())
+                    ->set('env', ENV)
+                    ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
                     ->set('token', $this->_security->getCSRF()->getToken());
         }
 
         if ($layoutView) {
             $layoutView->set('authUser', $user)
-                    ->set('env', ENV);
-            $layoutView->set('isAdmin', $this->isAdmin())
+                    ->set('env', ENV)
+                    ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
                     ->set('token', $this->_security->getCSRF()->getToken());
         }

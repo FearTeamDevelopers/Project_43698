@@ -180,7 +180,7 @@ class Security extends Base implements SecurityInterface
      * 
      * @param string $name
      * @param string $pass
-     * @return mixed
+     * @return true or re-throw exception
      */
     public function authenticate($name, $pass)
     {
@@ -189,7 +189,7 @@ class Security extends Base implements SecurityInterface
             $this->setUser($user);
             return true;
         } catch (Exception $ex) {
-            return $ex->getMessage();
+            throw $ex;
         }
     }
 

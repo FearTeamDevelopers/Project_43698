@@ -5,19 +5,19 @@ section.wrapper.login.singlePage
             header
                h2.fi-torso Přihlášení
             form(method='POST' action='#')
-               |{if isset($errors["account_error"])}
+               |{if isset($account_error)}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["account_error"])}
+                  |{echo $account_error}
                |{/if}
                input(type='email' name='email' placeholder='Váš@email.cz' required)
-               |{if isset($errors["email_error"])}
+               |{if isset($email_error)}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["email_error"])}
+                  |{echo $email_error}
                |{/if}
                input(type='password' name='password' placeholder='Vaše heslo' required)
-               |{if isset($errors["password_error"])}
+               |{if isset($password_error)}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["password_error"])}
+                  |{echo $password_error}
                |{/if}
                input(type='submit' name='submitLogin' value='Přihlásit')
                |<br/><br/>

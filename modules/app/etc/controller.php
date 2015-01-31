@@ -29,7 +29,7 @@ class Controller extends BaseController
     const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnění';
     const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
     const ERROR_MESSAGE_6 = 'Přísput odepřen';
-    
+
     /**
      * Store security context object
      * @var type 
@@ -43,7 +43,7 @@ class Controller extends BaseController
      * @read
      */
     protected $_cache;
-    
+
     /**
      * Store configuration
      * @var type 
@@ -57,7 +57,7 @@ class Controller extends BaseController
      * @read
      */
     protected $_serverHost;
-    
+
     /**
      * 
      * @param type $options
@@ -70,13 +70,13 @@ class Controller extends BaseController
         $this->_serverHost = RequestMethods::server('HTTP_HOST');
         $this->_cache = Registry::get('cache');
         $this->_config = Registry::get('configuration');
-        
+
         // schedule disconnect from database 
         Events::add('framework.controller.destruct.after', function($name) {
             $database = Registry::get('database');
             $database->disconnect();
         });
-        
+
         $metaData = $this->getCache()->get('global_meta_data');
 
         if (null !== $metaData) {
@@ -117,7 +117,7 @@ class Controller extends BaseController
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
-        $return = mb_ereg_replace('[\-]+','-',trim(trim($cleaned), '-'));
+        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
         return strtolower($return);
     }
 
@@ -144,7 +144,7 @@ class Controller extends BaseController
                     ->set('pagednextlink', $path . $nextPage);
         }
     }
-    
+
     /**
      * @protected
      */
@@ -177,9 +177,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_member') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -204,9 +202,7 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_participant') !== true) {
-            $view->warningMessage(self::ERROR_MESSAGE_6);
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/');
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
 
@@ -222,7 +218,7 @@ class Controller extends BaseController
             return false;
         }
     }
-    
+
     /**
      * load user from security context
      */
