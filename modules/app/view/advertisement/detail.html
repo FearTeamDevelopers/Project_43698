@@ -6,7 +6,9 @@
   <div class="row container">
     <div class="buttonWrapper">
       <ul>
-        <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>
+        <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
+        <li><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" class="fi-pencil">Upravit</a></li>
+        <li><a href="/bazar/smazat/{echo $ad->getUniqueKey()}" class="fi-trash">Smazat</a></li>{/if}
       </ul>
     </div>
     <article class="large-12">

@@ -62,9 +62,17 @@
           <td><span>Fotky</span></td>
           <td>{if isset($errors["uploadfile"])}
             <label class="error">{echo join("<br/>", $errors["uploadfile"])}</label>{/if}
-            <p><span class="field"><a href="#" class="multi_upload fi-plus mh10"></a><a href="#" class="multi_upload_dec fi-minus mh10"></a></span><span class="field file_inputs">
+            <p><span>K inzerátu mohou být připojeny maximálně 3 fotky</span><br/><span class="field"><a href="#" class="multi_upload fi-plus mh10"></a><a href="#" class="multi_upload_dec fi-minus mh10"></a></span><span class="field file_inputs">
                 <input type="file" name="uploadfile[]" accept="image/*"/></span></p>
           </td>
+        </tr>
+        <tr>
+          <td><span>Nahrané fotky</span></td>
+          <td><span class="field">
+              {script $images = $ad->getImages()}
+              {if $images !== null}
+              {foreach $image in $images}<a href="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage"><img src="{echo $image->getImgThumb()}" width="30%"/></a>{/foreach}
+              {/if}</span></td>
         </tr>
         <tr>
           <td colspan="2">

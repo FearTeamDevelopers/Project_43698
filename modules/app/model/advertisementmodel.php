@@ -505,4 +505,20 @@ class AdvertisementModel extends Model
         return self::count(array('active = ?' => true, 'userId = ?' => (int)$userId), array('id'));
     }
 
+    /**
+     * 
+     * @param type $uniqueKey
+     * @param type $userId
+     * @return type
+     */
+    public static function fetchAdByKeyUserId($uniqueKey, $userId)
+    {
+        $ad = self::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $userId));
+        
+        if(null !== $ad){
+            $ad->_images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
+        }
+        
+        return $ad;
+    }
 }

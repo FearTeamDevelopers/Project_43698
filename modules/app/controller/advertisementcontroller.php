@@ -257,30 +257,40 @@ class AdvertisementController extends Controller
             ));
 
             if ($message->validate()) {
-                require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                $transport = \Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
-                        ->setUsername('info@fear-team.cz')
-                        ->setPassword('ThcEbmInfo-2015*');
-                $mailer = \Swift_Mailer::newInstance($transport);
+                try {
+                    require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+                    $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host,
+                                        $this->getConfig()->smtp->port, 
+                                        $this->getConfig()->smtp->secured)
+                            ->setUsername($this->getConfig()->smtp->username)
+                            ->setPassword($this->getConfig()->smtp->password);
+                    $mailer = \Swift_Mailer::newInstance($transport);
 
-                $email = \Swift_Message::newInstance()
-                        ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
-                        ->setFrom('bazar@hastrman.cz')
-                        ->setBody($this->_getEmailBody($ad, $message));
+                    $email = \Swift_Message::newInstance()
+                            ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
+                            ->setFrom('bazar@hastrman.cz')
+                            ->setBody($this->_getEmailBody($ad, $message), 'text/html');
 
-                if ($message->getSendEmailCopy() == 1) {
-                    $email->setTo(array($message->getMsEmail(), $ad->getEmail()));
-                } else {
-                    $email->setTo($ad->getEmail());
+                    if ($message->getSendEmailCopy() == 1) {
+                        $email->setTo(array($message->getMsEmail(), $ad->getEmail()));
+                    } else {
+                        $email->setTo($ad->getEmail());
+                    }
+
+                    $mailer->send($email);
+                    $message->messageSent = 1;
+                    $messageId = $message->save();
+
+                    Event::fire('app.log', array('success', 'Message with Id: '.$messageId.' send for Ad Id: ' . $ad->getId()));
+                    $view->successMessage('Dotaz byl úspěšně odeslán');
+                    self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                } catch (\Exception $ex) {
+                    \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
+
+                    Event::fire('app.log', array('fail', 'Message not send for Ad Id: ' . $ad->getId()));
+                    $view->errorMessage('Nepodařilo se odeslat dotaz k inzerátu, opakujte akci později');
+                    self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
-
-                $mailer->send($email);
-
-                $message->messageSent = 1;
-                $message->save();
-
-                $view->successMessage('Dotaz byl úspěšně odeslán');
-                self::redirect('/bazar/r/' . $ad->getUniqueKey());
             } else {
                 $view->set('errors', $message->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
@@ -461,8 +471,8 @@ class AdvertisementController extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
 
-        $canonical = 'http://' . $this->getServerHost() . '/bazar/pridat';
-        $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
+        $canonical = 'http://' . $this->getServerHost() . '/bazar/upravit';
+        $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
         
         if (NULL === $ad) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
@@ -647,9 +657,9 @@ class AdvertisementController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray';
+            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeraty';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeray/p/' . $page;
+            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeraty/p/' . $page;
         }
 
         $ads = \App\Model\AdvertisementModel::fetchActiveByUser($userId, $adsPerPage, $page);

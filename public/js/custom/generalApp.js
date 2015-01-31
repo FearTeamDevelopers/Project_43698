@@ -109,6 +109,41 @@ jQuery(document).ready(function ($) {
     });
 
     /* ---------------------- AJAX OPERATIONS --------------------------------*/
+    //delete image in grid list
+    jQuery('.ajaxDeleteImage').click(function (event) {
+        event.preventDefault();
+        var parent = jQuery(this);
+        var url = jQuery(this).attr('href');
+        var csrf = jQuery('#csrf').val();
+
+        jQuery('#dialog p').text('Opravdu chcete pokračovat v mazání?');
+
+        jQuery('#dialog').dialog({
+            resizable: false,
+            width: 350,
+            height: 200,
+            modal: true,
+            buttons: {
+                "Smazat": function () {
+                    jQuery("#loader, .loader").show();
+                    jQuery.post(url, {csrf: csrf}, function (msg) {
+                        if (msg == 'success') {
+                            jQuery("#loader, .loader").hide();
+                            parent.children('img').hide('explode', 500);
+                        } else {
+                            alert(msg);
+                        }
+                    });
+                    jQuery(this).dialog("close");
+                },
+                "Zrušit": function () {
+                    jQuery(this).dialog("close");
+                }
+            }
+        });
+        return false;
+    });
+    
     jQuery('.ajaxDelete').click(function (event) {
         event.preventDefault();
         var parentTr = jQuery(this).parents('article');

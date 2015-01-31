@@ -83,6 +83,13 @@ class ModuleConfig extends Module
             'args' => ':uniquekey'
         ),
         array(
+            'pattern' => '/bazar/smazatfoto/:imageid',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'deleteadimage',
+            'args' => ':imageid'
+        ),
+        array(
             'pattern' => '/bazar/prodlouzit/:uniquekey',
             'module' => 'app',
             'controller' => 'advertisement',

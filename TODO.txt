@@ -15,5 +15,7 @@ Detail inzeratu
     fotky v inzeratu nemaj lightbox
 
 uprava inzeratu
-    zobrazit nahrane fotky
-    pridat moznost smazat nahrane fotky
+    nejakej styl pro nahrane fotky ?
+
+detail reportaze
+    vyhodit main imgage z header ramecku nebo jinak upravit

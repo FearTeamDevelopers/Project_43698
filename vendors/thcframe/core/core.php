@@ -121,6 +121,7 @@ class Core
         ),
         '503' => array(
             'THCFrame\Database\Exception\Service',
+            'THCFrame\Configuration\Exception\Smtp',
             'THCFrame\Cache\Exception\Service'
         ),
         '507' => array(
@@ -459,6 +460,13 @@ class Core
             foreach (self::$_exceptions as $template => $classes) {
                 foreach ($classes as $class) {
                     if ($class == $exception) {
+                        $controller = Registry::get('controller');
+                        
+                        if(null !== $controller){
+                            $controller->willRenderLayoutView = false;
+                            $controller->willRenderActionView = false;
+                        }
+                        
                         $defaultErrorFile = MODULES_PATH . "/app/view/errors/{$template}.phtml";
 
                         http_response_code($template);

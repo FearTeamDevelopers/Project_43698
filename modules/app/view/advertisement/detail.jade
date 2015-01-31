@@ -6,6 +6,12 @@ section.wrapper.bazar.detail.singlePage
          ul
             li
                a(href='/bazar').fi-arrow-left Bazar
+            |{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
+            li
+               a(href!='/bazar/upravit/{echo $ad->getUniqueKey()}').fi-pencil Upravit
+            li
+               a(href!='/bazar/smazat/{echo $ad->getUniqueKey()}').fi-trash Smazat
+            |{/if}
       article.large-12
          .row
             |{script $images=$ad->getImages()}

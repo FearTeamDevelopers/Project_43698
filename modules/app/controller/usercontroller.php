@@ -90,6 +90,8 @@ class UserController extends Controller
 
         $canonical = 'http://' . $this->getServerHost() . '/registrace';
 
+        $view->set('user', null);
+        
         $this->getLayoutView()
                 ->set('metatitle', 'Hastrman - Registrace')
                 ->set('canonical', $canonical);
@@ -141,24 +143,34 @@ class UserController extends Controller
                 $uid = $user->save();
                 
                 if ($verifyEmail) {
-                    require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                    $transport = \Swift_SmtpTransport::newInstance('smtp.ebola.cz', 465, 'ssl')
-                            ->setUsername('info@fear-team.cz')
-                            ->setPassword('ThcEbmInfo-2015*');
+                    try {
+                        require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+                        $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host, 
+                                                                        $this->getConfig()->smtp->port, 
+                                                                        $this->getConfig()->smtp->secured)
+                                ->setUsername($this->getConfig()->smtp->username)
+                                ->setPassword($this->getConfig()->smtp->password);
+                        $mailer = \Swift_Mailer::newInstance($transport);
 
-                    $mailer = \Swift_Mailer::newInstance($transport);
+                        $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
+                                . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
+                                . '<a href="http://' . $this->getServerHost() . '/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
+                                . 'S pozdravem,<br/>Hastrmani';
 
-                    $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
-                            . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
-                            . '<a href="http://'.$this->getServerHost().'/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
-                            . 'S pozdravem,<br/>Hastrmani';
-
-                    $regEmail = \Swift_Message::newInstance()
-                            ->setSubject('Hastrman - Registrace')
-                            ->setFrom('info@fear-team.cz')
-                            ->setTo($user->getEmail())
-                            ->setBody($emailBody, 'text/html');
-                    $mailer->send($regEmail);
+                        $regEmail = \Swift_Message::newInstance()
+                                ->setSubject('Hastrman - Registrace')
+                                ->setFrom('registrace@hastrman.cz')
+                                ->setTo($user->getEmail())
+                                ->setBody($emailBody, 'text/html');
+                        $mailer->send($regEmail);
+                    } catch (\Exception $ex) {
+                        \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
+                        
+                        Event::fire('app.log', array('fail', 'User Id: '.$uid));
+                        $user->delete();
+                        $view->errorMessage('Nepodařilo se odeslat aktivační email, opakujte registraci později');
+                        self::redirect('/');
+                    }
                 }
 
                 Event::fire('app.log', array('success', 'User Id: '.$uid));
