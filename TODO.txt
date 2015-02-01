@@ -19,3 +19,6 @@ uprava inzeratu
 
 detail reportaze
     vyhodit main imgage z header ramecku nebo jinak upravit
+
+galerie index
+    avatar galerie nema 100% width a u pravyho okraje to dela pruh s barvou podle hoveru
