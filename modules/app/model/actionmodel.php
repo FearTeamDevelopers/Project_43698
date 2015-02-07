@@ -296,7 +296,7 @@ class ActionModel extends Model
     public static function fetchOldWithLimit($limit = 10, $page = 1)
     {
         $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'startDate <= ?' => date('Y-m-d', time())), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
                 array('rank' => 'desc', 'startDate' => 'desc'), 
                 $limit, $page
         );

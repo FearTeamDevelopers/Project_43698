@@ -8,11 +8,15 @@
     <li><a href="/admin/advertisement/" class="chat"><span>Bazar</span></a></li>
     {if $isAdmin || $isSuperAdmin}
     <li><a href="/admin/partner/" class="grid"><span>Partneři</span></a></li>
-    <li><a href="/admin/user/" class="users"><span>Uživatelé</span></a></li>
+    <li>
+        <a href="/admin/user/" class="users menudrop"><span>Uživatelé</span></a>
+        <ul>
+            <li><a href="/admin/feedback/"><span>Feedback</span></a></li>
+        </ul>
+    </li>
     <li>
         <a href="/admin/system/" class="error menudrop"><span>Nastavení</span></a>
         <ul>
-            <li><a href="/admin/feedback/"><span>Feedback</span></a></li>
             <li><a href="/admin/redirect/"><span>Přesměrování</span></a></li>
             <li><a href="/search/"><span>Search Index</span></a></li>
         </ul>
