@@ -63,10 +63,10 @@
       <div class="infoWrapper">
         <div class="info">{if $ad->getAdType() =='tender'}
           <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
-          <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->getUserAlias()}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small>{if $ad->getPrice() == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
+          <center><span class="poptavka">Poptávka <br/></span></center>{/else}<span>{echo " ".$ad->getUserAlias()}<br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small>{if $ad->getPrice() == "0"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
           {else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->getUniqueKey()}" class="bla">zobrazit podrobnosti</a>
         </div>
-      </div>
+      </div>{if isset($authUser) && $authUser->getId() == $ad->getUserId()}<a href="/bazar/upravit/{echo $ad->getUniqueKey()}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->getUniqueKey()}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->getUniqueKey()}" title="Smazat" class="buttonTab delete ajaxReload fi-trash"></a>{/if}
     </article>{/foreach}
     {/if}{else}
     <article class="large-12 small-12 medium-12 column left">

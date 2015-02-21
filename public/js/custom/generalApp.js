@@ -24,7 +24,7 @@ jQuery(document).ready(function ($) {
         jQuery('#sendEmail').toggle('slow');
     });
 
-    jQuery('.images a').click(function (e) {
+    jQuery('.images a.dropdown').click(function (e) {
         e.preventDefault();
         jQuery(this).hide();
         jQuery('.thumbImage').show('slow');

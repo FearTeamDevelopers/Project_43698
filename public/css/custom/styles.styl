@@ -17,7 +17,7 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 @import "/stylus/default/colors"
 @import "/stylus/default/dimensions"
 @import "/stylus/default/wrappers"
-
+ 
 //layout
 @import "/stylus/layout/header"
 @import "/stylus/layout/footer"
@@ -39,6 +39,23 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 @import "/stylus/components/pager"
 @import "/stylus/components/notification"
 
+@import "mobile"
+
+body
+	.feedback
+		position fixed
+		bottom 0
+		right 1em
+		background #ff4500
+		border 1px solid white
+		border-bottom 0
+		padding .3em 1em
+		color white
+		z-index 100
+		a
+			color white
+		&:before
+			margin-right .5em
 
 
 

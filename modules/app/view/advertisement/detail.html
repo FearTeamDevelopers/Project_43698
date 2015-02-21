@@ -19,9 +19,9 @@
           <div class="images large-12">
             {foreach $image in $images}
             {if $image_i == 0}
-            <div class="mainImage large-12"><img src="{echo $image->getImgMain()}"/></div>{if count($images)>1}<a href="#" class="fi-arrow-down">zobrazit více fotek</a>{/if}
+            <div class="mainImage large-12"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgMain()}"/></a></div>{if count($images)>1}<a href="#" class="fi-arrow-down dropdown">zobrazit více fotek</a>{/if}
             {/if}{else}
-            <div class="thumbImage large-5 small-12 medium-6 column left"><img src="{echo $image->getImgThumb()}"/></div>{/else}
+            <div class="thumbImage large-5 small-12 medium-6 column left"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgThumb()}"/></a></div>{/else}
             {/foreach}
           </div>
         </div>{/if}

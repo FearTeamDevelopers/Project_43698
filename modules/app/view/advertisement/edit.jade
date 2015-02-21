@@ -83,7 +83,7 @@ section.wrapper.pridatInzerat.singlePage
                             {if $images !== null}
                             {foreach $image in $images}
                             a(href!="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage")
-                                img(src!="{echo $image->getImgThumb()}" width="30%")
+                                img(src!="{echo $image->getImgThumb()}")
                             {/foreach}
                             {/if}
                 tr

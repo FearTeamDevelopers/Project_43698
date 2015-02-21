@@ -39,13 +39,18 @@ section.wrapper.bazar.singlePage
                     span {echo " ".$ad->getSectionTitle()}<br/>
                     small
                         span cena:
-                    |{if $ad->getPrice() == "1"}
+                    |{if $ad->getPrice() == "0"}
                     span.price {echo " na dohodě"}<br/>
                     |{/if}
                     |{else}
                     span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
                     |{/else}
                     a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
+            |{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
+            a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')
+            a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
+            a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->getUniqueKey()}', title='Smazat')
+            |{/if}
         |{/foreach}
         |{/if}{else}
         article.large-12.small-12.medium-12.column.left

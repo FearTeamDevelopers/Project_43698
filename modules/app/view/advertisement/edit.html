@@ -68,7 +68,7 @@
           <td><span class="field">
               {script $images = $ad->getImages()}
               {if $images !== null}
-              {foreach $image in $images}<a href="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage"><img src="{echo $image->getImgThumb()}" width="30%"/></a>{/foreach}
+              {foreach $image in $images}<a href="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage"><img src="{echo $image->getImgThumb()}"/></a>{/foreach}
               {/if}</span></td>
         </tr>
         <tr>

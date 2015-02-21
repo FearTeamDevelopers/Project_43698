@@ -1,24 +1,18 @@
 
 section.wrapper.report{
 	header{
-		border 2px solid headerColor
-		border-top none
+
 		position relative
-		margin-bottom 40px
-		.imgWrapper{
-			height auto
-			overflow hidden
-			width 100%
-			img{
-				width auto
-				height 100%
-			}
-		}
+
 		.reportInfo{
-			height 100%
-			background rgba(0,0,0,1)
-			padding 10px
+			border 2px solid headerColor
+			border-top none
+			background rgba(0,0,0,.4)
+			padding 10px 0
 			text-align center
+			position absolute
+			z-index 1
+			height auto
 			h2 {
 				color white
 				width 100%
@@ -32,6 +26,16 @@ section.wrapper.report{
 			span{
 				color white
 			}
+		}
+	}
+	.imgWrapper{
+		height auto
+		max-height 500px
+		overflow hidden
+		padding 0 !important
+		margin-bottom 2rem
+		img{
+			width 100%
 		}
 	}
 	.container{

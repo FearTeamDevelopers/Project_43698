@@ -21,14 +21,16 @@ section.wrapper.bazar.detail.singlePage
                   |{foreach $image in $images}
                   |{if $image_i == 0}
                   .mainImage.large-12
-                     img(src!='{echo $image->getImgMain()}')
+                     a(href!='{echo $image->getImgMain()}' data-lightbox!="bla")
+                        img(src!='{echo $image->getImgMain()}')
                   |{if count($images)>1}
-                  a(href='#').fi-arrow-down zobrazit více fotek
+                  a(href='#').fi-arrow-down.dropdown zobrazit více fotek
                   |{/if}
                   |{/if}{else}
 
                   .thumbImage.large-5.small-12.medium-6.column.left
-                     img(src!='{echo $image->getImgThumb()}')
+                     a(href!='{echo $image->getImgMain()}' data-lightbox!="bla")
+                        img(src!='{echo $image->getImgThumb()}')
 
                   |{/else}
                   |{/foreach}
@@ -36,6 +38,7 @@ section.wrapper.bazar.detail.singlePage
             |{if !empty($images)}
             .large-5.medium-5.small-12.column
                .info
+
                   span {echo $ad->getUserAlias()} <br/>
                   small
                      span sekce:
