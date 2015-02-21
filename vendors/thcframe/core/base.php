@@ -25,7 +25,7 @@ class Base
      * @var THCFrame\Core\Inspector 
      */
     private $_inspector;
-    
+
     /**
      * Storage for dynamicly created variables mainly from database joins
      * 
@@ -89,7 +89,7 @@ class Base
             }
         }
     }
-    
+
     /**
      * There are four basic parts to our __call() method: 
      * checking to see that the inspector is set, 
@@ -120,7 +120,7 @@ class Base
                 }
 
                 unset($meta);
-                
+
                 if (isset($this->$property)) {
                     return $this->$property;
                 } else {
@@ -132,7 +132,7 @@ class Base
                 return null;
             }
         }
-        
+
         unset($getMatches);
 
         $setMatches = StringMethods::match($name, '#^set([a-zA-Z0-9_]+)$#');
@@ -146,7 +146,7 @@ class Base
                 if (empty($meta['@readwrite']) && empty($meta['@write'])) {
                     throw $this->_getReadonlyException($normalized);
                 }
-                
+
                 unset($meta);
 
                 $this->$property = $arguments[0];
@@ -157,7 +157,7 @@ class Base
                 return $this;
             }
         }
-        
+
         unset($setMatches);
 
         $unsetMatches = StringMethods::match($name, '#^uns([a-zA-Z0-9_]+)$#');
@@ -173,7 +173,7 @@ class Base
                 }
 
                 unset($meta);
-                
+
                 unset($this->$property);
                 return $this;
             } else {
@@ -181,7 +181,7 @@ class Base
                 return $this;
             }
         }
-        
+
         unset($unsetMatches);
 
         throw $this->_getImplementationException($name);
@@ -242,19 +242,11 @@ class Base
      */
     public function loadConfigFromDb($key)
     {
-        if (Registry::get('database') instanceof \THCFrame\Database\Connector) {
-            try {
-                $conf = Config::first(array('xkey = ?' => $key));
-                if ($conf !== null) {
-                    return $conf->getValue();
-                } else {
-                    return null;
-                }
-            } catch (\Exception $e) {
-                return null;
-            }
+        $conf = Config::first(array('xkey = ?' => $key));
+        if ($conf !== null) {
+            return $conf->getValue();
         } else {
-            throw new Exception\Argument('Connection to the database has not been initialized');
+            return null;
         }
     }
 
@@ -268,18 +260,14 @@ class Base
      */
     public function saveConfigToDb($key, $value)
     {
-        if (Registry::get('database') instanceof \THCFrame\Database\Connector) {
-            $conf = Config::first(array('xkey = ?' => $key));
-            $conf->value = $value;
+        $conf = Config::first(array('xkey = ?' => $key));
+        $conf->value = $value;
 
-            if ($conf->validate()) {
-                $conf->save();
-                return true;
-            } else {
-                return false;
-            }
+        if ($conf->validate()) {
+            $conf->save();
+            return true;
         } else {
-            throw new Exception\Argument('Connection to the database has not been initialized');
+            return false;
         }
     }
 

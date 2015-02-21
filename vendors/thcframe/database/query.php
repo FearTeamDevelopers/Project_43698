@@ -313,13 +313,19 @@ class Query extends Base
     public function getConnector()
     {
         if (empty($this->_connector)) {
-            $database = Registry::get('database');
+            if ($this->_databaseIdent === null) {
+                $dbIdent = 'main';
+            } else {
+                $dbIdent = strtolower($this->_databaseIdent);
+            }
+
+            $database = Registry::get('database')->get($dbIdent);
 
             if (!$database) {
                 throw new Exception\Connector('No connector availible');
             }
 
-            $this->_connector = $database->initialize();
+            $this->_connector = $database;
         }
 
         return $this->_connector;

@@ -150,7 +150,7 @@ class IndexController extends Controller
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $database = Registry::get('database');
+        $database = Registry::get('database')->get('main');
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, 'cron', 0, ?, now(), default)";
         $prepareIdSql = "ALTER TABLE tb_searchindex auto_increment = 1";
@@ -241,7 +241,7 @@ class IndexController extends Controller
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $database = Registry::get('database');
+        $database = Registry::get('database')->get('main');
         
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 1, ?, now(), default)";

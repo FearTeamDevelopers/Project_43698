@@ -9,7 +9,7 @@ use THCFrame\Model\Model;
  */
 class ReportModel extends Model
 {
-
+    
     /**
      * @readwrite
      */

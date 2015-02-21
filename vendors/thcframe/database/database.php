@@ -5,6 +5,7 @@ namespace THCFrame\Database;
 use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
 use THCFrame\Database\Exception;
+use THCFrame\Database\ConnectionHandler;
 
 /**
  * Factory class returns a Database\Connector subclass.
@@ -39,27 +40,54 @@ class Database extends Base
      * It accepts initialization options and selects the type of returned object, 
      * based on the internal $_type property.
      * 
+     * @param \THCFrame\Configuration\Driver $configuration
      * @return \THCFrame\Database\Database\Connector
      * @throws Exception\Argument
      */
     public function initialize($configuration)
     {
-        Event::fire('framework.database.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.database.initialize.before', array());
 
-        if (!$this->type) {
-            if (!empty($configuration->database) && !empty($configuration->database->type)) {
-                $this->type = $configuration->database->type;
-                $this->options = (array) $configuration->database;
-            } else {
-                throw new Exception\Argument('Error in configuration file');
+
+        $databases = $configuration->database;
+        $conHandler = new ConnectionHandler();
+
+        if (!empty($databases)) {
+            foreach ($databases as $dbIdent) {
+                if (!empty($dbIdent) && !empty($dbIdent->type)) {
+                    $type = $dbIdent->type;
+                    $options = (array) $dbIdent;
+                } else {
+                    throw new Exception\Argument('Error in configuration file');
+                }
+
+                $connector = $this->createConnector($type, $options);
+                $conHandler->add($dbIdent->id, $connector);
+                $connector->connect();
+                
+                Event::fire('framework.database.initialize.after', array($type, $options));
             }
         }
 
-        Event::fire('framework.database.initialize.after', array($this->type, $this->options));
+        return $conHandler;
+    }
 
-        switch ($this->type) {
+    /**
+     * 
+     * @param type $type
+     * @param type $options
+     * @return \THCFrame\Database\Connector\Mysql
+     * @throws Exception\Argument
+     */
+    private function createConnector($type = 'mysql', $options = array())
+    {
+        if (empty($options)) {
+            throw new Exception\Argument('Invalid database options');
+        }
+
+        switch ($type) {
             case 'mysql': {
-                    return new Connector\Mysql($this->options);
+                    return new Connector\Mysql($options);
                     break;
                 }
             default: {

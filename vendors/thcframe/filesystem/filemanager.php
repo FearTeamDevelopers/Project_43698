@@ -261,8 +261,12 @@ class FileManager extends Base
      * @return boolean
      * @throws Exception\IO
      */
-    public function mkdir($dirs, $mode = 0777)
+    public function mkdir($dirs, $mode = null)
     {
+        if(null === $mode){
+            $mode = self::DIR_CHMOD;
+        }
+        
         foreach ($this->toIterator($dirs) as $dir) {
             if (is_dir($dir)) {
                 continue;

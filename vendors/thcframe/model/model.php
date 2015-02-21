@@ -32,6 +32,14 @@ class Model extends Base
      * @readwrite
      */
     protected $_connector;
+    
+    /**
+     * In case of use multidb model have to has set database identificator
+     * Method getConnector then uses this to select correct database connector
+     * 
+     * @readwrite
+     */
+    protected $_databaseIdent = null;
 
     /**
      * @read
@@ -598,13 +606,17 @@ class Model extends Base
     public function getTable()
     {
         if (empty($this->_table)) {
-            $tablePrefix = Registry::get('configuration')->database->tablePrefix;
+            if ($this->_databaseIdent === null) {
+                $tablePrefix = Registry::get('configuration')->database->main->tablePrefix;
+            }else{
+                $tablePrefix = Registry::get('configuration')->database->{$this->_databaseIdent}->tablePrefix;
+            }
 
             if (preg_match('#model#i', get_class($this))) {
                 $parts = array_reverse(explode('\\', get_class($this)));
                 $this->_table = strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0]));
             } else {
-                throw new Exception\Implementation('Model is not valid THCFrame\Model\Model');
+                throw new Exception\Implementation('Model has not valid name used for THCFrame\Model\Model');
             }
         }
 
@@ -620,15 +632,20 @@ class Model extends Base
      */
     public function getConnector()
     {
-
         if (empty($this->_connector)) {
-            $database = Registry::get('database');
+            if ($this->_databaseIdent === null) {
+                $dbIdent = 'main';
+            } else {
+                $dbIdent = strtolower($this->_databaseIdent);
+            }
+            
+            $database = Registry::get('database')->get($dbIdent);
 
             if (!$database) {
                 throw new Exception\Connector('No connector availible');
             }
 
-            $this->_connector = $database->initialize();
+            $this->_connector = $database;
         }
 
         return $this->_connector;

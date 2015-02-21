@@ -287,11 +287,10 @@ class Core
             $parsedConfig = $confingInitialized->getParsed();
 
             // database
-            if ($parsedConfig->database->host != '') {
+            if ($parsedConfig->database->main->host != '') {
                 $database = new \THCFrame\Database\Database();
-                $initializedDb = $database->initialize($parsedConfig);
-                Registry::set('database', $initializedDb);
-                $initializedDb->connect();
+                $connectors = $database->initialize($parsedConfig);
+                Registry::set('database', $connectors);
                 
                 //extend configuration for config loaded from db
                 $confingInitialized->extendForDbConfig();

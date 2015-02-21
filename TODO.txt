@@ -22,3 +22,6 @@ detail reportaze
 
 galerie index
     avatar galerie nema 100% width a u pravyho okraje to dela pruh s barvou podle hoveru
+
+
+dodelat mysqldump class

@@ -6,6 +6,8 @@ use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
 use THCFrame\Database\Exception;
+use THCFrame\Database\Connector as Connector;
+use THCFrame\Filesystem\FileManager;
 
 /**
  * Mysqldump
@@ -15,13 +17,15 @@ class Mysqldump extends Base
 
     const MAXLINESIZE = 500;
 
+    /**
+     *
+     * @var THCFrame\Database\ConnectionHandler
+     */
+    private $_connectionHandler;
     private $_fileHandler = null;
-    private $_filename;
-    private $_backupname;
     private $_settings = array();
-    private $_tables = array();
     private $_database;
-    private $_mime;
+    private $_dumpedFiles = array();
     private $_defaultSettings = array(
         'include-tables' => array(),
         'exclude-tables' => array(),
@@ -31,114 +35,134 @@ class Mysqldump extends Base
         'single-transaction' => true,
         'lock-tables' => false,
         'add-locks' => true,
+        'disable-foreign-keys-check' => true,
         'extended-insert' => true
     );
 
     /**
      * Object constructor
      * 
-     * @param IDatabase $database
-     * @param mixed $settings
+     * @param type $settings
      */
-    public function __construct($settings = null)
+    public function __construct($settings = array())
     {
-//        ini_set('default_charset', 'UTF-8');
-        $this->_database = Registry::get('database');
-        $this->_database->connect();
+        $this->_connectionHandler = Registry::get('database');
 
-        $this->_settings = $this->_extend($this->_defaultSettings, $settings);
-        $this->_filename = APP_PATH . '/temp/db/' . $this->_database->getSchema() . '_' . date('Y-m-d') . '.sql';
-        $this->_backupname = $this->_database->getSchema() . '_' . date('Y-m-d') . '.sql';
+        $this->_prepareSettings($settings);
+
+        $filemanager = new FileManager();
+
+        if (!is_dir(APP_PATH . '/temp/db/')) {
+            $filemanager->mkdir(APP_PATH . '/temp/db/');
+        }
     }
 
+    /**
+     * 
+     */
     public function __destruct()
     {
-        $this->_database->disconnect();
+        $this->_connectionHandler->disconnectAll();
     }
 
     /**
-     * Returns header for dump file
-     *
-     * @return string
-     */
-    private function _getHeader()
-    {
-        $header = '-- mysqldump-php SQL Dump' . PHP_EOL .
-                '--' . PHP_EOL .
-                "-- Host: {$this->_database->getHost()}" . PHP_EOL .
-                '-- Generation Time: ' . date('r') . PHP_EOL .
-                '--' . PHP_EOL .
-                "-- Database: `{$this->_database->getSchema()}`" . PHP_EOL .
-                '--' . PHP_EOL .
-                'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL .
-                '--' . PHP_EOL;
-        return $header;
-    }
-
-    /**
-     * Returns footer for dump file
-     *
-     * @return string
-     */
-    private function _getFooter()
-    {
-        $footer = '--' . PHP_EOL .
-                'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL .
-                '--' . PHP_EOL;
-        return $footer;
-    }
-
-    /**
-     * Table structure extractor
      * 
-     * @param string $tablename
+     * @param type $settings
+     */
+    private function _prepareSettings($settings)
+    {
+        $dbIdents = $this->_connectionHandler->getIdentifications();
+
+        if (!empty($dbIdents)) {
+            foreach ($dbIdents as $id) {
+                if (!empty($settings[$id])) {
+                    $this->_settings[$id] = array_replace_recursive($this->_defaultSettings, $settings[$id]);
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param Connector $dbc
+     * @param type $dbid
+     * @return array
+     */
+    private function _getTables(Connector $dbc, $dbid)
+    {
+        $sqlResult = $dbc->execute('SHOW TABLES');
+        $tables = array();
+
+        while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
+            if (empty($this->_settings[$dbid]['include-tables']) ||
+                    (!empty($this->_settings[$dbid]['include-tables']) &&
+                    in_array($row['Tables_in_' . $dbc->getSchema()], $this->_settings[$dbid]['include-tables'], true))) {
+                array_push($tables, $row['Tables_in_' . $dbc->getSchema()]);
+            }
+        }
+
+        return $tables;
+    }
+
+    /**
+     * 
+     * @param Connector $dbc
+     * @param type $dbid
+     * @param type $table
      * @return boolean
      */
-    private function _getTableStructure($tablename)
+    private function _getTableStructure(Connector $dbc, $dbid, $table)
     {
-        $sqlResult = $this->_database->execute("SHOW CREATE TABLE `{$tablename}`");
+        $sqlResult = $dbc->execute("SHOW CREATE TABLE `{$table}`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             if (isset($row['Create Table'])) {
                 $this->_write(
                         '-- -----------------------------------------------------' . PHP_EOL .
-                        "-- Table structure for table `{$tablename}` --" . PHP_EOL);
+                        "-- Table structure for table `{$table}` --" . PHP_EOL);
 
-                if ($this->_settings['add-drop-table']) {
-                    $this->_write("DROP TABLE IF EXISTS `{$tablename}`;" . PHP_EOL);
+                if ($this->_settings[$dbid]['add-drop-table']) {
+                    $this->_write("DROP TABLE IF EXISTS `{$table}`;" . PHP_EOL);
                 }
 
                 $this->_write($row['Create Table'] . ';' . PHP_EOL);
                 return true;
             }
         }
+
+        return false;
     }
 
     /**
-     * Table rows extractor
      * 
-     * @param string $tablename
+     * @param Connector $dbc
+     * @param type $dbid
+     * @param type $tablename
      * @return type
      */
-    private function _listValues($tablename)
+    private function _getTableValues(Connector $dbc, $dbid, $tablename)
     {
         $this->_write('--' . PHP_EOL .
                 "-- Dumping data for table `{$tablename}` --" . PHP_EOL);
 
-        if ($this->_settings['single-transaction']) {
-            //$this->_database->query('SET GLOBAL TRANSACTION ISOLATION LEVEL REPEATABLE READ');
-            $this->_database->beginTransaction();
+        $dbSetting = $this->_settings[$dbid];
+
+        if ($dbSetting['single-transaction']) {
+            //$dbc->query('SET GLOBAL TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+            $dbc->beginTransaction();
         }
-        if ($this->_settings['lock-tables']) {
-            $this->_database->execute("LOCK TABLES `{$tablename}` READ LOCAL");
+
+        if ($dbSetting['lock-tables']) {
+            $dbc->execute("LOCK TABLES `{$tablename}` READ LOCAL");
         }
-        if ($this->_settings['add-locks']) {
+
+        if ($dbSetting['add-locks']) {
             $this->_write("LOCK TABLES `{$tablename}` WRITE;" . PHP_EOL);
         }
 
         $onlyOnce = true;
         $lineSize = 0;
-        $sqlResult = $this->_database->execute("SELECT * FROM `{$tablename}`");
+        $sqlResult = $dbc->execute("SELECT * FROM `{$tablename}`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             $vals = array();
@@ -146,7 +170,7 @@ class Mysqldump extends Base
                 $vals[] = is_null($val) ? 'NULL' : "{$val}";
             }
 
-            if ($onlyOnce || !$this->_settings['extended-insert']) {
+            if ($onlyOnce || !$dbSetting['extended-insert']) {
                 $lineSize += $this->_write(html_entity_decode(
                                 "INSERT INTO `{$tablename}` VALUES ('" . implode("', '", $vals) . "')", ENT_QUOTES, 'UTF-8'));
                 $onlyOnce = false;
@@ -154,7 +178,7 @@ class Mysqldump extends Base
                 $lineSize += $this->_write(html_entity_decode(",('" . implode("', '", $vals) . "')", ENT_QUOTES, 'UTF-8'));
             }
 
-            if (($lineSize > Mysqldump::MAXLINESIZE) || !$this->_settings['extended-insert']) {
+            if (($lineSize > self::MAXLINESIZE) || !$dbSetting['extended-insert']) {
                 $onlyOnce = true;
                 $lineSize = $this->_write(';' . PHP_EOL);
             }
@@ -163,39 +187,62 @@ class Mysqldump extends Base
         if (!$onlyOnce) {
             $this->_write(';' . PHP_EOL);
         }
-        if ($this->_settings['add-locks']) {
+        if ($dbSetting['add-locks']) {
             $this->_write('UNLOCK TABLES;' . PHP_EOL);
         }
-        if ($this->_settings['single-transaction']) {
-            $this->_database->commitTransaction();
+        if ($dbSetting['single-transaction']) {
+            $dbc->commitTransaction();
         }
-        if ($this->_settings['lock-tables']) {
-            $this->_database->execute('UNLOCK TABLES');
+        if ($dbSetting['lock-tables']) {
+            $dbc->execute('UNLOCK TABLES');
         }
+
+        unset($dbSetting);
 
         return;
     }
 
     /**
-     * merges arrays
-     *
-     * @param array $args
-     * @param array $extended
-     *
-     * @return array $extended
+     * Returns header for dump file
+     * 
+     * @param Connector $dbc
+     * @param type $dbid
+     * @return string
      */
-    private function _extend()
+    private function _createHeader(Connector $dbc, $dbid)
     {
-        $args = func_get_args();
-        $extended = array();
-        if (is_array($args) && count($args) > 0) {
-            foreach ($args as $array) {
-                if (is_array($array)) {
-                    $extended = array_merge($extended, $array);
-                }
-            }
+        $header = '-- mysqldump-php SQL Dump' . PHP_EOL .
+                '--' . PHP_EOL .
+                "-- Host: {$dbc->getHost()}" . PHP_EOL .
+                '-- Generation Time: ' . date('r') . PHP_EOL .
+                '--' . PHP_EOL .
+                "-- Database: `{$dbc->getSchema()}`" . PHP_EOL .
+                '--' . PHP_EOL;
+
+        if ($this->_settings[$dbid]['disable-foreign-keys-check']) {
+            $header .= 'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL .
+                    '--' . PHP_EOL;
         }
-        return $extended;
+
+        return $header;
+    }
+
+    /**
+     * Returns footer for dump file
+     * 
+     * @param type $dbid
+     * @return string
+     */
+    private function _getFooter($dbid)
+    {
+        $footer = '';
+        if ($this->_settings[$dbid]['disable-foreign-keys-check']) {
+            $footer .= '--' . PHP_EOL .
+                    'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL .
+                    '--' . PHP_EOL;
+        }
+
+        return $footer;
     }
 
     /**
@@ -241,87 +288,73 @@ class Mysqldump extends Base
     }
 
     /**
-     * Main call
+     * Create mysql database dump of all connected databases
      * 
-     * @param string $filename
-     * @throws \Exception
+     * @throws Exception\Backup
      */
-    public function create($filename = '')
+    public function create()
     {
-        if (!empty($filename)) {
-            $this->_filename = $filename;
-        }
+        $dbIdents = $this->_connectionHandler->getIdentifications();
 
-        if (empty($this->_filename)) {
-            throw new Exception\Backup('Output file name is not set', 1);
-        }
+        if (!empty($dbIdents)) {
+            foreach ($dbIdents as $id) {
+                $db = $this->_connectionHandler->get($id);
+                $filename = APP_PATH . '/temp/db/' . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
 
-        if (!$this->_open($this->_filename)) {
-            throw new Exception\Backup(sprintf('Output file %s is not writable', $this->_filename), 2);
-        }
-
-        Event::fire('framework.mysqldump.create.before', array($this->_filename));
-
-        $this->_write($this->_getHeader());
-        $this->_tables = array();
-
-        $sqlResult = $this->_database->execute('SHOW TABLES');
-
-        while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
-            if (empty($this->_settings['include-tables']) ||
-                    (!empty($this->_settings['include-tables']) &&
-                    in_array($row['Tables_in_' . $this->_database->getSchema()], $this->_settings['include-tables'], true))) {
-                array_push($this->_tables, $row['Tables_in_' . $this->_database->getSchema()]);
-            }
-        }
-
-        // Exporting tables one by one
-        foreach ($this->_tables as $table) {
-            if (in_array($table, $this->_settings['exclude-tables'], true)) {
-                continue;
-            }
-            
-            foreach ($this->_settings['exclude-tables-reqex'] as $regex) {
-                if(mb_ereg_match($regex, $table)){
-                    continue 2;
+                if (!$this->_open($filename)) {
+                    throw new Exception\Backup(sprintf('Output file %s is not writable', $filename), 2);
                 }
-            }
-            
-            $is_table = $this->_getTableStructure($table);
-            if (true === $is_table && false === $this->_settings['no-data']) {
-                $this->_listValues($table);
+
+                Event::fire('framework.mysqldump.create.before', array($filename));
+
+                $this->_write($this->_getHeader($db, $id));
+                $tables = $this->_getTables($db, $id);
+
+                if (!empty($tables)) {
+                    foreach ($tables as $table) {
+                        if (in_array($table, $this->_settings[$id]['exclude-tables'], true)) {
+                            continue;
+                        }
+
+                        foreach ($this->_settings[$id]['exclude-tables-reqex'] as $regex) {
+                            if (mb_ereg_match($regex, $table)) {
+                                continue 2;
+                            }
+                        }
+
+                        $is_table = $this->_getTableStructure($db, $id, $table);
+                        if (true === $is_table && false === $this->_settings[$id]['no-data']) {
+                            $this->_getTableValues($db, $id, $table);
+                        }
+                    }
+                }
+
+                $this->_write($this->_getFooter($id));
+                Event::fire('framework.mysqldump.create.after', array($filename));
+
+                $this->_close();
+                $this->_dumpedFiles[] = $filename;
             }
         }
-
-        $this->_write($this->_getFooter());
-        Event::fire('framework.mysqldump.create.after', array($this->_filename));
-
-        $this->_close();
-
-        return $this;
     }
-    
+
     /**
+     * Download database dump
      * 
-     * @return type
-     */
-    public function getBackupName()
-    {
-        return $this->_backupname;
-    }
-
-    /**
-     *  Download database dump
      */
     public function downloadDump()
     {
-        $this->_mime = 'text/x-sql';
-        header('Content-Type: application/octet-stream');
-        header("Content-Transfer-Encoding: Binary");
-        header("Content-Disposition: attachment; filename=\"" . basename($this->_filename) . "\"");
-        header('Content-Length: ' . filesize($this->_filename));
-        ob_clean();
-        readfile($this->_filename);
+        if (!empty($this->_dumpedFiles)) {
+            foreach ($this->_dumpedFiles as $filename) {
+                $mime = 'text/x-sql';
+                header('Content-Type: application/octet-stream');
+                header("Content-Transfer-Encoding: Binary");
+                header("Content-Disposition: attachment; filename=\"" . basename($filename) . "\"");
+                header('Content-Length: ' . filesize($filename));
+                ob_clean();
+                readfile($filename);
+            }
+        }
         exit;
     }
 

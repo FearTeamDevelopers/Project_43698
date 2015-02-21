@@ -61,8 +61,6 @@ class SystemController extends Controller
         $dump->create();
         $view->successMessage('Database backup has been successfully created');
         Event::fire('admin.log', array('success', 'Database backup ' . $dump->getBackupName()));
-        unset($fm);
-        unset($dump);
         self::redirect('/admin/system/');
     }
 

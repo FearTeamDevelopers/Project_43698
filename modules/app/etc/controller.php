@@ -73,8 +73,7 @@ class Controller extends BaseController
 
         // schedule disconnect from database 
         Events::add('framework.controller.destruct.after', function($name) {
-            $database = Registry::get('database');
-            $database->disconnect();
+            Registry::get('database')->disconnectAll();
         });
 
         $metaData = $this->getCache()->get('global_meta_data');
