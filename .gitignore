@@ -1,7 +1,7 @@
 /application/configuration/config_live.ini
 /application/configuration/config_qa.ini
-/application/configuration/dbschema.sql
-/application/configuration/update.sql
+/application/configuration/maindb.sql
+/application/configuration/searchdb.sql
 /application/logs/
 /public/js/custom/min/
 /public/uploads/

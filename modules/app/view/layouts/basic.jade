@@ -71,7 +71,9 @@ html
                         p HASTRMAN APNEA tým<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: apnea@hastrman.cz<br/>Jan Tichý - 721 863 728
         #dialog(title='Chcete pokračovat?')
             p
+        |{if $showfeedback}
         a(href="/feedback").fi-comment.feedback Pošlete nám feedback
+        |{/if}
 
         //
           JS scripts

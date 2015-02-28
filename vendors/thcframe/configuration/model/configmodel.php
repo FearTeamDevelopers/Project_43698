@@ -57,7 +57,7 @@ class ConfigModel extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, alphanumeric, max(500)
+     * @validate required, alphanumeric, max(2048)
      * @label value
      */
     protected $_value;

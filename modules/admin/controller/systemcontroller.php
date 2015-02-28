@@ -52,15 +52,20 @@ class SystemController extends Controller
     {
         $view = $this->getActionView();
         $dump = new Mysqldump();
-        $fm = new FileManager();
 
-        if (!is_dir(APP_PATH . '/temp/db/')) {
-            $fm->mkdir(APP_PATH . '/temp/db/');
+        try {
+            if ($dump->create()) {
+                $view->successMessage('Database backup has been successfully created');
+                Event::fire('admin.log', array('success', 'Database backup'));
+            } else {
+                $view->errorMessage('Database backup could not be created');
+                Event::fire('admin.log', array('fail', 'Database backup'));
+            }
+        } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
+            $view->errorMessage($ex->getMessage());
+            Event::fire('admin.log', array('fail', 'Database backup'));
         }
 
-        $dump->create();
-        $view->successMessage('Database backup has been successfully created');
-        Event::fire('admin.log', array('success', 'Database backup ' . $dump->getBackupName()));
         self::redirect('/admin/system/');
     }
 

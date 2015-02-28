@@ -147,7 +147,10 @@
     </div>
     <div id="dialog" title="Chcete pokračovat?">
       <p></p>
-    </div><a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>
+    </div>
+    {if $showfeedback}
+    <a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>
+    {/if}
     <!--JS scripts
     -->
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>

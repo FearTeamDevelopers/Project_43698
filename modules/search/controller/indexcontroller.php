@@ -25,6 +25,7 @@ class IndexController extends Controller
     private $_textSource = array(
         'tb_action' => array(
             'model' => 'App\Model\ActionModel',
+            'modelLabel' => 'Akce',
             'where' => array('active = 1', 'approved = 1', 'archive = 0'),
             'path' => '/akce/r/',
             'identifier' => 'urlKey',
@@ -33,6 +34,7 @@ class IndexController extends Controller
             'previewColumns' => array('metaDescription', 'created')),
         'tb_report' => array(
             'model' => 'App\Model\ReportModel',
+            'modelLabel' => 'Reportáže',
             'where' => array('active = 1', 'approved = 1', 'archive = 0'),
             'path' => '/reportaze/r/',
             'identifier' => 'urlKey',
@@ -41,6 +43,7 @@ class IndexController extends Controller
             'previewColumns' => array('metaDescription', 'created')),
         'tb_pagecontent' => array(
             'model' => 'App\Model\PageContentModel',
+            'modelLabel' => 'Obsah webu - statické stránky',
             'where' => array('active = 1'),
             'path' => '/page/',
             'identifier' => 'urlKey',
@@ -49,6 +52,7 @@ class IndexController extends Controller
             'previewColumns' => array('metaDescription', 'created')),
         'tb_news' => array(
             'model' => 'App\Model\NewsModel',
+            'modelLabel' => 'Novinky',
             'where' => array('active = 1', 'approved = 1', 'archive = 0'),
             'path' => '/novinky/r/',
             'identifier' => 'urlKey',
@@ -57,6 +61,7 @@ class IndexController extends Controller
             'previewColumns' => array('metaDescription', 'created')),
         'tb_advertisement' => array(
             'model' => 'App\Model\AdvertisementModel',
+            'modelLabel' => 'Bazar',
             'where' => array('active = 1'),
             'path' => '/bazar/r/',
             'identifier' => 'uniqueKey',

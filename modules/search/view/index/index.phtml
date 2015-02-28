@@ -23,7 +23,7 @@
             {if !empty($tables)}
             {foreach $table in $tables}
             <tr>
-                <td>{echo $table["model"]}</td>
+                <td>{echo $table["modelLabel"]}</td>
                 <td><a href="/search/index/updateindex/{echo $table_i}" class="btn btn3 btn_refresh"></a></td>
             </tr>
             {/foreach}

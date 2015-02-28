@@ -46,6 +46,8 @@ class Mysqldump extends Base
      */
     public function __construct($settings = array())
     {
+        parent::__construct();
+
         $this->_connectionHandler = Registry::get('database');
 
         $this->_prepareSettings($settings);
@@ -69,7 +71,7 @@ class Mysqldump extends Base
      * 
      * @param type $settings
      */
-    private function _prepareSettings($settings)
+    private function _prepareSettings(array $settings)
     {
         $dbIdents = $this->_connectionHandler->getIdentifications();
 
@@ -77,6 +79,8 @@ class Mysqldump extends Base
             foreach ($dbIdents as $id) {
                 if (!empty($settings[$id])) {
                     $this->_settings[$id] = array_replace_recursive($this->_defaultSettings, $settings[$id]);
+                } else {
+                    $this->_settings[$id] = $this->_defaultSettings;
                 }
             }
         }
@@ -233,7 +237,7 @@ class Mysqldump extends Base
      * @param type $dbid
      * @return string
      */
-    private function _getFooter($dbid)
+    private function _createFooter($dbid)
     {
         $footer = '';
         if ($this->_settings[$dbid]['disable-foreign-keys-check']) {
@@ -272,7 +276,7 @@ class Mysqldump extends Base
     {
         $bytesWritten = 0;
         if (false === ($bytesWritten = fwrite($this->_fileHandler, $str))) {
-            throw new Exception\Backup('Writting to file failed!', 4);
+            throw new Exception\Mysqldump('Writting to file failed!', 4);
         }
         return $bytesWritten;
     }
@@ -288,52 +292,93 @@ class Mysqldump extends Base
     }
 
     /**
-     * Create mysql database dump of all connected databases
+     * Main private method
+     * Creates file and write database dump into it
      * 
-     * @throws Exception\Backup
+     * @param Connector $db     connector instance
+     * @param string    $id     database identification
+     * @throws Exception\Mysqldump
      */
-    public function create()
+    private function writeData(Connector $db, $id)
     {
-        $dbIdents = $this->_connectionHandler->getIdentifications();
+        $filename = APP_PATH . '/temp/db/' . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
 
-        if (!empty($dbIdents)) {
-            foreach ($dbIdents as $id) {
-                $db = $this->_connectionHandler->get($id);
-                $filename = APP_PATH . '/temp/db/' . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
+        if (!$this->_open($filename)) {
+            throw new Exception\Mysqldump(sprintf('Output file %s is not writable', $filename), 2);
+        }
 
-                if (!$this->_open($filename)) {
-                    throw new Exception\Backup(sprintf('Output file %s is not writable', $filename), 2);
+        Event::fire('framework.mysqldump.create.before', array($filename));
+
+        $this->_write($this->_createHeader($db, $id));
+        $tables = $this->_getTables($db, $id);
+
+        if (!empty($tables)) {
+            foreach ($tables as $table) {
+                if (in_array($table, $this->_settings[$id]['exclude-tables'], true)) {
+                    continue;
                 }
 
-                Event::fire('framework.mysqldump.create.before', array($filename));
-
-                $this->_write($this->_getHeader($db, $id));
-                $tables = $this->_getTables($db, $id);
-
-                if (!empty($tables)) {
-                    foreach ($tables as $table) {
-                        if (in_array($table, $this->_settings[$id]['exclude-tables'], true)) {
-                            continue;
-                        }
-
-                        foreach ($this->_settings[$id]['exclude-tables-reqex'] as $regex) {
-                            if (mb_ereg_match($regex, $table)) {
-                                continue 2;
-                            }
-                        }
-
-                        $is_table = $this->_getTableStructure($db, $id, $table);
-                        if (true === $is_table && false === $this->_settings[$id]['no-data']) {
-                            $this->_getTableValues($db, $id, $table);
-                        }
+                foreach ($this->_settings[$id]['exclude-tables-reqex'] as $regex) {
+                    if (mb_ereg_match($regex, $table)) {
+                        continue 2;
                     }
                 }
 
-                $this->_write($this->_getFooter($id));
-                Event::fire('framework.mysqldump.create.after', array($filename));
+                $is_table = $this->_getTableStructure($db, $id, $table);
+                if (true === $is_table && false === $this->_settings[$id]['no-data']) {
+                    $this->_getTableValues($db, $id, $table);
+                }
+            }
+        }
 
-                $this->_close();
-                $this->_dumpedFiles[] = $filename;
+        $this->_write($this->_createFooter($id));
+        Event::fire('framework.mysqldump.create.after', array($filename));
+
+        $this->_close();
+        $this->_dumpedFiles[] = $filename;
+    }
+
+    /**
+     * Main public method
+     * Create mysql database dump of all connected databases or one specific 
+     * database based on parameter
+     * 
+     * @param string        $dbId       database identification
+     * @return boolean
+     * @throws Exception\Mysqldump
+     */
+    public function create($dbId = null)
+    {
+        $dbIdents = $this->_connectionHandler->getIdentifications();
+
+        if (empty($dbIdents)) {
+            throw new Exception\Mysqldump('No connected database found');
+        }
+
+        if (null !== $dbId) {
+            if (array_key_exists($dbId, $dbIdents)) {
+                $db = $this->_connectionHandler->get($dbId);
+                $this->writeData($db, $dbId);
+
+                if (!empty($this->_dumpedFiles)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                throw new Exception\Mysqldump(sprintf('Database with identification %s is not connected', $dbId));
+            }
+        } else {
+            foreach ($dbIdents as $id) {
+                $db = $this->_connectionHandler->get($id);
+                $this->writeData($db, $id);
+                unset($db);
+            }
+
+            if (!empty($this->_dumpedFiles)) {
+                return true;
+            } else {
+                return false;
             }
         }
     }
