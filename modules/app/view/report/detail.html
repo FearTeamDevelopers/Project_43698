@@ -1,14 +1,1 @@
-
-<section class="wrapper report">
-  <div class="row">
-    <header class="row">
-      <div class="reportInfo large-12 column">
-        <h2>{echo $report->getTitle()}</h2><small><span>Autor:</span></small><span>{echo " ".$report->getUserAlias()}</span><br/><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}</span>
-      </div>
-      <div class="imgWrapper large-12 column"><img src="{echo $report->getImgMain()}" class="centerBlock"/></div>
-    </header>
-    <div class="page row">
-      <div class="container">{echo html_entity_decode($report->getBody())}</div>
-    </div>
-  </div>
-</section>
+<section class="wrapper report"><div class="row"><header class="row"><div class="reportInfo large-12 column"><h2>{echo $report->getTitle()}</h2><small><span>Autor:</span></small><span>{echo " ".$report->getUserAlias()}</span><br/><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}</span></div><div class="imgWrapper large-12 column"><img src="{echo $report->getImgMain()}" class="centerBlock"/></div></header><div class="page row"><div class="container">{echo html_entity_decode($report->getBody())}</div></div></div></section>

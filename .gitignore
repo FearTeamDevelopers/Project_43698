@@ -14,3 +14,7 @@
 /public/js/plugins/filemanager/files/
 /prepros.cfg
 /modules/app/view/prepros.cfg
+/node_modules/
+/gulpfile.js
+/hastrman.sublime-project
+/hastrman.sublime-workspace

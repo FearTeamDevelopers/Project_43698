@@ -42,7 +42,7 @@ RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
 # Return 403 Forbidden header and show the content of the root homepage
 RewriteRule .* index.php [F]
 ########## End - Rewrite rules to block out some common exploits
- 
+
 ########## Begin - File injection protection, by SigSiu.net
 RewriteCond %{REQUEST_METHOD} GET
 RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http:// [OR]
@@ -50,7 +50,7 @@ RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=(\.\.//?)+ [OR]
 RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=/([a-z0-9_.]//?)+ [NC]
 RewriteRule .* - [F]
 ########## End - File injection protection
- 
+
 ########## Begin - Basic antispam Filter, by SigSiu.net
 ## This code uses PCRE and works only with Apache 2.x.
 RewriteCond %{QUERY_STRING} \b(ambien|blue\spill|cialis|cocaine|ejaculation|erectile)\b [NC,OR]
@@ -202,7 +202,7 @@ Header unset Cache-Control
 ## placing a hash in front of this section's lines
 <IfModule mod_expires.c>
 ExpiresActive On
- 
+
 ExpiresDefault "now plus 1 hour"
 ExpiresByType text/css "now plus 1 week"
 ExpiresByType application/javascript "now plus 1 week"
@@ -250,15 +250,15 @@ RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R,L]
 ########## End - Redirect non-www to www
 
 ########## Begin - Preventing Bandwidth Image Theft
-RewriteCond %{HTTP_REFERER} !^(http(s)?://)?(www\.)?(hastrman|hastrman\.fear-team)\.(cz|dev).* [NC]
-RewriteCond %{HTTP_REFERER} !^$
-RewriteRule \.(jpe?g|gif|bmp|png|ico|svg)$ - [F]
+#RewriteCond %{HTTP_REFERER} !^(http(s)?://)?(www\.)?(hastrman|hastrman\.fear-team)\.(cz|dev).* [NC]
+#RewriteCond %{HTTP_REFERER} !^$
+#RewriteRule \.(jpe?g|gif|bmp|png|ico|svg)$ - [F]
 ########## End - Preventing Bandwidth Image Theft
 
 RewriteCond %{REQUEST_FILENAME} -s
 RewriteRule /public/(.*)/(.*)\.(css|jpe?g|gif|png|js|ico|svg)$ - [NC,L]
 
-RewriteCond %{REQUEST_URI} (^/tests/(.*)$) 
+RewriteCond %{REQUEST_URI} (^/tests/(.*)$)
 RewriteRule .* - [F]
 
 RewriteCond %{REQUEST_FILENAME} -s [OR]

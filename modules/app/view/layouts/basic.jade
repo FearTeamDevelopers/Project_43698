@@ -53,9 +53,6 @@ html
                         h1 Hastrman
                 .small-12.medium-12.large-8.columns.navWrapper
                     include menu.jade
-            .row
-                .large-8.medium-12.small-12.columns.right#dropdown
-                    include submenu.jade
         include ../components/notification
         .content
             | {yield action}
@@ -72,7 +69,7 @@ html
         #dialog(title='Chcete pokračovat?')
             p
         a(href="/feedback").fi-comment.feedback Pošlete nám feedback
-
+       s cript var $buoop = {c:2};function $buo_f(){var e = document.createElement("script");e.src = "//browser-update.org/update.js";document.body.appendChild(e);};try {document.addEventListener("DOMContentLoaded", $buo_f,false)}catch(e){window.attachEvent("onload", $buo_f)}
         //
           JS scripts
         script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
@@ -85,6 +82,6 @@ html
         script(type='text/javascript', src='/public/js/plugins/jssor.slider.mini.js')
         script(type='text/javascript', src='/public/js/custom/jssor.slider.init.js')
         |{/if}
-        script(type='text/javascript', src='/public/js/custom/generalApp.js')
+        script(type='text/javascript', src='/public/js/custom/build/generalApp.js')
         //
           End JS scripts
