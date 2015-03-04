@@ -79,13 +79,13 @@ section.wrapper.pridatInzerat.singlePage
                         span Nahrané fotky
                     td
                         span.field
-                            {script $images = $ad->getImages()}
-                            {if $images !== null}
-                            {foreach $image in $images}
+                            | {script $images = $ad->getImages()}
+                            | {if $images !== null}
+                            | {foreach $image in $images}
                             a(href!="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage")
                                 img(src!="{echo $image->getImgThumb()}")
-                            {/foreach}
-                            {/if}
+                            | {/foreach}
+                            |{/if}
                 tr
                     td(colspan=2)
                         input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")

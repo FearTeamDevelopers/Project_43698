@@ -46,7 +46,7 @@
       <header class="row">
         <div class="small-12 medium-12 large-4 columns"><a href="/">
             <h1>Hastrman</h1></a></div>
-        <div class="small-12 medium-12 large-8 columns navWrapper">
+        <div class="small-12 medium-12 large-8 columns navWrapper"><a href="#" class="showMenu">Menu</a>
           <nav>
             <ul>
               <li><a href="#">O nás</a>
@@ -71,11 +71,27 @@
                   <li><a href="/kurzy/udi">UDI</a></li>
                 </ul>
               </li>
-              <li><a href="#" class="sluzby">Služby</a></li>
-              <li><a href="/odkazy">Odkazy</a></li>
-              <li><a href="/galerie">Galerie</a></li>
+              <li><a href="#">Služby</a>
+                <ul>
+                  <li><a href="/sluzby/plneni-lahvi">Plnění lahví</a></li>
+                  <li><a href="/sluzby/pujcovna-potapecske-vystroje">Půjčovna potápěčské výstroje</a></li>
+                  <li><a href="/sluzby/prodej-nove-vystroje">Prodej nové výstroje</a></li>
+                  <li><a href="/sluzby/prace-pod-vodou">Práce pod vodou</a></li>
+                  <li><a href="/sluzby/servis-potapecske-techniky">Servis potápěčské techniky</a></li>
+                </ul>
+              </li>
+              <li><a href="/galerie" class="galerie">Galerie</a></li>
+              <li><a href="#">Ostatni</a>
+                <ul>
+                  <li><a href="/odkazy">Odkazy</a></li>
+                  <li><a href="/bazen">Bazén</a></li>
+                  <li><a href="/technika">Technika</a></li>
+                  <li><a href="/pojisteni">Pojišťění</a></li>
+                  <li><a href="/bazar">Bazar</a></li>
+                </ul>
+              </li>
               <li><a href="#" title="Hledat" id="displaySearch" class="fi-magnifying-glass"></a></li>{if !isset($authUser)}
-              <li><a href="/prihlasit" title="Přihlásit se" class="fi-torso"></a></li>{/if}{else}
+              <li><a href="/prihlasit" title="Přihlásit se" class="fi-torso galerie"></a></li>{/if}{else}
               <li><a href="#" class="fi-power"></a>
                 <ul>
                   <li><a href="/muj-profil">Můj profil</a></li>
@@ -86,25 +102,6 @@
           </nav>
         </div>
       </header>
-      <div class="row">
-        <div id="dropdown" class="large-8 medium-12 small-12 columns right">
-          <div class="submenu">
-            <ul>
-              <li><a href="/bazen">Bazén</a></li>
-              <li><a href="/technika">Technika</a></li>
-              <li><a href="/pojisteni">Pojišťění</a></li>
-              <li><a href="/bazar">Bazar</a></li>
-            </ul>
-            <ul>
-              <li><a href="/sluzby/plneni-lahvi">Plnění lahví</a></li>
-              <li><a href="/sluzby/pujcovna-potapecske-vystroje">Půjčovna potápěčské výstroje</a></li>
-              <li><a href="/sluzby/prodej-nove-vystroje">Prodej nové výstroje</a></li>
-              <li><a href="/sluzby/prace-pod-vodou">Práce pod vodou</a></li>
-              <li><a href="/sluzby/servis-potapecske-techniky">Servis potápěčské techniky</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </section>
     <div class="notificationWrapper">{if !empty($infoMessage)}
       <div class="notification msginfo large-5 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
@@ -133,11 +130,10 @@
           <header>
             <h3 class="fi-telephone">Kontakty</h3>
           </header>
-          <div class="large-4 small-12 medium-12 columns borderRight">
-            <p>Potápěčské centrum HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: info@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 600<br/><br/><a href="https://www.google.cz/maps/place/Mládežnická+1275,+293+01+Mladá+Boleslav/@50.4330411,14.9196529,17z/data=!3m1!4b1!4m2!3m1!1s0x4709544ea3d0d74d:0xcc376964dfa62f6d" target="_blank">Najdete nás podle mapy</a></p>
-          </div>
+          <div class="large-4 small-12 medium-12 columns borderRight"></div>
+          <p>Potápěčské centrum HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: info@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>kuhn@hastrman.cz<br/>Jaromír Dítě - 608 550 606<br/>dite@hastrman.cz<br/><br/><a href="https://www.google.cz/maps/place/Mládežnická+1275,+293+01+Mladá+Boleslav/@50.4330411,14.9196529,17z/data=!3m1!4b1!4m2!3m1!1s0x4709544ea3d0d74d:0xcc376964dfa62f6d" target="_blank">Najdete nás podle mapy</a></p>
           <div class="large-4 columns borderRight">
-            <p>Klub sportovních potápěčů HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: klub@hastrman.cz<br/>Jiří Nový - 603 482 708<br/>novy@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 600</p>
+            <p>Klub sportovních potápěčů HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: klub@hastrman.cz<br/>Jiří Nový - 603 482 708<br/>novy@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 606</p>
           </div>
           <div class="large-4 columns">
             <p>HASTRMAN APNEA tým<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: apnea@hastrman.cz<br/>Jan Tichý - 721 863 728</p>
@@ -147,10 +143,8 @@
     </div>
     <div id="dialog" title="Chcete pokračovat?">
       <p></p>
-    </div>
-    {if $showfeedback}
-    <a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>
-    {/if}
+    </div>{if $showfeedback}<a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>
+    <script>var $buoop = {c:2};function $buo_f(){var e = document.createElement("script");e.src = "//browser-update.org/update.js";document.body.appendChild(e);};try {document.addEventListener("DOMContentLoaded", $buo_f,false)}catch(e){window.attachEvent("onload", $buo_f)}</script>
     <!--JS scripts
     -->
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
@@ -161,7 +155,7 @@
     <script type="text/javascript" src="/public/js/plugins/lightbox.min.js"></script>{if isset($includejssorslider)}
     <script type="text/javascript" src="/public/js/plugins/jssor.slider.mini.js"></script>
     <script type="text/javascript" src="/public/js/custom/jssor.slider.init.js"></script>{/if}
-    <script type="text/javascript" src="/public/js/custom/generalApp.js"></script>
+    <script type="text/javascript" src="/public/js/custom/build/generalApp.js"></script>
     <!--End JS scripts
     -->
   </body>

@@ -1,41 +1,7 @@
-
-<section class="wrapper blue filter">
-  <div class="row">
-      {if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
-    <form method="get" action="/bazar/filtr" class="filtr">
-      <select name="bftype">
-        {if isset($bftype)}
-        {if $bftype == 'nabidka'}
-        <option value="0">Typ</option>
-        <option value="nabidka" selected="selected">Nabídka</option>
-        <option value="poptavka">Poptávka</option>{/if}{elseif $bftype == 'poptavka'}
-        <option value="0">Typ</option>
-        <option value="nabidka">Nabídka</option>
-        <option value="poptavka" selected="selected">Poptávka</option>{/elseif}{else}
-        <option value="0" selected="selected">Typ</option>
-        <option value="nabidka">Nabídka</option>
-        <option value="poptavka">Poptávka</option>{/else}
-        {/if}{else}
-        <option value="0">Typ</option>
-        <option value="nabidka">Nabídka</option>
-        <option value="poptavka">Poptávka</option>{/else}
-      </select>
-      <select name="bfsection">{if isset($bfsection)}
-        <option value="0">Sekce</option>{foreach $ad in $adsections}
-        {if $ad->urlKey == $bfsection}
-        <option value="{echo $ad->urlKey}" selected="selected">{echo $ad->title}</option>{/if}{else}
-        <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/else}
-        {/foreach}
-        {/if}{else}
-        <option value="0">Sekce</option>{foreach $ad in $adsections}
-        <option value="{echo $ad->urlKey}">{echo $ad->title}</option>{/foreach}
-        {/else}
-      </select>
-      <input type="submit" name="zobrazit" value="Zobrazit"/>
-    </form>
-      {/if}
-    <form method="get" action="/bazar/hledat" class="search">
-      <input type="text" placeholder="vyhledat v bazaru..." name="adstr"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
-    </form>
-  </div>
-</section>
+<section class="wrapper blue filter"><div class="row">{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}<form method="get" action="/bazar/filtr" class="filtr"><select name="bftype">{if isset($bftype)}
+{if $bftype == 'nabidka'}<option value="0">Typ</option><option value="nabidka" selected="selected">Nabídka</option><option value="poptavka">Poptávka</option>{/if}{elseif $bftype == 'poptavka'}<option value="0">Typ</option><option value="nabidka">Nabídka</option><option value="poptavka" selected="selected">Poptávka</option>{/elseif}{else}<option value="0" selected="selected">Typ</option><option value="nabidka">Nabídka</option><option value="poptavka">Poptávka</option>{/else}
+{/if}{else}<option value="0">Typ</option><option value="nabidka">Nabídka</option><option value="poptavka">Poptávka</option>{/else}</select><select name="bfsection">{if isset($bfsection)}<option value="0">Sekce</option>{foreach $ad in $adsections}
+{if $ad->urlKey == $bfsection}<option value="{echo $ad->getUrlKey()}" selected="selected">{echo $ad->getTitle()}</option>{/if}{else}<option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/else}
+{/foreach}
+{/if}{else}<option value="0">Sekce</option>{foreach $ad in $adsections}<option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/foreach}
+{/else}</select><input type="submit" value="Zobrazit"/></form>{/if}<form method="GET" action="/bazar/hledat" class="search"><input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a></form></div></section>
