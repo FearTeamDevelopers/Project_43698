@@ -33,7 +33,10 @@ gulp.task('image',function(){
 *************/
 gulp.task('templates', function(){
 	gulp.src('modules/app/view/**/*.jade')
-		.pipe(jade())
+		.pipe(jade({
+			jade: jade,
+			pretty: true
+			}))
 		.on('error', console.error.bind(console))
 		.pipe(gulp.dest('modules/app/view/'))
 		.pipe(reload({stream: true}))

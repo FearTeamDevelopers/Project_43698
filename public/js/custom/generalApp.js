@@ -9,7 +9,7 @@ jQuery(document).ready(function ($) {
 		$(this).closest('.navWrapper').find('nav').slideToggle(300).toggleClass('active');
 	});
 
-	$('nav>ul>li>a:not(.galerie)').click(function(event){
+	$('nav>ul>li>a.dropdown').click(function(event){
 		event.preventDefault();
 		if($(this).closest('li').hasClass('active')){
 			$(this).closest('li').find('ul').slideUp(300,function(){
@@ -62,14 +62,7 @@ jQuery(document).ready(function ($) {
         event.preventDefault();
         jQuery('#dropdown').toggle('slow');
     });
-    jQuery('#displaySearch').click(function (event) {
-        event.preventDefault();
-        jQuery('.searchWrapper').toggle('slow');
-    });
-    jQuery('.close').click(function (event) {
-        event.preventDefault();
-        jQuery('.searchWrapper').hide('slow');
-    });
+
     jQuery('.closeNotif').click(function (event) {
         event.preventDefault();
         jQuery('.notificationWrapper').hide('slow');

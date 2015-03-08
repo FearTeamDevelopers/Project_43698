@@ -41,17 +41,16 @@ html
         title {echo $metatitle}
     body
         section.wrapper.topPanel.blue
-            .row.searchWrapper
-                .large-3.small-6.medium-4.centerBlock
+
+            header.row
+                .small-12.medium-6.large-6.columns
+                    a(href='/')
+                        h1 Hastrman
+                .large-4.small-12.medium-47.centerBlock.searchWrapper
                     form.fulltextsearch(method='get', action='/hledat')
                         input(type='text',name='str', title='Pole nemůže být prázdné', placeholder='Prohledat hastrmana...' required).small-10.left
                         a#hledatHastrman(href='#', title='Hledat').fi-magnifying-glass.left
-                        a.close(href='#', title='Zavřít').fi-x-circle
-            header.row
-                .small-12.medium-12.large-4.columns
-                    a(href='/')
-                        h1 Hastrman
-                .small-12.medium-12.large-8.columns.navWrapper
+                .small-12.medium-12.large-12.columns.navWrapper
                     include menu.jade
         include ../components/notification
         .content
@@ -69,7 +68,7 @@ html
         #dialog(title='Chcete pokračovat?')
             p
         a(href="/feedback").fi-comment.feedback Pošlete nám feedback
-        script var $buoop = {c:2};function $buo_f(){var e = document.createElement("script");e.src = "//browser-update.org/update.js";document.body.appendChild(e);};try {document.addEventListener("DOMContentLoaded", $buo_f,false)}catch(e){window.attachEvent("onload", $buo_f)}
+
         //
           JS scripts
         script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
@@ -80,7 +79,7 @@ html
         script(type='text/javascript', src='/public/js/plugins/lightbox.min.js')
         |{if isset($includejssorslider)}
         script(type='text/javascript', src='/public/js/plugins/jssor.slider.mini.js')
-        script(type='text/javascript', src='/public/js/custom/jssor.slider.init.js')
+        script(type='text/javascript', src='/public/js/custom/build/jssor.slider.init.js')
         |{/if}
         script(type='text/javascript', src='/public/js/custom/build/generalApp.js')
         //

@@ -1,13 +1,78 @@
-<section class="wrapper blue filter"><div class="row">{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}<form method="get" action="/bazar/filtr" class="filtr"><select name="bftype">{if isset($bftype)}
-{if $bftype == 'nabidka'}<option value="0">Typ</option><option value="nabidka" selected="selected">Nabídka</option><option value="poptavka">Poptávka</option>{/if}{elseif $bftype == 'poptavka'}<option value="0">Typ</option><option value="nabidka">Nabídka</option><option value="poptavka" selected="selected">Poptávka</option>{/elseif}{else}<option value="0" selected="selected">Typ</option><option value="nabidka">Nabídka</option><option value="poptavka">Poptávka</option>{/else}
-{/if}{else}<option value="0">Typ</option><option value="nabidka">Nabídka</option><option value="poptavka">Poptávka</option>{/else}</select><select name="bfsection">{if isset($bfsection)}<option value="0">Sekce</option>{foreach $ad in $adsections}
-{if $ad->urlKey == $bfsection}<option value="{echo $ad->getUrlKey()}" selected="selected">{echo $ad->getTitle()}</option>{/if}{else}<option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/else}
-{/foreach}
-{/if}{else}<option value="0">Sekce</option>{foreach $ad in $adsections}<option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/foreach}
-{/else}</select><input type="submit" value="Zobrazit"/></form>{/if}<form method="GET" action="/bazar/hledat" class="search"><input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a></form></div></section><section class="wrapper bazar singlePage"><header class="row"><h2>Moje inzeráty</h2></header><div class="row container">{if !empty($ads)}<div class="buttonWrapper"><ul><li><a href="/bazar" class="fi-arrow-left">Bazar</a></li><li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li></ul></div>{foreach $ad in $ads}<article class="medium-6 column left"><div class="imgWrapper">{script $images=$ad->getImages()}
-{if !empty($images)}
-{script $image=array_shift($images)}<a data-lightbox="{echo $ad->getId()}" href="{echo $image->getImgMain()}"><img src="{echo $image->getImgThumb()}"/></a>{/if}</div><div class="nazev"><div class="nazevWrapper"><h4>{echo $ad->getTitle()}</h4></div></div><div class="infoWrapper"><div class="info">{if $ad->getAdType() =='tender'}<center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}<center><span class="poptavka">Poptávka <br/></span></center>{/else}<small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small>{if $ad->getPrice() == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
-{else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->getUniqueKey()}" class="bla">zobrazit podrobnosti</a></div></div><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->getUniqueKey()}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->getUniqueKey()}" title="Smazat" class="buttonTab delete ajaxReload fi-trash"></a></article>{/foreach}
-{/if}{else}<h3>Nemáte žádné inzeráty</h3>{/else}</div>{if  $pagecount > 1}<section class="pager row">{if $currentpage !=1}
-{if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
-{/if}</section>{/if}</section>
+
+<section class="wrapper blue filter">
+  <div class="row">{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
+    <form method="get" action="/bazar/filtr" class="filtr">
+      <select name="bftype">
+        {if isset($bftype)}
+        {if $bftype == 'nabidka'}
+        <option value="0">Typ</option>
+        <option value="nabidka" selected="selected">Nabídka</option>
+        <option value="poptavka">Poptávka</option>{/if}{elseif $bftype == 'poptavka'}
+        <option value="0">Typ</option>
+        <option value="nabidka">Nabídka</option>
+        <option value="poptavka" selected="selected">Poptávka</option>{/elseif}{else}
+        <option value="0" selected="selected">Typ</option>
+        <option value="nabidka">Nabídka</option>
+        <option value="poptavka">Poptávka</option>{/else}
+        {/if}{else}
+        <option value="0">Typ</option>
+        <option value="nabidka">Nabídka</option>
+        <option value="poptavka">Poptávka</option>{/else}
+      </select>
+      <select name="bfsection">{if isset($bfsection)}
+        <option value="0">Sekce</option>{foreach $ad in $adsections}
+        {if $ad->urlKey == $bfsection}
+        <option value="{echo $ad->getUrlKey()}" selected="selected">{echo $ad->getTitle()}</option>{/if}{else}
+        <option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/else}
+        {/foreach}
+        {/if}{else}
+        <option value="0">Sekce</option>{foreach $ad in $adsections}
+        <option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/foreach}
+        {/else}
+      </select>
+      <input type="submit" value="Zobrazit"/>
+    </form>{/if}
+    <form method="GET" action="/bazar/hledat" class="search">
+      <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
+    </form>
+  </div>
+</section>
+<section class="wrapper bazar singlePage">
+  <header class="row">
+    <h2>Moje inzeráty</h2>
+  </header>
+  <div class="row container">{if !empty($ads)}
+    <div class="buttonWrapper">
+      <ul>
+        <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>
+        <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>
+      </ul>
+    </div>{foreach $ad in $ads}
+    <article class="medium-6 column left">
+      <div class="imgWrapper">
+        {script $images=$ad->getImages()}
+        {if !empty($images)}
+        {script $image=array_shift($images)}<a data-lightbox="{echo $ad->getId()}" href="{echo $image->getImgMain()}"><img src="{echo $image->getImgThumb()}"/></a>{/if}
+      </div>
+      <div class="nazev">
+        <div class="nazevWrapper">
+          <h4>{echo $ad->getTitle()}</h4>
+        </div>
+      </div>
+      <div class="infoWrapper">
+        <div class="info">{if $ad->getAdType() =='tender'}
+          <center><span class="nabidka">Nabídka <br/></span></center>{/if}{else}
+          <center><span class="poptavka">Poptávka <br/></span></center>{/else}<small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small>{if $ad->getPrice() == "1"}<span class="price">{echo " na dohodě"}<br/></span>{/if}
+          {else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/></span>{/else}<a href="/bazar/r/{echo $ad->getUniqueKey()}" class="bla">zobrazit podrobnosti</a>
+        </div>
+      </div><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->getUniqueKey()}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->getUniqueKey()}" title="Smazat" class="buttonTab delete ajaxReload fi-trash"></a>
+    </article>{/foreach}
+    {/if}{else}
+    <h3>Nemáte žádné inzeráty</h3>{/else}
+  </div>{if  $pagecount > 1}
+  <section class="pager row">
+    {if $currentpage !=1}
+    {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
+    {/if}
+  </section>{/if}
+</section>
