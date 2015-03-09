@@ -58,7 +58,7 @@ class RedirectController extends Controller
                 $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/redirect/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($redirect->getErrors())));
                 $view->set('errors', $redirect->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('redirect', $redirect);
@@ -104,7 +104,8 @@ class RedirectController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/redirect/');
             } else {
-                Event::fire('admin.log', array('fail', 'Redirect id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Redirect id: ' . $id,
+                    'Errors: '.  json_encode($redirect->getErrors())));
                 $view->set('errors', $redirect->getErrors());
             }
         }

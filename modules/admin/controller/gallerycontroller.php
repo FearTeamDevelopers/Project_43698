@@ -244,21 +244,23 @@ class GalleryController extends Controller
 
             $photos = \App\Model\PhotoModel::all(array('galleryId = ?' => (int) $id), array('id'));
 
-            $ids = array();
-            foreach ($photos as $colPhoto) {
-                $ids[] = $colPhoto->getId();
-            }
+            if(!empty($photos)){
+                $ids = array();
+                foreach ($photos as $colPhoto) {
+                    $ids[] = $colPhoto->getId();
+                }
 
-            \App\Model\PhotoModel::deleteAll(array('id IN ?' => $ids));
+                \App\Model\PhotoModel::deleteAll(array('id IN ?' => $ids));
 
-            $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getId();
-            $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getId();
+                $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getId();
+                $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getId();
 
-            if ($path == $pathThumbs) {
-                $fm->remove($path);
-            } else {
-                $fm->remove($path);
-                $fm->remove($pathThumbs);
+                if ($path == $pathThumbs) {
+                    $fm->remove($path);
+                } else {
+                    $fm->remove($path);
+                    $fm->remove($pathThumbs);
+                }
             }
 
             if ($gallery->delete()) {

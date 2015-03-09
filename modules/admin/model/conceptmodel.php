@@ -5,9 +5,9 @@ namespace Admin\Model;
 use THCFrame\Model\Model;
 
 /**
- * Log ORM class
+ * Concept ORM class
  */
-class AdminLogModel extends Model
+class ConceptModel extends Model
 {
 
     /**
@@ -21,10 +21,10 @@ class AdminLogModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 80
+     * @type integer
      * 
-     * @validate alphanumeric, max(80)
+     * @validate numeric, max(8)
+     * @label autor
      */
     protected $_userId;
 
@@ -32,41 +32,56 @@ class AdminLogModel extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 50
+     * @length 150
      * 
-     * @validate alpha, max(50)
+     * @validate required, alphanumeric, max(150)
+     * @label nazev
      */
-    protected $_module;
+    protected $_title;
 
     /**
      * @column
      * @readwrite
      * @type text
-     * @length 50
+     * @length 256
      * 
-     * @validate alpha, max(50)
+     * @validate required, html
+     * @label teaser
      */
-    protected $_controller;
+    protected $_shortBody;
 
     /**
      * @column
      * @readwrite
      * @type text
-     * @length 50
+     * @length 256
      * 
-     * @validate alpha, max(50)
+     * @validate required, html
+     * @label text
      */
-    protected $_action;
+    protected $_body;
 
     /**
      * @column
      * @readwrite
      * @type text
-     * @length 15
+     * @length 250
      * 
-     * @validate alpha, max(15)
+     * @validate alphanumeric, max(250)
+     * @label keywords
      */
-    protected $_result;
+    protected $_keywords;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 150
+     * 
+     * @validate alphanumeric, max(150)
+     * @label meta-název
+     */
+    protected $_metaTitle;
 
     /**
      * @column
@@ -75,8 +90,9 @@ class AdminLogModel extends Model
      * @length 256
      * 
      * @validate alphanumeric
+     * @label meta-popis
      */
-    protected $_params;
+    protected $_metaDescription;
 
     /**
      * @column

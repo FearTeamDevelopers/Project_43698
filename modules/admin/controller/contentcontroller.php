@@ -88,8 +88,8 @@ class ContentController extends Controller
                 $view->successMessage('Obsah'.self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/content/');
             } else {
-                Event::fire('admin.log', array('fail'));
-                $view->set('errors', $content->getErrors())
+                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors + $content->getErrors())));
+                $view->set('errors', $errors + $content->getErrors())
                     ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                     ->set('content', $content);
             }
@@ -147,7 +147,8 @@ class ContentController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/content/');
             } else {
-                Event::fire('admin.log', array('fail', 'Content id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Content id: ' . $id,
+                    'Errors: '.  json_encode($errors + $content->getErrors())));
                 $view->set('errors', $content->getErrors())
                     ->set('content', $content);
             }

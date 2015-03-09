@@ -129,7 +129,7 @@ class AdvertisementController extends Controller
                 Event::fire('admin.log', array('success', 'Ad id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $id, 'Errors: '.  json_encode($ad->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -212,10 +212,10 @@ class AdvertisementController extends Controller
                 $view->successMessage('Gallery' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/advertisement/sections/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors+$adsection->getErrors())));
                 $view->set('adsection', $adsection)
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                        ->set('errors', $adsection->getErrors());
+                        ->set('errors', $errors+ $adsection->getErrors());
             }
         }
     }
@@ -262,8 +262,9 @@ class AdvertisementController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/advertisement/sections/');
             } else {
-                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id));
-                $view->set('errors', $adsection->getErrors());
+                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
+                    'Errors: '.  json_encode($errors + $adsection->getErrors())));
+                $view->set('errors', $errors + $adsection->getErrors());
             }
         }
     }
@@ -290,7 +291,8 @@ class AdvertisementController extends Controller
                 Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id));
+                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
+                    'Errors: '.  json_encode($adsection->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -327,7 +329,8 @@ class AdvertisementController extends Controller
                 Event::fire('admin.log', array('success', 'Ad id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $id,
+                    'Errors: '.  json_encode($ad->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }

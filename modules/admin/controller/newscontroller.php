@@ -181,7 +181,8 @@ class NewsController extends Controller
                 $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/news/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 
+                    'Errors: '.  json_encode($this->_errors + $news->getErrors())));
                 $view->set('errors', $this->_errors + $news->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('news', $news);
@@ -256,7 +257,8 @@ class NewsController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/news/');
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: '.  json_encode($this->_errors + $news->getErrors())));
                 $view->set('errors', $this->_errors + $news->getErrors());
             }
         }
@@ -337,11 +339,13 @@ class NewsController extends Controller
 
             if ($news->validate()) {
                 $news->save();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: '.  json_encode($news->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -376,7 +380,8 @@ class NewsController extends Controller
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: '.  json_encode($news->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -435,7 +440,7 @@ class NewsController extends Controller
                     Event::fire('admin.log', array('delete success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_6;
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -469,7 +474,7 @@ class NewsController extends Controller
                     Event::fire('admin.log', array('activate success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_4;
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -503,7 +508,7 @@ class NewsController extends Controller
                     Event::fire('admin.log', array('deactivate success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_5;
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -534,11 +539,11 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
                     $this->getCache()->invalidate();
+                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -569,11 +574,11 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
                     $this->getCache()->invalidate();
+                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }

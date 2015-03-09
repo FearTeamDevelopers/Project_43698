@@ -250,9 +250,9 @@ RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R,L]
 ########## End - Redirect non-www to www
 
 ########## Begin - Preventing Bandwidth Image Theft
-#RewriteCond %{HTTP_REFERER} !^(http(s)?://)?(www\.)?(hastrman|hastrman\.fear-team)\.(cz|dev).* [NC]
-#RewriteCond %{HTTP_REFERER} !^$
-#RewriteRule \.(jpe?g|gif|bmp|png|ico|svg)$ - [F]
+RewriteCond %{HTTP_REFERER} !^(http(s)?://)?(www\.)?(hastrman|hastrman\.fear-team)\.(cz|dev).* [NC]
+RewriteCond %{HTTP_REFERER} !^$
+RewriteRule \.(jpe?g|gif|bmp|png|ico|svg)$ - [F]
 ########## End - Preventing Bandwidth Image Theft
 
 RewriteCond %{REQUEST_FILENAME} -s

@@ -31,7 +31,7 @@ class UserController extends Controller
             if ($this->checkCSRFToken() !== true) {
                 self::redirect('/prihlasit');
             }
-            
+
             $email = RequestMethods::post('email');
             $password = RequestMethods::post('password');
             $error = false;
@@ -50,7 +50,7 @@ class UserController extends Controller
                 try {
                     $this->getSecurity()->authenticate($email, $password);
                     self::redirect('/muj-profil');
-                } catch (\THCFrame\Security\Exception\UserInactive $e){
+                } catch (\THCFrame\Security\Exception\UserInactive $e) {
                     $view->set('account_error', 'Účet ještě nebyl aktivován');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
@@ -86,7 +86,7 @@ class UserController extends Controller
         $canonical = 'http://' . $this->getServerHost() . '/registrace';
 
         $view->set('user', null);
-        
+
         $this->getLayoutView()
                 ->set('metatitle', 'Hastrman - Registrace')
                 ->set('canonical', $canonical);
@@ -113,11 +113,11 @@ class UserController extends Controller
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
             $verifyEmail = $this->getConfig()->registration_verif_email;
-            
+
             if ($verifyEmail) {
                 $active = false;
                 $actToken = Rand::randStr(50);
-            }else{
+            } else {
                 $active = true;
                 $actToken = null;
             }
@@ -136,13 +136,11 @@ class UserController extends Controller
 
             if (empty($errors) && $user->validate()) {
                 $uid = $user->save();
-                
+
                 if ($verifyEmail) {
                     try {
                         require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                        $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host, 
-                                                                        $this->getConfig()->smtp->port, 
-                                                                        $this->getConfig()->smtp->secured)
+                        $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host, $this->getConfig()->smtp->port, $this->getConfig()->smtp->secured)
                                 ->setUsername($this->getConfig()->smtp->username)
                                 ->setPassword($this->getConfig()->smtp->password);
                         $mailer = \Swift_Mailer::newInstance($transport);
@@ -160,19 +158,20 @@ class UserController extends Controller
                         $mailer->send($regEmail);
                     } catch (\Exception $ex) {
                         \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
-                        
-                        Event::fire('app.log', array('fail', 'User Id: '.$uid));
+
+                        Event::fire('app.log', array('fail', 'Email not send for User Id: ' . $uid,
+                            'Error: ' . $ex->getMessage()));
                         $user->delete();
                         $view->errorMessage('Nepodařilo se odeslat aktivační email, opakujte registraci později');
                         self::redirect('/');
                     }
                 }
 
-                Event::fire('app.log', array('success', 'User Id: '.$uid));
-                
+                Event::fire('app.log', array('success', 'User Id: ' . $uid));
+
                 if ($verifyEmail) {
                     $view->successMessage('Registrace byla úspěšná. Na uvedený email byl zaslán odkaz k aktivaci účtu.');
-                }else{
+                } else {
                     $view->successMessage('Registrace byla úspěšná');
                 }
 
@@ -193,7 +192,7 @@ class UserController extends Controller
     {
         $view = $this->getActionView();
         $errors = array();
-        
+
         $canonical = 'http://' . $this->getServerHost() . '/profil';
 
         $user = \App\Model\UserModel::first(array('id = ?' => $this->getUser()->getId()));
@@ -207,7 +206,7 @@ class UserController extends Controller
             if ($this->checkCSRFToken() !== true) {
                 self::redirect('/muj-profil');
             }
-            
+
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Hesla se neshodují');
             }
@@ -250,7 +249,7 @@ class UserController extends Controller
             }
         }
     }
-    
+
     /**
      * Activate account via activation link send by email
      * 
@@ -259,27 +258,29 @@ class UserController extends Controller
     public function activateAccount($key)
     {
         $view = $this->getActionView();
-        
+
         $user = \App\Model\UserModel::first(array('active = ?' => false, 'emailActivationToken = ?' => $key));
-        
-        if(null === $user){
+
+        if (null === $user) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
-        
+
         $user->active = true;
         $user->emailActivationToken = null;
-        
-        if($user->validate()){
+
+        if ($user->validate()) {
             $user->save();
-            
-            Event::fire('app.log', array('success', 'User Id: '.$user->getId()));
+
+            Event::fire('app.log', array('success', 'User Id: ' . $user->getId()));
             $view->successMessage('Účet byl aktivován');
             self::redirect('/');
-        }else{
-            Event::fire('app.log', array('fail', 'User Id: '.$user->getId()));
+        } else {
+            Event::fire('app.log', array('fail', 'User Id: ' . $user->getId(),
+                'Errors: ' . json_encode($user->getErrors())));
             $view->warningMessage(self::ERROR_MESSAGE_1);
             self::redirect('/');
         }
     }
+
 }
