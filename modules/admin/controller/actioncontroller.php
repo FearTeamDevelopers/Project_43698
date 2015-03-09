@@ -192,7 +192,7 @@ class ActionController extends Controller
                 $view->successMessage('Action' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/action/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($this->_errors + $action->getErrors())));
                 $view->set('errors', $this->_errors + $action->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('action', $action);
@@ -268,7 +268,8 @@ class ActionController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/action/');
             } else {
-                Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Action id: ' . $id, 
+                    'Errors: '.json_encode($this->_errors + $action->getErrors())));
                 $view->set('errors', $this->_errors + $action->getErrors());
             }
         }
@@ -315,7 +316,8 @@ class ActionController extends Controller
                     Event::fire('admin.log', array('success', 'Action id: ' . $id));
                     echo 'success';
                 } else {
-                    Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                    Event::fire('admin.log', array('fail', 'Action id: ' . $id, 
+                    'Errors: '.json_encode($this->_errors + $action->getErrors())));
                     echo self::ERROR_MESSAGE_1;
                 }
             } else {
@@ -349,11 +351,13 @@ class ActionController extends Controller
 
             if ($action->validate()) {
                 $action->save();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Action id: ' . $id, 
+                    'Errors: '.json_encode($this->_errors + $action->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -388,7 +392,8 @@ class ActionController extends Controller
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Action id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Action id: ' . $id, 
+                    'Errors: '.json_encode($this->_errors + $action->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -449,7 +454,7 @@ class ActionController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_6;
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -484,7 +489,7 @@ class ActionController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_4;
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -519,7 +524,7 @@ class ActionController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_5;
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -554,7 +559,7 @@ class ActionController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -589,7 +594,7 @@ class ActionController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }

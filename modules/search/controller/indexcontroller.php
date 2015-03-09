@@ -155,7 +155,7 @@ class IndexController extends Controller
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $database = Registry::get('database')->get('main');
+        $database = Registry::get('database')->get('search');
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, 'cron', 0, ?, now(), default)";
         $prepareIdSql = "ALTER TABLE tb_searchindex auto_increment = 1";
@@ -246,8 +246,7 @@ class IndexController extends Controller
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $database = Registry::get('database')->get('main');
-        
+        $database = Registry::get('database')->get('search');
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 1, ?, now(), default)";
         $deleteSql = "DELETE FROM tb_searchindex WHERE sourceModel=?";
@@ -300,7 +299,7 @@ class IndexController extends Controller
                 unset($article);
             }
 
-            $database->execute($insertSqlLog, $variables['model'], $table, $userName, $wordsCount);
+            $database->execute($insertSqlLog, $variables['modelLabel'], $table, $userName, $wordsCount);
 
             unset($wordsCount);
         } else {
@@ -310,7 +309,7 @@ class IndexController extends Controller
         $time = round(microtime(true) - $starttime, 2);
         Event::fire('search.log', array('success', sprintf('Search index for %s built in %s sec', $table, $time)));
 
-        $view->successMessage(sprintf('Search index for %s has been successfully built', $this->_textSource[$table]['model']));
+        $view->successMessage(sprintf('Search index for %s has been successfully built', $this->_textSource[$table]['modelLabel']));
         self::redirect('/search/');
     }
 

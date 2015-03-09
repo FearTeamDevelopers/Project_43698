@@ -384,7 +384,7 @@ class StringMethods
         if(empty($badChars)){
             $badChars = array('.', ',', '_', '(', ')', '[', ']', '|', ';',
                 '?', '<', '>', '/', '\\', '!', '@', '&', '*', ':', '+', '^',
-                '=', '~', '°', '´', '`', '%', "'", '"', '$', '#');
+                '=', '~', '°', '´', '`', '%', "'", '"', '$', '#', '&ldquo;');
         }
         
         $noDiacriticString = self::removeDiacriticalMarks($string);

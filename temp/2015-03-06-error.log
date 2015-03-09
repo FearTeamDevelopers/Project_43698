@@ -1,0 +1,57 @@
+[2015-03-06 11:52:58] Notice ~ template.php(326) : runtime-created function ~ 11 ~ Undefined variable: ad
+[2015-03-06 11:52:58] Notice ~ template.php(326) : runtime-created function ~ 18 ~ Undefined variable: adsections
+[2015-03-06 11:52:58] Warning ~ template.php(326) : runtime-created function ~ 18 ~ Invalid argument supplied for foreach()
+[2015-03-06 11:52:58] Notice ~ template.php(326) : runtime-created function ~ 41 ~ Undefined variable: ad
+[2015-03-06 11:52:58] Notice ~ template.php(326) : runtime-created function ~ 48 ~ Undefined variable: ad
+[2015-03-06 11:52:58] Notice ~ template.php(326) : runtime-created function ~ 55 ~ Undefined variable: ad
+[2015-03-06 11:52:58] Notice ~ template.php(326) : runtime-created function ~ 69 ~ Undefined variable: submstoken
+[2015-03-06 13:14:06] Notice ~ template.php(326) : runtime-created function ~ 16 ~ Undefined variable: gallery
+[2015-03-06 13:14:06] Notice ~ template.php(326) : runtime-created function ~ 34 ~ Undefined variable: gallery
+[2015-03-06 13:14:06] Notice ~ template.php(326) : runtime-created function ~ 43 ~ Undefined variable: gallery
+[2015-03-06 13:14:58] Notice ~ template.php(326) : runtime-created function ~ 16 ~ Undefined variable: gallery
+[2015-03-06 13:14:58] Notice ~ template.php(326) : runtime-created function ~ 34 ~ Undefined variable: gallery
+[2015-03-06 13:14:58] Notice ~ template.php(326) : runtime-created function ~ 43 ~ Undefined variable: gallery
+[2015-03-06 13:15:10] Notice ~ template.php(326) : runtime-created function ~ 23 ~ Undefined variable: photo
+[2015-03-06 13:15:10] Notice ~ template.php(326) : runtime-created function ~ 32 ~ Undefined variable: photo
+[2015-03-06 13:24:41] Notice ~ template.php(326) : runtime-created function ~ 23 ~ Undefined variable: photo
+[2015-03-06 13:24:41] Notice ~ template.php(326) : runtime-created function ~ 32 ~ Undefined variable: photo
+[2015-03-06 20:10:45] Warning ~ gallerycontroller.php ~ 248 ~ Invalid argument supplied for foreach()
+[2015-03-06 20:10:45] There was an error in the query You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1
+SQL: DELETE FROM tb_photo WHERE id IN () 
+[2015-03-06 20:20:19] Notice ~ template.php(326) : runtime-created function ~ 11 ~ Undefined variable: ad
+[2015-03-06 20:20:19] Notice ~ template.php(326) : runtime-created function ~ 18 ~ Undefined variable: adsections
+[2015-03-06 20:20:19] Warning ~ template.php(326) : runtime-created function ~ 18 ~ Invalid argument supplied for foreach()
+[2015-03-06 20:20:19] Notice ~ template.php(326) : runtime-created function ~ 41 ~ Undefined variable: ad
+[2015-03-06 20:20:19] Notice ~ template.php(326) : runtime-created function ~ 48 ~ Undefined variable: ad
+[2015-03-06 20:20:19] Notice ~ template.php(326) : runtime-created function ~ 55 ~ Undefined variable: ad
+[2015-03-06 20:20:19] Notice ~ template.php(326) : runtime-created function ~ 69 ~ Undefined variable: submstoken
+[2015-03-06 20:20:28] Notice ~ template.php(326) : runtime-created function ~ 11 ~ Undefined variable: ad
+[2015-03-06 20:20:28] Notice ~ template.php(326) : runtime-created function ~ 18 ~ Undefined variable: adsections
+[2015-03-06 20:20:28] Warning ~ template.php(326) : runtime-created function ~ 18 ~ Invalid argument supplied for foreach()
+[2015-03-06 20:20:28] Notice ~ template.php(326) : runtime-created function ~ 41 ~ Undefined variable: ad
+[2015-03-06 20:20:28] Notice ~ template.php(326) : runtime-created function ~ 48 ~ Undefined variable: ad
+[2015-03-06 20:20:28] Notice ~ template.php(326) : runtime-created function ~ 55 ~ Undefined variable: ad
+[2015-03-06 20:20:28] Notice ~ template.php(326) : runtime-created function ~ 69 ~ Undefined variable: submstoken
+[2015-03-06 20:38:39] Warning ~ usercontroller.php ~ 311 ~ unlink(): open_basedir restriction in effect. File() is not within the allowed path(s): (/home/www/hastrman.cz:/usr/share/php)
+[2015-03-06 20:38:39] Warning ~ usercontroller.php ~ 312 ~ unlink(): open_basedir restriction in effect. File() is not within the allowed path(s): (/home/www/hastrman.cz:/usr/share/php)
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 7 ~ Undefined variable: metadescription
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 9 ~ Undefined variable: metarobots
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 19 ~ Undefined variable: metaogurl
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 20 ~ Undefined variable: metatitle
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 21 ~ Undefined variable: metadescription
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 22 ~ Undefined variable: metaogtype
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 23 ~ Undefined variable: metaogsitename
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 24 ~ Undefined variable: metaogimage
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 35 ~ Undefined variable: metatitle
+[2015-03-06 20:59:07] Notice ~ template.php(326) : runtime-created function ~ 151 ~ Undefined variable: showfeedback
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 7 ~ Undefined variable: metadescription
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 9 ~ Undefined variable: metarobots
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 19 ~ Undefined variable: metaogurl
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 20 ~ Undefined variable: metatitle
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 21 ~ Undefined variable: metadescription
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 22 ~ Undefined variable: metaogtype
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 23 ~ Undefined variable: metaogsitename
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 24 ~ Undefined variable: metaogimage
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 35 ~ Undefined variable: metatitle
+[2015-03-06 20:59:33] Notice ~ template.php(326) : runtime-created function ~ 151 ~ Undefined variable: showfeedback
+[2015-03-06 23:39:07] Warning ~ request.php ~ 69 ~ curl_setopt(): CURLOPT_FOLLOWLOCATION cannot be activated when an open_basedir is set

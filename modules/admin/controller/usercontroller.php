@@ -134,7 +134,7 @@ class UserController extends Controller
                 $view->successMessage('Uživatel' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('user', $user);
@@ -205,7 +205,8 @@ class UserController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/');
             } else {
-                Event::fire('admin.log', array('fail', 'User id: ' . $user->getId()));
+                Event::fire('admin.log', array('fail', 'User id: ' . $user->getId(),
+                    'Errors: '.  json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -282,7 +283,8 @@ class UserController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail', 'User id: ' . $id));
+                Event::fire('admin.log', array('fail', 'User id: ' . $id,
+                    'Errors: '.  json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -304,12 +306,7 @@ class UserController extends Controller
         if (NULL === $user) {
             echo self::ERROR_MESSAGE_2;
         } else {
-            $pathMain = $user->getUnlinkPath();
-            $pathThumb = $user->getUnlinkThumbPath();
-
             if ($user->delete()) {
-                @unlink($pathMain);
-                @unlink($pathThumb);
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
                 echo 'success';
             } else {

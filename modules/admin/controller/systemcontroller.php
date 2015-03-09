@@ -7,7 +7,6 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Database\Mysqldump;
 use THCFrame\Events\Events as Event;
 use THCFrame\Configuration\Model\ConfigModel;
-use THCFrame\Filesystem\FileManager;
 use THCFrame\Profiler\Profiler;
 use THCFrame\Router\Model\RedirectModel;
 use THCFrame\Filesystem\LineCounter;
@@ -38,6 +37,7 @@ class SystemController extends Controller
         if (RequestMethods::post('clearCache')) {
             Event::fire('admin.log', array('success'));
             $this->getCache()->clearCache();
+            
             $view->successMessage('Cache has been successfully deleted');
             self::redirect('/admin/system/');
         }
@@ -63,10 +63,21 @@ class SystemController extends Controller
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             $view->errorMessage($ex->getMessage());
-            Event::fire('admin.log', array('fail', 'Database backup'));
+            Event::fire('admin.log', array('fail', 'Database backup', 
+                'Error: '.$ex->getMessage()));
         }
 
         self::redirect('/admin/system/');
+    }
+    
+    /**
+     * Copy live db into backup db
+     * 
+     * @before _cron
+     */
+    public function createCompleteDatabaseBackup()
+    {
+        
     }
 
     /**
@@ -106,7 +117,7 @@ class SystemController extends Controller
                     Event::fire('admin.log', array('success', $conf->getXkey() . ': ' . $oldVal . ' - ' . $conf->getValue()));
                     $conf->save();
                 } else {
-                    Event::fire('admin.log', array('fail', $conf->getXkey() . ': ' . $conf->getValue()));
+                    Event::fire('admin.log', array('fail', $conf->getXkey() . ': ' . json_encode($conf->getErrors())));
                     $error = $conf->getErrors();
                     $errors[$conf->xkey] = array_shift($error);
                 }

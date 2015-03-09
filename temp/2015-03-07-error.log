@@ -1,0 +1,14 @@
+[2015-03-07 00:59:14] Notice ~ template.php(326) : runtime-created function ~ 11 ~ Undefined variable: ad
+[2015-03-07 00:59:14] Notice ~ template.php(326) : runtime-created function ~ 18 ~ Undefined variable: adsections
+[2015-03-07 00:59:14] Warning ~ template.php(326) : runtime-created function ~ 18 ~ Invalid argument supplied for foreach()
+[2015-03-07 00:59:14] Notice ~ template.php(326) : runtime-created function ~ 41 ~ Undefined variable: ad
+[2015-03-07 00:59:14] Notice ~ template.php(326) : runtime-created function ~ 48 ~ Undefined variable: ad
+[2015-03-07 00:59:14] Notice ~ template.php(326) : runtime-created function ~ 55 ~ Undefined variable: ad
+[2015-03-07 00:59:14] Notice ~ template.php(326) : runtime-created function ~ 69 ~ Undefined variable: submstoken
+[2015-03-07 09:55:20] Notice ~ template.php(326) : runtime-created function ~ 15 ~ Undefined variable: submstoken
+[2015-03-07 09:55:20] Notice ~ template.php(326) : runtime-created function ~ 21 ~ Undefined variable: report
+[2015-03-07 09:55:20] Notice ~ template.php(326) : runtime-created function ~ 30 ~ Undefined variable: report
+[2015-03-07 09:55:20] Notice ~ template.php(326) : runtime-created function ~ 81 ~ Undefined variable: report
+[2015-03-07 09:55:20] Notice ~ template.php(326) : runtime-created function ~ 90 ~ Undefined variable: report
+[2015-03-07 09:55:20] Notice ~ template.php(326) : runtime-created function ~ 100 ~ Undefined variable: report
+[2015-03-07 09:58:39] Warning ~ request.php ~ 69 ~ curl_setopt(): CURLOPT_FOLLOWLOCATION cannot be activated when an open_basedir is set

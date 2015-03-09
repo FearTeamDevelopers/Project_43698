@@ -249,7 +249,7 @@ class ReportController extends Controller
                 $view->successMessage('Report' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/report/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($this->_errors + $report->getErrors())));
                 $view->set('errors', $this->_errors + $report->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('report', $report);
@@ -326,7 +326,8 @@ class ReportController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/report/');
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
+                    'Errors: '.json_encode($this->_errors + $report->getErrors())));
                 $view->set('errors', $this->_errors + $report->getErrors());
             }
         }
@@ -478,11 +479,13 @@ class ReportController extends Controller
 
             if ($report->validate()) {
                 $report->save();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
+                    'Errors: '.json_encode($report->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -517,7 +520,8 @@ class ReportController extends Controller
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
+                    'Errors: '.json_encode($report->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -577,7 +581,7 @@ class ReportController extends Controller
                     Event::fire('admin.log', array('delete success', 'Report ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_6;
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -612,7 +616,7 @@ class ReportController extends Controller
                     Event::fire('admin.log', array('activate success', 'Report ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_4;
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -647,7 +651,7 @@ class ReportController extends Controller
                     Event::fire('admin.log', array('deactivate success', 'Report ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_5;
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -682,7 +686,7 @@ class ReportController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -717,7 +721,7 @@ class ReportController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }

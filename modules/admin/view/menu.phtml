@@ -6,7 +6,7 @@
     <li><a href="/admin/gallery/" class="media"><span>Galerie</span></a></li>
     <li><a href="/admin/content/" class="editor"><span>Obsah webu</span></a></li>
     <li><a href="/admin/advertisement/" class="chat"><span>Bazar</span></a></li>
-    {if $isAdmin || $isSuperAdmin}
+    {if $isSuperAdmin}
     <li><a href="/admin/partner/" class="grid"><span>Partneři</span></a></li>
     <li>
         <a href="/admin/user/" class="users menudrop"><span>Uživatelé</span></a>
@@ -21,5 +21,16 @@
             <li><a href="/search/"><span>Search Index</span></a></li>
         </ul>
     </li>
-    {/if}
+    {/if}{elseif $isAdmin}
+    <li><a href="/admin/partner/" class="grid"><span>Partneři</span></a></li>
+    <li>
+        <a href="/admin/user/" class="users menudrop"><span>Uživatelé</span></a>
+        <ul>
+            <li><a href="/admin/feedback/"><span>Feedback</span></a></li>
+        </ul>
+    </li>
+    <li>
+        <a href="/admin/system/" class="error menudrop"><span>Nastavení</span></a>
+    </li>
+    {/elseif}
 </ul>

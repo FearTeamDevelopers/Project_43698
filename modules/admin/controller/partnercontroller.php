@@ -74,7 +74,7 @@ class PartnerController extends Controller
                             $view->successMessage('Partner' . self::SUCCESS_MESSAGE_1);
                             self::redirect('/admin/partner/');
                         } else {
-                            Event::fire('admin.log', array('fail'));
+                            Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($partner->getErrors())));
                             $view->set('errors', $partner->getErrors())
                                     ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                                     ->set('partner', $partner);
@@ -85,7 +85,7 @@ class PartnerController extends Controller
                 }
             } else {
                 $errors['logo'] = $fileErrors;
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors+$partner->getErrors())));
                 $view->set('errors', $errors)
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken());
             }
@@ -160,7 +160,8 @@ class PartnerController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/partner/');
             } else {
-                Event::fire('admin.log', array('fail', 'Partner id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Partner id: ' . $id,
+                    'Errors: '.  json_encode($errors+$partner->getErrors())));
                 $view->set('errors', $errors + $partner->getErrors());
             }
         }
@@ -225,7 +226,6 @@ class PartnerController extends Controller
                 echo self::ERROR_MESSAGE_5;
             }
         } else {
-            Event::fire('admin.log', array('fail', 'Partner id: ' . $id));
             echo self::ERROR_MESSAGE_2;
         }
     }
@@ -270,7 +270,7 @@ class PartnerController extends Controller
                         Event::fire('admin.log', array('delete success', 'Partner ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_6);
                     } else {
-                        Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                        Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                         $message = join('<br/>', $errors);
                         $view->longFlashMessage($message);
                     }
@@ -301,7 +301,7 @@ class PartnerController extends Controller
                         Event::fire('admin.log', array('activate success', 'Partner ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_4);
                     } else {
-                        Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                        Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                         $message = join('<br/>', $errors);
                         $view->longFlashMessage($message);
                     }
@@ -332,7 +332,7 @@ class PartnerController extends Controller
                         Event::fire('admin.log', array('deactivate success', 'Partner ids: ' . join(',', $ids)));
                         $view->successMessage(self::SUCCESS_MESSAGE_5);
                     } else {
-                        Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                        Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                         $message = join('<br/>', $errors);
                         $view->longFlashMessage($message);
                     }
