@@ -362,12 +362,10 @@ class SystemController extends Controller
     {
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
-        
+        \THCFrame\Core\Core::getLogger()->log(serialize($_SERVER));
         try {
             require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-            $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host, $this->getConfig()->smtp->port, $this->getConfig()->smtp->secured)
-                    ->setUsername($this->getConfig()->smtp->username)
-                    ->setPassword($this->getConfig()->smtp->password);
+            $transport = \Swift_MailTransport::newInstance(null);
             $mailer = \Swift_Mailer::newInstance($transport);
 
             $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
@@ -378,8 +376,9 @@ class SystemController extends Controller
             $regEmail = \Swift_Message::newInstance()
                     ->setSubject('Hastrman - Test')
                     ->setFrom('registrace@hastrman.cz')
-                    ->setTo('hodan.tomas@gmail.com')
+                    ->setTo(array('hodan.tomas@gmail.com'))
                     ->setBody($emailBody, 'text/html');
+            
             $mailer->send($regEmail);
         } catch (\Exception $ex) {
             \THCFrame\Core\Core::getLogger()->log($ex->getMessage());

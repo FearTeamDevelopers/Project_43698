@@ -140,9 +140,7 @@ class UserController extends Controller
                 if ($verifyEmail) {
                     try {
                         require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                        $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host, $this->getConfig()->smtp->port, $this->getConfig()->smtp->secured)
-                                ->setUsername($this->getConfig()->smtp->username)
-                                ->setPassword($this->getConfig()->smtp->password);
+                        $transport = \Swift_MailTransport::newInstance(null);
                         $mailer = \Swift_Mailer::newInstance($transport);
 
                         $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
