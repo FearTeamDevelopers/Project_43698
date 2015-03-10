@@ -6,6 +6,7 @@ use THCFrame\Events\Events as Events;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Core\StringMethods;
+use THCFrame\Request\RequestMethods;
 
 /**
  * Module specific controller class extending framework controller class

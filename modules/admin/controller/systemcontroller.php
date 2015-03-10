@@ -37,7 +37,7 @@ class SystemController extends Controller
         if (RequestMethods::post('clearCache')) {
             Event::fire('admin.log', array('success'));
             $this->getCache()->clearCache();
-            
+
             $view->successMessage('Cache has been successfully deleted');
             self::redirect('/admin/system/');
         }
@@ -63,13 +63,13 @@ class SystemController extends Controller
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             $view->errorMessage($ex->getMessage());
-            Event::fire('admin.log', array('fail', 'Database backup', 
-                'Error: '.$ex->getMessage()));
+            Event::fire('admin.log', array('fail', 'Database backup',
+                'Error: ' . $ex->getMessage()));
         }
 
         self::redirect('/admin/system/');
     }
-    
+
     /**
      * Copy live db into backup db
      * 
@@ -159,63 +159,63 @@ class SystemController extends Controller
             xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">'. PHP_EOL;
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">' . PHP_EOL;
 
         $xmlEnd = '</urlset>';
 
         $host = RequestMethods::server('HTTP_HOST');
-        
+
         $pageContent = \App\Model\PageContentModel::all(array('active = ?' => true));
         $redirects = RedirectModel::all(array('module = ?' => 'app'));
         $news = \App\Model\NewsModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
         $reports = \App\Model\ReportModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
         $actions = \App\Model\ActionModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
-        
+
         $redirectArr = array();
-        if(null !== $redirects){
-            foreach ($redirects as $redirect){
+        if (null !== $redirects) {
+            foreach ($redirects as $redirect) {
                 $redirectArr[$redirect->getToPath()] = $redirect->getFromPath();
             }
         }
-        
+
         $articlesXml = '';
-        $pageContentXml = "<url><loc>http://{$host}</loc></url>". PHP_EOL
+        $pageContentXml = "<url><loc>http://{$host}</loc></url>" . PHP_EOL
                 . "<url><loc>http://{$host}/akce</loc></url>"
                 . "<url><loc>http://{$host}/archivakci</loc></url>"
                 . "<url><loc>http://{$host}/reportaze</loc></url>"
                 . "<url><loc>http://{$host}/novinky</loc></url>"
                 . "<url><loc>http://{$host}/galerie</loc></url>"
-                . "<url><loc>http://{$host}/bazar</loc></url>". PHP_EOL;
+                . "<url><loc>http://{$host}/bazar</loc></url>" . PHP_EOL;
 
         if (null !== $pageContent) {
             foreach ($pageContent as $content) {
-                $pageUrl = '/page/'.$content->getUrlKey();
-                if(array_key_exists($pageUrl, $redirectArr)){
+                $pageUrl = '/page/' . $content->getUrlKey();
+                if (array_key_exists($pageUrl, $redirectArr)) {
                     $pageUrl = $redirectArr[$pageUrl];
                 }
-                $pageContentXml .= "<url><loc>http://{$host}{$pageUrl}</loc></url>". PHP_EOL;
-            }
-        }
-        
-        if(null !== $news){
-            foreach ($news as $_news){
-                $articlesXml .= "<url><loc>http://{$host}/novinky/r/{$_news->getUrlKey()}</loc></url>". PHP_EOL;
-            }
-        }
-        
-        if(null !== $actions){
-            foreach ($actions as $action){
-                $articlesXml .= "<url><loc>http://{$host}/akce/r/{$action->getUrlKey()}</loc></url>". PHP_EOL;
-            }
-        }
-        
-        if(null !== $reports){
-            foreach ($reports as $report){
-                $articlesXml .= "<url><loc>http://{$host}/reportaze/r/{$report->getUrlKey()}</loc></url>". PHP_EOL;
+                $pageContentXml .= "<url><loc>http://{$host}{$pageUrl}</loc></url>" . PHP_EOL;
             }
         }
 
-        file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml. $xmlEnd);
+        if (null !== $news) {
+            foreach ($news as $_news) {
+                $articlesXml .= "<url><loc>http://{$host}/novinky/r/{$_news->getUrlKey()}</loc></url>" . PHP_EOL;
+            }
+        }
+
+        if (null !== $actions) {
+            foreach ($actions as $action) {
+                $articlesXml .= "<url><loc>http://{$host}/akce/r/{$action->getUrlKey()}</loc></url>" . PHP_EOL;
+            }
+        }
+
+        if (null !== $reports) {
+            foreach ($reports as $report) {
+                $articlesXml .= "<url><loc>http://{$host}/reportaze/r/{$report->getUrlKey()}</loc></url>" . PHP_EOL;
+            }
+        }
+
+        file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml . $xmlEnd);
 
         Event::fire('admin.log', array('success'));
         $view->successMessage('Soubor sitemap.xml byl aktualizován');
@@ -252,7 +252,7 @@ class SystemController extends Controller
             Kupujte jen takovou výstroj, která tato kriteria splňuje! Pamatujte, že cena je až 
             druhotným ukazatelem ... nebo váš život stojí za pár ušetřených stokorun?';
 
-        $LARGE_TEXT = str_replace('h1','h2',$content->getBody());
+        $LARGE_TEXT = str_replace('h1', 'h2', $content->getBody());
         unset($content);
 
         $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
@@ -286,7 +286,7 @@ class SystemController extends Controller
                 $date = new \DateTime();
                 $date->add(new \DateInterval('P' . (int) $i . 'D'));
                 $startDate = $date->format('Y-m-d');
-            
+
                 $action = new \App\Model\ActionModel(array(
                     'title' => 'Action-' . $i . '-' . time(),
                     'userId' => 1,
@@ -346,12 +346,44 @@ class SystemController extends Controller
     public function linecounter()
     {
         $view = $this->getActionView();
-        
+
         $counter = new LineCounter();
         $totalLines = $counter->countLines(APP_PATH);
         $fileCounter = $counter->getFileCounter();
-        
+
         $view->set('totallines', $totalLines)
                 ->set('filecounter', $fileCounter);
     }
+
+    /**
+     * @before _cron
+     */
+    public function testSendEmail()
+    {
+        $this->_willRenderActionView = false;
+        $this->_willRenderLayoutView = false;
+        
+        try {
+            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+            $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host, $this->getConfig()->smtp->port, $this->getConfig()->smtp->secured)
+                    ->setUsername($this->getConfig()->smtp->username)
+                    ->setPassword($this->getConfig()->smtp->password);
+            $mailer = \Swift_Mailer::newInstance($transport);
+
+            $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
+                    . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
+                    . '<a href="http://hastrman.cz/">Odkaz na hastrmana</a><br/><br/>'
+                    . 'S pozdravem,<br/>Hastrmani';
+
+            $regEmail = \Swift_Message::newInstance()
+                    ->setSubject('Hastrman - Test')
+                    ->setFrom('registrace@hastrman.cz')
+                    ->setTo('hodan.tomas@gmail.com')
+                    ->setBody($emailBody, 'text/html');
+            $mailer->send($regEmail);
+        } catch (\Exception $ex) {
+            \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
+        }
+    }
+
 }

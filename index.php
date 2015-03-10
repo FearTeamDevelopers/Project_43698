@@ -5,6 +5,8 @@ if(preg_match('#^.*\.dev$#i',$_SERVER['SERVER_NAME'])){
     defined('ENV')? null : define('ENV', 'dev');
 }elseif(preg_match('#^.*\.fear-team\.cz$#i', $_SERVER['SERVER_NAME'])){
     defined('ENV')? null : define('ENV', 'qa');
+}elseif(preg_match('#^dev\..*\.cz$#i', $_SERVER['SERVER_NAME'])){
+    defined('ENV')? null : define('ENV', 'qa');
 }else{
     defined('ENV')? null : define('ENV', 'live');
 }

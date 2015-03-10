@@ -155,7 +155,9 @@ class IndexController extends Controller
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $database = Registry::get('database')->get('search');
+        $searchDb = Registry::get('database')->get('search');
+        $mainDb = Registry::get('database')->get('main');
+        
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, 'cron', 0, ?, now(), default)";
         $prepareIdSql = "ALTER TABLE tb_searchindex auto_increment = 1";
@@ -163,15 +165,15 @@ class IndexController extends Controller
 
         $starttime = microtime(true);
 
-        $database->execute($truncateSql);
-        $database->execute($prepareIdSql);
+        $searchDb->execute($truncateSql);
+        $searchDb->execute($prepareIdSql);
         
         foreach ($this->_textSource as $table => $variables) {
             $sql = "SELECT " . implode(', ', $variables['columns'])
                     . " FROM " . $table
                     . " WHERE " . implode(' AND ', $variables['where']);
 
-            $articles = $database->execute($sql);
+            $articles = $mainDb->execute($sql);
             $wordsCount = 0;
 
             if (null !== $articles) {
@@ -201,7 +203,7 @@ class IndexController extends Controller
                         $wordsCount++;
                         $weight = $this->_getWeight($word, $occ, $title, $article['keywords'], $path);
 
-                        $database->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
+                        $searchDb->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
                     }
 
                     unset($words);
@@ -213,7 +215,7 @@ class IndexController extends Controller
                 continue;
             }
 
-            $database->execute($insertSqlLog, $variables['model'], $table, $wordsCount);
+            $searchDb->execute($insertSqlLog, $variables['model'], $table, $wordsCount);
 
             unset($table);
             unset($wordsCount);
@@ -246,7 +248,9 @@ class IndexController extends Controller
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $database = Registry::get('database')->get('search');
+        $searchDb = Registry::get('database')->get('search');
+        $mainDb = Registry::get('database')->get('main');
+        
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 1, ?, now(), default)";
         $deleteSql = "DELETE FROM tb_searchindex WHERE sourceModel=?";
@@ -258,8 +262,8 @@ class IndexController extends Controller
                 . " FROM " . $table
                 . " WHERE " . implode(' AND ', $variables['where']);
 
-        $database->execute($deleteSql, $variables['model']);
-        $articles = $database->execute($selectSql);
+        $searchDb->execute($deleteSql, $variables['model']);
+        $articles = $mainDb->execute($selectSql);
         $wordsCount = 0;
 
         if (null !== $articles) {
@@ -290,7 +294,7 @@ class IndexController extends Controller
 
                     $weight = $this->_getWeight($word, $occ, $title, $article['keywords'], $path);
 
-                    $database->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
+                    $searchDb->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
                 }
 
                 unset($words);
@@ -299,7 +303,7 @@ class IndexController extends Controller
                 unset($article);
             }
 
-            $database->execute($insertSqlLog, $variables['modelLabel'], $table, $userName, $wordsCount);
+            $searchDb->execute($insertSqlLog, $variables['modelLabel'], $table, $userName, $wordsCount);
 
             unset($wordsCount);
         } else {

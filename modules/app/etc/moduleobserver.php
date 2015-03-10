@@ -29,6 +29,14 @@ class ModuleObserver implements SubscriberInterface
     public function appLog()
     {
         $params = func_get_args();
+        $security = Registry::get('security');
+        $user = $security->getUser();
+        
+        if(null === $user){
+            $userId = 'annonymous';
+        }else{
+            $userId = $user->getWholeName();
+        }
 
         $router = Registry::get('router');
         $route = $router->getLastRoute();
@@ -50,7 +58,7 @@ class ModuleObserver implements SubscriberInterface
         }
 
         $log = new \Admin\Model\AdminLogModel(array(
-            'userId' => 'annonymous',
+            'userId' => $userId,
             'module' => $module,
             'controller' => $controller,
             'action' => $action,
