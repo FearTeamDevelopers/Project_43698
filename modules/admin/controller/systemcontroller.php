@@ -355,34 +355,4 @@ class SystemController extends Controller
                 ->set('filecounter', $fileCounter);
     }
 
-    /**
-     * @before _cron
-     */
-    public function testSendEmail()
-    {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
-        \THCFrame\Core\Core::getLogger()->log(serialize($_SERVER));
-        try {
-            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-            $transport = \Swift_MailTransport::newInstance(null);
-            $mailer = \Swift_Mailer::newInstance($transport);
-
-            $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
-                    . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
-                    . '<a href="http://hastrman.cz/">Odkaz na hastrmana</a><br/><br/>'
-                    . 'S pozdravem,<br/>Hastrmani';
-
-            $regEmail = \Swift_Message::newInstance()
-                    ->setSubject('Hastrman - Test')
-                    ->setFrom('registrace@hastrman.cz')
-                    ->setTo(array('hodan.tomas@gmail.com'))
-                    ->setBody($emailBody, 'text/html');
-            
-            $mailer->send($regEmail);
-        } catch (\Exception $ex) {
-            \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
-        }
-    }
-
 }
