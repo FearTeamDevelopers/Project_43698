@@ -171,9 +171,7 @@ class Controller extends BaseController
      */
     public function _cron()
     {
-        $view = $this->getActionView();
-
-        if (null !== RequestMethods::server('HTTP_HOST')) {
+        if (!preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT'))) {
             throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
@@ -184,7 +182,7 @@ class Controller extends BaseController
      */
     protected function isCron()
     {
-        if (RequestMethods::server('HTTP_HOST') === null) {
+        if (preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT'))) {
             return true;
         } else {
             return false;

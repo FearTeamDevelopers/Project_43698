@@ -67,7 +67,7 @@ class IndexController extends Controller
             'identifier' => 'uniqueKey',
             'columns' => array('uniqueKey', 'keywords', 'content', 'title', 'created'),
             'textColumns' => array('keywords', 'content'),
-            'previewColumns' => array('', 'created'))
+            'previewColumns' => array('null', 'created'))
     );
 
     /**
@@ -193,7 +193,10 @@ class IndexController extends Controller
 
                     $path = $variables['path'] . $article[$variables['identifier']];
                     $title = $article['title'];
-                    $rowDesc = $article[$variables['previewColumns'][0]];
+                    $rowDesc = '';
+                    if($variables['previewColumns'][0] != 'null'){
+                        $rowDesc = $article[$variables['previewColumns'][0]];
+                    }
                     $rowCreated = $article[$variables['previewColumns'][1]];
 
                     foreach ($words as $word => $occ) {
@@ -283,7 +286,10 @@ class IndexController extends Controller
 
                 $path = $variables['path'] . $article[$variables['identifier']];
                 $title = $article['title'];
-                $rowDesc = $article[$variables['previewColumns'][0]];
+                $rowDesc = '';
+                if($variables['previewColumns'][0] != 'null'){
+                    $rowDesc = $article[$variables['previewColumns'][0]];
+                }
                 $rowCreated = $article[$variables['previewColumns'][1]];
 
                 foreach ($words as $word => $occ) {
