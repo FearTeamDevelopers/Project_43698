@@ -508,7 +508,7 @@ jQuery(document).ready(function () {
             showTooltipLeftMenu();
 
             if (jQuery(this).width() <= 580) {
-                jQuery('.stdtable').wrap('<div class="tablewrapper"></div>');
+                jQuery('.stdtable, .stdtable2').wrap('<div class="tablewrapper"></div>');
 
                 if (jQuery('.headerinner2').length == 0)
                     insertHeaderInner2();

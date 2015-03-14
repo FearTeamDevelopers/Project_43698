@@ -5,6 +5,32 @@
 
 <div class="content">
     <div class="widgetbox">
+        {if !empty($concepts)}
+            <div class="contenttitle radiusbottom0">
+                <h2 class="table"><span>Koncepty</span></h2>
+            </div><!--contenttitle-->
+            <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+                <colgroup>
+                    <col class="con0" /> <col class="con1" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <td class="head0">Vytvořen</td>
+                        <td class="head1">Poslední změna</td>
+                        <td class="head0">&nbsp;</td>
+                    </tr>
+                </thead>
+                {foreach $concept in $concepts}
+                <tr>
+                    <td>{echo $concept->getCreated()}</td>
+                    <td>{echo $concept->getModified()}</td>
+                    <td><a href="/admin/action/add/{echo $concept->getId()}" class="btn btn3 btn_pencil" title="Načíst concept"></a>
+                        <a href="/admin/concept/delete/{echo $concept->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat concept"></a></td>
+                </tr>
+                {/foreach}
+            </table>
+        {/if}
+        
         <div class="contenttitle radiusbottom0">
             <h2 class="table"><span>Základní info</span></h2>
         </div><!--contenttitle-->
@@ -13,6 +39,8 @@
             <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
             <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
+            <input type="hidden" name="conceptid" id="conceptid" value="{echo $conceptid}" />
+            <input type="hidden" name="concepttype" id="concepttype" value="3" />
             <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
 
             <p>

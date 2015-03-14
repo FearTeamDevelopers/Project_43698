@@ -14,6 +14,8 @@
         <form class="stdform stdform2 cropit-form" method="post" action="#" enctype="multipart/form-data">
             <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+            <input type="hidden" name="conceptid" id="conceptid" value="{echo isset($conceptid) ? $conceptId:0}" />
+            <input type="hidden" name="concepttype" id="concepttype" value="3" />
             <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
             
             <p>

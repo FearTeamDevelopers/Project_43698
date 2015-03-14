@@ -1,6 +1,6 @@
 section.wrapper.singlePage
    .row.container
-      a(href!="/admin/action/{echo $act}/") Zpět do administrace
+      a(href!="/admin/action/{echo $act}/{echo $action->getId()}") Zpět do administrace
       br
       header
          h1 {echo $action->getTitle()}

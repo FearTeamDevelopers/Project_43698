@@ -60,9 +60,9 @@ $opts = array(
     'plugin' => array(
         'AutoResize' => array(
         'enable' => true,
-        'maxWidth'  => 1920,
-        'maxHeight'  => 1080,
-        'quality' => 80
+        'maxWidth'  => 1024,
+        'maxHeight'  => 1024,
+        'quality' => 75
         )
     ),
     'roots' => array(

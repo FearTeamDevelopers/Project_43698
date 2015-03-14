@@ -10,6 +10,10 @@ use THCFrame\Model\Model;
 class ConceptModel extends Model
 {
 
+    const CONCEPT_TYPE_ACTION = 1;
+    const CONCEPT_TYPE_NEWS = 2;
+    const CONCEPT_TYPE_REPORT = 3;
+    
     /**
      * @column
      * @readwrite
@@ -31,10 +35,20 @@ class ConceptModel extends Model
     /**
      * @column
      * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     * @label autor
+     */
+    protected $_type;
+
+    /**
+     * @column
+     * @readwrite
      * @type text
      * @length 150
      * 
-     * @validate required, alphanumeric, max(150)
+     * @validate alphanumeric, max(150)
      * @label nazev
      */
     protected $_title;
@@ -45,7 +59,7 @@ class ConceptModel extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html
+     * @validate html
      * @label teaser
      */
     protected $_shortBody;
@@ -56,7 +70,7 @@ class ConceptModel extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, html
+     * @validate html
      * @label text
      */
     protected $_body;

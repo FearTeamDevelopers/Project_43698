@@ -15,7 +15,7 @@ class Image extends Base
     /**
      * @readwrite
      */
-    protected $_quality = 80;
+    protected $_quality = 75;
 
     /**
      * @readwrite

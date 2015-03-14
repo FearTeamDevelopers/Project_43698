@@ -316,4 +316,13 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Show help for user section
+     * 
+     * @before _secured, _participant
+     */
+    public function help()
+    {
+        
+    }
 }

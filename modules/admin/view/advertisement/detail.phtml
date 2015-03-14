@@ -62,7 +62,7 @@
                         <img src="{echo $photo->imgThumb}" alt="" height="140px" />
                     </a>
                     <span>
-                        <a href="/admin/advertisement/deleteadimage/{echo $photo->id}" class="delete" value="Smazat"></a>
+                        {if $isAdmin}<a href="/admin/advertisement/deleteadimage/{echo $photo->id}" class="delete" value="Smazat"></a>{/if}
                     </span>
                 </li>
                 {/foreach}
