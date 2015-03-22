@@ -56,10 +56,19 @@ class ActionController extends Controller
      */
     private function _createObject()
     {
-        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        if (!$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array('This title is already used');
+        for ($i = 1; $i <= 50; $i++) {
+            if ($this->_checkUrlKey($urlKeyCh)) {
+                break;
+            } else {
+                $urlKeyCh = $urlKey . '-' . $i;
+            }
+
+            if ($i == 50) {
+                $this->_errors['title'] = array('Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.');
+                break;
+            }
         }
 
         $autoApprove = Registry::get('configuration')->action_autopublish;
@@ -73,7 +82,7 @@ class ActionController extends Controller
             'title' => RequestMethods::post('title'),
             'userId' => $this->getUser()->getId(),
             'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKey,
+            'urlKey' => $urlKeyCh,
             'approved' => $autoApprove,
             'archive' => 0,
             'shortBody' => $shortText,
@@ -282,6 +291,7 @@ class ActionController extends Controller
             $action = $this->_editObject($action);
 
             if (empty($this->_errors) && $action->validate()) {
+                \Admin\Model\ActionHistoryModel::createFromSource($action);
                 $action->save();
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));

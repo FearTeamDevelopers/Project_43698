@@ -1,10 +1,13 @@
 section.wrapper.akce.singlePage
    header.row
-      h2 Archiv akcí
+      h2 Proběhlé akce
    section.row.container
       |{if !empty($actions)}
       |{foreach $action in $actions}
       article
+         .date
+            .den {echo \App\Helper\DateFormater::g2dn($action->getStartDate())}
+            .mesic {echo \App\Helper\DateFormater::g2mn($action->getStartDate())}
          header
             h3 {echo $action->getTitle()}
             span 

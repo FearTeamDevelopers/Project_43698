@@ -36,7 +36,7 @@ class ActionController extends Controller
                 ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
                 ->set('metaogtype', 'article');
     }
-    
+
     /**
      * Get list of actions
      * 
@@ -49,10 +49,10 @@ class ActionController extends Controller
 
         $articlesPerPage = $this->getConfig()->actions_per_page;
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
-        
+
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/akce';
         } else {
@@ -60,7 +60,7 @@ class ActionController extends Controller
         }
 
         $content = $this->getCache()->get('akce-' . $page);
-        
+
         if (null !== $content) {
             $actions = $content;
         } else {
@@ -108,8 +108,9 @@ class ActionController extends Controller
         $this->_checkMetaData($layoutView, $action);
         $view->set('action', $action);
     }
-    
+
     /**
+     * Show archivated actions
      * 
      * @param type $page
      */
@@ -120,22 +121,22 @@ class ActionController extends Controller
 
         $articlesPerPage = $this->getConfig()->actions_per_page;
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
-        
+
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/archivakci';
         } else {
             $canonical = 'http://' . $this->getServerHost() . '/archivakci/p/' . $page;
         }
-        
-        $actions = \App\Model\ActionModel::fetchOldWithLimit($articlesPerPage, $page);
+
+        $actions = \App\Model\ActionModel::fetchArchivatedWithLimit($articlesPerPage, $page);
 
         $actionCount = \App\Model\ActionModel::count(
                         array('active = ?' => true,
                             'approved = ?' => 1,
-                            'startDate <= ?' => date('Y-m-d', time()))
+                            'archive = ?' => true)
         );
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
@@ -152,6 +153,50 @@ class ActionController extends Controller
     }
 
     /**
+     * Show old but not archivated actions
+     * 
+     * @param type $page
+     */
+    public function oldActions($page = 1)
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $articlesPerPage = $this->getConfig()->actions_per_page;
+
+        if ($page <= 0) {
+            $page = 1;
+        }
+
+        if ($page == 1) {
+            $canonical = 'http://' . $this->getServerHost() . '/probehleakce';
+        } else {
+            $canonical = 'http://' . $this->getServerHost() . '/probehleakce/p/' . $page;
+        }
+
+        $actions = \App\Model\ActionModel::fetchOldWithLimit($articlesPerPage, $page);
+
+        $actionCount = \App\Model\ActionModel::count(
+                        array('active = ?' => true,
+                            'approved = ?' => 1,
+                            'archive = ?' => false,
+                            'startDate <= ?' => date('Y-m-d', time()))
+        );
+
+        $actionsPageCount = ceil($actionCount / $articlesPerPage);
+
+        $this->_pagerMetaLinks($actionsPageCount, $page, '/probehleakce/p/');
+
+        $view->set('actions', $actions)
+                ->set('pagerpathprefix', '/probehleakce')
+                ->set('currentpage', $page)
+                ->set('pagecount', $actionsPageCount);
+
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Akce - Proběhlé');
+    }
+
+    /**
      * Preview of action created in administration but not saved into db
      * 
      * @before _secured, _participant
@@ -160,18 +205,19 @@ class ActionController extends Controller
     {
         $view = $this->getActionView();
         $session = Registry::get('session');
-        
+
         $action = $session->get('actionPreview');
 
-        if(null === $action){
+        if (null === $action) {
             $this->_willRenderActionView = false;
             $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/admin/action/');
         }
-        
+
         $act = RequestMethods::get('action');
-        
+
         $view->set('action', $action)
-            ->set('act', $act);
+                ->set('act', $act);
     }
+
 }

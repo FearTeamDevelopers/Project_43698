@@ -356,7 +356,7 @@ class Mysqldump extends Base
         }
 
         if (null !== $dbId) {
-            if (array_key_exists($dbId, $dbIdents)) {
+            if (in_array($dbId, $dbIdents)) {
                 $db = $this->_connectionHandler->get($dbId);
                 $this->writeData($db, $dbId);
 

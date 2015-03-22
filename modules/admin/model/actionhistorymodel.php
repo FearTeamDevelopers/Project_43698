@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Model;
+namespace Admin\Model;
 
 use THCFrame\Model\Model;
+use THCFrame\Registry\Registry;
+use THCFrame\Events\Events as Event;
 
 /**
  * 
  */
-class NewsModel extends Model
+class ActionHistoryModel extends Model
 {
 
     /**
      * @readwrite
      */
-    protected $_alias = 'nw';
+    protected $_alias = 'ach';
 
     /**
      * @column
@@ -29,9 +31,29 @@ class NewsModel extends Model
      * @type integer
      * 
      * @validate numeric, max(8)
-     * @label autor
+     * @label id zdroje
      */
-    protected $_userId;
+    protected $_originId;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     * @label id autora
+     */
+    protected $_createdBy;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     * @label id editora
+     */
+    protected $_editedBy;
 
     /**
      * @column
@@ -133,9 +155,53 @@ class NewsModel extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 250
+     * @length 12
      * 
-     * @validate alphanumeric, max(250)
+     * @validate date, max(12)
+     * @label datum začátek
+     */
+    protected $_startDate;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 12
+     * 
+     * @validate date, max(12)
+     * @label datum konec
+     */
+    protected $_endDate;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 10
+     * 
+     * @validate time, max(10)
+     * @label čas začátek
+     */
+    protected $_startTime;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 10
+     * 
+     * @validate time, max(10)
+     * @label čas konec
+     */
+    protected $_endTime;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 350
+     * 
+     * @validate alphanumeric, max(350)
      * @label keywords
      */
     protected $_keywords;
@@ -161,7 +227,7 @@ class NewsModel extends Model
      * @label meta-popis
      */
     protected $_metaDescription;
-
+    
     /**
      * @column
      * @readwrite
@@ -173,21 +239,6 @@ class NewsModel extends Model
     protected $_created;
 
     /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_modified;
-
-    /**
-     * @readwrite
-     */
-    protected $_fbLikeUrl;
-    
-    /**
      * 
      */
     public function preSave()
@@ -197,14 +248,7 @@ class NewsModel extends Model
 
         if (empty($this->$raw)) {
             $this->setCreated(date('Y-m-d H:i:s'));
-            $this->setActive(true);
         }
-        
-        $shortText = preg_replace('/https:/i', 'http:', $this->getShortBody());
-        $text = preg_replace('/https:/i', 'http:', $this->getBody());
-        $this->setShortBody($shortText);
-        $this->setBody($text);
-        $this->setModified(date('Y-m-d H:i:s'));
     }
 
     /**
@@ -213,8 +257,8 @@ class NewsModel extends Model
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('nw.*'))
-                ->join('tb_user', 'nw.userId = us.id', 'us', 
+        $query = self::getQuery(array('ac.*'))
+                ->join('tb_user', 'ac.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'));
         
         return self::initialize($query);
@@ -222,58 +266,56 @@ class NewsModel extends Model
 
     /**
      * Called from admin module
+     * 
      * @return array
      */
-    public static function fetchWithLimit($limit = 10, $page = 1)
+    public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('nw.*'))
-                ->join('tb_user', 'nw.userId = us.id', 'us', 
+        $query = self::getQuery(array('ac.*'))
+                ->join('tb_user', 'ac.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
-                ->order('nw.created', 'desc')
-                ->limit((int)$limit, $page);
+                ->order('ac.created', 'desc')
+                ->limit((int)$limit);
 
         return self::initialize($query);
     }
-
-    /**
-     * Called from app module
-     * @param type $limit
-     * @return type
-     */
-    public static function fetchActiveWithLimit($limit = 10, $page = 1)
-    {
-        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
-                array('rank' => 'desc','created' => 'desc'), 
-                $limit, $page
-        );
-        
-        return $news;
-    }
     
     /**
-     * Called from app module
-     * @param type $limit
-     * @return type
+     * 
+     * @param \App\Model\ActionModel $action
      */
-    public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
+    public static function createFromSource(\App\Model\ActionModel $action)
     {
-        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
-                array('rank' => 'desc', 'created' => 'desc'), 
-                $limit, $page
-        );
+        $sec = Registry::get('security');
+        $user = $sec->getUser();
         
-        return $news;
-    }
-    
-    /**
-     * Called from app module
-     * @param type $urlKey
-     * @return type
-     */
-    public static function fetchByUrlKey($urlKey)
-    {
-        return self::first(array('active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey));
+        $historyRecord = new self(array(
+            'originId' => $action->getId(),
+            'createdBy' => $action->getUserId(),
+            'editedBy' => $user->getId(),
+            'title' => $action->getTitle(),
+            'userAlias' => $action->getUserAlias(),
+            'urlKey' => $action->getUrlKey(),
+            'active' => $action->getActive(),
+            'approved' => $action->getApproved(),
+            'archive' => $action->getArchive(),
+            'shortBody' => $action->getShortBody(),
+            'body' => $action->getBody(),
+            'rank' => $action->getRank(),
+            'startDate' => $action->getStartDate(),
+            'endDate' => $action->getEndDate(),
+            'startTime' => $action->getStartTime(),
+            'endTime' => $action->getEndTime(),
+            'keywords' => $action->getKeywords(),
+            'metaTitle' => $action->getMetaTitle(),
+            'metaDescription' => $action->getMetaDescription()
+        ));
+        
+        if($historyRecord->validate()){
+            $id = $historyRecord->save();
+            Event::fire('admin.log', array('success', 'Action history id: '. $id));
+        }else{
+            Event::fire('admin.log', array('fail', 'Action history errors: ' . json_encode($historyRecord->getErrors())));
+        }
     }
 }

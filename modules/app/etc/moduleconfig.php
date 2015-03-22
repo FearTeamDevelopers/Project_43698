@@ -160,6 +160,13 @@ class ModuleConfig extends Module
             'args' => ':page'
         ),
         array(
+            'pattern' => '/probehleakce/p/:page',
+            'module' => 'app',
+            'controller' => 'action',
+            'action' => 'oldactions',
+            'args' => ':page'
+        ),
+        array(
             'pattern' => '/reportaze/p/:page',
             'module' => 'app',
             'controller' => 'report',
@@ -174,6 +181,13 @@ class ModuleConfig extends Module
             'args' => ':urlkey'
         ),
         array(
+            'pattern' => '/archivreportazi/p/:page',
+            'module' => 'app',
+            'controller' => 'report',
+            'action' => 'archive',
+            'args' => ':page'
+        ),
+        array(
             'pattern' => '/novinky/p/:page',
             'module' => 'app',
             'controller' => 'news',
@@ -186,6 +200,13 @@ class ModuleConfig extends Module
             'controller' => 'news',
             'action' => 'detail',
             'args' => ':urlkey'
+        ),
+        array(
+            'pattern' => '/archivnovinek/p/:page',
+            'module' => 'app',
+            'controller' => 'news',
+            'action' => 'archive',
+            'args' => ':page'
         ),
         array(
             'pattern' => '/bazar/filtr/p/:page',

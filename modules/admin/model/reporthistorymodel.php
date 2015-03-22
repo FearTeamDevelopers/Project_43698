@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Model;
+namespace Admin\Model;
 
 use THCFrame\Model\Model;
+use THCFrame\Registry\Registry;
+use THCFrame\Events\Events as Event;
 
 /**
  * 
  */
-class ReportModel extends Model
+class ReportHistoryModel extends Model
 {
-    
+
     /**
      * @readwrite
      */
-    protected $_alias = 'rp';
+    protected $_alias = 'rph';
 
     /**
      * @column
@@ -29,9 +31,29 @@ class ReportModel extends Model
      * @type integer
      * 
      * @validate numeric, max(8)
-     * @label autor
+     * @label id zdroje
      */
-    protected $_userId;
+    protected $_originId;
+
+    /**
+     * @column
+     * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     * @label id autora
+     */
+    protected $_createdBy;
+
+    /**
+     * @column
+     * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     * @label id editora
+     */
+    protected $_editedBy;
 
     /**
      * @column
@@ -118,7 +140,7 @@ class ReportModel extends Model
      * @label text
      */
     protected $_body;
-    
+
     /**
      * @column
      * @readwrite
@@ -217,21 +239,6 @@ class ReportModel extends Model
     protected $_created;
 
     /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_modified;
-
-    /**
-     * @readwrite
-     */
-    protected $_fbLikeUrl;
-
-    /**
      * 
      */
     public function preSave()
@@ -241,14 +248,7 @@ class ReportModel extends Model
 
         if (empty($this->$raw)) {
             $this->setCreated(date('Y-m-d H:i:s'));
-            $this->setActive(true);
         }
-        
-        $shortText = preg_replace('/https:/i', 'http:', $this->getShortBody());
-        $text = preg_replace('/https:/i', 'http:', $this->getBody());
-        $this->setShortBody($shortText);
-        $this->setBody($text);
-        $this->setModified(date('Y-m-d H:i:s'));
     }
 
     /**
@@ -260,7 +260,7 @@ class ReportModel extends Model
         $query = self::getQuery(array('rp.*'))
                 ->join('tb_user', 'rp.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'));
-        
+
         return self::initialize($query);
     }
 
@@ -274,55 +274,50 @@ class ReportModel extends Model
                 ->join('tb_user', 'rp.userId = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
                 ->order('rp.created', 'desc')
-                ->limit((int)$limit);
+                ->limit((int) $limit);
 
         return self::initialize($query);
     }
-    
+
     /**
-     * Called from app module
-     * @param type $limit
-     * @return type
+     * 
+     * @param \App\Model\ReportModel $report
      */
-    public static function fetchActiveWithLimit($limit = 10, $page = 1)
+    public static function createFromSource(\App\Model\ReportModel $report)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 
-                        'imgMain', 'imgThumb', 'photoName'), 
-                array('rank' => 'desc','created' => 'desc'), 
-                $limit, $page
-        );
-        
-        return $reports;
+        $sec = Registry::get('security');
+        $user = $sec->getUser();
+
+        $historyRecord = new self(array(
+            'originId' => $report->getId(),
+            'createdBy' => $report->getUserId(),
+            'editedBy' => $user->getId(),
+            'title' => $report->getTitle(),
+            'userAlias' => $report->getUserAlias(),
+            'urlKey' => $report->getUrlKey(),
+            'active' => $report->getActive(),
+            'approved' => $report->getApproved(),
+            'archive' => $report->getArchive(),
+            'shortBody' => $report->getShortBody(),
+            'body' => $report->getBody(),
+            'rank' => $report->getRank(),
+            'keywords' => $report->getKeywords(),
+            'metaTitle' => $report->getMetaTitle(),
+            'metaDescription' => $report->getMetaDescription(),
+            'metaImage' => $report->getMetaImage(),
+            'photoName' => $report->getPhotoName(),
+            'imgMain' => $report->getImgMain(),
+            'imgThumb' => $report->getImgThumb()
+        ));
+
+        if ($historyRecord->validate()) {
+            $id = $historyRecord->save();
+            Event::fire('admin.log', array('success', 'Report history id: ' . $id));
+        } else {
+            Event::fire('admin.log', array('fail', 'Report history errors: ' . json_encode($historyRecord->getErrors())));
+        }
     }
-    
-    /**
-     * Called from app module
-     * @param type $limit
-     * @return type
-     */
-    public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
-    {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 
-                    'imgMain', 'imgThumb', 'photoName'), 
-                array('rank' => 'desc', 'created' => 'desc'), 
-                $limit, $page
-        );
-        
-        return $reports;
-    }
-    
-    /**
-     * Called from app module
-     * @param type $urlKey
-     * @return type
-     */
-    public static function fetchByUrlKey($urlKey)
-    {
-        return self::first(array('active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey));
-    }
-    
+
     /**
      * 
      * @return type

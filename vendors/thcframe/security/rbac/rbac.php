@@ -11,7 +11,6 @@ class Rbac
 {
 
     private $_permissionList = array();
-    private $_resourceList = array();
     private $_roleList = array();
     private $_graph;
     private static $_instance = null;

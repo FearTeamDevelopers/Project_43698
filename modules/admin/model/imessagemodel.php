@@ -5,15 +5,16 @@ namespace Admin\Model;
 use THCFrame\Model\Model;
 
 /**
- * Concept ORM class
+ * 
  */
-class ConceptModel extends Model
+class ImessageModel extends Model
 {
 
-    const CONCEPT_TYPE_ACTION = 1;
-    const CONCEPT_TYPE_NEWS = 2;
-    const CONCEPT_TYPE_REPORT = 3;
-    
+    /**
+     * @readwrite
+     */
+    protected $_alias = 'ims';
+
     /**
      * @column
      * @readwrite
@@ -35,12 +36,34 @@ class ConceptModel extends Model
     /**
      * @column
      * @readwrite
-     * @type integer
+     * @type text
+     * @length 20
      * 
-     * @validate numeric, max(8)
+     * @validate alpha, max(20)
      * @label typ
      */
-    protected $_type;
+    protected $_messageType;
+
+    /**
+     * @column
+     * @readwrite
+     * @type boolean
+     * @index
+     * 
+     * @validate max(3)
+     */
+    protected $_active;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 80
+     * 
+     * @validate alphanumeric, max(80)
+     * @label alias autora
+     */
+    protected $_userAlias;
 
     /**
      * @column
@@ -48,7 +71,7 @@ class ConceptModel extends Model
      * @type text
      * @length 150
      * 
-     * @validate alphanumeric, max(150)
+     * @validate required, alphanumeric, max(150)
      * @label nazev
      */
     protected $_title;
@@ -59,18 +82,7 @@ class ConceptModel extends Model
      * @type text
      * @length 256
      * 
-     * @validate html
-     * @label teaser
-     */
-    protected $_shortBody;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate html
+     * @validate required, html
      * @label text
      */
     protected $_body;
@@ -79,34 +91,23 @@ class ConceptModel extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 250
+     * @length 12
      * 
-     * @validate alphanumeric, max(250)
-     * @label keywords
+     * @validate date, max(12)
+     * @label zobrazovat od
      */
-    protected $_keywords;
+    protected $_displayFrom;
 
     /**
      * @column
      * @readwrite
      * @type text
-     * @length 150
+     * @length 12
      * 
-     * @validate alphanumeric, max(150)
-     * @label meta-název
+     * @validate date, max(12)
+     * @label zobrazovat do
      */
-    protected $_metaTitle;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate alphanumeric
-     * @label meta-popis
-     */
-    protected $_metaDescription;
+    protected $_displayTo;
 
     /**
      * @column
@@ -138,8 +139,29 @@ class ConceptModel extends Model
 
         if (empty($this->$raw)) {
             $this->setCreated(date('Y-m-d H:i:s'));
+            $this->setActive(true);
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
 
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchAll()
+    {
+        $query = self::getQuery(array('ims.*'))
+                ->join('tb_user', 'ims.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+
+        return self::initialize($query);
+    }
+    
+    /**
+     * 
+     * @return array
+     */
+    public static function fetchActive()
+    {
+        return self::all(array('displayFrom >= ?' => date('Y-m-d', time()), 'displayTo <= ?' => date('Y-m-d', time()), 'active = ?' => true));
+    }
 }

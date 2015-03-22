@@ -87,6 +87,7 @@ class Mysql extends Database\Connector
         $this->disconnect();
         unset($this->_service);
     }
+
     /**
      * 
      * @param type $error
@@ -99,7 +100,7 @@ class Mysql extends Database\Connector
 
         Core::getLogger()->log($errMessage);
     }
-    
+
     /**
      * Method is used to ensure that the value of the
      * $_service is a valid MySQLi instance
@@ -225,7 +226,7 @@ class Mysql extends Database\Connector
         $meta = $stmt->result_metadata();
 
         unset($bindParamsMethod);
-        
+
         if ($meta) {
             $stmtRow = array();
             $rowReferences = array();
@@ -250,7 +251,7 @@ class Mysql extends Database\Connector
 
             unset($stmt);
             unset($bindResultMethod);
-            
+
             return $result;
         } else {
             return null;
@@ -434,7 +435,7 @@ class Mysql extends Database\Connector
         $result = $this->execute("DROP TABLE IF EXISTS {$table};");
         if ($result === false) {
             $this->_logError($this->_service->error, $sql);
-            
+
             if (ENV == 'dev') {
                 $error = $this->getLastError();
                 throw new Exception\Sql(sprintf('There was an error in the query: %s', $error));
@@ -446,7 +447,7 @@ class Mysql extends Database\Connector
         $result2 = $this->execute($sql);
         if ($result2 === false) {
             $this->_logError($this->_service->error, $sql);
-            
+
             if (ENV == 'dev') {
                 $error = $this->getLastError();
                 throw new Exception\Sql(sprintf('There was an error in the query: %s', $error));

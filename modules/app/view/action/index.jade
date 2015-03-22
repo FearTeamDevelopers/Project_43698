@@ -17,9 +17,13 @@ section.wrapper.akce.pb.singlePage
             a(href!='/akce/r/{echo $action->getUrlKey()}') čti více
       |{/foreach}
    .moreWrap.large-2.medium-3.small-6.centerBlock
+      a(href='/probehleakce')
+         .more
+            span Již proběhlé akce
+   .moreWrap.large-2.medium-3.small-6.centerBlock
       a(href='/archivakci')
          .more
-            span Zobrazit archiv akcí
+            span Archiv akcí
    |{/if}{else}
    section.row.container
       div Žádné akce nejsou naplánované

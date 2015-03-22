@@ -1,8 +1,8 @@
 section.wrapper.reports.singlePage
    header.row
       h2 Reportáže
+   |{if !empty($reports)}
    .row
-      |{if !empty($reports)}
       |{foreach $report in $reports}
       a(href!='/reportaze/r/{echo $report->getUrlKey()}')
          article.report.medium-4.left
@@ -12,5 +12,9 @@ section.wrapper.reports.singlePage
                span {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}
                div {echo html_entity_decode($report->getShortBody())}
       |{/foreach}
-      |{/if}
+   .moreWrap.large-2.medium-3.small-6.centerBlock
+      a(href='/archivreportazi')
+         .more
+            span Archiv reportáží
+   |{/if}
    include ../components/pager

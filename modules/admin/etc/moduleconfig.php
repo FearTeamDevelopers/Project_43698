@@ -36,6 +36,18 @@ class ModuleConfig extends Module
             'module' => 'admin',
             'controller' => 'user',
             'action' => 'logout',
+        ),
+        array(
+            'pattern' => '/c/generatesitemap',
+            'module' => 'admin',
+            'controller' => 'system',
+            'action' => 'cronGenerateSitemap',
+        ),
+        array(
+            'pattern' => '/c/dbbackup',
+            'module' => 'admin',
+            'controller' => 'system',
+            'action' => 'cronDatabaseBackup',
         )
     );
 

@@ -57,10 +57,19 @@ class ReportController extends Controller
      */
     private function _createObject()
     {
-        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        if (!$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array('This title is already used');
+        for ($i = 1; $i <= 50; $i++) {
+            if ($this->_checkUrlKey($urlKeyCh)) {
+                break;
+            } else {
+                $urlKeyCh = $urlKey . '-' . $i;
+            }
+
+            if ($i == 50) {
+                $this->_errors['title'] = array('Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.');
+                break;
+            }
         }
 
         $fileManager = new FileManager(array(
@@ -100,7 +109,7 @@ class ReportController extends Controller
             'title' => RequestMethods::post('title'),
             'userId' => $this->getUser()->getId(),
             'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKey,
+            'urlKey' => $urlKeyCh,
             'approved' => $this->getConfig()->report_autopublish,
             'archive' => 0,
             'shortBody' => $shortText,
@@ -341,6 +350,7 @@ class ReportController extends Controller
             $report = $this->_editObject($report);
 
             if (empty($this->_errors) && $report->validate()) {
+                \Admin\Model\ReportHistoryModel::createFromSource($report);
                 $report->save();
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));

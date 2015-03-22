@@ -1,12 +1,16 @@
 
 <section class="wrapper akce singlePage">
   <header class="row">
-    <h2>Archiv akcí</h2>
+    <h2>Proběhlé akce</h2>
   </header>
   <section class="row container">
     {if !empty($actions)}
     {foreach $action in $actions}
     <article>
+      <div class="date">
+        <div class="den">{echo \App\Helper\DateFormater::g2dn($action->getStartDate())}</div>
+        <div class="mesic">{echo \App\Helper\DateFormater::g2mn($action->getStartDate())}</div>
+      </div>
       <header>
         <h3>{echo $action->getTitle()}</h3><span> <small>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</small></span>
       </header>

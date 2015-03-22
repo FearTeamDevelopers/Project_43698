@@ -1,17 +1,17 @@
 
-<section class="wrapper akce singlePage">
+<section class="wrapper novinky singlePage">
   <header class="row">
-    <h2>Archiv akcí</h2>
+    <h2>Archiv novinek</h2>
   </header>
   <section class="row container">
-    {if !empty($actions)}
-    {foreach $action in $actions}
+    {if !empty($news)}
+    {foreach $new in $news}
     <article>
       <header>
-        <h3>{echo $action->getTitle()}</h3><span> <small>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</small></span>
+        <h3>{echo $new->getTitle()}</h3><span> <small>{echo "Vytvořil: ".$new->getUserAlias().", ".\App\Helper\DateFormater::t2d($new->getCreated())}</small></span>
       </header>
       <div class="body">
-        <div>{echo html_entity_decode($action->getShortBody())}</div><a href="/akce/r/{echo $action->getUrlKey()}">čti více</a>
+        <div>{echo html_entity_decode($new->getShortBody())}</div><a href="/novinky/r/{echo $new->getUrlKey()}">čti více</a>
       </div>
     </article>{/foreach}
     {/if}

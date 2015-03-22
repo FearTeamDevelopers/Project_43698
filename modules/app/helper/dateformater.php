@@ -71,6 +71,19 @@ class DateFormater
      *
      * @param type $date
      */
+    public static function g2yy($date)
+    {
+        if (!empty($date)) {
+            return date('Y', strtotime($date));
+        } else {
+            return date('Y', time());
+        }
+    }
+    
+    /**
+     *
+     * @param type $date
+     */
     public static function g2mn($date)
     {
         $czechMonths = array(1 => 'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec');

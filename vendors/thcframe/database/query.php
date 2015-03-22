@@ -105,6 +105,7 @@ class Query extends Base
     protected function _quote($value)
     {
         $connector = $this->getConnector();
+        $value = trim($value);
 
         if (is_numeric($value)) {
             $escaped = $connector->escape($value);

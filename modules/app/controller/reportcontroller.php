@@ -68,13 +68,14 @@ class ReportController extends Controller
         if (null !== $content) {
             $reports = $content;
         } else {
-            $reports = \App\Model\ReportModel::fetchOldWithLimit($articlesPerPage, $page);
+            $reports = \App\Model\ReportModel::fetchActiveWithLimit($articlesPerPage, $page);
 
             $this->getCache()->set('report-' . $page, $reports);
         }
 
         $reportCount = \App\Model\ReportModel::count(
                         array('active = ?' => true,
+                            'archive = ?' => false,
                             'approved = ?' => 1)
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
@@ -90,6 +91,56 @@ class ReportController extends Controller
                 ->set('metatitle', 'Hastrman - Reportáže');
     }
 
+    /**
+     * Show archivated actions
+     * 
+     * @param type $page
+     */
+    public function archive($page = 1)
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $articlesPerPage = $this->getConfig()->reports_per_page;
+
+        if($page <= 0){
+            $page = 1;
+        }
+        
+        if ($page == 1) {
+            $canonical = 'http://' . $this->getServerHost() . '/archivreportazi';
+        } else {
+            $canonical = 'http://' . $this->getServerHost() . '/archivreportazi/p/' . $page;
+        }
+        
+        $content = $this->getCache()->get('report-arch-' . $page);
+
+        if (null !== $content) {
+            $reports = $content;
+        } else {
+            $reports = \App\Model\ReportModel::fetchArchivatedWithLimit($articlesPerPage, $page);
+
+            $this->getCache()->set('report-arch-' . $page, $reports);
+        }
+
+        $reportCount = \App\Model\ReportModel::count(
+                        array('active = ?' => true,
+                            'archive = ?' => true,
+                            'approved = ?' => 1)
+        );
+        $reportsPageCount = ceil($reportCount / $articlesPerPage);
+
+        $this->_pagerMetaLinks($reportsPageCount, $page, '/archivreportazi/p/');
+        
+        $view->set('reports', $reports)
+                ->set('currentpage', $page)
+                ->set('pagerpathprefix', '/archivreportazi')
+                ->set('pagecount', $reportsPageCount);
+
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Reportáže - Archiv');
+    }
+    
     /**
      * Show report detail
      * 

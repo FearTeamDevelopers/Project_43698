@@ -56,10 +56,19 @@ class NewsController extends Controller
      */
     private function _createObject()
     {
-        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        if (!$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array('This title is already used');
+        for ($i = 1; $i <= 50; $i++) {
+            if ($this->_checkUrlKey($urlKeyCh)) {
+                break;
+            } else {
+                $urlKeyCh = $urlKey . '-' . $i;
+            }
+
+            if ($i == 50) {
+                $this->_errors['title'] = array('Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.');
+                break;
+            }
         }
 
         $autoApprove = Registry::get('configuration')->news_autopublish;
@@ -72,7 +81,7 @@ class NewsController extends Controller
             'title' => RequestMethods::post('title'),
             'userId' => $this->getUser()->getId(),
             'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKey,
+            'urlKey' => $urlKeyCh,
             'approved' => $autoApprove,
             'archive' => 0,
             'shortBody' => $shortText,
@@ -272,6 +281,7 @@ class NewsController extends Controller
             $news = $this->_editObject($news);
 
             if (empty($this->_errors) && $news->validate()) {
+                \Admin\Model\NewsHistoryModel::createFromSource($news);
                 $news->save();
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));

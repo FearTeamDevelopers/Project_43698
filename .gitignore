@@ -2,8 +2,10 @@
 /application/configuration/config_qa.ini
 /application/configuration/maindb.sql
 /application/configuration/searchdb.sql
+/application/configuration/update.sql
+/application/configuration/dev.sql
+/application/configuration/oldToNewDb.sql
 /application/logs/
-/public/js/custom/min/
 /public/uploads/
 /temp/cache/
 /temp/db/
@@ -13,8 +15,8 @@
 /.htaccess_backup.txt
 /public/js/plugins/filemanager/files/
 /prepros.cfg
-/modules/app/view/prepros.cfg
 /node_modules/
 /gulpfile.js
 /hastrman.sublime-project
 /hastrman.sublime-workspace
+/googlef731e53ddaa1ca37.html

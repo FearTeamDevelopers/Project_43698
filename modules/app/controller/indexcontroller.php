@@ -93,7 +93,8 @@ class IndexController extends Controller
                 ->set('partners', $partners)
                 ->set('reports', $reports);
         
-        $layoutView->set('canonical', $canonical);
+        $layoutView->set('includecarousel', 1)
+                ->set('canonical', $canonical);
     }
 
     /**
