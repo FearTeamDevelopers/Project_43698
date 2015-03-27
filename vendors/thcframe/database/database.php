@@ -50,7 +50,7 @@ class Database extends Base
 
         $databases = $configuration->database;
         $conHandler = new ConnectionHandler();
-
+        
         if (!empty($databases)) {
             foreach ($databases as $dbIdent) {
                 if (!empty($dbIdent) && !empty($dbIdent->type)) {

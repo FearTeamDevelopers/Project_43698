@@ -22,6 +22,8 @@ class Mysqldump extends Base
      * @var THCFrame\Database\ConnectionHandler
      */
     private $_connectionHandler;
+    private $_backupFileName = null;
+    private $_backupDir = null;
     private $_fileHandler = null;
     private $_settings = array();
     private $_database;
@@ -31,12 +33,14 @@ class Mysqldump extends Base
         'exclude-tables' => array(),
         'exclude-tables-reqex' => array(),
         'no-data' => false,
+        'only-data' => false,
         'add-drop-table' => true,
         'single-transaction' => true,
         'lock-tables' => false,
         'add-locks' => true,
         'disable-foreign-keys-check' => true,
-        'extended-insert' => true
+        'extended-insert' => true,
+        'write-comments' => true
     );
 
     /**
@@ -50,13 +54,16 @@ class Mysqldump extends Base
 
         $this->_connectionHandler = Registry::get('database');
 
-        $this->_prepareSettings($settings);
-
         $filemanager = new FileManager();
+        $defaultDir = APP_PATH . '/temp/db/';
 
-        if (!is_dir(APP_PATH . '/temp/db/')) {
-            $filemanager->mkdir(APP_PATH . '/temp/db/');
+        if (!is_dir($defaultDir)) {
+            $filemanager->mkdir($defaultDir);
         }
+
+        $this->_backupDir = $defaultDir;
+
+        $this->_prepareSettings($settings);
     }
 
     /**
@@ -120,10 +127,16 @@ class Mysqldump extends Base
         $sqlResult = $dbc->execute("SHOW CREATE TABLE `{$table}`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
+            if (true === $this->_settings[$dbid]['only-data']) {
+                return true;
+            }
+
             if (isset($row['Create Table'])) {
-                $this->_write(
-                        '-- -----------------------------------------------------' . PHP_EOL .
-                        "-- Table structure for table `{$table}` --" . PHP_EOL);
+                if (true === $this->_settings[$dbid]['write-comments']) {
+                    $this->_write(
+                            '-- -----------------------------------------------------' . PHP_EOL .
+                            "-- Table structure for table `{$table}` --" . PHP_EOL);
+                }
 
                 if ($this->_settings[$dbid]['add-drop-table']) {
                     $this->_write("DROP TABLE IF EXISTS `{$table}`;" . PHP_EOL);
@@ -146,8 +159,10 @@ class Mysqldump extends Base
      */
     private function _getTableValues(Connector $dbc, $dbid, $tablename)
     {
-        $this->_write('--' . PHP_EOL .
-                "-- Dumping data for table `{$tablename}` --" . PHP_EOL);
+        if (true === $this->_settings[$dbid]['write-comments']) {
+            $this->_write('--' . PHP_EOL .
+                    "-- Dumping data for table `{$tablename}` --" . PHP_EOL);
+        }
 
         $dbSetting = $this->_settings[$dbid];
 
@@ -171,7 +186,7 @@ class Mysqldump extends Base
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             $vals = array();
             foreach ($row as $val) {
-                $vals[] = is_null($val) ? 'NULL' : "{$val}";
+                $vals[] = is_null($val) ? 'NULL' : addslashes($val);
             }
 
             if ($onlyOnce || !$dbSetting['extended-insert']) {
@@ -215,17 +230,20 @@ class Mysqldump extends Base
      */
     private function _createHeader(Connector $dbc, $dbid)
     {
-        $header = '-- mysqldump-php SQL Dump' . PHP_EOL .
-                '--' . PHP_EOL .
-                "-- Host: {$dbc->getHost()}" . PHP_EOL .
-                '-- Generation Time: ' . date('r') . PHP_EOL .
-                '--' . PHP_EOL .
-                "-- Database: `{$dbc->getSchema()}`" . PHP_EOL .
-                '--' . PHP_EOL;
+        $header = '';
+
+        if (true === $this->_settings[$dbid]['write-comments']) {
+            $header .= '-- mysqldump-php SQL Dump' . PHP_EOL .
+                    '--' . PHP_EOL .
+                    "-- Host: {$dbc->getHost()}" . PHP_EOL .
+                    '-- Generation Time: ' . date('r') . PHP_EOL .
+                    '--' . PHP_EOL .
+                    "-- Database: `{$dbc->getSchema()}`" . PHP_EOL .
+                    '--' . PHP_EOL;
+        }
 
         if ($this->_settings[$dbid]['disable-foreign-keys-check']) {
-            $header .= 'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL .
-                    '--' . PHP_EOL;
+            $header .= 'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL;
         }
 
         return $header;
@@ -241,9 +259,7 @@ class Mysqldump extends Base
     {
         $footer = '';
         if ($this->_settings[$dbid]['disable-foreign-keys-check']) {
-            $footer .= '--' . PHP_EOL .
-                    'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL .
-                    '--' . PHP_EOL;
+            $footer .= 'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL;
         }
 
         return $footer;
@@ -301,7 +317,12 @@ class Mysqldump extends Base
      */
     private function writeData(Connector $db, $id)
     {
-        $filename = APP_PATH . '/temp/db/' . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
+
+        if (null === $this->_backupFileName) {
+            $filename = $this->_backupDir . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
+        } else {
+            $filename = $this->_backupDir . $this->_backupFileName;
+        }
 
         if (!$this->_open($filename)) {
             throw new Exception\Mysqldump(sprintf('Output file %s is not writable', $filename), 2);
@@ -335,7 +356,7 @@ class Mysqldump extends Base
         Event::fire('framework.mysqldump.create.after', array($filename));
 
         $this->_close();
-        $this->_dumpedFiles[] = $filename;
+        $this->_dumpedFiles[$id] = $filename;
     }
 
     /**
@@ -381,6 +402,50 @@ class Mysqldump extends Base
                 return false;
             }
         }
+    }
+
+    /**
+     * 
+     * @param type $id
+     * @return type
+     */
+    public function getDumpFile($id = null)
+    {
+        if (null === $id) {
+            return $this->_dumpedFiles;
+        } else {
+            if (array_key_exists($id, $this->_dumpedFiles)) {
+                return $this->_dumpedFiles[$id];
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param type $name
+     * @return \THCFrame\Database\Mysqldump
+     */
+    public function setBackupName($name)
+    {
+        $this->_backupFileName = $name;
+        return $this;
+    }
+
+    /**
+     * 
+     * @param type $dir
+     * @return \THCFrame\Database\Mysqldump
+     */
+    public function setBackupDir($dir)
+    {
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $this->_backupDir = $dir;
+        return $this;
     }
 
     /**

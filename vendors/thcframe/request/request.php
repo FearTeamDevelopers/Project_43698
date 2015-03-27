@@ -21,7 +21,7 @@ class Request extends Base
     /**
      * @readwrite
      */
-    public $_willFollow = true;
+    public $_willFollow = false;
 
     /**
      * @readwrite

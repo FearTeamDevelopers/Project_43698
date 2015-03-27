@@ -8,7 +8,7 @@ use THCFrame\Core\StringMethods;
 /**
  * 
  */
-class SystemController extends Controller
+class DevController extends Controller
 {
 
     /**
@@ -303,4 +303,17 @@ class SystemController extends Controller
         die;
     }
 
+    /**
+     * @before _secured, _superadmin
+     */
+    public function testSendEmail()
+    {
+        $this->_willRenderActionView = false;
+        $this->_willRenderLayoutView = false;
+        
+        $this->sendEmail('Test message', 'Hastrman test email');
+        print('<pre>'.print_r('Send', true).'</pre>');die;
+    }
+    
+    
 }

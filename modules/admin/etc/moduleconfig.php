@@ -41,13 +41,13 @@ class ModuleConfig extends Module
             'pattern' => '/c/generatesitemap',
             'module' => 'admin',
             'controller' => 'system',
-            'action' => 'cronGenerateSitemap',
+            'action' => 'crongeneratesitemap',
         ),
         array(
             'pattern' => '/c/dbbackup',
             'module' => 'admin',
             'controller' => 'system',
-            'action' => 'cronDatabaseBackup',
+            'action' => 'crondatabasebackup',
         )
     );
 

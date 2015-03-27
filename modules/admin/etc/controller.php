@@ -2,7 +2,7 @@
 
 namespace Admin\Etc;
 
-use THCFrame\Events\Events as Events;
+use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Core\StringMethods;
@@ -83,6 +83,40 @@ class Controller extends BaseController
 
     /**
      * 
+     * @param type $body
+     * @param type $subject
+     * @param type $sendTo
+     * @return type
+     */
+    protected function sendEmail($body, $subject, $sendTo = null)
+    {
+        try {
+            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+            $transport = \Swift_MailTransport::newInstance();
+            $mailer = \Swift_Mailer::newInstance($transport);
+
+            if (null === $sendTo) {
+                $sendTo = $this->getConfig()->system->adminemail;
+            }
+
+            $message = \Swift_Message::newInstance(null)
+                    ->setSubject($subject)
+                    ->setFrom('info@hastrman.cz')
+                    ->setTo($sendTo)
+                    ->setBody($body);
+
+            if ($mailer->send($message)) {
+                return true;
+            } else {
+                Event::fire('admin.log', array('fail', 'No email sent'));
+            }
+        } catch (\Exception $ex) {
+            Event::fire('admin.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
+        }
+    }
+
+    /**
+     * 
      * @param type $options
      */
     public function __construct($options = array())
@@ -94,7 +128,7 @@ class Controller extends BaseController
         $this->_config = Registry::get('configuration');
 
         // schedule disconnect from database 
-        Events::add('framework.controller.destruct.after', function($name) {
+        Event::add('framework.controller.destruct.after', function($name) {
             Registry::get('database')->disconnectAll();
         });
     }
@@ -263,7 +297,7 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function mutliSubmissionProtectionToken()
+    protected function mutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $token = $session->get('submissionprotection');
@@ -280,7 +314,7 @@ class Controller extends BaseController
      * 
      * @return type
      */
-    public function revalidateMutliSubmissionProtectionToken()
+    protected function revalidateMutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $session->erase('submissionprotection');
@@ -294,7 +328,7 @@ class Controller extends BaseController
      * 
      * @param type $token
      */
-    public function checkMutliSubmissionProtectionToken($token)
+    protected function checkMutliSubmissionProtectionToken($token)
     {
         $session = Registry::get('session');
         $sessionToken = $session->get('submissionprotection');
@@ -310,7 +344,7 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function checkCSRFToken()
+    protected function checkCSRFToken()
     {
         if ($this->_security->getCSRF()->verifyRequest()) {
             return true;

@@ -33,7 +33,7 @@ if (version_compare(phpversion(), '5.4', '<')) {
 //setcookie('XDEBUG_PROFILE', '', time()-1800);
 
 //register modules
-$modules = array('App', 'Admin', 'Search');
+$modules = array('App', 'Admin', 'Search', 'Cron');
 
 //core
 require(APP_PATH.'/vendors/thcframe/core/core.php');
