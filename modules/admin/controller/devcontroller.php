@@ -4,6 +4,7 @@ namespace Admin\Controller;
 
 use Admin\Etc\Controller;
 use THCFrame\Core\StringMethods;
+use THCFrame\Filesystem\FileManager;
 
 /**
  * 
@@ -314,6 +315,5 @@ class DevController extends Controller
         $this->sendEmail('Test message', 'Hastrman test email');
         print('<pre>'.print_r('Send', true).'</pre>');die;
     }
-    
-    
+  
 }

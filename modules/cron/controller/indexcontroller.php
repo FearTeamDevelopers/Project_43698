@@ -7,6 +7,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Database\Mysqldump;
 use THCFrame\Events\Events as Event;
 use THCFrame\Router\Model\RedirectModel;
+use THCFrame\Filesystem\FileManager;
 
 /**
  * 
@@ -15,21 +16,25 @@ class IndexController extends Controller
 {
 
     /**
-     * Remove old files from folder
+     * Comprime and then remove old files from folder
      * 
      * @param type $path
      * @param type $days
      */
-    private function _removeOldFiles($path, $days = 10)
+    private function _removeOldFiles($path, $days = 14)
     {
+        $fm = new FileManager();
+        
         if (!is_dir($path)) {
             mkdir($path, 0755, true);
+            return;
         }
 
         if ($handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
                 if (is_file($path . $file)) {
                     if (filemtime($path . $file) < ( time() - ( $days * 24 * 60 * 60 ) )) {
+                        $fm->gzCompressFile($path . $file);
                         unlink($path . $file);
                     }
                 }
@@ -63,19 +68,53 @@ class IndexController extends Controller
     }
 
     /**
-     * Create db backup by cron
+     * Create daily db backup by cron
      * 
      * @before _cron
      */
-    public function cronDatabaseBackup()
+    public function cronDailyDatabaseBackup()
     {
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        $path = APP_PATH . '/temp/db/';
+        $path = APP_PATH . '/temp/db/day/';
         $this->_removeOldFiles($path);
 
         $dump = new Mysqldump();
+        $dump->setBackupDir($path);
+
+        try {
+            if ($dump->create()) {
+                Event::fire('cron.log', array('success', 'Database backup'));
+            } else {
+                Event::fire('cron.log', array('fail', 'Database backup'));
+                $this->sendEmail('Error in mysqldump class while creating database backup', 'ERROR: Cron databaseBackup');
+            }
+        } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
+            Event::fire('cron.log', array('fail', 'Database backup',
+                'Error: ' . $ex->getMessage()));
+            $this->sendEmail('Error while creating database backup: ' . $ex->getMessage(), 'ERROR: Cron databaseBackup');
+        }
+    }
+    
+    /**
+     * Create monthly db backup by cron
+     * 
+     * @before _cron
+     */
+    public function cronMonthlyDatabaseBackup()
+    {
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
+
+        $path = APP_PATH . '/temp/db/month/';
+
+        if (!is_dir($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        $dump = new Mysqldump();
+        $dump->setBackupDir($path);
 
         try {
             if ($dump->create()) {
@@ -105,13 +144,14 @@ class IndexController extends Controller
         $dbDataPath = APP_PATH . '/temp/db/data/';
         $dbStructurePath = APP_PATH . '/temp/db/structure/';
 
-        $this->_removeOldFiles($dbDataPath, 60);
-        $this->_removeOldFiles($dbStructurePath, 60);
+        $this->_removeOldFiles($dbDataPath, 31);
+        $this->_removeOldFiles($dbStructurePath, 31);
 
         $settingsNoData = array('main' => array(
                 'no-data' => true,
                 'write-comments' => false,
                 'disable-foreign-keys-check' => false,
+                'use-file-compression' => false
         ));
 
         $settingsOnlyData = array('main' => array(
@@ -119,7 +159,8 @@ class IndexController extends Controller
                 'add-locks' => false,
                 'disable-foreign-keys-check' => false,
                 'extended-insert' => false,
-                'write-comments' => false
+                'write-comments' => false,
+                'use-file-compression' => false
         ));
         $dumpOnlyData = new Mysqldump($settingsOnlyData);
         $dumpNoData = new Mysqldump($settingsNoData);

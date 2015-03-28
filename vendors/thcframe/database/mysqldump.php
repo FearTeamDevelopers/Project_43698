@@ -22,6 +22,13 @@ class Mysqldump extends Base
      * @var THCFrame\Database\ConnectionHandler
      */
     private $_connectionHandler;
+    
+    /**
+     *
+     * @var THCFrame\Filesystem\FileManager 
+     */
+    private $_filemanager;
+    
     private $_backupFileName = null;
     private $_backupDir = null;
     private $_fileHandler = null;
@@ -40,7 +47,8 @@ class Mysqldump extends Base
         'add-locks' => true,
         'disable-foreign-keys-check' => true,
         'extended-insert' => true,
-        'write-comments' => true
+        'write-comments' => true,
+        'use-file-compression' => true
     );
 
     /**
@@ -54,11 +62,11 @@ class Mysqldump extends Base
 
         $this->_connectionHandler = Registry::get('database');
 
-        $filemanager = new FileManager();
+        $this->_filemanager = new FileManager();
         $defaultDir = APP_PATH . '/temp/db/';
 
         if (!is_dir($defaultDir)) {
-            $filemanager->mkdir($defaultDir);
+            $this->_filemanager->mkdir($defaultDir);
         }
 
         $this->_backupDir = $defaultDir;
@@ -315,7 +323,7 @@ class Mysqldump extends Base
      * @param string    $id     database identification
      * @throws Exception\Mysqldump
      */
-    private function writeData(Connector $db, $id)
+    private function _writeData(Connector $db, $id)
     {
 
         if (null === $this->_backupFileName) {
@@ -360,6 +368,24 @@ class Mysqldump extends Base
     }
 
     /**
+     * 
+     * @param array $files
+     */
+    private function _compressBackupFiles(array $files = array())
+    {
+        if (!empty($files)) {
+            foreach ($files as $dbid => $path) {
+                if ($this->_settings[$dbid]['use-file-compression'] === true) {
+                    if (file_exists($path)) {
+                        $this->_filemanager->gzCompressFile($path);
+                        unlink($path);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Main public method
      * Create mysql database dump of all connected databases or one specific 
      * database based on parameter
@@ -379,9 +405,10 @@ class Mysqldump extends Base
         if (null !== $dbId) {
             if (in_array($dbId, $dbIdents)) {
                 $db = $this->_connectionHandler->get($dbId);
-                $this->writeData($db, $dbId);
+                $this->_writeData($db, $dbId);
 
                 if (!empty($this->_dumpedFiles)) {
+                    $this->_compressBackupFiles($this->_dumpedFiles);
                     return true;
                 } else {
                     return false;
@@ -392,11 +419,12 @@ class Mysqldump extends Base
         } else {
             foreach ($dbIdents as $id) {
                 $db = $this->_connectionHandler->get($id);
-                $this->writeData($db, $id);
+                $this->_writeData($db, $id);
                 unset($db);
             }
 
             if (!empty($this->_dumpedFiles)) {
+                $this->_compressBackupFiles($this->_dumpedFiles);
                 return true;
             } else {
                 return false;
