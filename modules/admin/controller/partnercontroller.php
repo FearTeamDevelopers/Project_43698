@@ -35,7 +35,8 @@ class PartnerController extends Controller
     public function add()
     {
         $view = $this->getActionView();
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+                ->set('partner', null);
 
         if (RequestMethods::post('submitAddPartner')) {
             if ($this->checkCSRFToken() !== true &&

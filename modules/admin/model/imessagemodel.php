@@ -162,6 +162,6 @@ class ImessageModel extends Model
      */
     public static function fetchActive()
     {
-        return self::all(array('displayFrom >= ?' => date('Y-m-d', time()), 'displayTo <= ?' => date('Y-m-d', time()), 'active = ?' => true));
+        return self::all(array('displayFrom <= ?' => date('Y-m-d', time()), 'displayTo >= ?' => date('Y-m-d', time()), 'active = ?' => true));
     }
 }

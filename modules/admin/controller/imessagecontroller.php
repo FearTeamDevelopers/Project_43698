@@ -32,7 +32,8 @@ class ImessageController extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+                ->set('imessage', null);
 
         if (RequestMethods::post('submitAddImessage')) {
             if ($this->checkCSRFToken() !== true &&

@@ -185,7 +185,8 @@ class AdvertisementController extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+                ->set('adsection', null);
 
         if (RequestMethods::post('submitAddAdSection')) {
             if ($this->checkCSRFToken() !== true &&
