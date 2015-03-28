@@ -35,7 +35,13 @@ class ModuleConfig extends Module
             'pattern' => '/c/dbbackup',
             'module' => 'cron',
             'controller' => 'index',
-            'action' => 'crondatabasebackup',
+            'action' => 'crondailydatabasebackup',
+        ),
+        array(
+            'pattern' => '/c/monthdbbackup',
+            'module' => 'cron',
+            'controller' => 'index',
+            'action' => 'cronmonthlydatabasebackup',
         ),
         array(
             'pattern' => '/c/clonedb',

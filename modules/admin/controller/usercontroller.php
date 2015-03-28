@@ -3,7 +3,6 @@
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Security\PasswordManager;
@@ -14,6 +13,17 @@ use THCFrame\Security\PasswordManager;
 class UserController extends Controller
 {
 
+    private function _checkEmailActToken($token)
+    {
+        $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
+        
+        if($exists === null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     /**
      * Login into administration
      */
@@ -115,6 +125,20 @@ class UserController extends Controller
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
 
+            $actToken = Rand::randStr(50);
+            for ($i = 1; $i <= 75; $i++) {
+                if($this->_checkEmailActToken($actToken)){
+                    break;
+                } else {
+                    $actToken = Rand::randStr(50);
+                }
+
+                if ($i == 75) {
+                    $errors['email'] = array(self::ERROR_MESSAGE_3.' Zkuste vytvoření uživatele opakovat později');
+                    break;
+                }
+            }
+            
             $user = new \App\Model\UserModel(array(
                 'firstname' => RequestMethods::post('firstname'),
                 'lastname' => RequestMethods::post('lastname'),

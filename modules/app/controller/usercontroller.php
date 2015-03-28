@@ -14,6 +14,17 @@ use THCFrame\Core\Rand;
 class UserController extends Controller
 {
 
+    private function _checkEmailActToken($token)
+    {
+        $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
+        
+        if($exists === null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     /**
      * App module login
      */
@@ -116,10 +127,22 @@ class UserController extends Controller
 
             if ($verifyEmail) {
                 $active = false;
-                $actToken = Rand::randStr(50);
             } else {
                 $active = true;
-                $actToken = null;
+            }
+            
+            $actToken = Rand::randStr(50);
+            for ($i = 1; $i <= 75; $i++) {
+                if($this->_checkEmailActToken($actToken)){
+                    break;
+                } else {
+                    $actToken = Rand::randStr(50);
+                }
+
+                if ($i == 75) {
+                    $errors['email'] = array(self::ERROR_MESSAGE_3.' Zkuste registraci opakovat později');
+                    break;
+                }
             }
 
             $user = new \App\Model\UserModel(array(
@@ -265,7 +288,6 @@ class UserController extends Controller
         }
 
         $user->active = true;
-        $user->emailActivationToken = null;
 
         if ($user->validate()) {
             $user->save();
