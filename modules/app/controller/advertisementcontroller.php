@@ -392,8 +392,8 @@ class AdvertisementController extends Controller
                 $id = $ad->save();
 
                 $fileManager = new FileManager(array(
-                    'thumbWidth' => $this->getConfig()->thumb_width,
-                    'thumbHeight' => $this->getConfig()->thumb_height,
+                    'thumbWidth' => 230,
+                    'thumbHeight' => 230,
                     'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                     'maxImageWidth' => $this->getConfig()->photo_maxwidth,
                     'maxImageHeight' => $this->getConfig()->photo_maxheight
