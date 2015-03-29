@@ -11,12 +11,12 @@ section.wrapper.report
        .imgWrapper.large-12.column
           img.centerBlock(src!='{echo $report->getImgMain()}')
     .page.row
-      {if $report->getImgMain() != ""}
-       .container
+      |{if $report->getImgMain() != ""}
+      .container
           |{echo html_entity_decode($report->getBody())}
-      {/if}
-      {else}
-       .container.top_padded
+      |{/if}
+      |{else}
+      .container.top_padded
           |{echo html_entity_decode($report->getBody())}
-      {/else}
+      |{/else}
 
