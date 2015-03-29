@@ -21,7 +21,7 @@ class IndexController extends Controller
      * @param type $path
      * @param type $days
      */
-    private function _removeOldFiles($path, $days = 14)
+    private function _removeOldFiles($path, $days = 7)
     {
         $fm = new FileManager();
         
@@ -43,9 +43,9 @@ class IndexController extends Controller
     }
 
     /**
-     * Reconnect to the database
+     * Reconnect to the test database
      */
-    private function _resertConnection()
+    private function _resertTestConnection()
     {
         $oldDb = new \THCFrame\Database\Database();
         $db = $oldDb->initializeDirectly(array(
@@ -65,6 +65,23 @@ class IndexController extends Controller
 //        ));
 
         return $db;
+    }
+    
+    /**
+     * Reconnect to the database
+     */
+    private function _resertConnections()
+    {
+        $config = Registry::get('configuration');
+        Registry::get('database')->disconnectAll();
+
+        $database = new \THCFrame\Database\Database();
+        $connectors = $database->initialize($config);
+        Registry::set('database', $connectors);
+        
+        unset($config);
+        unset($database);
+        unset($connectors);
     }
 
     /**
@@ -170,7 +187,7 @@ class IndexController extends Controller
 
         try {
             if ($dumpNoData->create('main') && $dumpOnlyData->create('main')) {
-                $db = $this->_resertConnection();
+                $db = $this->_resertTestConnection();
 
                 $dbStructureSql = file_get_contents($dumpNoData->getDumpFile('main'));
                 $sqls = explode(';', $dbStructureSql);
@@ -181,7 +198,7 @@ class IndexController extends Controller
                     $db->execute($sql);
                 }
 
-                $db = $this->_resertConnection();
+                $db = $this->_resertTestConnection();
 
                 $dataSql = file_get_contents($dumpOnlyData->getDumpFile('main'));
                 $dataSqlArr = explode('INSERT INTO', $dataSql);
@@ -199,7 +216,7 @@ class IndexController extends Controller
                         $i++;
 
                         if ($i == 500) {
-                            $db = $this->_resertConnection();
+                            $db = $this->_resertTestConnection();
                             $db->execute('SET FOREIGN_KEY_CHECKS=0');
                             $i = 0;
                         }
@@ -303,6 +320,7 @@ class IndexController extends Controller
             }
 
             file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml . $xmlEnd);
+            $this->_resertConnections();
 
             Event::fire('cron.log', array('success', 'Links count: ' . $linkCounter));
         } catch (\Exception $ex) {

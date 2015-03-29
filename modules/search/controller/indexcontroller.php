@@ -128,7 +128,7 @@ class IndexController extends Controller
     /**
      * Reconnect to the database
      */
-    private function _resertConnection()
+    private function _resertConnections()
     {
         $config = Registry::get('configuration');
         Registry::get('database')->disconnectAll();
@@ -136,6 +136,10 @@ class IndexController extends Controller
         $database = new \THCFrame\Database\Database();
         $connectors = $database->initialize($config);
         Registry::set('database', $connectors);
+
+        unset($config);
+        unset($database);
+        unset($connectors);
     }
 
     /**
@@ -238,7 +242,7 @@ class IndexController extends Controller
                 $time = round(microtime(true) - $starttime, 2);
                 Event::fire('search.log', array('success', sprintf('Search index for %s built in %s sec', $table, $time)));
                 
-                $this->_resertConnection();
+                $this->_resertConnections();
             }
         } catch (\Exception $ex) {
             $body = 'Error while building index: ' . $ex->getMessage();
