@@ -39,7 +39,7 @@
       <header class="row">
         <div class="small-12 medium-6 large-6 columns"><a href="/">
             <h1>Hastrman</h1></a></div>
-        <div class="large-4 small-12 medium-47 centerBlock searchWrapper">
+        <div class="large-6 small-12 medium-6 centerBlock searchWrapper">
           <form method="get" action="/hledat" class="fulltextsearch">
             <input type="text" name="str" title="Pole nemůže být prázdné" placeholder="Prohledat hastrmana..." required class="small-10 left"><a id="hledatHastrman" href="#" title="Hledat" class="fi-magnifying-glass left"></a>
           </form>
@@ -89,7 +89,7 @@
                 </ul>
               </li>{if !isset($authUser)}
               <li><a href="/prihlasit" title="Přihlásit se" class="fi-torso galerie"></a></li>{/if}{else}
-              <li><a href="#" class="fi-power"></a>
+              <li><a href="#" class="dropdown fi-power"></a>
                 <ul>
                   <li><a href="/muj-profil">Můj profil</a></li>
                   <li><a href="/odhlasit">Odhlásit se</a></li>
