@@ -19,6 +19,7 @@ class IndexController extends Controller
     {
         $view = $this->getActionView();
 
+        $imessages = \Admin\Model\ImessageModel::fetchActive();
         $latestNews = \App\Model\NewsModel::fetchWithLimit(10);
         $latestActions = \App\Model\ActionModel::fetchWithLimit(10);
         $latestReports = \App\Model\ReportModel::fetchWithLimit(10);
@@ -27,7 +28,8 @@ class IndexController extends Controller
         $view->set('latestnews', $latestNews)
                 ->set('latestreports', $latestReports)
                 ->set('latestgalleries', $latestGalleries)
-                ->set('latestactions', $latestActions);
+                ->set('latestactions', $latestActions)
+                ->set('imessages', $imessages);
     }
 
 }

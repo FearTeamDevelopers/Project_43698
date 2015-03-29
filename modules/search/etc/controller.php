@@ -2,7 +2,7 @@
 
 namespace Search\Etc;
 
-use THCFrame\Events\Events as Events;
+use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Core\StringMethods;
@@ -112,7 +112,7 @@ class Controller extends BaseController
         $this->_config = Registry::get('configuration');
 
         // schedule disconnect from database 
-        Events::add('framework.controller.destruct.after', function($name) {
+        Event::add('framework.controller.destruct.after', function($name) {
             Registry::get('database')->disconnectAll();
         });
     }
@@ -171,9 +171,7 @@ class Controller extends BaseController
      */
     public function _cron()
     {
-        $view = $this->getActionView();
-
-        if (null !== RequestMethods::server('HTTP_HOST')) {
+        if (!preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT'))) {
             throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
     }
@@ -184,7 +182,7 @@ class Controller extends BaseController
      */
     protected function isCron()
     {
-        if (RequestMethods::server('HTTP_HOST') === null) {
+        if (preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT'))) {
             return true;
         } else {
             return false;
@@ -215,6 +213,40 @@ class Controller extends BaseController
             return false;
         }
     }
+    
+    /**
+     * 
+     * @param type $body
+     * @param type $subject
+     * @param type $sendTo
+     * @return type
+     */
+    protected function sendEmail($body, $subject, $sendTo = null)
+    {
+        try {
+            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+            $transport = \Swift_MailTransport::newInstance();
+            $mailer = \Swift_Mailer::newInstance($transport);
+
+            if(null === $sendTo){
+                $sendTo = $this->getConfig()->system->adminemail;
+            }
+            
+            $message = \Swift_Message::newInstance(null)
+                    ->setSubject($subject)
+                    ->setFrom('info@hastrman.cz')
+                    ->setTo($sendTo)
+                    ->setBody($body);
+
+            if ($mailer->send($message)) {
+                return true;
+            } else {
+                Event::fire('admin.log', array('fail', 'No email sent'));
+            }
+        } catch (\Exception $ex) {
+            Event::fire('search.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
+        }
+    }
 
     /**
      * load user from security context
@@ -227,7 +259,7 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function mutliSubmissionProtectionToken()
+    protected function mutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $token = $session->get('submissionprotection');
@@ -244,7 +276,7 @@ class Controller extends BaseController
      * 
      * @return type
      */
-    public function revalidateMutliSubmissionProtectionToken()
+    protected function revalidateMutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $session->erase('submissionprotection');
@@ -258,7 +290,7 @@ class Controller extends BaseController
      * 
      * @param type $token
      */
-    public function checkMutliSubmissionProtectionToken($token)
+    protected function checkMutliSubmissionProtectionToken($token)
     {
         $session = Registry::get('session');
         $sessionToken = $session->get('submissionprotection');
@@ -274,7 +306,7 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function checkCSRFToken()
+    protected function checkCSRFToken()
     {
         if ($this->_security->getCSRF()->verifyRequest()) {
             return true;

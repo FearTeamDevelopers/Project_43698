@@ -259,11 +259,7 @@ class AdvertisementController extends Controller
             if ($message->validate()) {
                 try {
                     require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                    $transport = \Swift_SmtpTransport::newInstance($this->getConfig()->smtp->host,
-                                        $this->getConfig()->smtp->port, 
-                                        $this->getConfig()->smtp->secured)
-                            ->setUsername($this->getConfig()->smtp->username)
-                            ->setPassword($this->getConfig()->smtp->password);
+                    $transport = \Swift_MailTransport::newInstance(null);
                     $mailer = \Swift_Mailer::newInstance($transport);
 
                     $email = \Swift_Message::newInstance()
@@ -281,13 +277,14 @@ class AdvertisementController extends Controller
                     $message->messageSent = 1;
                     $messageId = $message->save();
 
-                    Event::fire('app.log', array('success', 'Message with Id: '.$messageId.' send for Ad Id: ' . $ad->getId()));
+                    Event::fire('app.log', array('success', 'Message with Id: ' . $messageId . ' send for Ad Id: ' . $ad->getId()));
                     $view->successMessage('Dotaz byl úspěšně odeslán');
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 } catch (\Exception $ex) {
                     \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
 
-                    Event::fire('app.log', array('fail', 'Message not send for Ad Id: ' . $ad->getId()));
+                    Event::fire('app.log', array('fail', 'Email not send for Ad Id: ' . $ad->getId(),
+                        'Error: ' . $ex->getMessage()));
                     $view->errorMessage('Nepodařilo se odeslat dotaz k inzerátu, opakujte akci později');
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
@@ -309,14 +306,14 @@ class AdvertisementController extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         $articlesPerPage = $this->getConfig()->search_results_per_page;
-        
-        if($page <= 0){
+
+        if ($page <= 0) {
             $page = 1;
         }
-        
-        $requestUrl = 'http://'.$this->getServerHost().'/doadsearch/'.$page;
+
+        $requestUrl = 'http://' . $this->getServerHost() . '/doadsearch/' . $page;
         $parameters = array('adstr' => RequestMethods::get('adstr'));
-        
+
         $request = new Request();
         $response = $request->request('post', $requestUrl, $parameters);
         $urls = json_decode($response, true);
@@ -325,7 +322,7 @@ class AdvertisementController extends Controller
         $searchPageCount = ceil($articleCount['totalCount'] / $articlesPerPage);
 
         $this->_pagerMetaLinks($searchPageCount, $page, '/bazar/hledat/p/');
-        
+
         $canonical = 'http://' . $this->getServerHost() . '/bazar/hledat';
 
         $view->set('result', $urls)
@@ -333,7 +330,7 @@ class AdvertisementController extends Controller
                 ->set('pagecount', $searchPageCount)
                 ->set('pagerpathprefix', '/bazar/hledat')
                 ->set('pagerpathpostfix', '?' . http_build_query($parameters));
-        
+
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar - Hledat');
     }
@@ -354,7 +351,7 @@ class AdvertisementController extends Controller
         $view->set('adsections', $adSections)
                 ->set('ad', null)
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
-        
+
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar - Nový inzerát');
 
@@ -427,7 +424,8 @@ class AdvertisementController extends Controller
 
                                 Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $id));
                             } else {
-                                Event::fire('app.log', array('fail', 'Upload photo for ad ' . $id));
+                                Event::fire('app.log', array('fail', 'Upload photo for ad ' . $id,
+                                    'Errors: ' . json_encode($adImage->getErrors())));
                                 $uploadErrors += $adImage->getErrors();
                             }
                         }
@@ -440,7 +438,7 @@ class AdvertisementController extends Controller
                         $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     } else {
-                        Event::fire('app.log', array('fail'));
+                        Event::fire('app.log', array('fail', 'Errors: ' . json_encode($errors + $ad->getErrors())));
                         $view->set('ad', $ad)
                                 ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                                 ->set('errors', $errors + $ad->getErrors());
@@ -452,7 +450,7 @@ class AdvertisementController extends Controller
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
-                Event::fire('app.log', array('fail'));
+                Event::fire('app.log', array('fail', 'Errors: ' . json_encode($errors + $ad->getErrors())));
                 $view->set('ad', $ad)
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $ad->getErrors());
@@ -473,7 +471,7 @@ class AdvertisementController extends Controller
 
         $canonical = 'http://' . $this->getServerHost() . '/bazar/upravit';
         $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
-        
+
         if (NULL === $ad) {
             $view->warningMessage(self::ERROR_MESSAGE_2);
             $this->_willRenderActionView = false;
@@ -484,7 +482,7 @@ class AdvertisementController extends Controller
 
         $view->set('adsections', $adSections)
                 ->set('ad', $ad);
-        
+
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar - Upravit inzerát');
 
@@ -548,7 +546,8 @@ class AdvertisementController extends Controller
 
                                     Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $ad->getId()));
                                 } else {
-                                    Event::fire('app.log', array('fail', 'Upload photo for ad ' . $ad->getId()));
+                                    Event::fire('app.log', array('fail', 'Upload photo for ad ' . $ad->getId(),
+                                        'Errors: ' . json_encode($adImage->getErrors())));
                                     $uploadErrors += $adImage->getErrors();
                                 }
                             }
@@ -561,7 +560,8 @@ class AdvertisementController extends Controller
                             $view->successMessage(self::SUCCESS_MESSAGE_2);
                             self::redirect('/bazar/r/' . $ad->getUniqueKey());
                         } else {
-                            Event::fire('app.log', array('fail'));
+                            Event::fire('app.log', array('fail',
+                                'Errors: ' . json_encode($errors + $ad->getErrors())));
                             $view->set('errors', $errors + $ad->getErrors());
                         }
                     } else {
@@ -575,7 +575,8 @@ class AdvertisementController extends Controller
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId()));
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId(),
+                    'Errors: ' . json_encode($errors + $ad->getErrors())));
                 $view->set('errors', $errors + $ad->getErrors());
             }
         }
@@ -677,7 +678,7 @@ class AdvertisementController extends Controller
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar - Moje inzeráty');
     }
-    
+
     /**
      * Create request for availability extend
      * 
@@ -701,7 +702,8 @@ class AdvertisementController extends Controller
                 Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId()));
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId(),
+                    'Errors: '.  json_encode($ad->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }

@@ -4,6 +4,6 @@ namespace THCFrame\Database\Exception;
 
 use THCFrame\Database as Database;
 
-class Backup extends Database\Exception {
+class Mysqldump extends Database\Exception {
     
 }

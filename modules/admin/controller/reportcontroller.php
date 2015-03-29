@@ -16,7 +16,7 @@ class ReportController extends Controller
 {
 
     private $_errors = array();
-            
+
     /**
      * Check whether user has access to report or not
      * 
@@ -25,14 +25,14 @@ class ReportController extends Controller
      */
     private function _checkAccess(\App\Model\ReportModel $report)
     {
-        if($this->_security->isGranted('role_admin') === true ||
-                $report->getUserId() == $this->getUser()->getId()){
+        if ($this->_security->isGranted('role_admin') === true ||
+                $report->getUserId() == $this->getUser()->getId()) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     /**
      * Check whether report unique identifier already exist or not
      * 
@@ -49,7 +49,7 @@ class ReportController extends Controller
             return false;
         }
     }
-    
+
     /**
      * Create and return new report object
      * 
@@ -57,10 +57,19 @@ class ReportController extends Controller
      */
     private function _createObject()
     {
-        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        if (!$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array('This title is already used');
+        for ($i = 1; $i <= 50; $i++) {
+            if ($this->_checkUrlKey($urlKeyCh)) {
+                break;
+            } else {
+                $urlKeyCh = $urlKey . '-' . $i;
+            }
+
+            if ($i == 50) {
+                $this->_errors['title'] = array('Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.');
+                break;
+            }
         }
 
         $fileManager = new FileManager(array(
@@ -91,8 +100,7 @@ class ReportController extends Controller
             $imgThumb = '';
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
         );
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -101,7 +109,7 @@ class ReportController extends Controller
             'title' => RequestMethods::post('title'),
             'userId' => $this->getUser()->getId(),
             'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKey,
+            'urlKey' => $urlKeyCh,
             'approved' => $this->getConfig()->report_autopublish,
             'archive' => 0,
             'shortBody' => $shortText,
@@ -118,7 +126,7 @@ class ReportController extends Controller
 
         return $report;
     }
-    
+
     /**
      * Edit existing report object
      * 
@@ -169,8 +177,7 @@ class ReportController extends Controller
             $object->userAlias = $this->getUser()->getWholeName();
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
         );
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -193,7 +200,7 @@ class ReportController extends Controller
 
         return $object;
     }
-    
+
     /**
      * Check if there is object used for preview saved in session
      * 
@@ -204,7 +211,7 @@ class ReportController extends Controller
         $session = Registry::get('session');
         $report = $session->get('reportPreview');
         $session->erase('reportPreview');
-        
+
         return $report;
     }
 
@@ -224,14 +231,34 @@ class ReportController extends Controller
      * 
      * @before _secured, _participant
      */
-    public function add()
+    public function add($conceptId = 0)
     {
         $view = $this->getActionView();
-        
-        $report = $this->_checkForObject();
-        
+
+        if ($conceptId === 0) {
+            $report = $this->_checkForObject();
+        } else {
+            $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $conceptId));
+
+            $report = new \App\Model\ReportModel(array(
+                'title' => $concept->getTitle(),
+                'shortBody' => $concept->getShortBody(),
+                'body' => $concept->getBody(),
+                'keywords' => $concept->getKeywords(),
+                'metaTitle' => $concept->getMetaTitle(),
+                'metaDescription' => $concept->getMetaDescription()
+            ));
+        }
+
+        $reportConcepts = \Admin\Model\ConceptModel::all(array(
+                    'userId = ?' => $this->getUser()->getId(),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_REPORT),
+                array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
+
         $view->set('report', $report)
-            ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('conceptid', $conceptId)
+                ->set('concepts', $reportConcepts)
+                ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddReport')) {
             if ($this->checkCSRFToken() !== true &&
@@ -243,20 +270,22 @@ class ReportController extends Controller
 
             if (empty($this->_errors) && $report->validate()) {
                 $id = $report->save();
-
                 $this->getCache()->invalidate();
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 $view->successMessage('Report' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/report/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($this->_errors + $report->getErrors())));
                 $view->set('errors', $this->_errors + $report->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                        ->set('report', $report);
+                        ->set('report', $report)
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
-        
-         if (RequestMethods::post('submitPreviewReport')) {
+
+        if (RequestMethods::post('submitPreviewReport')) {
             if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/report/');
@@ -268,12 +297,14 @@ class ReportController extends Controller
                 $session = Registry::get('session');
                 $session->set('reportPreview', $report);
                 $session->set('reportPreviewPhoto', array($report->imgMain, $report->imgThumb));
-                
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+
                 self::redirect('/report/preview?action=add');
             } else {
                 $view->set('errors', $this->_errors + $report->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                        ->set('report', $report);
+                        ->set('report', $report)
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
     }
@@ -289,7 +320,7 @@ class ReportController extends Controller
         $view = $this->getActionView();
 
         $report = $this->_checkForObject();
-        
+
         if (null !== $report) {
             $view->set('report', $report);
         } else {
@@ -319,18 +350,22 @@ class ReportController extends Controller
             $report = $this->_editObject($report);
 
             if (empty($this->_errors) && $report->validate()) {
+                \Admin\Model\ReportHistoryModel::createFromSource($report);
                 $report->save();
                 $this->getCache()->invalidate();
-                
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/report/');
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
-                $view->set('errors', $this->_errors + $report->getErrors());
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
+                    'Errors: ' . json_encode($this->_errors + $report->getErrors())));
+                $view->set('errors', $this->_errors + $report->getErrors())
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
-        
+
         if (RequestMethods::post('submitPreviewReport')) {
             if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/report/');
@@ -341,10 +376,12 @@ class ReportController extends Controller
             if (empty($this->_errors) && $report->validate()) {
                 $session = Registry::get('session');
                 $session->set('reportPreview', $report);
-                
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+
                 self::redirect('/report/preview?action=edit');
             } else {
-                $view->set('errors', $this->_errors + $report->getErrors());
+                $view->set('errors', $this->_errors + $report->getErrors())
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
     }
@@ -422,7 +459,7 @@ class ReportController extends Controller
             echo self::ERROR_MESSAGE_1;
         }
     }
-    
+
     /**
      * Delete image in report preview
      * 
@@ -478,11 +515,13 @@ class ReportController extends Controller
 
             if ($report->validate()) {
                 $report->save();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
+                    'Errors: ' . json_encode($report->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -517,7 +556,8 @@ class ReportController extends Controller
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
+                    'Errors: ' . json_encode($report->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -577,7 +617,7 @@ class ReportController extends Controller
                     Event::fire('admin.log', array('delete success', 'Report ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_6;
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -612,7 +652,7 @@ class ReportController extends Controller
                     Event::fire('admin.log', array('activate success', 'Report ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_4;
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -647,7 +687,7 @@ class ReportController extends Controller
                     Event::fire('admin.log', array('deactivate success', 'Report ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_5;
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -682,7 +722,7 @@ class ReportController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -717,7 +757,7 @@ class ReportController extends Controller
                     $this->getCache()->invalidate();
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -812,7 +852,7 @@ class ReportController extends Controller
         $draw = $page + 1 + time();
 
         $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
-        
+
         $returnArr = array();
         if (null !== $reports) {
             foreach ($reports as $report) {
@@ -831,7 +871,7 @@ class ReportController extends Controller
                     $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
                 }
 
-                if($this->getUser()->getId() == $report->getUserId()){
+                if ($this->getUser()->getId() == $report->getUserId()) {
                     $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
                 }
 
@@ -848,10 +888,10 @@ class ReportController extends Controller
                 $arr [] = "\"" . $report->getCreated() . "\"";
                 $arr [] = "\"" . $label . "\"";
                 $arr [] = "\"" . $archiveLabel . "\"";
-
-                $tempStr = "\"<a href='/admin/report/edit/" . $report->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
-
+                
+                $tempStr = "\"";
                 if ($this->isAdmin() || $report->userId == $this->getUser()->getId()) {
+                    $tempStr .= "<a href='/admin/report/edit/" . $report->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/report/delete/" . $report->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
@@ -865,7 +905,7 @@ class ReportController extends Controller
             }
 
             $str .= join(',', $returnArr) . "]}";
-            
+
             echo $str;
         } else {
             $str .= "[ \"\",\"\",\"\",\"\",\"\",\"\",\"\"]]}";
@@ -874,4 +914,14 @@ class ReportController extends Controller
         }
     }
 
+    /**
+     * Show help for report section
+     * 
+     * @before _secured, _participant
+     */
+    public function help()
+    {
+        
+    }
+    
 }

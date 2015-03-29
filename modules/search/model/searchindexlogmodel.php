@@ -16,6 +16,11 @@ class SearchIndexLogModel extends Model
     protected $_alias = 'sil';
 
     /**
+     * @read
+     */
+    protected $_databaseIdent = 'search';
+    
+    /**
      * @column
      * @readwrite
      * @primary

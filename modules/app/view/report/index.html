@@ -1,22 +1,23 @@
-
 <section class="wrapper reports singlePage">
-  <header class="row">
-    <h2>Reportáže</h2>
-  </header>
-  <div class="row">
+    <header class="row">
+        <h2>Reportáže</h2>
+    </header>
     {if !empty($reports)}
-    {foreach $report in $reports}<a href="/reportaze/r/{echo $report->getUrlKey()}">
-      <article class="report medium-4 left"><img src="{echo $report->getImgThumb()}"/>
-        <div class="info">
-          <h2>{echo $report->getTitle()}</h2><span>{echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}</span>
-          <div>{echo html_entity_decode($report->getShortBody())}</div>
-        </div>
-      </article></a>{/foreach}
-    {/if}
-  </div>{if  $pagecount > 1}
-  <section class="pager row">
-    {if $currentpage !=1}
-    {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
-    {/if}
-  </section>{/if}
+    <div class="row">
+        {foreach $report in $reports}<a href="/reportaze/r/{echo $report->getUrlKey()}">
+            <article class="report medium-4 left"><img src="{echo $report->getImgThumb()}"/>
+                <div class="info">
+                    <h2>{echo $report->getTitle()}</h2><span>{echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}</span>
+                    <div>{echo html_entity_decode($report->getShortBody())}</div>
+                </div>
+            </article></a>{/foreach}
+    </div>
+    <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/archivreportazi">
+            <div class="more"><span>Archiv reportáží</span></div></a></div>
+    {/if}{if  $pagecount > 1}
+    <section class="pager row">
+        {if $currentpage !=1}
+        {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
+        {/if}
+    </section>{/if}
 </section>

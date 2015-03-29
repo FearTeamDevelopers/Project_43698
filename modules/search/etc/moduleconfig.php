@@ -29,27 +29,27 @@ class ModuleConfig extends Module
             'pattern' => '/dosearch/:page',
             'module' => 'search',
             'controller' => 'search',
-            'action' => 'doSearch',
+            'action' => 'dosearch',
             'args' => ':page'
         ),
         array(
             'pattern' => '/doadsearch/:page',
             'module' => 'search',
             'controller' => 'search',
-            'action' => 'doAdSearch',
+            'action' => 'doadsearch',
             'args' => ':page'
         ),
         array(
             'pattern' => '/s/buildindex',
             'module' => 'search',
             'controller' => 'index',
-            'action' => 'buildIndex'
+            'action' => 'buildindex'
         ),
         array(
             'pattern' => '/s/updateindex/:model',
             'module' => 'search',
             'controller' => 'index',
-            'action' => 'updateIndex',
+            'action' => 'updateindex',
             'args' => ':model'
         )
     );

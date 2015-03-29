@@ -156,8 +156,8 @@ class Controller extends BaseController
             self::redirect('/prihlasit');
         }
 
-        //30min inactivity till logout
-        if (time() - $session->get('lastActive') < 1800) {
+        //1h inactivity till logout
+        if (time() - $session->get('lastActive') < 3600) {
             $session->set('lastActive', time());
         } else {
             $view = $this->getActionView();

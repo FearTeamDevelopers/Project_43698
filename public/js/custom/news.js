@@ -1,6 +1,28 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function () {
+    setInterval(function () {
+        var cid = jQuery('#conceptid').val();
+        var type = jQuery('#concepttype').val();
+        var title = jQuery('input[name=title]').val();
+        var shorttext = CKEDITOR.instances['ckeditor2'].getData();
+        var text = CKEDITOR.instances['ckeditor'].getData();
+        var keywords = jQuery('input[name=keywords]').val();
+        var metatitle = jQuery('input[name=metatitle]').val();
+        var metadescription = jQuery('textarea[name=metadescription]').text();
+        
+        jQuery.post('/admin/concept/store/', {conceptid:cid, type:type,title:title,
+                shorttext:shorttext, text: text, keywords:keywords, 
+                metatitle:metatitle, metadescription:metadescription}, function (msg) {
+            if (msg == 'fail') {
+                jQuery('#dialog p').text('Error while saving concept');
+            } else {
+                jQuery('#conceptid').val(msg);
+            }
+        });
+
+    }, 300000);
+
     jQuery('.nosubmit').submit(function (event) {
         event.preventDefault();
         return false;
@@ -11,7 +33,7 @@ jQuery(document).ready(function () {
         var value = CKEDITOR.instances['ckeditor'].getData();
         CKEDITOR.instances['ckeditor2'].setData(value);
     });
-    
+
     jQuery('#teaser-to-text').click(function (event) {
         event.preventDefault();
         var value = CKEDITOR.instances['ckeditor2'].getData();

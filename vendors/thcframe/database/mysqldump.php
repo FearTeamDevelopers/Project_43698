@@ -22,6 +22,15 @@ class Mysqldump extends Base
      * @var THCFrame\Database\ConnectionHandler
      */
     private $_connectionHandler;
+    
+    /**
+     *
+     * @var THCFrame\Filesystem\FileManager 
+     */
+    private $_filemanager;
+    
+    private $_backupFileName = null;
+    private $_backupDir = null;
     private $_fileHandler = null;
     private $_settings = array();
     private $_database;
@@ -31,12 +40,15 @@ class Mysqldump extends Base
         'exclude-tables' => array(),
         'exclude-tables-reqex' => array(),
         'no-data' => false,
+        'only-data' => false,
         'add-drop-table' => true,
         'single-transaction' => true,
         'lock-tables' => false,
         'add-locks' => true,
         'disable-foreign-keys-check' => true,
-        'extended-insert' => true
+        'extended-insert' => true,
+        'write-comments' => true,
+        'use-file-compression' => true
     );
 
     /**
@@ -46,15 +58,20 @@ class Mysqldump extends Base
      */
     public function __construct($settings = array())
     {
+        parent::__construct();
+
         $this->_connectionHandler = Registry::get('database');
 
-        $this->_prepareSettings($settings);
+        $this->_filemanager = new FileManager();
+        $defaultDir = APP_PATH . '/temp/db/';
 
-        $filemanager = new FileManager();
-
-        if (!is_dir(APP_PATH . '/temp/db/')) {
-            $filemanager->mkdir(APP_PATH . '/temp/db/');
+        if (!is_dir($defaultDir)) {
+            $this->_filemanager->mkdir($defaultDir);
         }
+
+        $this->_backupDir = $defaultDir;
+
+        $this->_prepareSettings($settings);
     }
 
     /**
@@ -69,7 +86,7 @@ class Mysqldump extends Base
      * 
      * @param type $settings
      */
-    private function _prepareSettings($settings)
+    private function _prepareSettings(array $settings)
     {
         $dbIdents = $this->_connectionHandler->getIdentifications();
 
@@ -77,6 +94,8 @@ class Mysqldump extends Base
             foreach ($dbIdents as $id) {
                 if (!empty($settings[$id])) {
                     $this->_settings[$id] = array_replace_recursive($this->_defaultSettings, $settings[$id]);
+                } else {
+                    $this->_settings[$id] = $this->_defaultSettings;
                 }
             }
         }
@@ -116,10 +135,16 @@ class Mysqldump extends Base
         $sqlResult = $dbc->execute("SHOW CREATE TABLE `{$table}`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
+            if (true === $this->_settings[$dbid]['only-data']) {
+                return true;
+            }
+
             if (isset($row['Create Table'])) {
-                $this->_write(
-                        '-- -----------------------------------------------------' . PHP_EOL .
-                        "-- Table structure for table `{$table}` --" . PHP_EOL);
+                if (true === $this->_settings[$dbid]['write-comments']) {
+                    $this->_write(
+                            '-- -----------------------------------------------------' . PHP_EOL .
+                            "-- Table structure for table `{$table}` --" . PHP_EOL);
+                }
 
                 if ($this->_settings[$dbid]['add-drop-table']) {
                     $this->_write("DROP TABLE IF EXISTS `{$table}`;" . PHP_EOL);
@@ -142,8 +167,10 @@ class Mysqldump extends Base
      */
     private function _getTableValues(Connector $dbc, $dbid, $tablename)
     {
-        $this->_write('--' . PHP_EOL .
-                "-- Dumping data for table `{$tablename}` --" . PHP_EOL);
+        if (true === $this->_settings[$dbid]['write-comments']) {
+            $this->_write('--' . PHP_EOL .
+                    "-- Dumping data for table `{$tablename}` --" . PHP_EOL);
+        }
 
         $dbSetting = $this->_settings[$dbid];
 
@@ -167,7 +194,7 @@ class Mysqldump extends Base
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             $vals = array();
             foreach ($row as $val) {
-                $vals[] = is_null($val) ? 'NULL' : "{$val}";
+                $vals[] = is_null($val) ? 'NULL' : addslashes($val);
             }
 
             if ($onlyOnce || !$dbSetting['extended-insert']) {
@@ -211,17 +238,20 @@ class Mysqldump extends Base
      */
     private function _createHeader(Connector $dbc, $dbid)
     {
-        $header = '-- mysqldump-php SQL Dump' . PHP_EOL .
-                '--' . PHP_EOL .
-                "-- Host: {$dbc->getHost()}" . PHP_EOL .
-                '-- Generation Time: ' . date('r') . PHP_EOL .
-                '--' . PHP_EOL .
-                "-- Database: `{$dbc->getSchema()}`" . PHP_EOL .
-                '--' . PHP_EOL;
+        $header = '';
+
+        if (true === $this->_settings[$dbid]['write-comments']) {
+            $header .= '-- mysqldump-php SQL Dump' . PHP_EOL .
+                    '--' . PHP_EOL .
+                    "-- Host: {$dbc->getHost()}" . PHP_EOL .
+                    '-- Generation Time: ' . date('r') . PHP_EOL .
+                    '--' . PHP_EOL .
+                    "-- Database: `{$dbc->getSchema()}`" . PHP_EOL .
+                    '--' . PHP_EOL;
+        }
 
         if ($this->_settings[$dbid]['disable-foreign-keys-check']) {
-            $header .= 'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL .
-                    '--' . PHP_EOL;
+            $header .= 'SET FOREIGN_KEY_CHECKS=0;' . PHP_EOL;
         }
 
         return $header;
@@ -233,13 +263,11 @@ class Mysqldump extends Base
      * @param type $dbid
      * @return string
      */
-    private function _getFooter($dbid)
+    private function _createFooter($dbid)
     {
         $footer = '';
         if ($this->_settings[$dbid]['disable-foreign-keys-check']) {
-            $footer .= '--' . PHP_EOL .
-                    'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL .
-                    '--' . PHP_EOL;
+            $footer .= 'SET FOREIGN_KEY_CHECKS=1;' . PHP_EOL;
         }
 
         return $footer;
@@ -272,7 +300,7 @@ class Mysqldump extends Base
     {
         $bytesWritten = 0;
         if (false === ($bytesWritten = fwrite($this->_fileHandler, $str))) {
-            throw new Exception\Backup('Writting to file failed!', 4);
+            throw new Exception\Mysqldump('Writting to file failed!', 4);
         }
         return $bytesWritten;
     }
@@ -288,54 +316,164 @@ class Mysqldump extends Base
     }
 
     /**
-     * Create mysql database dump of all connected databases
+     * Main private method
+     * Creates file and write database dump into it
      * 
-     * @throws Exception\Backup
+     * @param Connector $db     connector instance
+     * @param string    $id     database identification
+     * @throws Exception\Mysqldump
      */
-    public function create()
+    private function _writeData(Connector $db, $id)
     {
-        $dbIdents = $this->_connectionHandler->getIdentifications();
 
-        if (!empty($dbIdents)) {
-            foreach ($dbIdents as $id) {
-                $db = $this->_connectionHandler->get($id);
-                $filename = APP_PATH . '/temp/db/' . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
+        if (null === $this->_backupFileName) {
+            $filename = $this->_backupDir . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
+        } else {
+            $filename = $this->_backupDir . $this->_backupFileName;
+        }
 
-                if (!$this->_open($filename)) {
-                    throw new Exception\Backup(sprintf('Output file %s is not writable', $filename), 2);
+        if (!$this->_open($filename)) {
+            throw new Exception\Mysqldump(sprintf('Output file %s is not writable', $filename), 2);
+        }
+
+        Event::fire('framework.mysqldump.create.before', array($filename));
+
+        $this->_write($this->_createHeader($db, $id));
+        $tables = $this->_getTables($db, $id);
+
+        if (!empty($tables)) {
+            foreach ($tables as $table) {
+                if (in_array($table, $this->_settings[$id]['exclude-tables'], true)) {
+                    continue;
                 }
 
-                Event::fire('framework.mysqldump.create.before', array($filename));
-
-                $this->_write($this->_getHeader($db, $id));
-                $tables = $this->_getTables($db, $id);
-
-                if (!empty($tables)) {
-                    foreach ($tables as $table) {
-                        if (in_array($table, $this->_settings[$id]['exclude-tables'], true)) {
-                            continue;
-                        }
-
-                        foreach ($this->_settings[$id]['exclude-tables-reqex'] as $regex) {
-                            if (mb_ereg_match($regex, $table)) {
-                                continue 2;
-                            }
-                        }
-
-                        $is_table = $this->_getTableStructure($db, $id, $table);
-                        if (true === $is_table && false === $this->_settings[$id]['no-data']) {
-                            $this->_getTableValues($db, $id, $table);
-                        }
+                foreach ($this->_settings[$id]['exclude-tables-reqex'] as $regex) {
+                    if (mb_ereg_match($regex, $table)) {
+                        continue 2;
                     }
                 }
 
-                $this->_write($this->_getFooter($id));
-                Event::fire('framework.mysqldump.create.after', array($filename));
-
-                $this->_close();
-                $this->_dumpedFiles[] = $filename;
+                $is_table = $this->_getTableStructure($db, $id, $table);
+                if (true === $is_table && false === $this->_settings[$id]['no-data']) {
+                    $this->_getTableValues($db, $id, $table);
+                }
             }
         }
+
+        $this->_write($this->_createFooter($id));
+        Event::fire('framework.mysqldump.create.after', array($filename));
+
+        $this->_close();
+        $this->_dumpedFiles[$id] = $filename;
+    }
+
+    /**
+     * 
+     * @param array $files
+     */
+    private function _compressBackupFiles(array $files = array())
+    {
+        if (!empty($files)) {
+            foreach ($files as $dbid => $path) {
+                if ($this->_settings[$dbid]['use-file-compression'] === true) {
+                    if (file_exists($path)) {
+                        $this->_filemanager->gzCompressFile($path);
+                        unlink($path);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Main public method
+     * Create mysql database dump of all connected databases or one specific 
+     * database based on parameter
+     * 
+     * @param string        $dbId       database identification
+     * @return boolean
+     * @throws Exception\Mysqldump
+     */
+    public function create($dbId = null)
+    {
+        $dbIdents = $this->_connectionHandler->getIdentifications();
+
+        if (empty($dbIdents)) {
+            throw new Exception\Mysqldump('No connected database found');
+        }
+
+        if (null !== $dbId) {
+            if (in_array($dbId, $dbIdents)) {
+                $db = $this->_connectionHandler->get($dbId);
+                $this->_writeData($db, $dbId);
+
+                if (!empty($this->_dumpedFiles)) {
+                    $this->_compressBackupFiles($this->_dumpedFiles);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                throw new Exception\Mysqldump(sprintf('Database with identification %s is not connected', $dbId));
+            }
+        } else {
+            foreach ($dbIdents as $id) {
+                $db = $this->_connectionHandler->get($id);
+                $this->_writeData($db, $id);
+                unset($db);
+            }
+
+            if (!empty($this->_dumpedFiles)) {
+                $this->_compressBackupFiles($this->_dumpedFiles);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param type $id
+     * @return type
+     */
+    public function getDumpFile($id = null)
+    {
+        if (null === $id) {
+            return $this->_dumpedFiles;
+        } else {
+            if (array_key_exists($id, $this->_dumpedFiles)) {
+                return $this->_dumpedFiles[$id];
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param type $name
+     * @return \THCFrame\Database\Mysqldump
+     */
+    public function setBackupName($name)
+    {
+        $this->_backupFileName = $name;
+        return $this;
+    }
+
+    /**
+     * 
+     * @param type $dir
+     * @return \THCFrame\Database\Mysqldump
+     */
+    public function setBackupDir($dir)
+    {
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $this->_backupDir = $dir;
+        return $this;
     }
 
     /**

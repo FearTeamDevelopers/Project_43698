@@ -1,8 +1,8 @@
 section.wrapper.novinky.singlePage
     header.row
         h2 Novinky
+    |{if !empty($news)}    
     section.row.container
-        |{if !empty($news)}
         | {foreach $new in $news}
         article
             header
@@ -13,7 +13,11 @@ section.wrapper.novinky.singlePage
                 div {echo html_entity_decode($new->getShortBody())}
                 a(href!='/novinky/r/{echo $new->getUrlKey()}') čti více
         | {/foreach}
-        |{/if}
+    .moreWrap.large-2.medium-3.small-6.centerBlock
+      a(href='/archivnovinek')
+         .more
+            span Archiv novinek
+    |{/if}
     include ../components/pager
 
 

@@ -146,7 +146,7 @@ class ReportModel extends Model
      * @type text
      * @length 350
      * 
-     * @validate path, max(350)
+     * @validate max(350)
      * @label photo path
      */
     protected $_imgMain;
@@ -157,7 +157,7 @@ class ReportModel extends Model
      * @type text
      * @length 350
      * 
-     * @validate path, max(350)
+     * @validate max(350)
      * @label thumb path
      */
     protected $_imgThumb;
@@ -243,6 +243,11 @@ class ReportModel extends Model
             $this->setCreated(date('Y-m-d H:i:s'));
             $this->setActive(true);
         }
+        
+        $shortText = preg_replace('/https:/i', 'http:', $this->getShortBody());
+        $text = preg_replace('/https:/i', 'http:', $this->getBody());
+        $this->setShortBody($shortText);
+        $this->setBody($text);
         $this->setModified(date('Y-m-d H:i:s'));
     }
 
@@ -290,15 +295,15 @@ class ReportModel extends Model
         
         return $reports;
     }
-
+    
     /**
      * Called from app module
      * @param type $limit
      * @return type
      */
-    public static function fetchOldWithLimit($limit = 10, $page = 1)
+    public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1), 
+        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 
                     'imgMain', 'imgThumb', 'photoName'), 
                 array('rank' => 'desc', 'created' => 'desc'), 

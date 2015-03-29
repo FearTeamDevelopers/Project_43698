@@ -3,7 +3,6 @@
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Security\PasswordManager;
@@ -14,6 +13,17 @@ use THCFrame\Security\PasswordManager;
 class UserController extends Controller
 {
 
+    private function _checkEmailActToken($token)
+    {
+        $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
+        
+        if($exists === null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     /**
      * Login into administration
      */
@@ -92,7 +102,8 @@ class UserController extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+                ->set('user', null);
 
         if (RequestMethods::post('submitAddUser')) {
             if ($this->checkCSRFToken() !== true &&
@@ -115,6 +126,20 @@ class UserController extends Controller
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
 
+            $actToken = Rand::randStr(50);
+            for ($i = 1; $i <= 75; $i++) {
+                if($this->_checkEmailActToken($actToken)){
+                    break;
+                } else {
+                    $actToken = Rand::randStr(50);
+                }
+
+                if ($i == 75) {
+                    $errors['email'] = array(self::ERROR_MESSAGE_3.' Zkuste vytvoření uživatele opakovat později');
+                    break;
+                }
+            }
+            
             $user = new \App\Model\UserModel(array(
                 'firstname' => RequestMethods::post('firstname'),
                 'lastname' => RequestMethods::post('lastname'),
@@ -134,7 +159,7 @@ class UserController extends Controller
                 $view->successMessage('Uživatel' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('user', $user);
@@ -205,7 +230,8 @@ class UserController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/');
             } else {
-                Event::fire('admin.log', array('fail', 'User id: ' . $user->getId()));
+                Event::fire('admin.log', array('fail', 'User id: ' . $user->getId(),
+                    'Errors: '.  json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -282,7 +308,8 @@ class UserController extends Controller
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail', 'User id: ' . $id));
+                Event::fire('admin.log', array('fail', 'User id: ' . $id,
+                    'Errors: '.  json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -304,12 +331,7 @@ class UserController extends Controller
         if (NULL === $user) {
             echo self::ERROR_MESSAGE_2;
         } else {
-            $pathMain = $user->getUnlinkPath();
-            $pathThumb = $user->getUnlinkThumbPath();
-
             if ($user->delete()) {
-                @unlink($pathMain);
-                @unlink($pathThumb);
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
                 echo 'success';
             } else {
@@ -319,4 +341,13 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * Show help for user section
+     * 
+     * @before _secured, _participant
+     */
+    public function help()
+    {
+        
+    }
 }

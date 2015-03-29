@@ -379,17 +379,27 @@ class StringMethods
      * @param string $replace
      * @return string
      */
-    public static function fastClean($string, $badChars = array(), $replace = '')
+    public static function fastClean($string, $badChars = array(), $replace = '', $keepDiacritic = false)
     {
         if(empty($badChars)){
             $badChars = array('.', ',', '_', '(', ')', '[', ']', '|', ';',
                 '?', '<', '>', '/', '\\', '!', '@', '&', '*', ':', '+', '^',
-                '=', '~', '°', '´', '`', '%', "'", '"', '$', '#');
+                '=', '°', '´', '`', '%', "'", '"', '$', '#',
+                '≤', '&le;', '≥', '&ge;', '≠', '&ne;',
+                '‘', '&lsquo;', '’', '&rsquo;', '“', '&ldquo;', '”', '&rdquo;', '‚', '&sbquo;',
+                '„', '&bdquo;', '′', '&prime;', '″', '&Prime;', '—', '&mdash;',
+                '˜', '&tilde;', '‹', '&lsaquo;', '›', '&rsaquo;', '«', '&laquo;', '»', '&raquo;'
+            );
+            //'‐', '–', '&ndash;'
+        }
+
+        if($keepDiacritic === false){
+            $noDiacriticString = self::removeDiacriticalMarks($string);
+        }else{
+            $noDiacriticString = $string;
         }
         
-        $noDiacriticString = self::removeDiacriticalMarks($string);
-        
-        $cleanString = str_replace($badChars, $replace, $noDiacriticString);
+        $cleanString = trim(str_replace($badChars, $replace, $noDiacriticString));
         
         unset($noDiacriticString);
         return $cleanString;

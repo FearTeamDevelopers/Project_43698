@@ -48,10 +48,9 @@ class Database extends Base
     {
         Event::fire('framework.database.initialize.before', array());
 
-
         $databases = $configuration->database;
         $conHandler = new ConnectionHandler();
-
+        
         if (!empty($databases)) {
             foreach ($databases as $dbIdent) {
                 if (!empty($dbIdent) && !empty($dbIdent->type)) {
@@ -70,6 +69,27 @@ class Database extends Base
         }
 
         return $conHandler;
+    }
+    
+    /**
+     * 
+     * @param array     $options
+     * @return \THCFrame\Database\Database\Connector
+     * @throws Exception\Argument
+     */
+    public function initializeDirectly($options)
+    {
+        if (!empty($options['type'])) {
+            $type = $options['type'];
+            $options = (array) $options;
+        } else {
+            throw new Exception\Argument('Error in configuration');
+        }
+
+        $connector = $this->createConnector($type, $options);
+        $connector->connect();
+        
+        return $connector;
     }
 
     /**

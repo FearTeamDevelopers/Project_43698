@@ -56,16 +56,24 @@ class NewsController extends Controller
      */
     private function _createObject()
     {
-        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        if (!$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array('This title is already used');
+        for ($i = 1; $i <= 50; $i++) {
+            if ($this->_checkUrlKey($urlKeyCh)) {
+                break;
+            } else {
+                $urlKeyCh = $urlKey . '-' . $i;
+            }
+
+            if ($i == 50) {
+                $this->_errors['title'] = array('Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.');
+                break;
+            }
         }
 
         $autoApprove = Registry::get('configuration')->news_autopublish;
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
@@ -73,7 +81,7 @@ class NewsController extends Controller
             'title' => RequestMethods::post('title'),
             'userId' => $this->getUser()->getId(),
             'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKey,
+            'urlKey' => $urlKeyCh,
             'approved' => $autoApprove,
             'archive' => 0,
             'shortBody' => $shortText,
@@ -83,7 +91,7 @@ class NewsController extends Controller
             'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
             'metaDescription' => RequestMethods::post('metadescription')
         ));
-        
+
         return $news;
     }
 
@@ -106,8 +114,7 @@ class NewsController extends Controller
             $object->userAlias = $this->getUser()->getWholeName();
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
@@ -122,7 +129,7 @@ class NewsController extends Controller
         $object->keywords = $keywords;
         $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
         $object->metaDescription = RequestMethods::post('metadescription');
-        
+
         return $object;
     }
 
@@ -156,14 +163,34 @@ class NewsController extends Controller
      * 
      * @before _secured, _participant
      */
-    public function add()
+    public function add($conceptId = 0)
     {
         $view = $this->getActionView();
 
-        $news = $this->_checkForObject();
-        
+        if ($conceptId === 0) {
+            $news = $this->_checkForObject();
+        } else {
+            $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $conceptId));
+
+            $news = new \App\Model\NewsModel(array(
+                'title' => $concept->getTitle(),
+                'shortBody' => $concept->getShortBody(),
+                'body' => $concept->getBody(),
+                'keywords' => $concept->getKeywords(),
+                'metaTitle' => $concept->getMetaTitle(),
+                'metaDescription' => $concept->getMetaDescription()
+            ));
+        }
+
+        $newsConcepts = \Admin\Model\ConceptModel::all(array(
+                    'userId = ?' => $this->getUser()->getId(),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS),
+                array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
+
         $view->set('news', $news)
-            ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('conceptid', $conceptId)
+                ->set('concepts', $newsConcepts)
+                ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddNews')) {
             if ($this->checkCSRFToken() !== true &&
@@ -176,18 +203,21 @@ class NewsController extends Controller
             if (empty($this->_errors) && $news->validate()) {
                 $id = $news->save();
                 $this->getCache()->invalidate();
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/news/');
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail',
+                    'Errors: ' . json_encode($this->_errors + $news->getErrors())));
                 $view->set('errors', $this->_errors + $news->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                        ->set('news', $news);
+                        ->set('news', $news)
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
-        
+
         if (RequestMethods::post('submitPreviewNews')) {
             if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
@@ -199,12 +229,14 @@ class NewsController extends Controller
             if (empty($this->_errors) && $news->validate()) {
                 $session = Registry::get('session');
                 $session->set('newsPreview', $news);
-                
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+
                 self::redirect('/news/preview?action=add');
             } else {
                 $view->set('errors', $this->_errors + $news->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                        ->set('news', $news);
+                        ->set('news', $news)
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
     }
@@ -220,7 +252,7 @@ class NewsController extends Controller
         $view = $this->getActionView();
 
         $news = $this->_checkForObject();
-        
+
         if (null !== $news) {
             $view->set('news', $news);
         } else {
@@ -249,18 +281,22 @@ class NewsController extends Controller
             $news = $this->_editObject($news);
 
             if (empty($this->_errors) && $news->validate()) {
+                \Admin\Model\NewsHistoryModel::createFromSource($news);
                 $news->save();
                 $this->getCache()->invalidate();
-                
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/admin/news/');
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id));
-                $view->set('errors', $this->_errors + $news->getErrors());
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($this->_errors + $news->getErrors())));
+                $view->set('errors', $this->_errors + $news->getErrors())
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
-        
+
         if (RequestMethods::post('submitPreviewNews')) {
             if ($this->checkCSRFToken() !== true) {
                 self::redirect('/admin/news/');
@@ -271,10 +307,12 @@ class NewsController extends Controller
             if (empty($this->_errors) && $action->validate()) {
                 $session = Registry::get('session');
                 $session->set('newsPreview', $news);
-                
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+
                 self::redirect('/news/preview?action=edit');
             } else {
-                $view->set('errors', $this->_errors + $news->getErrors());
+                $view->set('errors', $this->_errors + $news->getErrors())
+                        ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
     }
@@ -337,11 +375,13 @@ class NewsController extends Controller
 
             if ($news->validate()) {
                 $news->save();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -376,7 +416,8 @@ class NewsController extends Controller
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -435,7 +476,7 @@ class NewsController extends Controller
                     Event::fire('admin.log', array('delete success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_6;
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -469,7 +510,7 @@ class NewsController extends Controller
                     Event::fire('admin.log', array('activate success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_4;
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -503,7 +544,7 @@ class NewsController extends Controller
                     Event::fire('admin.log', array('deactivate success', 'News ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_5;
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -534,11 +575,11 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
                     $this->getCache()->invalidate();
+                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -569,11 +610,11 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
                     $this->getCache()->invalidate();
+                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
                     echo self::SUCCESS_MESSAGE_2;
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Error count:' . count($errors)));
+                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
                     echo $message;
                 }
@@ -706,9 +747,9 @@ class NewsController extends Controller
                 $arr [] = "\"" . $label . "\"";
                 $arr [] = "\"" . $archiveLabel . "\"";
 
-                $tempStr = "\"<a href='/admin/news/edit/" . $_news->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
-
+                $tempStr = "\"";
                 if ($this->isAdmin() || $_news->userId == $this->getUser()->getId()) {
+                    $tempStr .= "<a href='/admin/news/edit/" . $_news->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/news/delete/" . $_news->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
@@ -731,4 +772,14 @@ class NewsController extends Controller
         }
     }
 
+    /**
+     * Show help for news section
+     * 
+     * @before _secured, _participant
+     */
+    public function help()
+    {
+        
+    }
+    
 }

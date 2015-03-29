@@ -17,11 +17,11 @@ class BasicUser extends Model
 
     /**
      * Time after which a password must expire i.e. the password needs to be updated
-     * approx 6 months
+     * approx 4 months
      * 
      * @var int
      */
-    public static $passwordExpiryTime = 15552000;
+    public static $passwordExpiryTime = 10368000;
 
     /**
      * Maximum time after which the user must re-login
@@ -315,13 +315,13 @@ class BasicUser extends Model
             $token->save();
 
             if ($secure && $httpOnly) {
-                \setcookie('AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, TRUE, TRUE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, TRUE, TRUE);
             } elseif (!$secure && !$httpOnly) {
-                \setcookie('AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, FALSE, FALSE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, FALSE, FALSE);
             } elseif ($secure && !$httpOnly) {
-                \setcookie('AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, TRUE, FALSE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, TRUE, FALSE);
             } elseif (!$secure && $httpOnly) {
-                \setcookie('AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, FALSE, TRUE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, FALSE, TRUE);
             }
 
             return true;
@@ -337,8 +337,8 @@ class BasicUser extends Model
      */
     public static function checkRememberMe()
     {
-        if (RequestMethods::cookie('AUTHID') != '') {
-            $token = Authtoken::first(array('token = ?' => RequestMethods::cookie('AUTHID')));
+        if (RequestMethods::cookie('THCF_AUTHID') != '') {
+            $token = Authtoken::first(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
 
             if ($token !== null) {
                 $currentTime = time();
@@ -353,7 +353,7 @@ class BasicUser extends Model
                 }
             } else {
                 //If this AUTH token is not found in DB, then erase the cookie from the client's machine and return FALSE
-                \setcookie("AUTHID", "");
+                \setcookie("THCF_AUTHID", "");
                 return false;
             }
         } else {
@@ -367,9 +367,9 @@ class BasicUser extends Model
      */
     public static function deleteAuthenticationToken()
     {
-        if (RequestMethods::cookie('AUTHID') != '') {
-            Authtoken::deleteAll(array('token = ?' => RequestMethods::cookie('AUTHID')));
-            \setcookie('AUTHID', '', time()-1800);
+        if (RequestMethods::cookie('THCF_AUTHID') != '') {
+            Authtoken::deleteAll(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
+            \setcookie('THCF_AUTHID', '', time()-1800);
         }
     }
 

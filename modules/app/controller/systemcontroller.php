@@ -74,7 +74,7 @@ class SystemController extends Controller
                 $view->successMessage('Děkujeme za Vaše nápady a návrhy');
                 self::redirect('/');
             } else {
-                Event::fire('app.log', array('fail'));
+                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($feedback->getErrors())));
                 $view->set('feedback', $feedback)
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $feedback->getErrors());

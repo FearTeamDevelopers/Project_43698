@@ -16,6 +16,11 @@ class SearchIndexModel extends Model
     protected $_alias = 'si';
 
     /**
+     * @read
+     */
+    protected $_databaseIdent = 'search';
+    
+    /**
      * @column
      * @readwrite
      * @primary

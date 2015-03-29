@@ -2,10 +2,11 @@
 
 namespace Admin\Etc;
 
-use THCFrame\Events\Events as Events;
+use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Core\StringMethods;
+use THCFrame\Request\RequestMethods;
 
 /**
  * Module specific controller class extending framework controller class
@@ -13,21 +14,37 @@ use THCFrame\Core\StringMethods;
 class Controller extends BaseController
 {
 
-    const SUCCESS_MESSAGE_1 = ' has been successfully created';
-    const SUCCESS_MESSAGE_2 = 'All changes were successfully saved';
-    const SUCCESS_MESSAGE_3 = ' has been successfully deleted';
-    const SUCCESS_MESSAGE_4 = 'Everything has been successfully activated';
-    const SUCCESS_MESSAGE_5 = 'Everything has been successfully deactivated';
-    const SUCCESS_MESSAGE_6 = 'Everything has been successfully deleted';
-    const SUCCESS_MESSAGE_7 = 'Everything has been successfully uploaded';
-    const SUCCESS_MESSAGE_8 = 'Everything has been successfully saved';
-    const SUCCESS_MESSAGE_9 = 'Everything has been successfully added';
-    const ERROR_MESSAGE_1 = 'Oops, something went wrong';
-    const ERROR_MESSAGE_2 = 'Not found';
-    const ERROR_MESSAGE_3 = 'Unknown error eccured';
-    const ERROR_MESSAGE_4 = 'You dont have permissions to do this';
-    const ERROR_MESSAGE_5 = 'Required fields are not valid';
-    const ERROR_MESSAGE_6 = 'Access denied';
+//    const SUCCESS_MESSAGE_1 = ' has been successfully created';
+//    const SUCCESS_MESSAGE_2 = 'All changes were successfully saved';
+//    const SUCCESS_MESSAGE_3 = ' has been successfully deleted';
+//    const SUCCESS_MESSAGE_4 = 'Everything has been successfully activated';
+//    const SUCCESS_MESSAGE_5 = 'Everything has been successfully deactivated';
+//    const SUCCESS_MESSAGE_6 = 'Everything has been successfully deleted';
+//    const SUCCESS_MESSAGE_7 = 'Everything has been successfully uploaded';
+//    const SUCCESS_MESSAGE_8 = 'Everything has been successfully saved';
+//    const SUCCESS_MESSAGE_9 = 'Everything has been successfully added';
+//    const ERROR_MESSAGE_1 = 'Oops, something went wrong';
+//    const ERROR_MESSAGE_2 = 'Not found';
+//    const ERROR_MESSAGE_3 = 'Unknown error eccured';
+//    const ERROR_MESSAGE_4 = 'You dont have permissions to do this';
+//    const ERROR_MESSAGE_5 = 'Required fields are not valid';
+//    const ERROR_MESSAGE_6 = 'Access denied';
+
+    const SUCCESS_MESSAGE_1 = ' byl(a) úspěšně vytovřen(a)';
+    const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
+    const SUCCESS_MESSAGE_3 = ' byl(a) úspěšně smazán(a)';
+    const SUCCESS_MESSAGE_4 = 'Vše bylo úspěšně aktivováno';
+    const SUCCESS_MESSAGE_5 = 'Vše bylo úspěšně deaktivováno';
+    const SUCCESS_MESSAGE_6 = 'Vše bylo úspěšně smazáno';
+    const SUCCESS_MESSAGE_7 = 'Vše bylo úspěšně nahráno';
+    const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
+    const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
+    const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
+    const ERROR_MESSAGE_2 = 'Nenalezeno';
+    const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
+    const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnění';
+    const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
+    const ERROR_MESSAGE_6 = 'Přísput odepřen';
 
     /**
      * Store security context object
@@ -66,6 +83,40 @@ class Controller extends BaseController
 
     /**
      * 
+     * @param type $body
+     * @param type $subject
+     * @param type $sendTo
+     * @return type
+     */
+    protected function sendEmail($body, $subject, $sendTo = null)
+    {
+        try {
+            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+            $transport = \Swift_MailTransport::newInstance();
+            $mailer = \Swift_Mailer::newInstance($transport);
+
+            if (null === $sendTo) {
+                $sendTo = $this->getConfig()->system->adminemail;
+            }
+
+            $message = \Swift_Message::newInstance(null)
+                    ->setSubject($subject)
+                    ->setFrom('info@hastrman.cz')
+                    ->setTo($sendTo)
+                    ->setBody($body);
+
+            if ($mailer->send($message)) {
+                return true;
+            } else {
+                Event::fire('admin.log', array('fail', 'No email sent'));
+            }
+        } catch (\Exception $ex) {
+            Event::fire('admin.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
+        }
+    }
+
+    /**
+     * 
      * @param type $options
      */
     public function __construct($options = array())
@@ -77,7 +128,7 @@ class Controller extends BaseController
         $this->_config = Registry::get('configuration');
 
         // schedule disconnect from database 
-        Events::add('framework.controller.destruct.after', function($name) {
+        Event::add('framework.controller.destruct.after', function($name) {
             Registry::get('database')->disconnectAll();
         });
     }
@@ -100,8 +151,8 @@ class Controller extends BaseController
             self::redirect('/admin/login');
         }
 
-        //60min inactivity till logout
-        if (time() - $session->get('lastActive') < 3600) {
+        //5h inactivity till logout
+        if (time() - $session->get('lastActive') < 18000) {
             $session->set('lastActive', time());
         } else {
             $view = $this->getActionView();
@@ -109,6 +160,29 @@ class Controller extends BaseController
             $view->infoMessage('You has been logged out for long inactivity');
             $this->_security->logout();
             self::redirect('/admin/login');
+        }
+    }
+
+    /**
+     * @protected
+     */
+    public function _cron()
+    {
+        if (!preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT'))) {
+            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
+        }
+    }
+
+    /**
+     * 
+     * @return boolean
+     */
+    protected function isCron()
+    {
+        if (preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT'))) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -223,7 +297,7 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function mutliSubmissionProtectionToken()
+    protected function mutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $token = $session->get('submissionprotection');
@@ -240,7 +314,7 @@ class Controller extends BaseController
      * 
      * @return type
      */
-    public function revalidateMutliSubmissionProtectionToken()
+    protected function revalidateMutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $session->erase('submissionprotection');
@@ -254,7 +328,7 @@ class Controller extends BaseController
      * 
      * @param type $token
      */
-    public function checkMutliSubmissionProtectionToken($token)
+    protected function checkMutliSubmissionProtectionToken($token)
     {
         $session = Registry::get('session');
         $sessionToken = $session->get('submissionprotection');
@@ -270,7 +344,7 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function checkCSRFToken()
+    protected function checkCSRFToken()
     {
         if ($this->_security->getCSRF()->verifyRequest()) {
             return true;

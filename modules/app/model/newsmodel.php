@@ -199,6 +199,11 @@ class NewsModel extends Model
             $this->setCreated(date('Y-m-d H:i:s'));
             $this->setActive(true);
         }
+        
+        $shortText = preg_replace('/https:/i', 'http:', $this->getShortBody());
+        $text = preg_replace('/https:/i', 'http:', $this->getBody());
+        $this->setShortBody($shortText);
+        $this->setBody($text);
         $this->setModified(date('Y-m-d H:i:s'));
     }
 
@@ -251,9 +256,9 @@ class NewsModel extends Model
      * @param type $limit
      * @return type
      */
-    public static function fetchOldWithLimit($limit = 10, $page = 1)
+    public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $news = self::all(array('active = ?' => true, 'approved = ?' => 1), 
+        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), 
                 array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), 
                 array('rank' => 'desc', 'created' => 'desc'), 
                 $limit, $page

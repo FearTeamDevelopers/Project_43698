@@ -15,18 +15,18 @@ section.wrapper.bazar.singlePage
         |{foreach $ad in $ads}
         article.large-6.small-12.medium-6.column.left
             .imgWrapper
-                | {script $images=$ad->getImages()}
-                | {if !empty($images)}
-                | {script $image=array_shift($images)}
+                |{script $images=$ad->getImages()}
+                |{if !empty($images)}
+                |{script $image=array_shift($images)}
                 a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->getImgMain()}")
                     img(src!="{echo $image->getImgThumb()}")
-                | {/if}
+                |{/if}
             .nazev
                 .nazevWrapper
                     h4 {echo $ad->getTitle()}
             .infoWrapper
                 .info
-                    | {if $ad->getAdType() =='tender'}
+                    |{if $ad->getAdType() =='tender'}
                     center
                         span.nabidka Nabídka <br/>
                     |{/if}{else}

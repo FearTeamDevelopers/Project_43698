@@ -1,0 +1,17 @@
+section.wrapper.reports.singlePage
+    header.row
+      h2 Archiv reportáží
+    section.row.container
+        |{if !empty($reports)}
+        | {foreach $report in $reports}
+        article
+            header
+                h3 {echo $report->getTitle()}
+                span 
+                    small {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}
+            .body
+                div {echo html_entity_decode($report->getShortBody())}
+                a(href!='/reportaze/r/{echo $report->getUrlKey()}') čti více
+        | {/foreach}
+        |{/if}
+    include ../components/pager

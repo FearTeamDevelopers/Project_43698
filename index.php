@@ -5,6 +5,8 @@ if(preg_match('#^.*\.dev$#i',$_SERVER['SERVER_NAME'])){
     defined('ENV')? null : define('ENV', 'dev');
 }elseif(preg_match('#^.*\.fear-team\.cz$#i', $_SERVER['SERVER_NAME'])){
     defined('ENV')? null : define('ENV', 'qa');
+}elseif(preg_match('#^dev\..*\.cz$#i', $_SERVER['SERVER_NAME'])){
+    defined('ENV')? null : define('ENV', 'qa');
 }else{
     defined('ENV')? null : define('ENV', 'live');
 }
@@ -31,7 +33,7 @@ if (version_compare(phpversion(), '5.4', '<')) {
 //setcookie('XDEBUG_PROFILE', '', time()-1800);
 
 //register modules
-$modules = array('App', 'Admin', 'Search');
+$modules = array('App', 'Admin', 'Search', 'Cron');
 
 //core
 require(APP_PATH.'/vendors/thcframe/core/core.php');

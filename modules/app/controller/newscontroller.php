@@ -64,13 +64,14 @@ class NewsController extends Controller
         if (null !== $content) {
             $news = $content;
         } else {
-            $news = \App\Model\NewsModel::fetchOldWithLimit($articlesPerPage, $page);
+            $news = \App\Model\NewsModel::fetchActiveWithLimit($articlesPerPage, $page);
 
             $this->getCache()->set('news-' . $page, $news);
         }
 
         $newsCount = \App\Model\NewsModel::count(
                         array('active = ?' => true,
+                            'archive = ?' => false,
                             'approved = ?' => 1)
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
@@ -86,6 +87,56 @@ class NewsController extends Controller
                 ->set('metatitle', 'Hastrman - Novinky');
     }
 
+    /**
+     * Get list of archivated news
+     * 
+     * @param int $page
+     */
+    public function archive($page = 1)
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $articlesPerPage = $this->getConfig()->news_per_page;
+
+        if($page <= 0){
+            $page = 1;
+        }
+        
+        if ($page == 1) {
+            $canonical = 'http://' . $this->getServerHost() . '/archivnovinek';
+        } else {
+            $canonical = 'http://' . $this->getServerHost() . '/archivnovinek/p/' . $page;
+        }
+        
+        $content = $this->getCache()->get('news-arch-' . $page);
+        
+        if (null !== $content) {
+            $news = $content;
+        } else {
+            $news = \App\Model\NewsModel::fetchArchivatedWithLimit($articlesPerPage, $page);
+
+            $this->getCache()->set('news-arch-' . $page, $news);
+        }
+
+        $newsCount = \App\Model\NewsModel::count(
+                        array('active = ?' => true,
+                            'archive = ?' => true,
+                            'approved = ?' => 1)
+        );
+        $newsPageCount = ceil($newsCount / $articlesPerPage);
+
+        $this->_pagerMetaLinks($newsPageCount, $page, '/archivnovinek/p/');
+
+        $view->set('news', $news)
+                ->set('currentpage', $page)
+                ->set('pagerpathprefix', '/archivnovinek')
+                ->set('pagecount', $newsPageCount);
+
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Novinky - Archiv');
+    }
+    
     /**
      * Show news detail
      * 

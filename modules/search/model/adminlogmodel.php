@@ -72,9 +72,9 @@ class AdminLogModel extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 350
+     * @length 256
      * 
-     * @validate alphanumeric, max(350)
+     * @validate alphanumeric
      */
     protected $_params;
 
