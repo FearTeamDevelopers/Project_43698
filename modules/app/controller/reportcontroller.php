@@ -7,7 +7,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Registry\Registry;
 
 /**
- * 
+ *
  */
 class ReportController extends Controller
 {
@@ -43,7 +43,7 @@ class ReportController extends Controller
 
     /**
      * Get list of reports
-     * 
+     *
      * @param int $page
      */
     public function index($page = 1)
@@ -56,13 +56,13 @@ class ReportController extends Controller
         if($page <= 0){
             $page = 1;
         }
-        
+
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/reportaze';
         } else {
             $canonical = 'http://' . $this->getServerHost() . '/reportaze/p/' . $page;
         }
-        
+
         $content = $this->getCache()->get('report-' . $page);
 
         if (null !== $content) {
@@ -81,7 +81,7 @@ class ReportController extends Controller
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
         $this->_pagerMetaLinks($reportsPageCount, $page, '/reportaze/p/');
-        
+
         $view->set('reports', $reports)
                 ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/reportaze')
@@ -93,7 +93,7 @@ class ReportController extends Controller
 
     /**
      * Show archivated actions
-     * 
+     *
      * @param type $page
      */
     public function archive($page = 1)
@@ -106,13 +106,13 @@ class ReportController extends Controller
         if($page <= 0){
             $page = 1;
         }
-        
+
         if ($page == 1) {
             $canonical = 'http://' . $this->getServerHost() . '/archivreportazi';
         } else {
             $canonical = 'http://' . $this->getServerHost() . '/archivreportazi/p/' . $page;
         }
-        
+
         $content = $this->getCache()->get('report-arch-' . $page);
 
         if (null !== $content) {
@@ -131,7 +131,7 @@ class ReportController extends Controller
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
         $this->_pagerMetaLinks($reportsPageCount, $page, '/archivreportazi/p/');
-        
+
         $view->set('reports', $reports)
                 ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/archivreportazi')
@@ -140,49 +140,49 @@ class ReportController extends Controller
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Reportáže - Archiv');
     }
-    
+
     /**
      * Show report detail
-     * 
+     *
      * @param string $urlKey
      */
     public function detail($urlKey)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        
+
         $report = \App\Model\ReportModel::fetchByUrlKey($urlKey);
-        
+
         if($report === null){
             self::redirect('/nenalezeno');
         }
-        
+
         $this->_checkMetaData($layoutView, $report);
         $view->set('report', $report);
     }
 
     /**
      * Preview of report created in administration but not saved into db
-     * 
+     *
      * @before _secured, _participant
      */
     public function preview()
     {
         $view = $this->getActionView();
         $session = Registry::get('session');
-        
+
         $report = $session->get('reportPreview');
-        
+
         if(null === $report){
             $this->_willRenderActionView = false;
             $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/admin/report/');
         }
-        
+
         $act = RequestMethods::get('action');
-        
+
         $view->set('report', $report)
             ->set('act', $act);
     }
-    
+
 }
