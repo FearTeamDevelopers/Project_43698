@@ -18,6 +18,10 @@ class IndexController extends Controller
     const RANKER_URLWEIGHT = 6000;
     const RANKER_KEYWORDWEIGHT = 2000;
 
+    private $_dbConnectionTimer;
+    private $_dbConnMain;
+    private $_dbConnSearch;
+
     /**
      * @read
      * @var type 
@@ -124,22 +128,28 @@ class IndexController extends Controller
         unset($cleanStr);
         return $cleanStr2;
     }
-    
+
     /**
      * Reconnect to the database
      */
     private function _resertConnections()
     {
-        $config = Registry::get('configuration');
-        Registry::get('database')->disconnectAll();
+        if ($this->_dbConnectionTimer + 26 < microtime(true)) {
+            $config = Registry::get('configuration');
+            Registry::get('database')->disconnectAll();
 
-        $database = new \THCFrame\Database\Database();
-        $connectors = $database->initialize($config);
-        Registry::set('database', $connectors);
-
-        unset($config);
-        unset($database);
-        unset($connectors);
+            $database = new \THCFrame\Database\Database();
+            $connectors = $database->initialize($config);
+            Registry::set('database', $connectors);
+            
+            $this->_dbConnectionTimer = microtime(true);
+            $this->_dbConnSearch = Registry::get('database')->get('search');
+            $this->_dbConnMain = Registry::get('database')->get('main');
+            
+            unset($config);
+            unset($database);
+            unset($connectors);
+        }
     }
 
     /**
@@ -165,15 +175,15 @@ class IndexController extends Controller
     {
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
-        
+
         Event::fire('search.log', array('success', 'Building search index'));
         //ini_set('max_execution_time', 1800);
 
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $searchDb = Registry::get('database')->get('search');
-        $mainDb = Registry::get('database')->get('main');
+        $this->_dbConnSearch = Registry::get('database')->get('search');
+        $this->_dbConnMain = Registry::get('database')->get('main');
 
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, 'cron', 0, ?, now(), default)";
@@ -181,19 +191,18 @@ class IndexController extends Controller
         $truncateSql = "TRUNCATE tb_searchindex";
 
         try {
-            $searchDb->execute($truncateSql);
-            $searchDb->execute($prepareIdSql);
+            $this->_dbConnectionTimer = microtime(true);
+            $this->_dbConnSearch->execute($truncateSql);
+            $this->_dbConnSearch->execute($prepareIdSql);
 
             foreach ($this->_textSource as $table => $variables) {
                 $starttime = microtime(true);
-                $searchDb = Registry::get('database')->get('search');
-                $mainDb = Registry::get('database')->get('main');
-        
+
                 $sql = "SELECT " . implode(', ', $variables['columns'])
                         . " FROM " . $table
                         . " WHERE " . implode(' AND ', $variables['where']);
 
-                $articles = $mainDb->execute($sql);
+                $articles = $this->_dbConnMain->execute($sql);
                 $wordsCount = 0;
 
                 if (null !== $articles) {
@@ -226,25 +235,29 @@ class IndexController extends Controller
                             $wordsCount++;
                             $weight = $this->_getWeight($word, $occ, $title, $article['keywords'], $path);
 
-                            $searchDb->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
+                            $this->_resertConnections();
+                            $this->_dbConnSearch->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
                         }
 
                         unset($words);
                         unset($article);
                         unset($path);
                         unset($title);
+
+                        $this->_resertConnections();
                     }
                 } else {
+                    Event::fire('search.log.user', array('warning', sprintf('No articles found for indexing in %s', $variables['modelLabel'])));
                     continue;
                 }
 
-                $searchDb->execute($insertSqlLog, $variables['model'], $table, $wordsCount);
                 $time = round(microtime(true) - $starttime, 2);
-                Event::fire('search.log', array('success', sprintf('Search index for %s built in %s sec', $table, $time)));
-                
                 $this->_resertConnections();
+                $this->_dbConnSearch->execute($insertSqlLog, $variables['modelLabel'], $table, $wordsCount);
+                Event::fire('search.log', array('success', sprintf('Search index for %s built in %s sec', $variables['modelLabel'], $time)));
             }
         } catch (\Exception $ex) {
+            $this->_resertConnections();
             $body = 'Error while building index: ' . $ex->getMessage();
             Event::fire('search.log', array('fail', $body));
             $this->sendEmail($body, 'ERROR: Search buildIndex');
@@ -266,14 +279,14 @@ class IndexController extends Controller
             self::redirect('/search/');
         }
 
-        Event::fire('search.log', array('success', sprintf('Building search index for table %s', $table)));
+        Event::fire('search.log.user', array('success', sprintf('Building search index for table %s', $table)));
         $userName = $this->getUser()->getWholeName();
 
         $stopWordsCs = implode('|', $this->stopwords_cs);
         $stopWordsEn = implode('|', $this->stopwords_en);
 
-        $searchDb = Registry::get('database')->get('search');
-        $mainDb = Registry::get('database')->get('main');
+        $this->_dbConnSearch = Registry::get('database')->get('search');
+        $this->_dbConnMain = Registry::get('database')->get('main');
 
         $insertSql = "INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)";
         $insertSqlLog = "INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 1, ?, now(), default)";
@@ -287,8 +300,8 @@ class IndexController extends Controller
                     . " FROM " . $table
                     . " WHERE " . implode(' AND ', $variables['where']);
 
-            $searchDb->execute($deleteSql, $variables['model']);
-            $articles = $mainDb->execute($selectSql);
+            $this->_dbConnSearch->execute($deleteSql, $variables['model']);
+            $articles = $this->_dbConnMain->execute($selectSql);
             $wordsCount = 0;
 
             if (null !== $articles) {
@@ -319,10 +332,10 @@ class IndexController extends Controller
                             continue;
                         }
                         $wordsCount++;
-
                         $weight = $this->_getWeight($word, $occ, $title, $article['keywords'], $path);
 
-                        $searchDb->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
+                        $this->_resertConnections();
+                        $this->_dbConnSearch->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
                     }
 
                     unset($words);
@@ -331,21 +344,22 @@ class IndexController extends Controller
                     unset($article);
                 }
 
-                $searchDb->execute($insertSqlLog, $variables['modelLabel'], $table, $userName, $wordsCount);
+                $time = round(microtime(true) - $starttime, 2);
+                $this->_resertConnections();
+                $this->_dbConnSearch->execute($insertSqlLog, $variables['modelLabel'], $table, $userName, $wordsCount);
 
-                unset($wordsCount);
+                Event::fire('search.log.user', array('success', sprintf('Search index for %s built in %s sec', $table, $time)));
+                $view->successMessage(sprintf('Search index for %s has been successfully built', $this->_textSource[$table]['modelLabel']));
+                self::redirect('/search/');
             } else {
-                return;
+                Event::fire('search.log.user', array('warning', sprintf('No articles found for indexing in %s', $this->_textSource[$table]['modelLabel'])));
+                $view->warningMessage(sprintf('No articles found for indexing in %s', $this->_textSource[$table]['modelLabel']));
+                self::redirect('/search/');
             }
-
-            $time = round(microtime(true) - $starttime, 2);
-            Event::fire('search.log', array('success', sprintf('Search index for %s built in %s sec', $table, $time)));
-
-            $view->successMessage(sprintf('Search index for %s has been successfully built', $this->_textSource[$table]['modelLabel']));
-            self::redirect('/search/');
         } catch (\Exception $ex) {
+            $this->_resertConnections();
             $body = 'Error while building index: ' . $ex->getMessage();
-            Event::fire('search.log', array('fail', $body));
+            Event::fire('search.log.user', array('fail', $body));
             $this->sendEmail($body, 'ERROR: Search buildIndex');
         }
     }

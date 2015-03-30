@@ -20,7 +20,7 @@ class NewsController extends Controller
         $uri = RequestMethods::server('REQUEST_URI');
 
         if ($object->getMetaTitle() != '') {
-            $layoutView->set('metatitle', $object->getMetaTitle());
+            $layoutView->set('metatitle', 'Novinky - '.$object->getMetaTitle());
         }
 
         if ($object->getMetaDescription() != '') {

@@ -324,6 +324,7 @@ class IndexController extends Controller
 
             Event::fire('cron.log', array('success', 'Links count: ' . $linkCounter));
         } catch (\Exception $ex) {
+            $this->_resertConnections();
             Event::fire('cron.log', array('fail', 'Error while creating sitemap file: ' . $ex->getMessage()));
             $this->sendEmail('Error while creating sitemap file: ' . $ex->getMessage(), 'ERROR: Cron generateSitemap');
         }

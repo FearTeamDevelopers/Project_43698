@@ -80,7 +80,7 @@ class AdvertisementController extends Controller
         $uri = RequestMethods::server('REQUEST_URI');
 
         if ($object->getMetaTitle() != '') {
-            $layoutView->set('metatitle', $object->getTitle());
+            $layoutView->set('metatitle', 'Bazar - '.$object->getTitle());
         }
 
         $canonical = 'http://' . $this->getServerHost() . '/bazar/r/' . $object->getUniqueKey();

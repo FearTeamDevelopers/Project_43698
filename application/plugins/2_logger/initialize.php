@@ -52,8 +52,8 @@ if (ENV == 'dev') {
     });
 
 // log database events
-    THCFrame\Events\Events::add('framework.database.initialize.before', function($type, $options) use ($logger) {
-        $logger->log(sprintf('framework.database.initialize.before: %s', $type));
+    THCFrame\Events\Events::add('framework.database.initialize.before', function() use ($logger) {
+        $logger->log(sprintf('framework.database.initialize.before'));
     });
 
     THCFrame\Events\Events::add('framework.database.initialize.after', function($type, $options) use ($logger) {

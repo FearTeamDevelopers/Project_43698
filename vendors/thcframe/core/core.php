@@ -174,7 +174,6 @@ class Core
                 break;
         }
 
-        $file = basename($file);
         $message = "{$type} ~ {$file} ~ {$row} ~ {$text}";
 
         if (self::$_logger instanceof \THCFrame\Logger\Driver) {

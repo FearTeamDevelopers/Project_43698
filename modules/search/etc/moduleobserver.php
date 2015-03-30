@@ -17,7 +17,8 @@ class ModuleObserver implements SubscriberInterface
     public function getSubscribedEvents()
     {
         return array(
-            'search.log' => 'searchLog'
+            'search.log' => 'searchLog',
+            'search.log.user' => 'searchUserLog'
         );
     }
     
@@ -62,4 +63,48 @@ class ModuleObserver implements SubscriberInterface
         }
     }
 
+    /**
+     * 
+     * @param array $params
+     */
+    public function searchUserLog()
+    {
+        $params = func_get_args();
+        
+        $router = Registry::get('router');
+        $route = $router->getLastRoute();
+        
+        $security = Registry::get('security');
+        $userId = $security->getUser()->getWholeName();
+
+        $module = $route->getModule();
+        $controller = $route->getController();
+        $action = $route->getAction();
+
+        if (!empty($params)) {
+            $result = array_shift($params);
+            
+            $paramStr = '';
+            if (!empty($params)) {
+                $paramStr = join(', ', $params);
+            }
+        } else {
+            $result = 'fail';
+            $paramStr = '';
+        }
+
+        $log = new \Search\Model\AdminLogModel(array(
+            'userId' => $userId,
+            'module' => $module,
+            'controller' => $controller,
+            'action' => $action,
+            'result' => $result,
+            'params' => $paramStr
+        ));
+
+        if ($log->validate()) {
+            $log->save();
+        }
+    }
+    
 }

@@ -24,7 +24,7 @@ class ReportController extends Controller
         }
 
         if ($object->getMetaTitle() != '') {
-            $layoutView->set('metatitle', $object->getMetaTitle());
+            $layoutView->set('metatitle', 'Reportáže - '.$object->getMetaTitle());
         }
 
         if ($object->getMetaDescription() != '') {

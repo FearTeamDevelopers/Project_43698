@@ -20,7 +20,7 @@ class ActionController extends Controller
         $uri = RequestMethods::server('REQUEST_URI');
 
         if ($object->getMetaTitle() != '') {
-            $layoutView->set('metatitle', $object->getMetaTitle());
+            $layoutView->set('metatitle', 'Akce - '.$object->getMetaTitle());
         }
 
         if ($object->getMetaDescription() != '') {
