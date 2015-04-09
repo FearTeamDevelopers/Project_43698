@@ -590,6 +590,65 @@ class Model extends Base
     }
 
     /**
+     * Method creates a query instance, and targets the table related to the Model class. 
+     * It applies a WHERE clause if the primary key property value is not empty, 
+     * and builds a data array based on columns returned by the getColumns() method. 
+     * 
+     * Finally, it calls the query instance’s update() method to commit the 
+     * data to the database. This method will update an existing record, 
+     * depending on whether the primary key property has a value.
+     * 
+     * @return type
+     * @throws Exception\Primary
+     */
+    public function update()
+    {
+        $primary = $this->primaryColumn;
+
+        $raw = $primary['raw'];
+        $name = $primary['name'];
+
+        $query = $this->connector
+                ->query()
+                ->from($this->table);
+
+        if (!empty($this->$raw)) {
+            $query->where("{$name} = ?", $this->$raw);
+        }else{
+            throw new Exception\Primary('Primary key is not set');
+        }
+
+        $data = array();
+        foreach ($this->columns as $key => $column) {
+            
+            if (!$column['read']) {
+                $prop = $column['raw'];
+                $data[$key] = $this->$prop;
+                continue;
+            }
+
+            if ($column != $this->primaryColumn && $column) {
+                $method = 'get' . ucfirst($key);
+                
+                if($this->$method() !== null){
+                    $data[$key] = $this->$method();
+                }
+                continue;
+            }
+        }
+        
+        $result = $query->update($data);
+        
+        unset($query);
+
+        if ($result > 0) {
+            $this->$raw = $result;
+        }
+
+        return $result;
+    }
+    
+    /**
      * 
      */
     public function postSave()

@@ -63,11 +63,6 @@ class Authentication extends Base
                 return new DatabaseAuthentication($this->options);
                 break;
             }
-            case 'config':{
-                $users = (array) $configuration->security->authentication->users;
-                return new ConfigAuthentication($users);
-                break;
-            }
             default:{
                 throw new Exception\Argument('Invalid authentication type');
                 break;

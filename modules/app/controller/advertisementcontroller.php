@@ -349,7 +349,6 @@ class AdvertisementController extends Controller
         $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
 
         $view->set('adsections', $adSections)
-                ->set('ad', null)
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         $layoutView->set('canonical', $canonical)
@@ -512,8 +511,8 @@ class AdvertisementController extends Controller
                 $ad->save();
 
                 $fileManager = new FileManager(array(
-                    'thumbWidth' => $this->getConfig()->thumb_width,
-                    'thumbHeight' => $this->getConfig()->thumb_height,
+                    'thumbWidth' => 230,
+                    'thumbHeight' => 230,
                     'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                     'maxImageWidth' => $this->getConfig()->photo_maxwidth,
                     'maxImageHeight' => $this->getConfig()->photo_maxheight

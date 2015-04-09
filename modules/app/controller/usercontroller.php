@@ -17,14 +17,14 @@ class UserController extends Controller
     private function _checkEmailActToken($token)
     {
         $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
-        
-        if($exists === null){
+
+        if ($exists === null) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     /**
      * App module login
      */
@@ -61,7 +61,9 @@ class UserController extends Controller
                 try {
                     $this->getSecurity()->authenticate($email, $password);
                     self::redirect('/muj-profil');
-                } catch (\THCFrame\Security\Exception\UserInactive $e) {
+                } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
+                    $view->set('account_error', 'Účet byl uzamčen. Přihlášení opakujte za 15 min.');
+                } catch (\THCFrame\Security\Exception\UserInactive $ex) {
                     $view->set('account_error', 'Účet ještě nebyl aktivován');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
@@ -121,78 +123,66 @@ class UserController extends Controller
                 $errors['email'] = array('Tento email je již použit');
             }
 
-            $salt = PasswordManager::createSalt();
-            $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
-            $verifyEmail = $this->getConfig()->registration_verif_email;
+            if (PasswordManager::strength(RequestMethods::post('password')) > 0.5) {
+                $salt = PasswordManager::createSalt();
+                $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
+                $verifyEmail = $this->getConfig()->registration_verif_email;
 
-            if ($verifyEmail) {
-                $active = false;
-            } else {
-                $active = true;
-            }
-            
-            $actToken = Rand::randStr(50);
-            for ($i = 1; $i <= 75; $i++) {
-                if($this->_checkEmailActToken($actToken)){
-                    break;
+                if ($verifyEmail) {
+                    $active = false;
                 } else {
-                    $actToken = Rand::randStr(50);
+                    $active = true;
                 }
 
-                if ($i == 75) {
-                    $errors['email'] = array(self::ERROR_MESSAGE_3.' Zkuste registraci opakovat později');
-                    break;
+                $actToken = Rand::randStr(50);
+                for ($i = 1; $i <= 75; $i++) {
+                    if ($this->_checkEmailActToken($actToken)) {
+                        break;
+                    } else {
+                        $actToken = Rand::randStr(50);
+                    }
+
+                    if ($i == 75) {
+                        $errors['email'] = array(self::ERROR_MESSAGE_3 . ' Zkuste registraci opakovat později');
+                        break;
+                    }
                 }
+
+                $user = new \App\Model\UserModel(array(
+                    'firstname' => RequestMethods::post('firstname'),
+                    'lastname' => RequestMethods::post('lastname'),
+                    'email' => RequestMethods::post('email'),
+                    'phoneNumber' => RequestMethods::post('phone'),
+                    'password' => $hash,
+                    'salt' => $salt,
+                    'role' => 'role_member',
+                    'active' => $active,
+                    'emailActivationToken' => $actToken
+                ));
+            } else {
+                $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
-
-            $user = new \App\Model\UserModel(array(
-                'firstname' => RequestMethods::post('firstname'),
-                'lastname' => RequestMethods::post('lastname'),
-                'email' => RequestMethods::post('email'),
-                'phoneNumber' => RequestMethods::post('phone'),
-                'password' => $hash,
-                'salt' => $salt,
-                'role' => 'role_member',
-                'active' => $active,
-                'emailActivationToken' => $actToken
-            ));
 
             if (empty($errors) && $user->validate()) {
                 $uid = $user->save();
 
                 if ($verifyEmail) {
-                    try {
-                        require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                        $transport = \Swift_MailTransport::newInstance(null);
-                        $mailer = \Swift_Mailer::newInstance($transport);
+                    $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
+                            . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
+                            . '<a href="http://' . $this->getServerHost() . '/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
+                            . 'S pozdravem,<br/>Hastrmani';
 
-                        $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
-                                . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
-                                . '<a href="http://' . $this->getServerHost() . '/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
-                                . 'S pozdravem,<br/>Hastrmani';
-
-                        $regEmail = \Swift_Message::newInstance()
-                                ->setSubject('Hastrman - Registrace')
-                                ->setFrom('registrace@hastrman.cz')
-                                ->setTo($user->getEmail())
-                                ->setBody($emailBody, 'text/html');
-                        $mailer->send($regEmail);
-                    } catch (\Exception $ex) {
-                        \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
-
-                        Event::fire('app.log', array('fail', 'Email not send for User Id: ' . $uid,
-                            'Error: ' . $ex->getMessage()));
+                    if ($this->sendEmail($emailBody, 'Hastrman - Registrace', $user->getEmail(), 'registrace@hastrman.cz')) {
+                        Event::fire('app.log', array('success', 'User Id with email activation: ' . $uid));
+                        $view->successMessage('Registrace byla úspěšná. Na uvedený email byl zaslán odkaz k aktivaci účtu.');
+                    } else {
+                        Event::fire('app.log', array('fail', 'Email not send for User Id: ' . $uid));
                         $user->delete();
                         $view->errorMessage('Nepodařilo se odeslat aktivační email, opakujte registraci později');
                         self::redirect('/');
                     }
-                }
-
-                Event::fire('app.log', array('success', 'User Id: ' . $uid));
-
-                if ($verifyEmail) {
-                    $view->successMessage('Registrace byla úspěšná. Na uvedený email byl zaslán odkaz k aktivaci účtu.');
                 } else {
+                    Event::fire('app.log', array('success', 'User Id: ' . $uid));
                     $view->successMessage('Registrace byla úspěšná');
                 }
 
@@ -243,21 +233,26 @@ class UserController extends Controller
             }
 
             $pass = RequestMethods::post('password');
+            
+            if (PasswordManager::strength($pass) > 0.5) {
+                if ($pass === null || $pass == '') {
+                    $salt = $user->getSalt();
+                    $hash = $user->getPassword();
+                } else {
+                    $salt = PasswordManager::createSalt();
+                    $hash = PasswordManager::hashPassword($pass, $salt);
+                }
 
-            if ($pass === null || $pass == '') {
-                $salt = $user->getSalt();
-                $hash = $user->getPassword();
+                $user->firstname = RequestMethods::post('firstname');
+                $user->lastname = RequestMethods::post('lastname');
+                $user->email = RequestMethods::post('email');
+                $user->phoneNumber = RequestMethods::post('phone');
+                $user->password = $hash;
+                $user->salt = $salt;
             } else {
-                $salt = PasswordManager::createSalt();
-                $hash = PasswordManager::hashPassword($pass, $salt);
+                $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
 
-            $user->firstname = RequestMethods::post('firstname');
-            $user->lastname = RequestMethods::post('lastname');
-            $user->email = RequestMethods::post('email');
-            $user->phoneNumber = RequestMethods::post('phone');
-            $user->password = $hash;
-            $user->salt = $salt;
 
             if (empty($errors) && $user->validate()) {
                 $user->save();

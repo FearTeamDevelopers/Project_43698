@@ -260,7 +260,7 @@ class IndexController extends Controller
             $this->_resertConnections();
             $body = 'Error while building index: ' . $ex->getMessage();
             Event::fire('search.log', array('fail', $body));
-            $this->sendEmail($body, 'ERROR: Search buildIndex');
+            $this->sendEmail($body, 'ERROR: Search buildIndex', null, 'cron@hastrman.cz');
         }
     }
 
@@ -360,7 +360,7 @@ class IndexController extends Controller
             $this->_resertConnections();
             $body = 'Error while building index: ' . $ex->getMessage();
             Event::fire('search.log.user', array('fail', $body));
-            $this->sendEmail($body, 'ERROR: Search buildIndex');
+            $this->sendEmail($body, 'ERROR: Search buildIndex', null, 'cron@hastrman.cz');
         }
     }
 

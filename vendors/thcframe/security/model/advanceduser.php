@@ -31,6 +31,26 @@ class AdvancedUser extends BasicUser
     protected $_accountExpire;
     
     /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 20
+     *
+     * @validate numeric, max(20)
+     */
+    protected $_lastLoginIp;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 256
+     *
+     * @validate numeric, max(1000)
+     */
+    protected $_lastLoginBrowser;
+    
+    /**
      * To check if the password has aged. i.e. if the time has passed 
      * after which the password must be changed.
      * 

@@ -97,6 +97,20 @@
                 </select>
             </span>
         </p>
+        <p>
+            <label>Zablokován</label>
+            <span class="field">
+                <select name="blocked" class="longinput">
+                    {if $user->blocked == 1}
+                    <option value="0">Účet není zablokovaný</option>
+                    <option value="1" selected>Zablokován</option>
+                    {/if}{else}
+                    <option value="0" selected>Účet není zablokovaný</option>
+                    <option value="1">Zablokován</option>
+                    {/else}
+                </select>
+            </span>
+        </p>
 
         {if $isSuperAdmin}
         <p>

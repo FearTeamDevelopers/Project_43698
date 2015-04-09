@@ -81,8 +81,7 @@ class Security extends Base implements SecurityInterface
             throw new \Exception('Error in configuration file');
         }
 
-        $session = Registry::get('session');
-        $user = $session->get('authUser');
+        $user = Registry::get('session')->get('authUser');
 
         $authentication = new Authentication\Authentication();
         $this->_authentication = $authentication->initialize($configuration);
@@ -93,18 +92,6 @@ class Security extends Base implements SecurityInterface
         if ($user instanceof BasicUser) {
             $this->_user = $user;
             Event::fire('framework.security.initialize.user', array($user));
-        }
-
-        if ($this->_authorization->type == 'resourcebase') {
-            Event::add('framework.router.findroute.after', function($path) {
-                $role = $this->getAuthorization()->checkForResource($path);
-
-                if ($role !== null) {
-                    if ($this->isGranted($role) !== true) {
-                        throw new \THCFrame\Security\Exception\Unauthorized();
-                    }
-                }
-            });
         }
 
         Event::fire('framework.security.initialize.after', array());

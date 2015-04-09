@@ -13,6 +13,22 @@ use THCFrame\Core\StringMethods;
  */
 class Controller extends BaseController
 {
+//    const SUCCESS_MESSAGE_1 = ' has been successfully created';
+//    const SUCCESS_MESSAGE_2 = 'All changes were successfully saved';
+//    const SUCCESS_MESSAGE_3 = ' has been successfully deleted';
+//    const SUCCESS_MESSAGE_4 = 'Everything has been successfully activated';
+//    const SUCCESS_MESSAGE_5 = 'Everything has been successfully deactivated';
+//    const SUCCESS_MESSAGE_6 = 'Everything has been successfully deleted';
+//    const SUCCESS_MESSAGE_7 = 'Everything has been successfully uploaded';
+//    const SUCCESS_MESSAGE_8 = 'Everything has been successfully saved';
+//    const SUCCESS_MESSAGE_9 = 'Everything has been successfully added';
+//    const ERROR_MESSAGE_1 = 'Oops, something went wrong';
+//    const ERROR_MESSAGE_2 = 'Not found';
+//    const ERROR_MESSAGE_3 = 'Unknown error eccured';
+//    const ERROR_MESSAGE_4 = 'You dont have permissions to do this';
+//    const ERROR_MESSAGE_5 = 'Required fields are not valid';
+//    const ERROR_MESSAGE_6 = 'Access denied';
+//    const ERROR_MESSAGE_7 = 'Password is too weak';
 
     const SUCCESS_MESSAGE_1 = ' byl(a) úspěšně vytovřen(a)';
     const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
@@ -29,6 +45,7 @@ class Controller extends BaseController
     const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnění';
     const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
     const ERROR_MESSAGE_6 = 'Přísput odepřen';
+    const ERROR_MESSAGE_7 = 'Heslo je příliš slabé';
 
     /**
      * Store security context object
@@ -145,6 +162,49 @@ class Controller extends BaseController
     }
 
     /**
+     * 
+     * @param type $body
+     * @param type $subject
+     * @param type $sendTo
+     * @param type $sendFrom
+     * @return boolean
+     */
+    protected function sendEmail($body, $subject, $sendTo = null, $sendFrom = null)
+    {
+        try {
+            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+            $transport = \Swift_MailTransport::newInstance();
+            $mailer = \Swift_Mailer::newInstance($transport);
+
+            $message = \Swift_Message::newInstance(null)
+                    ->setSubject($subject)
+                    ->setBody($body, 'text/html');
+
+            if (null === $sendTo) {
+                $message->setTo($this->getConfig()->system->adminemail);
+            } else {
+                $message->setTo($sendTo);
+            }
+
+            if (null === $sendFrom) {
+                $message->setFrom('info@hastrman.cz');
+            } else {
+                $message->setFrom($sendFrom);
+            }
+
+            if ($mailer->send($message)) {
+                return true;
+            } else {
+                Event::fire('admin.log', array('fail', 'No email sent'));
+                return false;
+            }
+        } catch (\Exception $ex) {
+            Event::fire('admin.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
+            return false;
+        }
+    }
+
+    /**
      * @protected
      */
     public function _secured()
@@ -153,6 +213,8 @@ class Controller extends BaseController
         $user = $this->_security->getUser();
 
         if (!$user) {
+            $this->_willRenderActionView = false;
+            $this->_willRenderLayoutView = false;
             self::redirect('/prihlasit');
         }
 

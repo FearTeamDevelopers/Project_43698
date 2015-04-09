@@ -36,7 +36,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      * @readwrite
      * @var boolean 
      */
-    protected $_bruteForceDetection = true;
+    protected $_accountBlockTime = 300;
 
     /**
      * It denotes the # of maximum attempts for login using the password. 
@@ -79,6 +79,32 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
 
     /**
      * 
+     * @param type $user
+     * @return type
+     */
+    private function _successfullLogin($user)
+    {
+        $user->setLastLogin();
+        $user->setTotalLoginAttempts(0);
+        $user->setLastLoginAttempt(0);
+        $user->setFirstLoginAttempt(0);
+        $user->update();
+
+        return $user;
+    }
+    
+    private function _loadCompleteUser($id)
+    {
+        $user = \App\Model\UserModel::first(array('id = ?' => (int)$id));
+        
+        $user->password = null;
+        $user->salt = null;
+
+        return $user;
+    }
+    
+    /**
+     * 
      * @param array $options
      */
     public function __construct($options = array())
@@ -101,16 +127,19 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
     {
         $errMessage = sprintf('%s and/or password are incorrect', ucfirst($this->_name));
         $errMessageNotActive = 'Account is not active';
+        $errMessageBlock = 'Account is blocked. Try login after '.($this->_accountBlockTime/60).' mins';
 
-        $user = \App\Model\UserModel::first(array(
-                    "{$this->_name} = ?" => $name
-        ));
+        $user = \App\Model\UserModel::first(
+                        array("{$this->_name} = ?" => $name), array('id', "{$this->_name}", "{$this->_pass}",
+                    'salt', 'active', 'blocked', 'lastLogin', 'role',
+                    'totalLoginAttempts', 'lastLoginAttempt', 'firstLoginAttempt'));
 
         if ($user === null) {
             throw new Exception\UserNotExists($errMessage);
         }
 
         $passVerify = PasswordManager::validatePassword($pass, $user->getPassword(), $user->getSalt());
+        $currentTime = time();
 
         if ($passVerify === true) {
             if ($user instanceof AdvancedUser) {
@@ -120,46 +149,43 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                     throw new Exception\UserExpired($errMessage);
                 } elseif ($user->isPasswordExpired()) {
                     throw new Exception\UserPassExpired($errMessage);
+                } elseif ($user->isBlocked()) {
+                    if (($currentTime - $user->getLastLoginAttempt()) >= $this->accountBlockTime) {
+                        $this->_successfullLogin($user);
+                        return $this->_loadCompleteUser($user->getId());
+                    }else{
+                        throw new Exception\UserBlocked($errMessageBlock);
+                    }
                 } else {
-                    $user->setLastLogin();
-                    $user->setTotalLoginAttempts(0);
-                    $user->setLastLoginAttempt(0);
-                    $user->setFirstLoginAttempt(0);
-                    $user->save();
-
-                    $user->password = null;
-                    $user->salt = null;
-
-                    return $user;
+                    $this->_successfullLogin($user);
+                    return $this->_loadCompleteUser($user->getId());
                 }
             } elseif ($user instanceof BasicUser) {
                 if (!$user->isActive()) {
                     throw new Exception\UserInactive($errMessageNotActive);
+                } elseif ($user->isBlocked()) {
+                    } elseif ($user->isBlocked()) {
+                    if (($currentTime - $user->getLastLoginAttempt()) >= $this->accountBlockTime) {
+                        $this->_successfullLogin($user);
+                        return $this->_loadCompleteUser($user->getId());
+                    }else{
+                        throw new Exception\UserBlocked($errMessageBlock);
+                    }
                 } else {
-                    $user->setLastLogin();
-                    $user->setTotalLoginAttempts(0);
-                    $user->setLastLoginAttempt(0);
-                    $user->setFirstLoginAttempt(0);
-                    $user->save();
-
-                    $user->password = null;
-                    $user->salt = null;
-
-                    return $user;
+                    $this->_successfullLogin($user);
+                    return $this->_loadCompleteUser($user->getId());
                 }
             } else {
                 throw new Exception\Implementation(sprintf('%s is not implementing BasicUser', get_class($user)));
             }
         } else {
-            if ($this->_bruteForceDetection === true) {
-                if ($this->isBruteForce($user)) {
-                    $identifier = $this->_name;
-                    Core::getLogger()->log(sprintf('Brute Force Attack Detected for account %s', $user->$identifier));
+            if ($user->isBlocked()) {
+                throw new Exception\UserBlocked($errMessageBlock);
+            } elseif ($this->isBruteForce($user)) { //Brute force attack detection
+                $identifier = $this->_name;
+                Core::getLogger()->log(sprintf('Brute Force Attack Detected for account %s', $user->$identifier));
 
-                    throw new Exception\BruteForceAttack('WARNING: Brute Force Attack Detected. We Recommend you use captcha.');
-                } else {
-                    throw new Exception\WrongPassword($errMessage);
-                }
+                throw new Exception\BruteForceAttack('WARNING: Brute Force Attack Detected.');
             } else {
                 throw new Exception\WrongPassword($errMessage);
             }
@@ -172,7 +198,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      * @param string $user    User object
      * @return boolean      Returns True if brute-force is detected. False otherwise
      */
-    protected function isBruteForce($user)
+    protected function isBruteForce(BasicUser $user)
     {
         $currentTime = time();
 
@@ -181,7 +207,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
             $user->setTotalLoginAttempts($user->getTotalLoginAttempts() + 1);
             $user->setLastLoginAttempt($currentTime);
             $user->setFirstLoginAttempt($currentTime);
-            $user->save();
+            $user->update();
 
             return false;
         }
@@ -190,9 +216,10 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
         //time period, then reset the counters and return true to declare this a brute force attack.
         if (($currentTime - $user->getLastLoginAttempt()) <= $this->bruteForceLockTimePeriod) {
             $user->setTotalLoginAttempts(0);
-            $user->setLastLoginAttempt(0);
+            $user->setLastLoginAttempt($currentTime);
             $user->setFirstLoginAttempt(0);
-            $user->save();
+            $user->setBlocked(true);
+            $user->update();
 
             return true;
         }
@@ -204,9 +231,10 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
             // then that is an attack. Hence we reset the counters and return TRUE.
             if ($user->getTotalLoginAttempts() >= $this->bruteForceLockAttempts) {
                 $user->setTotalLoginAttempts(0);
-                $user->setLastLoginAttempt(0);
+                $user->setLastLoginAttempt($currentTime);
                 $user->setFirstLoginAttempt(0);
-                $user->save();
+                $user->setBlocked(true);
+                $user->update();
 
                 return true;
             } else {
@@ -214,7 +242,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                 //this is not a brute force attack. Hence we just update our counters.
                 $user->setTotalLoginAttempts($user->getTotalLoginAttempts() + 1);
                 $user->setLastLoginAttempt($currentTime);
-                $user->save();
+                $user->update();
 
                 return false;
             }
@@ -222,10 +250,17 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
             //since difference between two failed login requests are out of 
             //$_bruteForceLockAttemptTotalTime time period, we can safely reset 
             //all the counters and TELL THAT THIS IS NOT A BRUTE FORCE ATTACK.
-            $user->setTotalLoginAttempts(0);
-            $user->setLastLoginAttempt(0);
-            $user->setFirstLoginAttempt(0);
-            $user->save();
+            $totalAttempts = $user->getTotalLoginAttempts() + 1;
+            
+            if($totalAttempts >= $this->bruteForceLockAttempts){
+                $user->setBlocked(true);
+                $user->setTotalLoginAttempts(0);
+            }else{
+                $user->setTotalLoginAttempts($totalAttempts);
+            }
+            
+            $user->setLastLoginAttempt($currentTime);
+            $user->update();
 
             return false;
         }

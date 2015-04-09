@@ -6,6 +6,7 @@ use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Security\PasswordManager;
+use THCFrame\Core\Rand;
 
 /**
  * 
@@ -16,14 +17,14 @@ class UserController extends Controller
     private function _checkEmailActToken($token)
     {
         $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
-        
-        if($exists === null){
+
+        if ($exists === null) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     /**
      * Login into administration
      */
@@ -52,6 +53,10 @@ class UserController extends Controller
                 try {
                     $this->getSecurity()->authenticate($email, $password);
                     self::redirect('/admin/');
+                } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
+                    $view->set('account_error', 'Účet byl uzamčen. Přihlášení opakujte za 15 min.');
+                } catch (\THCFrame\Security\Exception\UserInactive $ex) {
+                    $view->set('account_error', 'Účet ještě nebyl aktivován');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
@@ -123,34 +128,38 @@ class UserController extends Controller
                 $errors['email'] = array('Tento email se již používá');
             }
 
-            $salt = PasswordManager::createSalt();
-            $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
+            if (PasswordManager::strength(RequestMethods::post('password')) > 0.6) {
+                $salt = PasswordManager::createSalt();
+                $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
 
-            $actToken = Rand::randStr(50);
-            for ($i = 1; $i <= 75; $i++) {
-                if($this->_checkEmailActToken($actToken)){
-                    break;
-                } else {
-                    $actToken = Rand::randStr(50);
+                $actToken = Rand::randStr(50);
+                for ($i = 1; $i <= 75; $i++) {
+                    if ($this->_checkEmailActToken($actToken)) {
+                        break;
+                    } else {
+                        $actToken = Rand::randStr(50);
+                    }
+
+                    if ($i == 75) {
+                        $errors['email'] = array(self::ERROR_MESSAGE_3 . ' Zkuste vytvoření uživatele opakovat později');
+                        break;
+                    }
                 }
 
-                if ($i == 75) {
-                    $errors['email'] = array(self::ERROR_MESSAGE_3.' Zkuste vytvoření uživatele opakovat později');
-                    break;
-                }
+                $user = new \App\Model\UserModel(array(
+                    'firstname' => RequestMethods::post('firstname'),
+                    'lastname' => RequestMethods::post('lastname'),
+                    'email' => RequestMethods::post('email'),
+                    'phoneNumber' => RequestMethods::post('phone'),
+                    'emailActivationToken' => null,
+                    'password' => $hash,
+                    'salt' => $salt,
+                    'active' => true,
+                    'role' => RequestMethods::post('role', 'role_member')
+                ));
+            } else {
+                $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
-            
-            $user = new \App\Model\UserModel(array(
-                'firstname' => RequestMethods::post('firstname'),
-                'lastname' => RequestMethods::post('lastname'),
-                'email' => RequestMethods::post('email'),
-                'phoneNumber' => RequestMethods::post('phone'),
-                'emailActivationToken' => null,
-                'password' => $hash,
-                'salt' => $salt,
-                'active' => true,
-                'role' => RequestMethods::post('role', 'role_member')
-            ));
 
             if (empty($errors) && $user->validate()) {
                 $userId = $user->save();
@@ -159,7 +168,7 @@ class UserController extends Controller
                 $view->successMessage('Uživatel' . self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors + $user->getErrors())));
+                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors())
                         ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('user', $user);
@@ -207,21 +216,24 @@ class UserController extends Controller
             }
 
             $pass = RequestMethods::post('password');
+            if (PasswordManager::strength($pass) > 0.6) {
+                if (null === $pass || $pass == '') {
+                    $salt = $user->getSalt();
+                    $hash = $user->getPassword();
+                } else {
+                    $salt = PasswordManager::createSalt();
+                    $hash = PasswordManager::hashPassword($pass, $salt);
+                }
 
-            if (null === $pass || $pass == '') {
-                $salt = $user->getSalt();
-                $hash = $user->getPassword();
+                $user->firstname = RequestMethods::post('firstname');
+                $user->lastname = RequestMethods::post('lastname');
+                $user->email = RequestMethods::post('email');
+                $user->phoneNumber = RequestMethods::post('phone');
+                $user->password = $hash;
+                $user->salt = $salt;
             } else {
-                $salt = PasswordManager::createSalt();
-                $hash = PasswordManager::hashPassword($pass, $salt);
+                $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
-
-            $user->firstname = RequestMethods::post('firstname');
-            $user->lastname = RequestMethods::post('lastname');
-            $user->email = RequestMethods::post('email');
-            $user->phoneNumber = RequestMethods::post('phone');
-            $user->password = $hash;
-            $user->salt = $salt;
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
@@ -231,7 +243,7 @@ class UserController extends Controller
                 self::redirect('/admin/');
             } else {
                 Event::fire('admin.log', array('fail', 'User id: ' . $user->getId(),
-                    'Errors: '.  json_encode($errors + $user->getErrors())));
+                    'Errors: ' . json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -284,22 +296,27 @@ class UserController extends Controller
 
             $pass = RequestMethods::post('password');
 
-            if (null === $pass || $pass == '') {
-                $salt = $user->getSalt();
-                $hash = $user->getPassword();
-            } else {
-                $salt = PasswordManager::createSalt();
-                $hash = PasswordManager::hashPassword($pass, $salt);
-            }
+            if (PasswordManager::strength($pass) > 0.5) {
+                if (null === $pass || $pass == '') {
+                    $salt = $user->getSalt();
+                    $hash = $user->getPassword();
+                } else {
+                    $salt = PasswordManager::createSalt();
+                    $hash = PasswordManager::hashPassword($pass, $salt);
+                }
 
-            $user->firstname = RequestMethods::post('firstname');
-            $user->lastname = RequestMethods::post('lastname');
-            $user->email = RequestMethods::post('email');
-            $user->phoneNumber = RequestMethods::post('phone');
-            $user->password = $hash;
-            $user->salt = $salt;
-            $user->role = RequestMethods::post('role', $user->getRole());
-            $user->active = RequestMethods::post('active');
+                $user->firstname = RequestMethods::post('firstname');
+                $user->lastname = RequestMethods::post('lastname');
+                $user->email = RequestMethods::post('email');
+                $user->phoneNumber = RequestMethods::post('phone');
+                $user->password = $hash;
+                $user->salt = $salt;
+                $user->role = RequestMethods::post('role', $user->getRole());
+                $user->active = RequestMethods::post('active');
+                $user->blocked = RequestMethods::post('blocked');
+            } else {
+                $errors['password'] = array(self::ERROR_MESSAGE_7);
+            }
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
@@ -309,7 +326,7 @@ class UserController extends Controller
                 self::redirect('/admin/user/');
             } else {
                 Event::fire('admin.log', array('fail', 'User id: ' . $id,
-                    'Errors: '.  json_encode($errors + $user->getErrors())));
+                    'Errors: ' . json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -350,4 +367,5 @@ class UserController extends Controller
     {
         
     }
+
 }

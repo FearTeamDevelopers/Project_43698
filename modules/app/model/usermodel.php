@@ -64,6 +64,7 @@ class UserModel extends BasicUser
 
         if (empty($this->$raw)) {
             $this->setCreated(date('Y-m-d H:i:s'));
+            $this->setBlocked(false);
             $this->setLastLogin(0);
             $this->setTotalLoginAttempts(0);
             $this->setLastLoginAttempt(0);

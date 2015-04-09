@@ -4,6 +4,7 @@ namespace Admin\Etc;
 
 use THCFrame\Registry\Registry;
 use THCFrame\Events\SubscriberInterface;
+use THCFrame\Security\Model\SecLogModel;
 
 /**
  * Module specific observer class
@@ -18,7 +19,7 @@ class ModuleObserver implements SubscriberInterface
     public function getSubscribedEvents()
     {
         return array(
-            'admin.log' => 'adminLog'
+            'admin.log' => 'adminLog',
         );
     }
 
@@ -64,6 +65,14 @@ class ModuleObserver implements SubscriberInterface
         if ($log->validate()) {
             $log->save();
         }
+    }
+
+    /**
+     * 
+     */
+    public function secLog()
+    {
+        $params = func_get_args();
     }
 
 }

@@ -68,11 +68,6 @@ class Authorization extends Base
                 return new AnnotationBaseAuthorization($roleManager);
                 break;
             }
-            case 'resourcebase':{
-                $resources = (array) $configuration->security->authorization->resources;
-                return new ResourceBaseAuthorization($roleManager, $resources);
-                break;
-            }
             default:{
                 throw new Exception\Argument('Invalid authorization type');
                 break;

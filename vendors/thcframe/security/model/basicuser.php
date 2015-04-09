@@ -78,6 +78,17 @@ class BasicUser extends Model
      * @validate max(3)
      */
     protected $_active;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type boolean
+     * @index
+     * 
+     * @validate max(3)
+     * @label acc blocked
+     */
+    protected $_blocked;
 
     /**
      * @column
@@ -172,6 +183,8 @@ class BasicUser extends Model
         if (empty($this->$raw)) {
             $this->setCreated(date("Y-m-d H:i:s"));
             $this->setActive(true);
+            $this->setBlocked(false);
+            $this->setBlockCounter(0);
             $this->setLastLogin(0);
             $this->setTotalLoginAttempts(0);
             $this->setLastLoginAttempt(0);
@@ -248,6 +261,16 @@ class BasicUser extends Model
     public function isActive()
     {
         return (boolean)$this->_active;
+    }
+    
+    /**
+     * Function to check if the user's account is blocked or not
+     * 
+     * @return boolean
+     */
+    public function isBlocked()
+    {
+        return (boolean)$this->_blocked;
     }
     
     /**
