@@ -25,7 +25,7 @@
                 <tr>
                     <td>{echo $concept->getCreated()}</td>
                     <td>{echo $concept->getModified()}</td>
-                    <td><a href="/admin/action/add/{echo $concept->getId()}" class="btn btn3 btn_pencil" title="Načíst concept"></a>
+                    <td><a href="/admin/action/loadconcept/{echo $concept->getId()}" class="btn btn3 btn_pencil ajaxLoadConcept" title="Načíst concept"></a>
                         <a href="/admin/concept/delete/{echo $concept->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat concept"></a></td>
                 </tr>
                 {/foreach}

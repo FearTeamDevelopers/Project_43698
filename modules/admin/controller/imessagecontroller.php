@@ -32,12 +32,12 @@ class ImessageController extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('imessage', null);
 
         if (RequestMethods::post('submitAddImessage')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/imessage/');
             }
 
@@ -55,12 +55,12 @@ class ImessageController extends Controller
                 $id = $imessage->save();
 
                 Event::fire('admin.log', array('success', 'Imessage id: ' . $id));
-                $view->successMessage('Zpráva' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/imessage/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($imessage->getErrors())));
                 $view->set('errors', $imessage->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('imessage', $imessage);
             }
         }
@@ -86,7 +86,7 @@ class ImessageController extends Controller
         $view->set('imessage', $imessage);
 
         if (RequestMethods::post('submitEditImessage')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/imessage/');
             }
 
@@ -118,8 +118,7 @@ class ImessageController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $imessage = \Admin\Model\ImessageModel::first(array('id = ?' => $id));
 

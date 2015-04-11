@@ -39,7 +39,7 @@ class UserController extends Controller
                 ->set('canonical', $canonical);
 
         if (RequestMethods::post('submitLogin')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/prihlasit');
             }
 
@@ -98,7 +98,7 @@ class UserController extends Controller
 
         $canonical = 'http://' . $this->getServerHost() . '/registrace';
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('user', $user);
 
         $this->getLayoutView()
@@ -106,8 +106,8 @@ class UserController extends Controller
                 ->set('canonical', $canonical);
 
         if (RequestMethods::post('register')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/');
             }
             $errors = array();
@@ -173,7 +173,7 @@ class UserController extends Controller
                             . '<a href="http://' . $this->getServerHost() . '/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
                             . 'S pozdravem,<br/>Hastrmani';
 
-                    if ($this->sendEmail($emailBody, 'Hastrman - Registrace', $user->getEmail(), 'registrace@hastrman.cz')) {
+                    if ($this->_sendEmail($emailBody, 'Hastrman - Registrace', $user->getEmail(), 'registrace@hastrman.cz')) {
                         Event::fire('app.log', array('success', 'User Id with email activation: ' . $uid));
                         $view->successMessage('Registrace byla úspěšná. Na uvedený email byl zaslán odkaz k aktivaci účtu.');
                     } else {
@@ -215,7 +215,7 @@ class UserController extends Controller
         $view->set('user', $user);
 
         if (RequestMethods::post('editProfile')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/muj-profil');
             }
 

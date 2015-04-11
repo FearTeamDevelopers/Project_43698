@@ -70,11 +70,11 @@ class GalleryController extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddGallery')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/gallery/');
             }
 
@@ -101,12 +101,12 @@ class GalleryController extends Controller
 
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                $view->successMessage('Gallery' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/gallery/detail/' . $id);
             } else {
                 Event::fire('admin.log', array('fail'));
                 $view->set('gallery', $gallery)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $gallery->getErrors());
             }
         }
@@ -160,7 +160,7 @@ class GalleryController extends Controller
         $view->set('gallery', $gallery);
 
         if (RequestMethods::post('submitEditGallery')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
@@ -227,7 +227,7 @@ class GalleryController extends Controller
         $view->set('gallery', $gallery);
 
         if (RequestMethods::post('submitDeleteGallery')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
@@ -266,7 +266,7 @@ class GalleryController extends Controller
             if ($gallery->delete()) {
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                $view->successMessage('Galerie' . self::SUCCESS_MESSAGE_3);
+                $view->successMessage(self::SUCCESS_MESSAGE_3);
                 self::redirect('/admin/gallery/');
             } else {
                 Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
@@ -321,11 +321,11 @@ class GalleryController extends Controller
         }
 
         $view->set('gallery', $gallery)
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddPhoto')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/gallery/');
             }
             $errors = $uploadErrors = array();
@@ -395,8 +395,7 @@ class GalleryController extends Controller
      */
     public function deletePhoto($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $photo = \App\Model\PhotoModel::first(
                         array('id = ?' => $id), array('id', 'imgMain', 'imgThumb', 'galleryId')
@@ -440,8 +439,7 @@ class GalleryController extends Controller
      */
     public function changePhotoStatus($id)
     {
-        $this->willRenderLayoutView = false;
-        $this->willRenderActionView = false;
+        $this->_disableView();
 
         $photo = \App\Model\PhotoModel::first(array('id = ?' => (int) $id));
 

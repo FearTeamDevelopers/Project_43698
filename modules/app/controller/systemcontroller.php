@@ -50,14 +50,14 @@ class SystemController extends Controller
 
         $canonical = 'http://' . $this->getServerHost() . '/feedback';
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('feedback', null);
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Feedback');
 
         if (RequestMethods::post('submitFeedback')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/feedback');
             }
             
@@ -76,7 +76,7 @@ class SystemController extends Controller
             } else {
                 Event::fire('app.log', array('fail', 'Errors: '.  json_encode($feedback->getErrors())));
                 $view->set('feedback', $feedback)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $feedback->getErrors());
             }
         }

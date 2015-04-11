@@ -94,7 +94,7 @@ class SystemController extends Controller
         $view->set('config', $config);
 
         if (RequestMethods::post('submitEditSet')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/');
             }
             $errors = array();
@@ -129,8 +129,7 @@ class SystemController extends Controller
      */
     public function showProfiler()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         echo Profiler::display();
     }

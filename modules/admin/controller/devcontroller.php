@@ -27,8 +27,7 @@ class DevController extends Controller
             exit;
         }
 
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         ini_set('max_execution_time', 1800);
         ini_set('memory_limit', '256M');
@@ -181,8 +180,7 @@ class DevController extends Controller
             exit;
         }
 
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $oldDb = new \THCFrame\Database\Database();
         $db = $oldDb->initializeDirectly(array(
@@ -309,10 +307,9 @@ class DevController extends Controller
      */
     public function testSendEmail()
     {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
+        $this->_disableView();
         
-        $this->sendEmail('Test message', 'Hastrman test email');
+        $this->_sendEmail('Test message', 'Hastrman test email');
         print('<pre>'.print_r('Send', true).'</pre>');die;
     }
   

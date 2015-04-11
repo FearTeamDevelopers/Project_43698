@@ -163,24 +163,10 @@ class NewsController extends Controller
      * 
      * @before _secured, _participant
      */
-    public function add($conceptId = 0)
+    public function add()
     {
         $view = $this->getActionView();
-
-        if ($conceptId === 0) {
-            $news = $this->_checkForObject();
-        } else {
-            $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $conceptId));
-
-            $news = new \App\Model\NewsModel(array(
-                'title' => $concept->getTitle(),
-                'shortBody' => $concept->getShortBody(),
-                'body' => $concept->getBody(),
-                'keywords' => $concept->getKeywords(),
-                'metaTitle' => $concept->getMetaTitle(),
-                'metaDescription' => $concept->getMetaDescription()
-            ));
-        }
+        $news = $this->_checkForObject();
 
         $newsConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
@@ -188,13 +174,12 @@ class NewsController extends Controller
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('news', $news)
-                ->set('conceptid', $conceptId)
                 ->set('concepts', $newsConcepts)
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddNews')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -206,21 +191,21 @@ class NewsController extends Controller
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
-                $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/news/');
             } else {
                 Event::fire('admin.log', array('fail',
                     'Errors: ' . json_encode($this->_errors + $news->getErrors())));
                 $view->set('errors', $this->_errors + $news->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('news', $news)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
 
         if (RequestMethods::post('submitPreviewNews')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -234,7 +219,7 @@ class NewsController extends Controller
                 self::redirect('/news/preview?action=add');
             } else {
                 $view->set('errors', $this->_errors + $news->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('news', $news)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -253,9 +238,7 @@ class NewsController extends Controller
 
         $news = $this->_checkForObject();
 
-        if (null !== $news) {
-            $view->set('news', $news);
-        } else {
+        if (null === $news) {
             $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
             if (null === $news) {
@@ -269,12 +252,18 @@ class NewsController extends Controller
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/news/');
             }
-
-            $view->set('news', $news);
         }
+        
+        $newsConcepts = \Admin\Model\ConceptModel::all(array(
+                    'userId = ?' => $this->getUser()->getId(),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS),
+                array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
+        
+        $view->set('news', $news)
+                ->set('concepts', $newsConcepts);
 
         if (RequestMethods::post('submitEditNews')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -298,7 +287,7 @@ class NewsController extends Controller
         }
 
         if (RequestMethods::post('submitPreviewNews')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -325,8 +314,7 @@ class NewsController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $news = \App\Model\NewsModel::first(
                         array('id = ?' => (int) $id), array('id', 'userId')
@@ -358,8 +346,7 @@ class NewsController extends Controller
      */
     public function approveNews($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
@@ -395,8 +382,7 @@ class NewsController extends Controller
      */
     public function rejectNews($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
@@ -445,8 +431,7 @@ class NewsController extends Controller
      */
     public function massAction()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $errors = array();
 
@@ -633,8 +618,7 @@ class NewsController extends Controller
      */
     public function load()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $page = (int) RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
@@ -782,4 +766,32 @@ class NewsController extends Controller
         
     }
     
+    /**
+     * Load concept into active form
+     * 
+     * @before _secured, _participant
+     */
+    public function loadConcept($id)
+    {
+        $this->_disableView();
+        $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
+        
+        if(null !== $concept){
+            $conceptArr = array(
+                'conceptid' => $concept->getId(),
+                'title' => $concept->getTitle(),
+                'shortbody' => $concept->getShortBody(),
+                'body' => $concept->getBody(),
+                'keywords' => $concept->getKeywords(),
+                'metatitle' => $concept->getMetaTitle(),
+                'metadescription' => $concept->getMetaDescription()
+            );
+            
+            echo json_encode($conceptArr);
+            exit;
+        }else{
+            echo 'notfound';
+            exit;
+        }
+    }
 }

@@ -174,24 +174,10 @@ class ActionController extends Controller
      * 
      * @before _secured, _participant
      */
-    public function add($conceptId = 0)
+    public function add()
     {
         $view = $this->getActionView();
-
-        if ($conceptId === 0) {
-            $action = $this->_checkForObject();
-        } else {
-            $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $conceptId));
-
-            $action = new \App\Model\ActionModel(array(
-                'title' => $concept->getTitle(),
-                'shortBody' => $concept->getShortBody(),
-                'body' => $concept->getBody(),
-                'keywords' => $concept->getKeywords(),
-                'metaTitle' => $concept->getMetaTitle(),
-                'metaDescription' => $concept->getMetaDescription()
-            ));
-        }
+        $action = $this->_checkForObject();
 
         $actionConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
@@ -199,13 +185,12 @@ class ActionController extends Controller
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('action', $action)
-                ->set('conceptid', $conceptId)
                 ->set('concepts', $actionConcepts)
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddAction')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/action/');
             }
 
@@ -213,24 +198,24 @@ class ActionController extends Controller
 
             if (empty($this->_errors) && $action->validate()) {
                 $id = $action->save();
-                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
                 $this->getCache()->invalidate();
+                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
-                $view->successMessage('Action' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/action/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($this->_errors + $action->getErrors())));
                 $view->set('errors', $this->_errors + $action->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('action', $action)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
 
         if (RequestMethods::post('submitPreviewAction')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/action/');
             }
 
@@ -244,7 +229,7 @@ class ActionController extends Controller
                 self::redirect('/action/preview?action=add');
             } else {
                 $view->set('errors', $this->_errors + $action->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('action', $action)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -263,9 +248,7 @@ class ActionController extends Controller
 
         $action = $this->_checkForObject();
 
-        if (null !== $action) {
-            $view->set('action', $action);
-        } else {
+        if (null === $action) {
             $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id));
 
             if (null === $action) {
@@ -279,12 +262,19 @@ class ActionController extends Controller
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/action/');
             }
-
-            $view->set('action', $action);
         }
 
+        $actionConcepts = \Admin\Model\ConceptModel::all(array(
+                    'userId = ?' => $this->getUser()->getId(),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION), 
+                array('id', 'created', 'modified'), 
+                array('created' => 'DESC'), 10);
+
+        $view->set('action', $action)
+                ->set('concepts', $actionConcepts);
+
         if (RequestMethods::post('submitEditAction')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
@@ -308,7 +298,7 @@ class ActionController extends Controller
         }
 
         if (RequestMethods::post('submitPreviewAction')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
@@ -335,8 +325,7 @@ class ActionController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $action = \App\Model\ActionModel::first(
                         array('id = ?' => (int) $id), array('id', 'userId')
@@ -369,8 +358,7 @@ class ActionController extends Controller
      */
     public function approveAction($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id));
 
@@ -406,8 +394,7 @@ class ActionController extends Controller
      */
     public function rejectAction($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id));
 
@@ -456,8 +443,7 @@ class ActionController extends Controller
      */
     public function massAction()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $errors = array();
 
@@ -647,8 +633,7 @@ class ActionController extends Controller
      */
     public function load()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $page = (int) RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
@@ -794,5 +779,34 @@ class ActionController extends Controller
     public function help()
     {
         
+    }
+    
+    /**
+     * Load concept into active form
+     * 
+     * @before _secured, _participant
+     */
+    public function loadConcept($id)
+    {
+        $this->_disableView();
+        $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
+        
+        if(null !== $concept){
+            $conceptArr = array(
+                'conceptid' => $concept->getId(),
+                'title' => $concept->getTitle(),
+                'shortbody' => $concept->getShortBody(),
+                'body' => $concept->getBody(),
+                'keywords' => $concept->getKeywords(),
+                'metatitle' => $concept->getMetaTitle(),
+                'metadescription' => $concept->getMetaDescription()
+            );
+            
+            echo json_encode($conceptArr);
+            exit;
+        }else{
+            echo 'notfound';
+            exit;
+        }
     }
 }

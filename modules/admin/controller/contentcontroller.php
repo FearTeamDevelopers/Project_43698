@@ -53,12 +53,12 @@ class ContentController extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('content', null);
 
         if (RequestMethods::post('submitAddContent')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/content/');
             }
             
@@ -86,12 +86,12 @@ class ContentController extends Controller
 
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
-                $view->successMessage('Obsah'.self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/content/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors + $content->getErrors())));
                 $view->set('errors', $errors + $content->getErrors())
-                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                     ->set('content', $content);
             }
         }
@@ -118,7 +118,7 @@ class ContentController extends Controller
         $view->set('content', $content);
 
         if (RequestMethods::post('submitEditContent')) {
-            if($this->checkCSRFToken() !== true){
+            if($this->_checkCSRFToken() !== true){
                 self::redirect('/admin/content/');
             }
             

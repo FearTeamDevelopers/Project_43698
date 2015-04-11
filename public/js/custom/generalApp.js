@@ -116,13 +116,14 @@ jQuery(document).ready(function ($) {
         if (jQuery('.uploadForm .file_inputs input[type=file]').length < 3) {
             jQuery('.uploadForm .file_inputs input[type=file]')
                     .last()
-                    .after('<input type="file" name="uploadfile[]" accept="image/*"/>');
+                    .after('<br/><input type="file" name="uploadfile[]" accept="image/*"/>');
         }
     });
 
     jQuery('.uploadForm .multi_upload_dec').click(function () {
         if (jQuery('.uploadForm .file_inputs input[type=file]').length > 1) {
             jQuery('.uploadForm .file_inputs input[type=file]').last().remove();
+            jQuery('.uploadForm .file_inputs br').last().remove();
         }
     });
 
@@ -276,7 +277,7 @@ jQuery(function () {
             pauseOnHover: 'immediate',
             onEnd: function (data) {
                 _direction = (_direction == 'left') ? 'right' : 'left';
-                $(this).trigger('configuration', ['direction', _direction]);
+                jQuery(this).trigger('configuration', ['direction', _direction]);
             }
         }
     });
@@ -303,7 +304,7 @@ jQuery(function () {
             pauseOnHover: 'immediate',
             onEnd: function (data) {
                 _direction = (_direction == 'left') ? 'right' : 'left';
-                $(this).trigger('configuration', ['direction', _direction]);
+                jQuery(this).trigger('configuration', ['direction', _direction]);
             }
         }
     });

@@ -16,12 +16,35 @@ jQuery(document).ready(function () {
                 metatitle:metatitle, metadescription:metadescription}, function (msg) {
             if (msg == 'fail') {
                 jQuery('#dialog p').text('Error while saving concept');
+                jQuery('#dialog').dialog();
             } else {
                 jQuery('#conceptid').val(msg);
             }
         });
 
     }, 300000);
+    
+    jQuery('a.ajaxLoadConcept').click(function(event){
+        event.preventDefault();
+        var url = jQuery(this).attr('href');
+        
+        jQuery.post(url, function (message) {
+            if (message == 'notfound') {
+                jQuery('#dialog p').text('Error while loading concept');
+                jQuery('#dialog').dialog();
+            } else {
+                var concept = jQuery.parseJSON(message);
+
+                jQuery('#conceptid').val(concept.conceptid);
+                jQuery('input[name=title]').val(concept.title);
+                CKEDITOR.instances['ckeditor2'].setData(concept.shortbody);
+                CKEDITOR.instances['ckeditor'].setData(concept.body);
+                jQuery('input[name=keywords]').val(concept.keywords);
+                jQuery('input[name=metatitle]').val(concept.metatitle);
+                jQuery('textarea[name=metadescription]').text(concept.metadescription);
+            }
+        });
+    });
 
     jQuery('.nosubmit').submit(function (event) {
         event.preventDefault();

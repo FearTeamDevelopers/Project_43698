@@ -231,24 +231,10 @@ class ReportController extends Controller
      * 
      * @before _secured, _participant
      */
-    public function add($conceptId = 0)
+    public function add()
     {
         $view = $this->getActionView();
-
-        if ($conceptId === 0) {
-            $report = $this->_checkForObject();
-        } else {
-            $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $conceptId));
-
-            $report = new \App\Model\ReportModel(array(
-                'title' => $concept->getTitle(),
-                'shortBody' => $concept->getShortBody(),
-                'body' => $concept->getBody(),
-                'keywords' => $concept->getKeywords(),
-                'metaTitle' => $concept->getMetaTitle(),
-                'metaDescription' => $concept->getMetaDescription()
-            ));
-        }
+        $report = $this->_checkForObject();
 
         $reportConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
@@ -256,13 +242,12 @@ class ReportController extends Controller
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('report', $report)
-                ->set('conceptid', $conceptId)
                 ->set('concepts', $reportConcepts)
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddReport')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/report/');
             }
 
@@ -274,20 +259,20 @@ class ReportController extends Controller
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
-                $view->successMessage('Report' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/report/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($this->_errors + $report->getErrors())));
                 $view->set('errors', $this->_errors + $report->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('report', $report)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
 
         if (RequestMethods::post('submitPreviewReport')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/report/');
             }
 
@@ -302,7 +287,7 @@ class ReportController extends Controller
                 self::redirect('/report/preview?action=add');
             } else {
                 $view->set('errors', $this->_errors + $report->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('report', $report)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -318,13 +303,9 @@ class ReportController extends Controller
     public function edit($id)
     {
         $view = $this->getActionView();
-
         $report = $this->_checkForObject();
 
-        if (null !== $report) {
-            $view->set('report', $report);
-        } else {
-
+        if (null === $report) {
             $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
             if (null === $report) {
@@ -338,12 +319,18 @@ class ReportController extends Controller
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/report/');
             }
-
-            $view->set('report', $report);
         }
+        
+        $reportConcepts = \Admin\Model\ConceptModel::all(array(
+                    'userId = ?' => $this->getUser()->getId(),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_REPORT),
+                array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
+
+        $view->set('report', $report)
+                ->set('concepts', $reportConcepts);
 
         if (RequestMethods::post('submitEditReport')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/report/');
             }
 
@@ -367,7 +354,7 @@ class ReportController extends Controller
         }
 
         if (RequestMethods::post('submitPreviewReport')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/report/');
             }
 
@@ -394,8 +381,7 @@ class ReportController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $report = \App\Model\ReportModel::first(
                         array('id = ?' => (int) $id), array('id', 'userId')
@@ -427,10 +413,9 @@ class ReportController extends Controller
      */
     public function deleteMainPhoto($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
-        if ($this->checkCSRFToken()) {
+        if ($this->_checkCSRFToken()) {
             $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
             if (NULL === $report) {
@@ -467,8 +452,7 @@ class ReportController extends Controller
      */
     public function previewDeletePhoto()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $session = Registry::get('session');
         $photo = $session->get('reportPreviewPhoto');
@@ -498,8 +482,7 @@ class ReportController extends Controller
      */
     public function approveReport($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
@@ -535,8 +518,7 @@ class ReportController extends Controller
      */
     public function rejectReport($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
@@ -585,8 +567,7 @@ class ReportController extends Controller
      */
     public function massAction()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $errors = array();
 
@@ -776,8 +757,7 @@ class ReportController extends Controller
      */
     public function load()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $page = (int) RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
@@ -924,4 +904,32 @@ class ReportController extends Controller
         
     }
     
+    /**
+     * Load concept into active form
+     * 
+     * @before _secured, _participant
+     */
+    public function loadConcept($id)
+    {
+        $this->_disableView();
+        $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
+        
+        if(null !== $concept){
+            $conceptArr = array(
+                'conceptid' => $concept->getId(),
+                'title' => $concept->getTitle(),
+                'shortbody' => $concept->getShortBody(),
+                'body' => $concept->getBody(),
+                'keywords' => $concept->getKeywords(),
+                'metatitle' => $concept->getMetaTitle(),
+                'metadescription' => $concept->getMetaDescription()
+            );
+            
+            echo json_encode($conceptArr);
+            exit;
+        }else{
+            echo 'notfound';
+            exit;
+        }
+    }
 }

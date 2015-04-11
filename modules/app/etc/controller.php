@@ -13,9 +13,10 @@ use THCFrame\Core\StringMethods;
  */
 class Controller extends BaseController
 {
-//    const SUCCESS_MESSAGE_1 = ' has been successfully created';
+    
+//    const SUCCESS_MESSAGE_1 = 'Content has been successfully created';
 //    const SUCCESS_MESSAGE_2 = 'All changes were successfully saved';
-//    const SUCCESS_MESSAGE_3 = ' has been successfully deleted';
+//    const SUCCESS_MESSAGE_3 = 'Content has been successfully deleted';
 //    const SUCCESS_MESSAGE_4 = 'Everything has been successfully activated';
 //    const SUCCESS_MESSAGE_5 = 'Everything has been successfully deactivated';
 //    const SUCCESS_MESSAGE_6 = 'Everything has been successfully deleted';
@@ -30,9 +31,9 @@ class Controller extends BaseController
 //    const ERROR_MESSAGE_6 = 'Access denied';
 //    const ERROR_MESSAGE_7 = 'Password is too weak';
 
-    const SUCCESS_MESSAGE_1 = ' byl(a) úspěšně vytovřen(a)';
+    const SUCCESS_MESSAGE_1 = 'Vše bylo úspěšně vytovřeno';
     const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
-    const SUCCESS_MESSAGE_3 = ' byl(a) úspěšně smazán(a)';
+    const SUCCESS_MESSAGE_3 = 'Vybraná položka byla úspěšně smazána';
     const SUCCESS_MESSAGE_4 = 'Vše bylo úspěšně aktivováno';
     const SUCCESS_MESSAGE_5 = 'Vše bylo úspěšně deaktivováno';
     const SUCCESS_MESSAGE_6 = 'Vše bylo úspěšně smazáno';
@@ -169,7 +170,7 @@ class Controller extends BaseController
      * @param type $sendFrom
      * @return boolean
      */
-    protected function sendEmail($body, $subject, $sendTo = null, $sendFrom = null)
+    protected function _sendEmail($body, $subject, $sendTo = null, $sendFrom = null)
     {
         try {
             require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
@@ -281,17 +282,9 @@ class Controller extends BaseController
     }
 
     /**
-     * load user from security context
-     */
-    public function getUser()
-    {
-        return $this->_security->getUser();
-    }
-
-    /**
      * 
      */
-    public function mutliSubmissionProtectionToken()
+    protected function _mutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $token = $session->get('submissionprotection');
@@ -308,7 +301,7 @@ class Controller extends BaseController
      * 
      * @return type
      */
-    public function revalidateMutliSubmissionProtectionToken()
+    protected function _revalidateMutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
         $session->erase('submissionprotection');
@@ -322,7 +315,7 @@ class Controller extends BaseController
      * 
      * @param type $token
      */
-    public function checkMutliSubmissionProtectionToken($token)
+    protected function _checkMutliSubmissionProtectionToken($token)
     {
         $session = Registry::get('session');
         $sessionToken = $session->get('submissionprotection');
@@ -338,7 +331,7 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function checkCSRFToken()
+    protected function _checkCSRFToken()
     {
         if ($this->_security->getCSRF()->verifyRequest()) {
             return true;
@@ -347,6 +340,14 @@ class Controller extends BaseController
         }
     }
 
+    /**
+     * Load user from security context
+     */
+    public function getUser()
+    {
+        return $this->_security->getUser();
+    }
+    
     /**
      * 
      */

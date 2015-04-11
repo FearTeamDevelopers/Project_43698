@@ -239,11 +239,11 @@ class AdvertisementController extends Controller
 
         $view->set('ad', $ad)
                 ->set('admessage', null)
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAdReply')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/bazar/r/' . $ad->getUniqueKey());
             }
 
@@ -290,7 +290,7 @@ class AdvertisementController extends Controller
                 }
             } else {
                 $view->set('errors', $message->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('admessage', $message);
             }
         }
@@ -349,14 +349,14 @@ class AdvertisementController extends Controller
         $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
 
         $view->set('adsections', $adSections)
-                ->set('submstoken', $this->mutliSubmissionProtectionToken());
+                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar - Nový inzerát');
 
         if (RequestMethods::post('submitAddAdvertisement')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/bazar');
             }
 
@@ -434,12 +434,12 @@ class AdvertisementController extends Controller
 
                     if (empty($errors['uploadfile'])) {
                         Event::fire('app.log', array('success', 'Ad id: ' . $id));
-                        $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
+                        $view->successMessage(self::SUCCESS_MESSAGE_1);
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     } else {
                         Event::fire('app.log', array('fail', 'Errors: ' . json_encode($errors + $ad->getErrors())));
                         $view->set('ad', $ad)
-                                ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                                ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                                 ->set('errors', $errors + $ad->getErrors());
                     }
                 } else {
@@ -451,7 +451,7 @@ class AdvertisementController extends Controller
             } else {
                 Event::fire('app.log', array('fail', 'Errors: ' . json_encode($errors + $ad->getErrors())));
                 $view->set('ad', $ad)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $ad->getErrors());
             }
         }
@@ -486,7 +486,7 @@ class AdvertisementController extends Controller
                 ->set('metatitle', 'Hastrman - Bazar - Upravit inzerát');
 
         if (RequestMethods::post('submitEditAdvertisement')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/bazar');
             }
 

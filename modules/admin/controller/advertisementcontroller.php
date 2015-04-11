@@ -80,8 +80,7 @@ class AdvertisementController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $ad = \App\Model\AdvertisementModel::first(
                         array('id = ?' => (int) $id), 
@@ -109,8 +108,7 @@ class AdvertisementController extends Controller
      */
     public function changeState($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id));
 
@@ -143,10 +141,9 @@ class AdvertisementController extends Controller
      */
     public function deleteAdImage($imageId)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
-        if ($this->checkCSRFToken()) {
+        if ($this->_checkCSRFToken()) {
             $photo = \App\Model\AdImageModel::first(
                             array('id = ?' => (int) $imageId), 
                             array('id', 'adId', 'imgMain', 'imgThumb')
@@ -185,12 +182,12 @@ class AdvertisementController extends Controller
     {
         $view = $this->getActionView();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('adsection', null);
 
         if (RequestMethods::post('submitAddAdSection')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/advertisement/sections/');
             }
 
@@ -210,12 +207,12 @@ class AdvertisementController extends Controller
                 $id = $adsection->save();
 
                 Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
-                $view->successMessage('Gallery' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/advertisement/sections/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors+$adsection->getErrors())));
                 $view->set('adsection', $adsection)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors+ $adsection->getErrors());
             }
         }
@@ -241,7 +238,7 @@ class AdvertisementController extends Controller
         $view->set('adsection', $adsection);
 
         if (RequestMethods::post('submitEditAdSection')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/advertisement/sections/');
             }
 
@@ -278,8 +275,7 @@ class AdvertisementController extends Controller
      */
     public function deleteSection($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $adsection = \App\Model\AdSectionModel::first(
                         array('id = ?' => (int) $id), array('id')
@@ -307,8 +303,7 @@ class AdvertisementController extends Controller
      */
     public function extendAvailability($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id, 'hasAvailabilityRequest = ?' => true));
 

@@ -73,8 +73,7 @@ class UserController extends Controller
      */
     public function logout()
     {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
+        $this->_disableView();
 
         $this->getSecurity()->logout();
         self::redirect('/admin/');
@@ -106,12 +105,12 @@ class UserController extends Controller
         $view = $this->getActionView();
         $user = null;
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('user', $user);
 
         if (RequestMethods::post('submitAddUser')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/user/');
             }
 
@@ -164,12 +163,12 @@ class UserController extends Controller
                 $userId = $user->save();
 
                 Event::fire('admin.log', array('success', 'User id: ' . $userId));
-                $view->successMessage('Uživatel' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/user/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('user', $user);
             }
         }
@@ -196,7 +195,7 @@ class UserController extends Controller
         $view->set('user', $user);
 
         if (RequestMethods::post('submitUpdateProfile')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/user/');
             }
 
@@ -273,7 +272,7 @@ class UserController extends Controller
         $view->set('user', $user);
 
         if (RequestMethods::post('submitEditUser')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/user/');
             }
 
@@ -339,8 +338,7 @@ class UserController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $user = \App\Model\UserModel::first(array('id = ?' => $id));
 

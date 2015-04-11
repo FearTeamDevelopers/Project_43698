@@ -105,12 +105,12 @@ class IndexController extends Controller
                 Event::fire('cron.log', array('success', 'Database backup'));
             } else {
                 Event::fire('cron.log', array('fail', 'Database backup'));
-                $this->sendEmail('Error in mysqldump class while creating database backup', 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+                $this->_sendEmail('Error in mysqldump class while creating database backup', 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             Event::fire('cron.log', array('fail', 'Database backup',
                 'Error: ' . $ex->getMessage()));
-            $this->sendEmail('Error while creating database backup: ' . $ex->getMessage(), 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+            $this->_sendEmail('Error while creating database backup: ' . $ex->getMessage(), 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
         }
     }
     
@@ -138,12 +138,12 @@ class IndexController extends Controller
                 Event::fire('cron.log', array('success', 'Database backup'));
             } else {
                 Event::fire('cron.log', array('fail', 'Database backup'));
-                $this->sendEmail('Error in mysqldump class while creating database backup', 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+                $this->_sendEmail('Error in mysqldump class while creating database backup', 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             Event::fire('cron.log', array('fail', 'Database backup',
                 'Error: ' . $ex->getMessage()));
-            $this->sendEmail('Error while creating database backup: ' . $ex->getMessage(), 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+            $this->_sendEmail('Error while creating database backup: ' . $ex->getMessage(), 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
         }
     }
 
@@ -229,12 +229,12 @@ class IndexController extends Controller
                 Event::fire('cron.log', array('success', sprintf('Database clone to test took %s sec', $time)));
             } else {
                 Event::fire('cron.log', array('fail', 'Database clone to test'));
-                $this->sendEmail('Unknown error', 'ERROR: Cron clone production database', null, 'cron@hastrman.cz');
+                $this->_sendEmail('Unknown error', 'ERROR: Cron clone production database', null, 'cron@hastrman.cz');
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             Event::fire('cron.log', array('fail', 'Database clone to test',
                 'Error: ' . $ex->getMessage()));
-            $this->sendEmail('Error: ' . $ex->getMessage(), 'ERROR: Cron clone production database', null, 'cron@hastrman.cz');
+            $this->_sendEmail('Error: ' . $ex->getMessage(), 'ERROR: Cron clone production database', null, 'cron@hastrman.cz');
         }
     }
 
@@ -325,7 +325,7 @@ class IndexController extends Controller
         } catch (\Exception $ex) {
             $this->_resertConnections();
             Event::fire('cron.log', array('fail', 'Error while creating sitemap file: ' . $ex->getMessage()));
-            $this->sendEmail('Error while creating sitemap file: ' . $ex->getMessage(), 'ERROR: Cron generateSitemap', null, 'cron@hastrman.cz');
+            $this->_sendEmail('Error while creating sitemap file: ' . $ex->getMessage(), 'ERROR: Cron generateSitemap', null, 'cron@hastrman.cz');
         }
     }
 

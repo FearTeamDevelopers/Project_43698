@@ -155,7 +155,7 @@ class Mysql extends Database\Connector
             $this->isConnected = false;
             $this->_service->close();
         }
-
+        
         return $this;
     }
 

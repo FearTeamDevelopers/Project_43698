@@ -18,8 +18,7 @@ class ConceptController extends Controller
      */
     public function store()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $conceptId = RequestMethods::post('conceptid', 0);
 
@@ -76,9 +75,8 @@ class ConceptController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
-
+        $this->_disableView();
+        
         $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $concept) {

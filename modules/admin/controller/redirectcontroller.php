@@ -36,12 +36,12 @@ class RedirectController extends Controller
         $view = $this->getActionView();
         $modules = Core::getModuleNames();
 
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('modules', $modules);
 
         if (RequestMethods::post('submitAddRedirect')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/redirect/');
             }
 
@@ -55,12 +55,12 @@ class RedirectController extends Controller
                 $id = $redirect->save();
 
                 Event::fire('admin.log', array('success', 'Redirect id: ' . $id));
-                $view->successMessage('News' . self::SUCCESS_MESSAGE_1);
+                $view->successMessage(self::SUCCESS_MESSAGE_1);
                 self::redirect('/admin/redirect/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($redirect->getErrors())));
                 $view->set('errors', $redirect->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('redirect', $redirect);
             }
         }
@@ -89,7 +89,7 @@ class RedirectController extends Controller
                 ->set('modules', $modules);
 
         if (RequestMethods::post('submitEditRedirect')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/redirect/');
             }
 
@@ -119,8 +119,7 @@ class RedirectController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $redirect = RedirectModel::first(
                         array('id = ?' => (int) $id), array('id')

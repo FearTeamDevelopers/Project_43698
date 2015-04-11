@@ -35,12 +35,12 @@ class PartnerController extends Controller
     public function add()
     {
         $view = $this->getActionView();
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
                 ->set('partner', null);
 
         if (RequestMethods::post('submitAddPartner')) {
-            if ($this->checkCSRFToken() !== true &&
-                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/partner/');
             }
 
@@ -72,12 +72,12 @@ class PartnerController extends Controller
                             $id = $partner->save();
 
                             Event::fire('admin.log', array('success', 'Partner id: ' . $id));
-                            $view->successMessage('Partner' . self::SUCCESS_MESSAGE_1);
+                            $view->successMessage(self::SUCCESS_MESSAGE_1);
                             self::redirect('/admin/partner/');
                         } else {
                             Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($partner->getErrors())));
                             $view->set('errors', $partner->getErrors())
-                                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                                     ->set('partner', $partner);
                         }
 
@@ -88,7 +88,7 @@ class PartnerController extends Controller
                 $errors['logo'] = $fileErrors;
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors+$partner->getErrors())));
                 $view->set('errors', $errors)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken());
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken());
             }
         }
     }
@@ -115,7 +115,7 @@ class PartnerController extends Controller
         $view->set('partner', $partner);
 
         if (RequestMethods::post('submitEditPartner')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/partner/');
             }
 
@@ -176,8 +176,7 @@ class PartnerController extends Controller
      */
     public function delete($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $partner = \App\Model\PartnerModel::first(
                         array('id = ?' => (int) $id), array('id', 'logo')
@@ -207,8 +206,7 @@ class PartnerController extends Controller
      */
     public function deleteLogo($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $partner = \App\Model\PartnerModel::first(array('id = ?' => (int) $id));
 
@@ -242,7 +240,7 @@ class PartnerController extends Controller
         $errors = array();
 
         if (RequestMethods::post('performPartnerAction')) {
-            if ($this->checkCSRFToken() !== true) {
+            if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/partner/');
             }
 
