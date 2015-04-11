@@ -94,11 +94,12 @@ class UserController extends Controller
     public function registration()
     {
         $view = $this->getActionView();
-        $view->set('submstoken', $this->mutliSubmissionProtectionToken());
+        $user = null;
 
         $canonical = 'http://' . $this->getServerHost() . '/registrace';
 
-        $view->set('user', null);
+        $view->set('submstoken', $this->mutliSubmissionProtectionToken())
+                ->set('user', $user);
 
         $this->getLayoutView()
                 ->set('metatitle', 'Hastrman - Registrace')
@@ -123,45 +124,45 @@ class UserController extends Controller
                 $errors['email'] = array('Tento email je již použit');
             }
 
-            if (PasswordManager::strength(RequestMethods::post('password')) > 0.5) {
-                $salt = PasswordManager::createSalt();
-                $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
-                $verifyEmail = $this->getConfig()->registration_verif_email;
-
-                if ($verifyEmail) {
-                    $active = false;
-                } else {
-                    $active = true;
-                }
-
-                $actToken = Rand::randStr(50);
-                for ($i = 1; $i <= 75; $i++) {
-                    if ($this->_checkEmailActToken($actToken)) {
-                        break;
-                    } else {
-                        $actToken = Rand::randStr(50);
-                    }
-
-                    if ($i == 75) {
-                        $errors['email'] = array(self::ERROR_MESSAGE_3 . ' Zkuste registraci opakovat později');
-                        break;
-                    }
-                }
-
-                $user = new \App\Model\UserModel(array(
-                    'firstname' => RequestMethods::post('firstname'),
-                    'lastname' => RequestMethods::post('lastname'),
-                    'email' => RequestMethods::post('email'),
-                    'phoneNumber' => RequestMethods::post('phone'),
-                    'password' => $hash,
-                    'salt' => $salt,
-                    'role' => 'role_member',
-                    'active' => $active,
-                    'emailActivationToken' => $actToken
-                ));
-            } else {
+            if (PasswordManager::strength(RequestMethods::post('password')) <= 0.5) {
                 $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
+
+            $salt = PasswordManager::createSalt();
+            $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
+            $verifyEmail = $this->getConfig()->registration_verif_email;
+
+            if ($verifyEmail) {
+                $active = false;
+            } else {
+                $active = true;
+            }
+
+            $actToken = Rand::randStr(50);
+            for ($i = 1; $i <= 75; $i++) {
+                if ($this->_checkEmailActToken($actToken)) {
+                    break;
+                } else {
+                    $actToken = Rand::randStr(50);
+                }
+
+                if ($i == 75) {
+                    $errors['email'] = array(self::ERROR_MESSAGE_3 . ' Zkuste registraci opakovat později');
+                    break;
+                }
+            }
+
+            $user = new \App\Model\UserModel(array(
+                'firstname' => RequestMethods::post('firstname'),
+                'lastname' => RequestMethods::post('lastname'),
+                'email' => RequestMethods::post('email'),
+                'phoneNumber' => RequestMethods::post('phone'),
+                'password' => $hash,
+                'salt' => $salt,
+                'role' => 'role_member',
+                'active' => $active,
+                'emailActivationToken' => $actToken
+            ));
 
             if (empty($errors) && $user->validate()) {
                 $uid = $user->save();
@@ -233,7 +234,7 @@ class UserController extends Controller
             }
 
             $pass = RequestMethods::post('password');
-            
+
             if (PasswordManager::strength($pass) > 0.5) {
                 if ($pass === null || $pass == '') {
                     $salt = $user->getSalt();

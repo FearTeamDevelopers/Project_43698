@@ -2,7 +2,7 @@
 
 namespace App\Etc;
 
-use THCFrame\Events\Events as Events;
+use THCFrame\Events\Events as Event;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
@@ -89,7 +89,7 @@ class Controller extends BaseController
         $this->_config = Registry::get('configuration');
 
         // schedule disconnect from database 
-        Events::add('framework.controller.destruct.after', function($name) {
+        Event::add('framework.controller.destruct.after', function($name) {
             Registry::get('database')->disconnectAll();
         });
 

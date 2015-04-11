@@ -96,7 +96,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
     private function _loadCompleteUser($id)
     {
         $user = \App\Model\UserModel::first(array('id = ?' => (int)$id));
-        
+
         $user->password = null;
         $user->salt = null;
 
@@ -133,7 +133,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                         array("{$this->_name} = ?" => $name), array('id', "{$this->_name}", "{$this->_pass}",
                     'salt', 'active', 'blocked', 'lastLogin', 'role',
                     'totalLoginAttempts', 'lastLoginAttempt', 'firstLoginAttempt'));
-
+        
         if ($user === null) {
             throw new Exception\UserNotExists($errMessage);
         }

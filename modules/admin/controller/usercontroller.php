@@ -90,9 +90,7 @@ class UserController extends Controller
         $view = $this->getActionView();
 
         $users = \App\Model\UserModel::all(
-                        array('role <> ?' => 'role_superadmin'), 
-                        array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), 
-                        array('id' => 'asc')
+                        array('role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), array('id' => 'asc')
         );
 
         $view->set('users', $users);
@@ -106,9 +104,10 @@ class UserController extends Controller
     public function add()
     {
         $view = $this->getActionView();
+        $user = null;
 
         $view->set('submstoken', $this->mutliSubmissionProtectionToken())
-                ->set('user', null);
+                ->set('user', $user);
 
         if (RequestMethods::post('submitAddUser')) {
             if ($this->checkCSRFToken() !== true &&
@@ -128,38 +127,38 @@ class UserController extends Controller
                 $errors['email'] = array('Tento email se již používá');
             }
 
-            if (PasswordManager::strength(RequestMethods::post('password')) > 0.6) {
-                $salt = PasswordManager::createSalt();
-                $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
-
-                $actToken = Rand::randStr(50);
-                for ($i = 1; $i <= 75; $i++) {
-                    if ($this->_checkEmailActToken($actToken)) {
-                        break;
-                    } else {
-                        $actToken = Rand::randStr(50);
-                    }
-
-                    if ($i == 75) {
-                        $errors['email'] = array(self::ERROR_MESSAGE_3 . ' Zkuste vytvoření uživatele opakovat později');
-                        break;
-                    }
-                }
-
-                $user = new \App\Model\UserModel(array(
-                    'firstname' => RequestMethods::post('firstname'),
-                    'lastname' => RequestMethods::post('lastname'),
-                    'email' => RequestMethods::post('email'),
-                    'phoneNumber' => RequestMethods::post('phone'),
-                    'emailActivationToken' => null,
-                    'password' => $hash,
-                    'salt' => $salt,
-                    'active' => true,
-                    'role' => RequestMethods::post('role', 'role_member')
-                ));
-            } else {
+            if (PasswordManager::strength(RequestMethods::post('password')) <= 0.6) {
                 $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
+            
+            $salt = PasswordManager::createSalt();
+            $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
+
+            $actToken = Rand::randStr(50);
+            for ($i = 1; $i <= 75; $i++) {
+                if ($this->_checkEmailActToken($actToken)) {
+                    break;
+                } else {
+                    $actToken = Rand::randStr(50);
+                }
+
+                if ($i == 75) {
+                    $errors['email'] = array(self::ERROR_MESSAGE_3 . ' Zkuste vytvoření uživatele opakovat později');
+                    break;
+                }
+            }
+
+            $user = new \App\Model\UserModel(array(
+                'firstname' => RequestMethods::post('firstname'),
+                'lastname' => RequestMethods::post('lastname'),
+                'email' => RequestMethods::post('email'),
+                'phoneNumber' => RequestMethods::post('phone'),
+                'emailActivationToken' => null,
+                'password' => $hash,
+                'salt' => $salt,
+                'active' => true,
+                'role' => RequestMethods::post('role', 'role_member')
+            ));
 
             if (empty($errors) && $user->validate()) {
                 $userId = $user->save();

@@ -642,10 +642,10 @@ class Model extends Base
         unset($query);
 
         if ($result > 0) {
-            $this->$raw = $result;
+            return true;
+        }else{
+            return false;
         }
-
-        return $result;
     }
     
     /**
