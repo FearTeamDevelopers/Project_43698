@@ -51,9 +51,8 @@
     {foreach $ad in $ads}
     <article class="large-6 small-12 medium-6 column left">
       <div class="imgWrapper">
-        {script $images=$ad->getImages()}
-        {if !empty($images)}
-        {script $image=array_shift($images)}<a data-lightbox="{echo $ad->getId()}" data-title="{echo $image->getPhotoName()}" href="{echo $image->getImgMain()}"><img src="{echo $image->getImgThumb()}"/></a>{/if}
+        {if !empty($ad->getImgMain())}
+        <a data-lightbox="{echo $ad->getId()}" data-title="{echo $ad->getPhotoName()}" href="{echo $ad->getImgMain()}"><img src="{echo $ad->getImgThumb()}"/></a>{/if}
       </div>
       <div class="nazev">
         <div class="nazevWrapper">

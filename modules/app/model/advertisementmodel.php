@@ -46,6 +46,16 @@ class AdvertisementModel extends Model
     /**
      * @column
      * @readwrite
+     * @type integer
+     * 
+     * @validate numeric, max(8)
+     * @label photo
+     */
+    protected $_mainPhotoId;
+    
+    /**
+     * @column
+     * @readwrite
      * @type boolean
      * @index
      * 
@@ -257,18 +267,14 @@ class AdvertisementModel extends Model
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                         array('ads.title' => 'sectionTitle'))
+                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', 
+                        array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
                 ->where('adv.active = ?', true)
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
                 ->order('adv.created', 'desc')
                 ->limit((int) $adsPerPage, (int) $page);
 
         $ads = self::initialize($query);
-
-        if (null !== $ads) {
-            foreach ($ads as &$ad) {
-                $ad->images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
-            }
-        }
         
         return $ads;
     }
@@ -289,6 +295,8 @@ class AdvertisementModel extends Model
                             array('us.firstname', 'us.lastname'))
                     ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                             array('ads.title' => 'sectionTitle'))
+                    ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', 
+                        array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
                     ->where('adv.adType = ?', $type)
@@ -296,12 +304,6 @@ class AdvertisementModel extends Model
                     ->limit((int)$adsPerPage, (int)$page);
 
             $ads = self::initialize($query);
-            
-            if(null !== $ads){
-                foreach($ads as &$ad){
-                    $ad->images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
-                }
-            }
             
             return $ads;
         }else{
@@ -339,6 +341,8 @@ class AdvertisementModel extends Model
                             array('us.firstname', 'us.lastname'))
                     ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
                             array('ads.title' => 'sectionTitle'))
+                    ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', 
+                        array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
                     ->where('ads.urlKey = ?', $section)
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
@@ -347,12 +351,6 @@ class AdvertisementModel extends Model
                     ->limit((int)$adsPerPage, (int)$page);
 
             $ads = self::initialize($query);
-            
-            if(null !== $ads){
-                foreach($ads as &$ad){
-                    $ad->images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
-                }
-            }
             
             return $ads;
         }else{
@@ -400,6 +398,8 @@ class AdvertisementModel extends Model
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                         array('ads.title' => 'sectionTitle'))
+                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', 
+                        array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
                 ->where('ads.urlKey = ?', $section)
                 ->where('adv.active = ?', true)
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
@@ -407,12 +407,6 @@ class AdvertisementModel extends Model
                 ->limit((int) $adsPerPage, (int) $page);
 
         $ads = self::initialize($query);
-
-        if (null !== $ads) {
-            foreach ($ads as &$ad) {
-                $ad->images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
-            }
-        }
 
         return $ads;
     }
@@ -479,6 +473,8 @@ class AdvertisementModel extends Model
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', 
                         array('ads.title' => 'sectionTitle'))
+                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', 
+                        array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
                 ->where('adv.userId = ?', $userId)
                 ->where('adv.active = ?', true)
                 ->order('adv.created', 'desc')
@@ -486,12 +482,6 @@ class AdvertisementModel extends Model
 
         $ads = self::initialize($query);
         
-        if(null !== $ads){
-            foreach($ads as &$ad){
-                $ad->images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
-            }
-        }
-
         return $ads;
     }
     

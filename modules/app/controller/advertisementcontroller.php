@@ -349,6 +349,7 @@ class AdvertisementController extends Controller
         $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
 
         $view->set('adsections', $adSections)
+                ->set('ad', null)
                 ->set('submstoken', $this->_mutliSubmissionProtectionToken());
 
         $layoutView->set('canonical', $canonical)
@@ -420,6 +421,13 @@ class AdvertisementController extends Controller
 
                             if ($adImage->validate()) {
                                 $adImageId = $adImage->save();
+                                
+                                if($i == 0){
+                                    $ad->mainPhotoId = $adImageId;
+                                    if($ad->validate()){
+                                        $ad->save();
+                                    }
+                                }
 
                                 Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $id));
                             } else {
@@ -443,7 +451,6 @@ class AdvertisementController extends Controller
                                 ->set('errors', $errors + $ad->getErrors());
                     }
                 } else {
-
                     Event::fire('app.log', array('success', 'Ad id: ' . $id));
                     $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
@@ -542,6 +549,13 @@ class AdvertisementController extends Controller
 
                                 if ($adImage->validate()) {
                                     $adImageId = $adImage->save();
+                                    
+                                    if ($i == 0) {
+                                        $ad->mainPhotoId = $adImageId;
+                                        if ($ad->validate()) {
+                                            $ad->save();
+                                        }
+                                    }
 
                                     Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $ad->getId()));
                                 } else {
@@ -597,11 +611,13 @@ class AdvertisementController extends Controller
         if (NULL === $ad) {
             echo self::ERROR_MESSAGE_2;
         } else {
+            $adId = $ad->getId();
+            
             if ($ad->delete()) {
-                Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                Event::fire('admin.log', array('success', 'Ad id: ' . $adId));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId()));
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $adId));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -708,4 +724,8 @@ class AdvertisementController extends Controller
         }
     }
 
+    public function setNewMainPhoto($adId, $photoId)
+    {
+        
+    }
 }

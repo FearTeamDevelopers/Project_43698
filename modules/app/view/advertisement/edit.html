@@ -5,6 +5,12 @@
       <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
       <table>
         <tr>
+          <td><span>Platnost</span></td>
+          <td>
+            {echo \App\Helper\DateFormater::t2d(\App\Helper\FormPrinter::iset($ad,'expirationDate'))}
+          </td>
+        </tr>
+        <tr>
           <td><span>Název</span></td>
           <td>{if isset($errors["title"])}
             <label class="error">{echo join("<br/>", $errors["title"])}</label>{/if}
