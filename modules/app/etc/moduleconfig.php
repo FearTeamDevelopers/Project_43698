@@ -72,6 +72,13 @@ class ModuleConfig extends Module
             'pattern' => '/bazar/smazat/:uniquekey',
             'module' => 'app',
             'controller' => 'advertisement',
+            'action' => 'ajaxdelete',
+            'args' => ':uniquekey'
+        ),
+        array(
+            'pattern' => '/bazar/odstranit/:uniquekey',
+            'module' => 'app',
+            'controller' => 'advertisement',
             'action' => 'delete',
             'args' => ':uniquekey'
         ),

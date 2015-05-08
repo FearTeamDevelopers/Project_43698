@@ -50,7 +50,7 @@ class Database extends Base
 
         $databases = $configuration->database;
         $conHandler = new ConnectionHandler();
-        
+
         if (!empty($databases)) {
             foreach ($databases as $dbIdent) {
                 if (!empty($dbIdent) && !empty($dbIdent->type)) {
@@ -60,17 +60,21 @@ class Database extends Base
                     throw new Exception\Argument('Error in configuration file');
                 }
 
-                $connector = $this->createConnector($type, $options);
-                $conHandler->add($dbIdent->id, $connector);
-                $connector->connect();
-                
+                try {
+                    $connector = $this->createConnector($type, $options);
+                    $conHandler->add($dbIdent->id, $connector);
+                    $connector->connect();
+                } catch (Exception $exc) {
+                    throw new Exception\Connector($exc->getMessage());
+                }
+
                 Event::fire('framework.database.initialize.after', array($type, $options));
             }
         }
 
         return $conHandler;
     }
-    
+
     /**
      * 
      * @param array     $options
@@ -88,7 +92,7 @@ class Database extends Base
 
         $connector = $this->createConnector($type, $options);
         $connector->connect();
-        
+
         return $connector;
     }
 

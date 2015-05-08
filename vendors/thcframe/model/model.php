@@ -32,7 +32,7 @@ class Model extends Base
      * @readwrite
      */
     protected $_connector;
-    
+
     /**
      * In case of use multidb model have to has set database identificator
      * Method getConnector then uses this to select correct database connector
@@ -373,7 +373,7 @@ class Model extends Base
     {
         unset($this->_connector);
     }
-    
+
     /**
      * Method simplifies record retrieval for us. 
      * It determines the model’s primary column and checks to see whether 
@@ -444,9 +444,9 @@ class Model extends Base
                     ->where("{$name} = ?", $this->$raw);
 
             $state = $query->delete();
-            
+
             unset($query);
-            
+
             if ($state != -1) {
                 $this->connector->commitTransaction();
                 return $state;
@@ -480,7 +480,7 @@ class Model extends Base
         $state = $query->delete();
 
         unset($query);
-        
+
         if ($state != -1) {
             $instance->connector->commitTransaction();
             return $state;
@@ -513,7 +513,7 @@ class Model extends Base
         $state = $query->update($data);
 
         unset($query);
-        
+
         if ($state != -1) {
             $instance->connector->commitTransaction();
             return $state;
@@ -527,6 +527,14 @@ class Model extends Base
      * 
      */
     public function preSave()
+    {
+        
+    }
+
+    /**
+     * 
+     */
+    public function postSave()
     {
         
     }
@@ -577,7 +585,7 @@ class Model extends Base
         }
 
         $result = $query->save($data);
-        
+
         unset($query);
 
         if ($result > 0) {
@@ -587,6 +595,22 @@ class Model extends Base
         $this->postSave();
 
         return $result;
+    }
+
+    /**
+     * 
+     */
+    public function preUpdate()
+    {
+        
+    }
+
+    /**
+     * 
+     */
+    public function postUpdate()
+    {
+        
     }
 
     /**
@@ -603,6 +627,8 @@ class Model extends Base
      */
     public function update()
     {
+        $this->preUpdate();
+
         $primary = $this->primaryColumn;
 
         $raw = $primary['raw'];
@@ -614,13 +640,13 @@ class Model extends Base
 
         if (!empty($this->$raw)) {
             $query->where("{$name} = ?", $this->$raw);
-        }else{
+        } else {
             throw new Exception\Primary('Primary key is not set');
         }
 
         $data = array();
         foreach ($this->columns as $key => $column) {
-            
+
             if (!$column['read']) {
                 $prop = $column['raw'];
                 $data[$key] = $this->$prop;
@@ -629,31 +655,24 @@ class Model extends Base
 
             if ($column != $this->primaryColumn && $column) {
                 $method = 'get' . ucfirst($key);
-                
-                if($this->$method() !== null){
+
+                if ($this->$method() !== null) {
                     $data[$key] = $this->$method();
                 }
                 continue;
             }
         }
-        
+
         $result = $query->update($data);
-        
+
+        $this->postUpdate();
         unset($query);
 
         if ($result > 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
-    }
-    
-    /**
-     * 
-     */
-    public function postSave()
-    {
-        
     }
 
     /**
@@ -667,7 +686,7 @@ class Model extends Base
         if (empty($this->_table)) {
             if ($this->_databaseIdent === null) {
                 $tablePrefix = Registry::get('configuration')->database->main->tablePrefix;
-            }else{
+            } else {
                 $tablePrefix = Registry::get('configuration')->database->{$this->_databaseIdent}->tablePrefix;
             }
 
@@ -697,14 +716,24 @@ class Model extends Base
             } else {
                 $dbIdent = strtolower($this->_databaseIdent);
             }
-            
-            $database = Registry::get('database')->get($dbIdent);
 
-            if (!$database) {
-                throw new Exception\Connector('No connector availible');
+            try {
+                $database = Registry::get('database')->get($dbIdent);
+
+                if ($database->ping() === false) {
+                    $backupDb = Registry::get('database')->get('backup');
+
+                    if ($backupDb->ping() === false) {
+                        throw new Exception\Connector('No connector availible');
+                    } else {
+                        $this->_connector = $backupDb;
+                    }
+                } else {
+                    $this->_connector = $database;
+                }
+            } catch (Exception $ex) {
+                throw new Exception\Connector($ex->getMessage());
             }
-
-            $this->_connector = $database;
         }
 
         return $this->_connector;
@@ -881,7 +910,7 @@ class Model extends Base
         $class = get_class($this);
 
         unset($query);
-        
+
         if ($first) {
             return new $class($first);
         }
@@ -960,13 +989,12 @@ class Model extends Base
         }
 
         unset($query);
-        
-        if(empty($rows)){
+
+        if (empty($rows)) {
             return null;
-        }else{
+        } else {
             return $rows;
         }
-        
     }
 
     /**
@@ -1009,7 +1037,7 @@ class Model extends Base
         }
 
         unset($query);
-        
+
         if (empty($rows)) {
             return null;
         } else {
@@ -1104,7 +1132,7 @@ class Model extends Base
                             $label ? $label : $raw
                                 ), $arguments);
 
-                        $message = $template['message_'.$errLang];
+                        $message = $template['message_' . $errLang];
 
                         foreach ($replacements as $i => $replacement) {
                             $message = str_replace("{{$i}}", $replacement, $message);
@@ -1127,4 +1155,5 @@ class Model extends Base
     {
         return get_class($this);
     }
+
 }

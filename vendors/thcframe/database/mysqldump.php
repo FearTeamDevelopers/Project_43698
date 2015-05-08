@@ -34,7 +34,7 @@ class Mysqldump extends Base
     private $_fileHandler = null;
     private $_settings = array();
     private $_database;
-    private $_dumpedFiles = array();
+    private $_backupFiles = array();
     private $_defaultSettings = array(
         'include-tables' => array(),
         'exclude-tables' => array(),
@@ -364,7 +364,7 @@ class Mysqldump extends Base
         Event::fire('framework.mysqldump.create.after', array($filename));
 
         $this->_close();
-        $this->_dumpedFiles[$id] = $filename;
+        $this->_backupFiles[$id] = $filename;
     }
 
     /**
@@ -407,8 +407,8 @@ class Mysqldump extends Base
                 $db = $this->_connectionHandler->get($dbId);
                 $this->_writeData($db, $dbId);
 
-                if (!empty($this->_dumpedFiles)) {
-                    $this->_compressBackupFiles($this->_dumpedFiles);
+                if (!empty($this->_backupFiles)) {
+                    $this->_compressBackupFiles($this->_backupFiles);
                     return true;
                 } else {
                     return false;
@@ -423,8 +423,8 @@ class Mysqldump extends Base
                 unset($db);
             }
 
-            if (!empty($this->_dumpedFiles)) {
-                $this->_compressBackupFiles($this->_dumpedFiles);
+            if (!empty($this->_backupFiles)) {
+                $this->_compressBackupFiles($this->_backupFiles);
                 return true;
             } else {
                 return false;
@@ -440,10 +440,10 @@ class Mysqldump extends Base
     public function getDumpFile($id = null)
     {
         if (null === $id) {
-            return $this->_dumpedFiles;
+            return $this->_backupFiles;
         } else {
-            if (array_key_exists($id, $this->_dumpedFiles)) {
-                return $this->_dumpedFiles[$id];
+            if (array_key_exists($id, $this->_backupFiles)) {
+                return $this->_backupFiles[$id];
             } else {
                 return null;
             }
@@ -482,8 +482,8 @@ class Mysqldump extends Base
      */
     public function downloadDump()
     {
-        if (!empty($this->_dumpedFiles)) {
-            foreach ($this->_dumpedFiles as $filename) {
+        if (!empty($this->_backupFiles)) {
+            foreach ($this->_backupFiles as $filename) {
                 $mime = 'text/x-sql';
                 header('Content-Type: application/octet-stream');
                 header("Content-Transfer-Encoding: Binary");

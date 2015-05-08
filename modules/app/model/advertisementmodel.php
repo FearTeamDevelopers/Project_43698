@@ -244,7 +244,7 @@ class AdvertisementModel extends Model
                 ->where('adv.id = ?', (int) $id);
 
         $adArr = self::initialize($query);
-        $ad = array_shift($adArr);
+        $ad = !empty($adArr) ? array_shift($adArr): null;
 
         if (null !== $ad) {
             $ad->messages = \App\Model\AdMessageModel::all(array('adId = ?' => $ad->getId()));
@@ -376,7 +376,7 @@ class AdvertisementModel extends Model
                     ->where('adv.adType = ?', $type);
 
             $arr = self::initialize($query);
-            $obj = array_shift($arr);
+            $obj = !empty($arr) ? array_shift($arr): null;
             return (int)$obj->count;
         } else {
             return null;
@@ -427,7 +427,7 @@ class AdvertisementModel extends Model
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'));
 
         $arr = self::initialize($query);
-        $obj = array_shift($arr);
+        $obj = !empty($arr) ? array_shift($arr): null;
         return (int) $obj->count;
     }
 
@@ -449,7 +449,7 @@ class AdvertisementModel extends Model
                 ->where('adv.active = ?', true);
 
         $adArr = self::initialize($query);
-        $ad = array_shift($adArr);
+        $ad = !empty($adArr) ? array_shift($adArr): null;
 
         if (null !== $ad) {
             $ad->messages = \App\Model\AdMessageModel::all(array('adId = ?' => $ad->getId()));

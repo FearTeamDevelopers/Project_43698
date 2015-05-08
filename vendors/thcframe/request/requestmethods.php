@@ -46,7 +46,7 @@ class RequestMethods
         }
         return false;
     }
-    
+
     /**
      * Get value from $_POST array
      * 
@@ -61,7 +61,7 @@ class RequestMethods
         }
         return $default;
     }
-    
+
     /**
      * Check if key is in $_POST array
      * 
@@ -104,6 +104,44 @@ class RequestMethods
             return $_COOKIE[$key];
         }
         return $default;
+    }
+
+    /**
+     * Return client ip address
+     * 
+     * @return string
+     */
+    public static function getClientIpAddress()
+    {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+        return $ipaddress;
+    }
+
+    /**
+     * Return client browser identification
+     * 
+     * @return string
+     */
+    public static function getBrowser()
+    {
+        $ua = get_browser();
+
+        return json_encode($ua);
     }
 
 }

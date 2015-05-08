@@ -3,6 +3,7 @@
 namespace Admin\Etc;
 
 use THCFrame\Registry\Registry;
+use THCFrame\Request\RequestMethods;
 use THCFrame\Events\SubscriberInterface;
 use THCFrame\Security\Model\SecLogModel;
 
@@ -20,6 +21,7 @@ class ModuleObserver implements SubscriberInterface
     {
         return array(
             'admin.log' => 'adminLog',
+            'sec.log' => 'secLog',
         );
     }
 
@@ -33,9 +35,13 @@ class ModuleObserver implements SubscriberInterface
 
         $router = Registry::get('router');
         $route = $router->getLastRoute();
-
         $security = Registry::get('security');
-        $userId = $security->getUser()->getWholeName();
+        
+        if ($security->getUser() === null) {
+            $userId = 'annonymous';
+        } else {
+            $userId = $security->getUser()->getWholeName() . ':' . $security->getUser()->getId();
+        }
 
         $module = $route->getModule();
         $controller = $route->getController();
@@ -73,6 +79,43 @@ class ModuleObserver implements SubscriberInterface
     public function secLog()
     {
         $params = func_get_args();
+
+        $uip = RequestMethods::getClientIpAddress();
+        $ubrowser = RequestMethods::getBrowser();
+
+        $router = Registry::get('router');
+        $route = $router->getLastRoute();
+        $security = Registry::get('security');
+
+        if ($security->getUser() === null) {
+            $userId = 'annonymous';
+        } else {
+            $userId = $security->getUser()->getWholeName() . ':' . $security->getUser()->getId();
+        }
+
+        $module = $route->getModule();
+        $controller = $route->getController();
+        $action = $route->getAction();
+
+        if (!empty($params)) {
+            $paramStr = join(', ', $params);
+        } else {
+            $paramStr = '';
+        }
+
+        $log = new SecLogModel(array(
+            'userId' => $userId,
+            'module' => $module,
+            'controller' => $controller,
+            'action' => $action,
+            'userAgent' => $ubrowser,
+            'userIp' => $uip,
+            'params' => $paramStr
+        ));
+
+        if ($log->validate()) {
+            $log->save();
+        }
     }
 
 }

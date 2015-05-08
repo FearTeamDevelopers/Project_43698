@@ -8,6 +8,8 @@ use THCFrame\Security\Exception;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Security\Model\Authtoken;
 use THCFrame\Core\Rand;
+use THCFrame\Date\Date;
+use THCFrame\Registry\Registry;
 
 /**
  * Basic user class
@@ -16,26 +18,24 @@ class BasicUser extends Model
 {
 
     /**
-     * Time after which a password must expire i.e. the password needs to be updated
-     * approx 4 months
-     * 
-     * @var int
-     */
-    public static $passwordExpiryTime = 10368000;
-
-    /**
      * Maximum time after which the user must re-login
      * approx 1 month
      * 
      * @var int
      */
-    public static $rememberMeExpiryTime = 2592000;
-    
+    protected static $_rememberMeExpiryTime = 2592000;
+
+    /**
+     * 
+     * @var int 
+     */
+    protected static $_accountBlockTime = 300;
+
     /**
      * @readwrite
      */
     protected $_alias = 'us';
-    
+
     /**
      * @column
      * @readwrite
@@ -78,7 +78,7 @@ class BasicUser extends Model
      * @validate max(3)
      */
     protected $_active;
-    
+
     /**
      * @column
      * @readwrite
@@ -93,13 +93,22 @@ class BasicUser extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 25
+     * @type boolean
+     * @index
      * 
-     * @validate required, alpha, max(25)
-     * @label user role
+     * @validate max(3)
      */
-    protected $_role;
+    protected $_deleted;
+
+    /**
+     * @column
+     * @readwrite
+     * @type boolean
+     * @index
+     * 
+     * @validate max(3)
+     */
+    protected $_forcePassChange;
 
     /**
      * @column
@@ -111,7 +120,18 @@ class BasicUser extends Model
      * @validate required, max(40)
      */
     protected $_salt;
-    
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 25
+     * 
+     * @validate required, alpha, max(25)
+     * @label user role
+     */
+    protected $_role;
+
     /**
      * @column
      * @readwrite
@@ -141,7 +161,7 @@ class BasicUser extends Model
      * @label last login attempt
      */
     protected $_lastLoginAttempt;
-    
+
     /**
      * @column
      * @readwrite
@@ -151,6 +171,68 @@ class BasicUser extends Model
      * @label first login attempt
      */
     protected $_firstLoginAttempt;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
+     * @label pass expiration time
+     */
+    protected $_accountExpire;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
+     * @label pass expiration time
+     */
+    protected $_passExpire;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 20
+     *
+     * @validate numeric, max(20)
+     */
+    protected $_lastLoginIp;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 256
+     *
+     * @validate alphanumeric, max(1000)
+     */
+    protected $_lastLoginBrowser;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
+     */
+    protected $_lastForcePassChange;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
+     */
+    protected $_lastPassChange;
 
     /**
      * @column
@@ -171,29 +253,35 @@ class BasicUser extends Model
      * @validate datetime, max(22)
      */
     protected $_modified;
-    
+
     /**
      * 
      */
     public function preSave()
     {
         $primary = $this->getPrimaryColumn();
-        $raw = $primary["raw"];
+        $raw = $primary['raw'];
 
         if (empty($this->$raw)) {
-            $this->setCreated(date("Y-m-d H:i:s"));
+            $this->setCreated(date('Y-m-d H:i:s'));
             $this->setActive(true);
             $this->setBlocked(false);
-            $this->setBlockCounter(0);
-            $this->setLastLogin(0);
-            $this->setTotalLoginAttempts(0);
-            $this->setLastLoginAttempt(0);
-            $this->setFirstLoginAttempt(0);
+            $this->setDeleted(false);
+            $this->setPassExipre();
+            $this->setAccountExpire();
         }
-        
-        $this->setModified(date("Y-m-d H:i:s"));
+
+        $this->setModified(date('Y-m-d H:i:s'));
     }
     
+    /**
+     * 
+     */
+    public function preUpdate()
+    {
+        $this->setModified(date('Y-m-d H:i:s'));
+    }
+
     /**
      * 
      * @param type $value
@@ -207,32 +295,72 @@ class BasicUser extends Model
         } else {
             $this->_role = $value;
         }
+        
+        return $this;
     }
-    
+
     /**
      * Set user last login
      */
     public function setLastLogin($time = null)
     {
-        if($time === null){
+        if ($time === null) {
             $this->_lastLogin = time();
-        }else{
+        } else {
             $this->_lastLogin = $time;
         }
+        
+        return $this;
+    }
+
+    /**
+     * 
+     * @return \THCFrame\Security\Model\BasicUser
+     */
+    public function setPassExipre()
+    {
+        $passExpiration = Registry::get('configuration')->security->passwordExpiration;
+
+        if ((int) $passExpiration === 0) {
+            $this->_passExpire = 0;
+        } else {
+            $passExp = Date::getInstance()->dateAdd(time(), 'Y-m-d', 0, 0, $passExpiration);
+            $this->_passExpire = $passExp;
+        }
+        
+        return $this;
     }
     
+    /**
+     * 
+     * @return \THCFrame\Security\Model\BasicUser
+     */
+    public function setAccountExpire()
+    {
+        $accExpiration = Registry::get('configuration')->security->accountExpiration;
+
+        if ((int) $accExpiration === 0) {
+            $this->_accountExpire = 0;
+        } else {
+            $accExpirationDate = Date::getInstance()->dateAdd(time(), 'Y-m-d', 0, 0, $accExpiration);
+            $this->_accountExpire = $accExpirationDate;
+        }
+        
+        return $this;
+    }
+
     /**
      * Function to activate the account
      */
     public function activateAccount()
     {
         $this->_active = true;
-        
-        if($this->validate()){
+
+        if ($this->validate()) {
             $this->save();
-            
+
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -243,16 +371,16 @@ class BasicUser extends Model
     public function deactivateAccount()
     {
         $this->_active = false;
-        
-        if($this->validate()){
+
+        if ($this->validate()) {
             $this->save();
-            
+
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     /**
      * Function to check if the user's account is active or not
      * 
@@ -260,9 +388,9 @@ class BasicUser extends Model
      */
     public function isActive()
     {
-        return (boolean)$this->_active;
+        return (boolean) $this->_active;
     }
-    
+
     /**
      * Function to check if the user's account is blocked or not
      * 
@@ -270,9 +398,106 @@ class BasicUser extends Model
      */
     public function isBlocked()
     {
-        return (boolean)$this->_blocked;
+        $currentTime = time();
+
+        if ((boolean) $this->_blocked === true) {
+            if (($currentTime - $this->getLastLoginAttempt()) >= self::$_accountBlockTime) {
+                return false;
+            } else {
+                return (boolean) $this->_blocked;
+            }
+        } else {
+            return (boolean) $this->_blocked;
+        }
+    }
+
+    /**
+     * To check if the password has aged. i.e. if the time has passed 
+     * after which the password must be changed.
+     * 
+     * @return boolean
+     */
+    public function isPasswordExpired()
+    {
+        $passExp = Registry::get('configuration')->security->passwordExpiration;
+        if ((int)$passExp === 0) {
+            return false;
+        }
+
+        $currentTime = time();
+        $passExpire = Date::getInstance()->getTimestamp($this->passExpire);
+
+        if (($passExpire - $currentTime) < 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 
+     * @return boolean
+     */
+    public function getDaysToPassExpiration()
+    {
+        $passExp = Registry::get('configuration')->security->passwordExpiration;
+        if ((int)$passExp === 0) {
+            return false;
+        }
+
+        return Date::getInstance()->datediff($this->passExpire, time(), false);
+    }
+
+    /**
+     * To check if the account has aged. i.e. if the time has passed 
+     * after which the account will be blocked.
+     * 
+     * @return boolean
+     */
+    public function isAccountExpired()
+    {
+        $accExp = Registry::get('configuration')->security->accountExpiration;
+        if ((int)$accExp === 0) {
+            return false;
+        }
+
+        $currentTime = time();
+        $accExpire = Date::getInstance()->getTimestamp($this->accountExpire);
+
+        if (($accExpire - $currentTime) < 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
+    /**
+     * 
+     * @param type $oldPassword
+     * @param type $newPassword
+     * @param type $passStrength
+     * @return \THCFrame\Security\Model\BasicUser
+     * @throws Exception\WrongPassword
+     * @throws Exception\WeakPassword
+     */        
+    public function changePassword($oldPassword, $newPassword, $passStrength = 0.5)
+    {
+        if (!PasswordManager::validatePassword($oldPassword, $this->getPassword(), $this->getSalt())) {
+            throw new Exception\WrongPassword('Wrong Password provided');
+        }
+
+        if (PasswordManager::strength($newPassword) <= $passStrength) {
+            throw new Exception\WeakPassword('Password is too weak');
+        }
+        
+        $this->salt = PasswordManager::createSalt();
+        $this->password = PasswordManager::hashPassword($newPassword, $this->getSalt());
+        $this->lastPassChange = Date::getInstance()->getFormatedCurDatetime('system');
+        $this->setPassExipre();
+
+        return $this;
+    }
+
     /**
      * Function to reset the password for the current user
      * 
@@ -283,17 +508,19 @@ class BasicUser extends Model
      */
     public function resetPassword($oldPassword, $newPassword)
     {
-        if (!PasswordManager::validatePassword($oldPassword, $this->getPassword(), $this->getSalt())){
+        if (!PasswordManager::validatePassword($oldPassword, $this->getPassword(), $this->getSalt())) {
             throw new Exception\WrongPassword('Wrong Password provided');
         }
 
         $this->salt = PasswordManager::createSalt();
-        $this->password = PasswordManager::hashPassword($newPassword, $this->getSalt);
-        
-        if($this->validate()){
+        $this->password = PasswordManager::hashPassword($newPassword, $this->getSalt());
+        $this->lastPassChange = Date::getInstance()->getFormatedCurDatetime('system');
+        $this->setPassExipre();
+
+        if ($this->validate()) {
             $this->save();
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -304,21 +531,32 @@ class BasicUser extends Model
      * @param type $newPassword
      * @return boolean
      */
-    public function forceResetPassword($newPassword)
+    public function forceResetPassword($newPassword = null, $passStrength = 0.5)
     {
-        $this->salt = PasswordManager::createSalt();
-        $this->password = PasswordManager::hashPassword($newPassword, $this->getSalt);
+        if (null === $newPassword) {
+            $newPassword = PasswordManager::generate($passStrength);
+        }
         
-        if($this->validate()){
+        if (PasswordManager::strength($newPassword) <= $passStrength) {
+            throw new Exception\WeakPassword('Password is too weak');
+        }
+
+        $this->salt = PasswordManager::createSalt();
+        $this->password = PasswordManager::hashPassword($newPassword, $this->getSalt());
+        $this->forcePassChange = 1;
+        $this->lastForcePassChange = Date::getInstance()->getFormatedCurDatetime('system');
+        $this->setPassExipre();
+
+        if ($this->validate()) {
             $this->save();
-            return true;
-        }else{
+            return $newPassword;
+        } else {
             return false;
         }
     }
-    
+
     /**
-     * Function to enable "Remember Me" functionality
+     * Function to enable 'Remember Me' functionality
      * 
      * @param type $userID
      * @param type $secure
@@ -338,13 +576,13 @@ class BasicUser extends Model
             $token->save();
 
             if ($secure && $httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, TRUE, TRUE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, TRUE, TRUE);
             } elseif (!$secure && !$httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, FALSE, FALSE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, FALSE, FALSE);
             } elseif ($secure && !$httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, TRUE, FALSE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, TRUE, FALSE);
             } elseif (!$secure && $httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$rememberMeExpiryTime, null, null, FALSE, TRUE);
+                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, FALSE, TRUE);
             }
 
             return true;
@@ -367,7 +605,7 @@ class BasicUser extends Model
                 $currentTime = time();
 
                 //If cookie time has expired, then delete the cookie from the DB and the user's browser.
-                if (($currentTime - $token->created) >= static::$rememberMeExpiryTime) {
+                if (($currentTime - $token->created) >= static::$_rememberMeExpiryTime) {
                     static::deleteAuthenticationToken();
                     return false;
                 } else {
@@ -376,7 +614,7 @@ class BasicUser extends Model
                 }
             } else {
                 //If this AUTH token is not found in DB, then erase the cookie from the client's machine and return FALSE
-                \setcookie("THCF_AUTHID", "");
+                \setcookie('THCF_AUTHID', '');
                 return false;
             }
         } else {
@@ -392,7 +630,7 @@ class BasicUser extends Model
     {
         if (RequestMethods::cookie('THCF_AUTHID') != '') {
             Authtoken::deleteAll(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
-            \setcookie('THCF_AUTHID', '', time()-1800);
+            \setcookie('THCF_AUTHID', '', time() - 1800);
         }
     }
 

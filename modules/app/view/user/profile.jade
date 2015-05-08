@@ -66,6 +66,15 @@ section.wrapper.profil.singlePage
                      input(type='email', name='email',value!='{echo isset($user)? $user->email: ""}' required)
                tr
                   td
+                     span Původní heslo:
+                  td
+                     |{if isset($errors["oldpass"])}
+                     label.error.fi-alert
+                        |{echo join("<br/>", $errors["oldpass"])}
+                     |{/if}
+                     input(type='password', placeholder='nepovinné...',pattern=".{5,}",title='min. 5 znaků', name='oldpass')
+               tr
+                  td
                      span Heslo:
                   td
                      |{if isset($errors["password"])}

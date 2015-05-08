@@ -23,6 +23,7 @@ class Controller extends BaseController
 //    const SUCCESS_MESSAGE_7 = 'Everything has been successfully uploaded';
 //    const SUCCESS_MESSAGE_8 = 'Everything has been successfully saved';
 //    const SUCCESS_MESSAGE_9 = 'Everything has been successfully added';
+//    const SUCCESS_MESSAGE_10 = 'New password has been successfully generated and sent to email';
 //    const ERROR_MESSAGE_1 = 'Oops, something went wrong';
 //    const ERROR_MESSAGE_2 = 'Not found';
 //    const ERROR_MESSAGE_3 = 'Unknown error eccured';
@@ -40,6 +41,7 @@ class Controller extends BaseController
     const SUCCESS_MESSAGE_7 = 'Vše bylo úspěšně nahráno';
     const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
     const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
+    const SUCCESS_MESSAGE_10 = 'Heslo bylo nastaveno a posláno na email uživatele';
     const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
     const ERROR_MESSAGE_2 = 'Nenalezeno';
     const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
@@ -47,6 +49,8 @@ class Controller extends BaseController
     const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
     const ERROR_MESSAGE_6 = 'Přísput odepřen';
     const ERROR_MESSAGE_7 = 'Heslo je příliš slabé';
+    const ERROR_MESSAGE_8 = 'Platnost hesla vzprší během %s dní';
+    const ERROR_MESSAGE_9 = 'Původní heslo není platné';
 
     /**
      * Store security context object
@@ -163,6 +167,15 @@ class Controller extends BaseController
     }
 
     /**
+     * Disable view, used for ajax calls
+     */
+    protected function _disableView()
+    {
+        $this->_willRenderActionView = false;
+        $this->_willRenderLayoutView = false;
+    }
+    
+    /**
      * 
      * @param type $body
      * @param type $subject
@@ -236,8 +249,6 @@ class Controller extends BaseController
      */
     public function _member()
     {
-        $view = $this->getActionView();
-
         if ($this->_security->getUser() && $this->_security->isGranted('role_member') !== true) {
             throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }
@@ -261,8 +272,6 @@ class Controller extends BaseController
      */
     public function _participant()
     {
-        $view = $this->getActionView();
-
         if ($this->_security->getUser() && $this->_security->isGranted('role_participant') !== true) {
             throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
         }

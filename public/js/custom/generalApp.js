@@ -79,7 +79,7 @@ jQuery(document).ready(function ($) {
     if (jQuery('.notificationWrapper .notification').is(':visible')) {
         setTimeout(function () {
             jQuery('.notificationWrapper .notification').hide("slow");
-        }, 10000);
+        }, 5000);
     }
 
     /* GLOBAL SCRIPTS */
@@ -197,7 +197,7 @@ jQuery(document).ready(function ($) {
         return false;
     });
 
-    jQuery('.ajaxReload').click(function () {
+    jQuery('.ajaxReload').click(function (event) {
         event.preventDefault();
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();

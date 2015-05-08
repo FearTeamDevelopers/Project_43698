@@ -59,6 +59,13 @@
             </td>
           </tr>
           <tr>
+            <td><span>Původní heslo:</span></td>
+            <td>{if isset($errors["oldpass"])}
+              <label class="error fi-alert">{echo join("<br/>", $errors["oldpass"])}</label>{/if}
+              <input type="password" placeholder="nepovinné..." pattern=".{5,}" title="min. 5 znaků" name="oldpass"/>
+            </td>
+          </tr>
+          <tr>
             <td><span>Heslo:</span></td>
             <td>{if isset($errors["password"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["password"])}</label>{/if}

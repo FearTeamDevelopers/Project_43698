@@ -34,7 +34,7 @@ class UserController extends Controller
         $view = $this->getActionView();
 
         if (RequestMethods::post('submitLogin')) {
-
+            
             $email = RequestMethods::post('email');
             $password = RequestMethods::post('password');
             $error = false;
@@ -52,11 +52,25 @@ class UserController extends Controller
             if (!$error) {
                 try {
                     $this->getSecurity()->authenticate($email, $password);
+                    $daysToExpiration = $this->getSecurity()->getUser()->getDaysToPassExpiration();
+                    
+                    if($daysToExpiration !== false){
+                        if($daysToExpiration < 14 && $daysToExpiration > 1){
+                            $view->infoMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                        }elseif($daysToExpiration < 5 && $daysToExpiration > 1){
+                            $view->warningMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                        }elseif($daysToExpiration >= 1){
+                            $view->errorMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                        }
+                    }
+                    
                     self::redirect('/admin/');
                 } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
                     $view->set('account_error', 'Účet byl uzamčen. Přihlášení opakujte za 15 min.');
                 } catch (\THCFrame\Security\Exception\UserInactive $ex) {
                     $view->set('account_error', 'Účet ještě nebyl aktivován');
+                } catch (\THCFrame\Security\Exception\UserExpired $ex) {
+                    $view->set('account_error', 'Vypršela platnost účtu');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
@@ -89,7 +103,9 @@ class UserController extends Controller
         $view = $this->getActionView();
 
         $users = \App\Model\UserModel::all(
-                        array('role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'), array('id' => 'asc')
+                        array('role <> ?' => 'role_superadmin'), 
+                        array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'),
+                        array('id' => 'asc')
         );
 
         $view->set('users', $users);
@@ -129,7 +145,7 @@ class UserController extends Controller
             if (PasswordManager::strength(RequestMethods::post('password')) <= 0.6) {
                 $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
-            
+
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
 
@@ -213,28 +229,27 @@ class UserController extends Controller
                 }
             }
 
-            $pass = RequestMethods::post('password');
-            if (PasswordManager::strength($pass) > 0.6) {
-                if (null === $pass || $pass == '') {
-                    $salt = $user->getSalt();
-                    $hash = $user->getPassword();
-                } else {
-                    $salt = PasswordManager::createSalt();
-                    $hash = PasswordManager::hashPassword($pass, $salt);
+            $oldPassword = RequestMethods::post('oldpass');
+            if (!empty($oldPassword)) {
+                $newPass = RequestMethods::post('password');
+                
+                try{
+                    $user = $user->changePassword($oldPassword, $newPass, 0.6);
+                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
+                    $errors['oldpass'] = array(self::ERROR_MESSAGE_9);
+                }  catch (\THCFrame\Security\Exception\WeakPassword $ex){
+                    $errors['password'] = array(self::ERROR_MESSAGE_7);
                 }
-
-                $user->firstname = RequestMethods::post('firstname');
-                $user->lastname = RequestMethods::post('lastname');
-                $user->email = RequestMethods::post('email');
-                $user->phoneNumber = RequestMethods::post('phone');
-                $user->password = $hash;
-                $user->salt = $salt;
-            } else {
-                $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
+            
+            $user->firstname = RequestMethods::post('firstname');
+            $user->lastname = RequestMethods::post('lastname');
+            $user->email = RequestMethods::post('email');
+            $user->phoneNumber = RequestMethods::post('phone');
 
             if (empty($errors) && $user->validate()) {
-                $user->save();
+                $user->update();
+                $this->getSecurity()->setUser($user);
 
                 Event::fire('admin.log', array('success', 'User id: ' . $user->getId()));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
@@ -256,7 +271,6 @@ class UserController extends Controller
     public function edit($id)
     {
         $view = $this->getActionView();
-
         $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $user) {
@@ -292,32 +306,29 @@ class UserController extends Controller
                 }
             }
 
-            $pass = RequestMethods::post('password');
-
-            if (PasswordManager::strength($pass) > 0.5) {
-                if (null === $pass || $pass == '') {
-                    $salt = $user->getSalt();
-                    $hash = $user->getPassword();
-                } else {
-                    $salt = PasswordManager::createSalt();
-                    $hash = PasswordManager::hashPassword($pass, $salt);
+            $oldPassword = RequestMethods::post('oldpass');
+            if (!empty($oldPassword)) {
+                $newPass = RequestMethods::post('password');
+                
+                try{
+                    $user = $user->changePassword($oldPassword, $newPass, 0.6);
+                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
+                    $errors['oldpass'] = array(self::ERROR_MESSAGE_9);
+                }  catch (\THCFrame\Security\Exception\WeakPassword $ex){
+                    $errors['password'] = array(self::ERROR_MESSAGE_7);
                 }
-
-                $user->firstname = RequestMethods::post('firstname');
-                $user->lastname = RequestMethods::post('lastname');
-                $user->email = RequestMethods::post('email');
-                $user->phoneNumber = RequestMethods::post('phone');
-                $user->password = $hash;
-                $user->salt = $salt;
-                $user->role = RequestMethods::post('role', $user->getRole());
-                $user->active = RequestMethods::post('active');
-                $user->blocked = RequestMethods::post('blocked');
-            } else {
-                $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
 
+            $user->firstname = RequestMethods::post('firstname');
+            $user->lastname = RequestMethods::post('lastname');
+            $user->email = RequestMethods::post('email');
+            $user->phoneNumber = RequestMethods::post('phone');
+            $user->role = RequestMethods::post('role', $user->getRole());
+            $user->active = RequestMethods::post('active');
+            $user->blocked = RequestMethods::post('blocked');
+
             if (empty($errors) && $user->validate()) {
-                $user->save();
+                $user->update();
 
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
@@ -363,6 +374,52 @@ class UserController extends Controller
     public function help()
     {
         
+    }
+
+    /**
+     * Generate new password and send it to the user
+     * 
+     * @before _secured, _admin
+     * @param int   $id     user id
+     */
+    public function forcePasswordReset($id)
+    {
+        $view = $this->getActionView();
+        $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
+
+        if (NULL === $user) {
+            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/user/');
+        } elseif ($user->role == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
+            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/user/');
+        }
+
+        try {
+            $newPass = $user->forceResetPassword();
+
+            if ($newPass !== false) {
+                $emailBody = 'Dobrý den, <br/><br/>bylo Vám vyresetováno heslo. Po úspěšném přihlášení si ho změňte. '
+                        . '<br/><br/>Nové heslo: ' . $newPass . ' <br/><br/>S pozdravem <br/>Hastrman';
+
+                $this->_sendEmail($emailBody, 'Hastrman - Nové heslo', $user->getEmail());
+                $view->successMessage(self::SUCCESS_MESSAGE_10);
+                Event::fire('admin.log', array('success', 'Force password change for user: ' . $user->getId()));
+                self::redirect('/admin/user/');
+            } else {
+                $view->warningMessage(self::ERROR_MESSAGE_1);
+                Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
+                    'Errors: ' . json_encode($user->getErrors())));
+                self::redirect('/admin/user/');
+            }
+        } catch (\Exception $ex) {
+            $view->errorMessage(self::ERROR_MESSAGE_3);
+            Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
+                'Errors: ' . $ex->getMessage()));
+            self::redirect('/admin/user/');
+        }
     }
 
 }

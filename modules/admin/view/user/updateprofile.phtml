@@ -43,7 +43,7 @@
                 {/if}
             </span>
         </p>
-        
+
         <br/>
         <div class="contenttitle radiusbottom0">
             <h2 class="form"><span>Přihlašovací údaje</span></h2>
@@ -60,7 +60,18 @@
             </span>
         </p>
         <p>
-            <label>Heslo*</label>
+            <label>Původní heslo</label>
+            <span class="field">
+                <input type="password" name="oldpass" class="longinput" value=""/>
+                {if isset($errors["oldpass"])}
+                <label class="error">
+                    {echo join("<br/>", $errors["oldpass"])}
+                </label>
+                {/if}
+            </span>
+        </p>
+        <p>
+            <label>Heslo</label>
             <span class="field">
                 <input type="password" name="password" class="longinput" value=""/>
                 {if isset($errors["password"])}
@@ -71,7 +82,7 @@
             </span>
         </p>
         <p>
-            <label>Potvrdit heslo*</label>
+            <label>Potvrdit heslo</label>
             <span class="field">
                 <input type="password" name="password2" class="longinput" value=""/>
                 {if isset($errors["password2"])}

@@ -16,7 +16,7 @@ class IndexController extends Controller
 {
 
     /**
-     * Comprime and then remove old files from folder
+     * Remove old files from folder
      * 
      * @param type $path
      * @param type $days
@@ -24,7 +24,7 @@ class IndexController extends Controller
     private function _removeOldFiles($path, $days = 7)
     {
         $fm = new FileManager();
-        
+
         if (!is_dir($path)) {
             mkdir($path, 0755, true);
             return;
@@ -32,9 +32,11 @@ class IndexController extends Controller
 
         if ($handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
-                if (is_file($path . $file)) {
-                    if (filemtime($path . $file) < ( time() - ( $days * 24 * 60 * 60 ) )) {
+                if (is_file($path . $file) && filectime($path . $file) < ( time() - ( $days * 24 * 60 * 60 ) )) {
+                    if (!preg_match('#.*\.gz$#i', $file)) {
                         $fm->gzCompressFile($path . $file);
+                        unlink($path . $file);
+                    } else {
                         unlink($path . $file);
                     }
                 }
@@ -52,7 +54,7 @@ class IndexController extends Controller
             'type' => 'mysql',
             'host' => 'mysql4.ebola.cz',
             'username' => 'hastrmancz_ts',
-            'password' => 'SqlTstHrm-5102-',
+            'password' => 'wAeol+B4V(W96H1Aot',
             'schema' => 'hastrman_004'
         ));
 
@@ -66,7 +68,7 @@ class IndexController extends Controller
 
         return $db;
     }
-    
+
     /**
      * Reconnect to the database
      */
@@ -78,10 +80,34 @@ class IndexController extends Controller
         $database = new \THCFrame\Database\Database();
         $connectors = $database->initialize($config);
         Registry::set('database', $connectors);
-        
+
         unset($config);
         unset($database);
         unset($connectors);
+    }
+
+    /**
+     * 
+     * @param type $dir
+     * @return type
+     */
+    private function _folderSize($dir)
+    {
+        $count_size = 0;
+        $count = 0;
+        $dir_array = scandir($dir);
+        foreach ($dir_array as $key => $filename) {
+            if ($filename != ".." && $filename != ".") {
+                if (is_dir($dir . "/" . $filename)) {
+                    $new_foldersize = $this->_folderSize($dir . "/" . $filename);
+                    $count_size = $count_size + $new_foldersize;
+                } else if (is_file($dir . "/" . $filename)) {
+                    $count_size = $count_size + filesize($dir . "/" . $filename);
+                    $count++;
+                }
+            }
+        }
+        return $count_size;
     }
 
     /**
@@ -91,9 +117,6 @@ class IndexController extends Controller
      */
     public function cronDailyDatabaseBackup()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
-
         $path = APP_PATH . '/temp/db/day/';
         $this->_removeOldFiles($path);
 
@@ -113,7 +136,7 @@ class IndexController extends Controller
             $this->_sendEmail('Error while creating database backup: ' . $ex->getMessage(), 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
         }
     }
-    
+
     /**
      * Create monthly db backup by cron
      * 
@@ -121,14 +144,7 @@ class IndexController extends Controller
      */
     public function cronMonthlyDatabaseBackup()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
-
         $path = APP_PATH . '/temp/db/month/';
-
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
-        }
 
         $dump = new Mysqldump();
         $dump->setBackupDir($path);
@@ -154,8 +170,6 @@ class IndexController extends Controller
      */
     public function cronDatabaseProdToTest()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
         $starttime = microtime(true);
 
         $dbDataPath = APP_PATH . '/temp/db/data/';
@@ -245,9 +259,6 @@ class IndexController extends Controller
      */
     public function cronGenerateSitemap()
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
-
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
         <urlset
             xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -326,6 +337,32 @@ class IndexController extends Controller
             $this->_resertConnections();
             Event::fire('cron.log', array('fail', 'Error while creating sitemap file: ' . $ex->getMessage()));
             $this->_sendEmail('Error while creating sitemap file: ' . $ex->getMessage(), 'ERROR: Cron generateSitemap', null, 'cron@hastrman.cz');
+        }
+    }
+
+    /**
+     * Cron check database size and application disk space usage
+     * 
+     * @before _cron
+     */
+    public function systemCheck()
+    {
+        $connHandler = Registry::get('database');
+        $dbIdents = $connHandler->getIdentifications();
+        foreach ($dbIdents as $id) {
+            $db = $connHandler->get($id);
+            $size = $db->getDatabaseSize();
+            if ($size > 45) {
+                $body = sprintf('Database %s is growing large. Current size is %s MB', $db->getSchema(), $size);
+                $this->_sendEmail($body, 'WARNING: System chcek', null, 'cron@hastrman.cz');
+            }
+        }
+
+        $applicationFolderSize = $this->_folderSize(APP_PATH);
+        $applicationFolderSizeMb = $applicationFolderSize / (1024 * 1024);
+        if ($applicationFolderSizeMb > 600) {
+            $body = sprintf('Application folder is growing large. Current size is %s MB', $applicationFolderSizeMb);
+            $this->_sendEmail($body, 'WARNING: System chcek', null, 'cron@hastrman.cz');
         }
     }
 

@@ -258,22 +258,15 @@ class AdvertisementController extends Controller
 
             if ($message->validate()) {
                 try {
-                    require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-                    $transport = \Swift_MailTransport::newInstance(null);
-                    $mailer = \Swift_Mailer::newInstance($transport);
-
-                    $email = \Swift_Message::newInstance()
-                            ->setSubject('Hastrman - Bazar - Dotaz k inzerátu')
-                            ->setFrom('bazar@hastrman.cz')
-                            ->setBody($this->_getEmailBody($ad, $message), 'text/html');
-
                     if ($message->getSendEmailCopy() == 1) {
-                        $email->setTo(array($message->getMsEmail(), $ad->getEmail()));
+                        $sendTo = array($message->getMsEmail(), $ad->getEmail());
                     } else {
-                        $email->setTo($ad->getEmail());
+                        $sendTo = $ad->getEmail();
                     }
+                    
+                    $subject = 'Hastrman - Bazar - Dotaz k inzerátu';
+                    $this->_sendEmail($this->_getEmailBody($ad, $message), $subject, $sendTo, 'bazar@hastrman.cz');
 
-                    $mailer->send($email);
                     $message->messageSent = 1;
                     $messageId = $message->save();
 
@@ -583,14 +576,41 @@ class AdvertisementController extends Controller
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     }
                 } else {
-                    Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                    Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
                     $view->successMessage(self::SUCCESS_MESSAGE_2);
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId(),
+                Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId(),
                     'Errors: ' . json_encode($errors + $ad->getErrors())));
                 $view->set('errors', $errors + $ad->getErrors());
+            }
+        }
+    }
+
+    /**
+     * Ajax Delete existing ad
+     * 
+     * @before _secured, _member
+     * @param string    $uniqueKey      ad key
+     */
+    public function ajaxDelete($uniqueKey)
+    {
+        $this->_disableView();
+
+        $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
+
+        if (NULL === $ad) {
+            echo self::ERROR_MESSAGE_2;
+        } else {
+            $adId = $ad->getId();
+            
+            if ($ad->delete()) {
+                Event::fire('app.log', array('success', 'Ad id: ' . $adId));
+                echo 'success';
+            } else {
+                Event::fire('app.log', array('fail', 'Ad id: ' . $adId));
+                echo self::ERROR_MESSAGE_1;
             }
         }
     }
@@ -603,23 +623,26 @@ class AdvertisementController extends Controller
      */
     public function delete($uniqueKey)
     {
-        $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
+        $view = $this->getActionView();
 
         $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $ad) {
-            echo self::ERROR_MESSAGE_2;
+            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $this->willRenderLayoutView = false;
+            self::redirect('/bazar');
+        }
+
+        $adId = $ad->getId();
+
+        if ($ad->delete()) {
+            Event::fire('app.log', array('success', 'Ad id: ' . $adId));
+            $view->successMessage(self::SUCCESS_MESSAGE_6);
+            self::redirect('/bazar');
         } else {
-            $adId = $ad->getId();
-            
-            if ($ad->delete()) {
-                Event::fire('admin.log', array('success', 'Ad id: ' . $adId));
-                echo 'success';
-            } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $adId));
-                echo self::ERROR_MESSAGE_1;
-            }
+            Event::fire('app.log', array('fail', 'Ad id: ' . $adId));
+            $view->warningMessage(self::ERROR_MESSAGE_1);
         }
     }
 
@@ -631,8 +654,7 @@ class AdvertisementController extends Controller
      */
     public function deleteAdImage($id)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
@@ -646,10 +668,10 @@ class AdvertisementController extends Controller
                 @unlink($imgMain);
                 @unlink($imgThumb);
 
-                Event::fire('admin.log', array('success', 'AdImage id: ' . $adImage->getId()));
+                Event::fire('app.log', array('success', 'AdImage id: ' . $adImage->getId()));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'AdImage id: ' . $adImage->getId()));
+                Event::fire('app.log', array('fail', 'AdImage id: ' . $adImage->getId()));
                 echo self::ERROR_MESSAGE_1;
             }
         }
@@ -702,8 +724,7 @@ class AdvertisementController extends Controller
      */
     public function sendAvailabilityExtendRequest($uniqueKey)
     {
-        $this->willRenderActionView = false;
-        $this->willRenderLayoutView = false;
+        $this->_disableView();
 
         $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
 
@@ -714,10 +735,10 @@ class AdvertisementController extends Controller
 
             if ($ad->validate()) {
                 $ad->save();
-                Event::fire('admin.log', array('success', 'Ad id: ' . $ad->getId()));
+                Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $ad->getId(),
+                Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId(),
                     'Errors: '.  json_encode($ad->getErrors())));
                 echo self::ERROR_MESSAGE_1;
             }

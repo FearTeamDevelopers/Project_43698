@@ -30,14 +30,13 @@ class ConnectionHandler extends Base
      */
     public function add($id, $connector)
     {
-        $id = strtolower(trim($id));
-        
         if ($connector instanceof Connector) {
+            $id = strtolower(trim($id));
             $this->_connectors[$id] = $connector;
         } else {
             throw new Exception\Argument(sprintf('%s is not valid connector', $id));
         }
-        
+
         return $this;
     }
 
@@ -47,11 +46,10 @@ class ConnectionHandler extends Base
      */
     public function get($id)
     {
-        $id = strtolower(trim($id));
-        
-        if(array_key_exists($id, $this->_connectors)){
+        if (array_key_exists($id, $this->_connectors)) {
+            $id = strtolower(trim($id));
             return $this->_connectors[$id];
-        }else{
+        } else {
             throw new Exception\Argument(sprintf('%s is not registred connector', $id));
         }
     }
@@ -63,11 +61,11 @@ class ConnectionHandler extends Base
     public function erase($id)
     {
         $id = strtolower(trim($id));
-        
-        if(array_key_exists($id, $this->_connectors)){
+
+        if (array_key_exists($id, $this->_connectors)) {
             unset($this->_connectors[$id]);
         }
-        
+
         return $this;
     }
 
@@ -77,12 +75,13 @@ class ConnectionHandler extends Base
      */
     public function getIdentifications()
     {
-        if(!empty($this->_connectors)){
+        if (!empty($this->_connectors)) {
             return array_keys($this->_connectors);
-        }else{
+        } else {
             return array();
         }
     }
+
     /**
      * 
      * @param type $id
@@ -90,21 +89,22 @@ class ConnectionHandler extends Base
     public function disconnectById($id)
     {
         $id = strtolower(trim($id));
-        
-        if(array_key_exists($id, $this->_connectors)){
+
+        if (array_key_exists($id, $this->_connectors)) {
             $this->_connectors[$id]->disconnect();
         }
-        
+
         return $this;
     }
-    
+
     /**
      * 
      */
     public function disconnectAll()
     {
-        foreach ($this->_connectors as $connector){
+        foreach ($this->_connectors as $connector) {
             $connector->disconnect();
         }
     }
+
 }

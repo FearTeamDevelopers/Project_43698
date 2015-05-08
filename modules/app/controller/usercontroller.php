@@ -60,16 +60,30 @@ class UserController extends Controller
             if (!$error) {
                 try {
                     $this->getSecurity()->authenticate($email, $password);
+                    $daysToExpiration = $this->getSecurity()->getUser()->getDaysToPassExpiration();
+                    
+                    if($daysToExpiration !== false){
+                        if($daysToExpiration < 14 && $daysToExpiration > 1){
+                            $view->infoMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                        }elseif($daysToExpiration < 5 && $daysToExpiration > 1){
+                            $view->warningMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                        }elseif($daysToExpiration >= 1){
+                            $view->errorMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                        }
+                    }
+                    
                     self::redirect('/muj-profil');
                 } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
                     $view->set('account_error', 'Účet byl uzamčen. Přihlášení opakujte za 15 min.');
                 } catch (\THCFrame\Security\Exception\UserInactive $ex) {
                     $view->set('account_error', 'Účet ještě nebyl aktivován');
+                } catch (\THCFrame\Security\Exception\UserExpired $ex) {
+                    $view->set('account_error', 'Vypršela platnost účtu');
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
                     } else {
-                        $view->set('account_error', 'Email a/nebo heslo je špatně');
+                        $view->set('account_error', 'Email a/nebo heslo není správně');
                     }
                 }
             }
@@ -233,30 +247,26 @@ class UserController extends Controller
                 }
             }
 
-            $pass = RequestMethods::post('password');
-
-            if (PasswordManager::strength($pass) > 0.5) {
-                if ($pass === null || $pass == '') {
-                    $salt = $user->getSalt();
-                    $hash = $user->getPassword();
-                } else {
-                    $salt = PasswordManager::createSalt();
-                    $hash = PasswordManager::hashPassword($pass, $salt);
+            $oldPassword = RequestMethods::post('oldpass');
+            if (!empty($oldPassword)) {
+                $newPass = RequestMethods::post('password');
+                
+                try{
+                    $user = $user->changePassword($oldPassword, $newPass);
+                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
+                    $errors['oldpass'] = array(self::ERROR_MESSAGE_9);
+                }  catch (\THCFrame\Security\Exception\WeakPassword $ex){
+                    $errors['password'] = array(self::ERROR_MESSAGE_7);
                 }
-
-                $user->firstname = RequestMethods::post('firstname');
-                $user->lastname = RequestMethods::post('lastname');
-                $user->email = RequestMethods::post('email');
-                $user->phoneNumber = RequestMethods::post('phone');
-                $user->password = $hash;
-                $user->salt = $salt;
-            } else {
-                $errors['password'] = array(self::ERROR_MESSAGE_7);
             }
 
+            $user->firstname = RequestMethods::post('firstname');
+            $user->lastname = RequestMethods::post('lastname');
+            $user->email = RequestMethods::post('email');
+            $user->phoneNumber = RequestMethods::post('phone');
 
             if (empty($errors) && $user->validate()) {
-                $user->save();
+                $user->update();
                 $this->getSecurity()->setUser($user);
 
                 $view->successMessage(self::SUCCESS_MESSAGE_2);
@@ -283,11 +293,7 @@ class UserController extends Controller
             self::redirect('/');
         }
 
-        $user->active = true;
-
-        if ($user->validate()) {
-            $user->save();
-
+        if ($user->activateAccount()) {
             Event::fire('app.log', array('success', 'User Id: ' . $user->getId()));
             $view->successMessage('Účet byl aktivován');
             self::redirect('/');

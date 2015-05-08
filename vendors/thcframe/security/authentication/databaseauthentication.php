@@ -6,9 +6,9 @@ use THCFrame\Security\Authentication\Authentication;
 use THCFrame\Security\Authentication\AuthenticationInterface;
 use THCFrame\Security\Exception;
 use THCFrame\Security\Model\BasicUser;
-use THCFrame\Security\Model\AdvancedUser;
 use THCFrame\Security\PasswordManager;
 use THCFrame\Core\Core;
+use THCFrame\Request\RequestMethods;
 
 /**
  * DatabaseAuthentication verify user identity against database records
@@ -31,12 +31,6 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      * @var string 
      */
     protected $_pass = 'password';
-
-    /**
-     * @readwrite
-     * @var boolean 
-     */
-    protected $_accountBlockTime = 300;
 
     /**
      * It denotes the # of maximum attempts for login using the password. 
@@ -77,6 +71,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      */
     protected $_bruteForceLockAttemptTotalTime = 25;
 
+    
     /**
      * 
      * @param type $user
@@ -84,25 +79,33 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      */
     private function _successfullLogin($user)
     {
+        $user->setBlocked(false);
         $user->setLastLogin();
         $user->setTotalLoginAttempts(0);
         $user->setLastLoginAttempt(0);
         $user->setFirstLoginAttempt(0);
+        $user->setLastLoginIp(RequestMethods::getClientIpAddress());
+        $user->setLastLoginBrowser(RequestMethods::getBrowser());
         $user->update();
 
         return $user;
     }
-    
+
+    /**
+     * 
+     * @param int $id
+     * @return \App\Model\UserModel
+     */
     private function _loadCompleteUser($id)
     {
-        $user = \App\Model\UserModel::first(array('id = ?' => (int)$id));
+        $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
 
         $user->password = null;
         $user->salt = null;
 
         return $user;
     }
-    
+
     /**
      * 
      * @param array $options
@@ -127,22 +130,21 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
     {
         $errMessage = sprintf('%s and/or password are incorrect', ucfirst($this->_name));
         $errMessageNotActive = 'Account is not active';
-        $errMessageBlock = 'Account is blocked. Try login after '.($this->_accountBlockTime/60).' mins';
+        $errMessageBlock = 'Account is blocked. Try login after ' . ($this->_accountBlockTime / 60) . ' mins';
 
         $user = \App\Model\UserModel::first(
                         array("{$this->_name} = ?" => $name), array('id', "{$this->_name}", "{$this->_pass}",
                     'salt', 'active', 'blocked', 'lastLogin', 'role',
                     'totalLoginAttempts', 'lastLoginAttempt', 'firstLoginAttempt'));
-        
+
         if ($user === null) {
             throw new Exception\UserNotExists($errMessage);
         }
 
         $passVerify = PasswordManager::validatePassword($pass, $user->getPassword(), $user->getSalt());
-        $currentTime = time();
 
         if ($passVerify === true) {
-            if ($user instanceof AdvancedUser) {
+            if ($user instanceof BasicUser) {
                 if (!$user->isActive()) {
                     throw new Exception\UserInactive($errMessageNotActive);
                 } elseif ($user->isAccountExpired()) {
@@ -150,27 +152,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                 } elseif ($user->isPasswordExpired()) {
                     throw new Exception\UserPassExpired($errMessage);
                 } elseif ($user->isBlocked()) {
-                    if (($currentTime - $user->getLastLoginAttempt()) >= $this->accountBlockTime) {
-                        $this->_successfullLogin($user);
-                        return $this->_loadCompleteUser($user->getId());
-                    }else{
-                        throw new Exception\UserBlocked($errMessageBlock);
-                    }
-                } else {
-                    $this->_successfullLogin($user);
-                    return $this->_loadCompleteUser($user->getId());
-                }
-            } elseif ($user instanceof BasicUser) {
-                if (!$user->isActive()) {
-                    throw new Exception\UserInactive($errMessageNotActive);
-                } elseif ($user->isBlocked()) {
-                    } elseif ($user->isBlocked()) {
-                    if (($currentTime - $user->getLastLoginAttempt()) >= $this->accountBlockTime) {
-                        $this->_successfullLogin($user);
-                        return $this->_loadCompleteUser($user->getId());
-                    }else{
-                        throw new Exception\UserBlocked($errMessageBlock);
-                    }
+                    throw new Exception\UserBlocked($errMessageBlock);
                 } else {
                     $this->_successfullLogin($user);
                     return $this->_loadCompleteUser($user->getId());
@@ -251,14 +233,14 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
             //$_bruteForceLockAttemptTotalTime time period, we can safely reset 
             //all the counters and TELL THAT THIS IS NOT A BRUTE FORCE ATTACK.
             $totalAttempts = $user->getTotalLoginAttempts() + 1;
-            
-            if($totalAttempts >= $this->bruteForceLockAttempts){
+
+            if ($totalAttempts >= $this->bruteForceLockAttempts) {
                 $user->setBlocked(true);
                 $user->setTotalLoginAttempts(0);
-            }else{
+            } else {
                 $user->setTotalLoginAttempts($totalAttempts);
             }
-            
+
             $user->setLastLoginAttempt($currentTime);
             $user->update();
 

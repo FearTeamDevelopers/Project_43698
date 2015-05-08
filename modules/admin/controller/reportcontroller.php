@@ -391,7 +391,12 @@ class ReportController extends Controller
             echo self::ERROR_MESSAGE_2;
         } else {
             if ($this->_checkAccess($report)) {
+                $imgPath = $report->getUnlinkPath();
+                $thumbPath = $report->getUnlinkThumbPath();
+                
                 if ($report->delete()) {
+                    @unlink($imgPath);
+                    @unlink($thumbPath);
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('success', 'Report id: ' . $id));
                     echo 'success';

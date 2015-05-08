@@ -155,7 +155,7 @@ class Mysql extends Database\Connector
             $this->isConnected = false;
             $this->_service->close();
         }
-        
+
         return $this;
     }
 
@@ -459,4 +459,38 @@ class Mysql extends Database\Connector
         return $this;
     }
 
+    /**
+     * 
+     */
+    public function getDatabaseSize()
+    {
+        $sql = "SHOW TABLE STATUS FROM `" . $this->_schema . "`";
+        $result = $this->execute($sql);
+
+        if ($result !== false) {
+            $size = 0;
+
+            while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+                $size += $row["Data_length"] + $row["Index_length"];
+            }
+
+            $megabytes = $size / (1024 * 1024);
+            return number_format(round($megabytes, 3), 2);
+        }
+        
+        return 0;
+    }
+
+    /**
+     * 
+     * @return boolean
+     */
+    public function ping()
+    {
+        if ($this->_isValidService()) {
+            return $this->_service->ping();
+        }
+        
+        return false;
+    }
 }

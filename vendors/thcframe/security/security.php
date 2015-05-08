@@ -107,6 +107,8 @@ class Security extends Base implements SecurityInterface
     public function setUser(BasicUser $user)
     {
         @session_regenerate_id();
+        $user->password = null;
+        $user->salt = null;
 
         $session = Registry::get('session');
         $session->set('authUser', $user)
