@@ -104,7 +104,7 @@ class UserController extends Controller
 
         $users = \App\Model\UserModel::all(
                         array('role <> ?' => 'role_superadmin'), 
-                        array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created'),
+                        array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'),
                         array('id' => 'asc')
         );
 

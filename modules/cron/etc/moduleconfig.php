@@ -48,6 +48,12 @@ class ModuleConfig extends Module
             'module' => 'cron',
             'controller' => 'index',
             'action' => 'crondatabaseprodtotest',
+        ),
+        array(
+            'pattern' => '/c/systemcheck',
+            'module' => 'cron',
+            'controller' => 'index',
+            'action' => 'systemcheck',
         )
     );
 

@@ -8,6 +8,7 @@ use THCFrame\Database\Mysqldump;
 use THCFrame\Events\Events as Event;
 use THCFrame\Router\Model\RedirectModel;
 use THCFrame\Filesystem\FileManager;
+use THCFrame\Registry\Registry;
 
 /**
  * 

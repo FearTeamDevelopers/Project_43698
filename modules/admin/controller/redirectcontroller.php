@@ -17,7 +17,7 @@ class RedirectController extends Controller
     /**
      * Get list of all redirects
      * 
-     * @before _secured, _admin
+     * @before _secured, _superadmin
      */
     public function index()
     {
@@ -29,7 +29,7 @@ class RedirectController extends Controller
     /**
      * Create new redirect
      * 
-     * @before _secured, _admin
+     * @before _secured, _superadmin
      */
     public function add()
     {
@@ -69,7 +69,7 @@ class RedirectController extends Controller
     /**
      * Edit existing redirect
      * 
-     * @before _secured, _admin
+     * @before _secured, _superadmin
      * @param int   $id     redirect id
      */
     public function edit($id)
@@ -114,7 +114,7 @@ class RedirectController extends Controller
     /**
      * Delete existing redirect
      * 
-     * @before _secured, _admin
+     * @before _secured, _superadmin
      * @param int   $id     redirect id
      */
     public function delete($id)

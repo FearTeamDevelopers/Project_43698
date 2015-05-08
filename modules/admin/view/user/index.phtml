@@ -34,6 +34,7 @@
                         <td>{echo $user->getCreated()}</td>
                         <td>
                             {if ($user->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
+                            {if ($user->blocked)}<span class="labelProduct labelProductGray">Zablokovaný</span>{/if}
                             {if $user->getRole() == "role_admin"}<span class="labelProduct labelProductBlue">Admin</span>{/if}
                         </td>
 
