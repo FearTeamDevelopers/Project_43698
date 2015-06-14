@@ -102,11 +102,7 @@ class UserController extends Controller
     {
         $view = $this->getActionView();
 
-        $users = \App\Model\UserModel::all(
-                        array('role <> ?' => 'role_superadmin'), 
-                        array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'),
-                        array('id' => 'asc')
-        );
+        $users = \App\Model\UserModel::fetchAll();
 
         $view->set('users', $users);
     }
@@ -277,7 +273,7 @@ class UserController extends Controller
             $view->warningMessage(self::ERROR_MESSAGE_2);
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
-        } elseif ($user->role == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
+        } elseif ($user->getRole() == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
             $view->warningMessage(self::ERROR_MESSAGE_4);
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
@@ -351,7 +347,7 @@ class UserController extends Controller
     {
         $this->_disableView();
 
-        $user = \App\Model\UserModel::first(array('id = ?' => $id));
+        $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $user) {
             echo self::ERROR_MESSAGE_2;
@@ -391,7 +387,7 @@ class UserController extends Controller
             $view->warningMessage(self::ERROR_MESSAGE_2);
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
-        } elseif ($user->role == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
+        } elseif ($user->getRole() == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
             $view->warningMessage(self::ERROR_MESSAGE_4);
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
@@ -401,8 +397,8 @@ class UserController extends Controller
             $newPass = $user->forceResetPassword();
 
             if ($newPass !== false) {
-                $emailBody = 'Dobrý den, <br/><br/>bylo Vám vyresetováno heslo. Po úspěšném přihlášení si ho změňte. '
-                        . '<br/><br/>Nové heslo: ' . $newPass . ' <br/><br/>S pozdravem <br/>Hastrman';
+                $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Reset hesla'));
+                $emailBody = str_replace('{NEWPASS}', $newPass, $emailTemplate->getBody());
 
                 $this->_sendEmail($emailBody, 'Hastrman - Nové heslo', $user->getEmail());
                 $view->successMessage(self::SUCCESS_MESSAGE_10);

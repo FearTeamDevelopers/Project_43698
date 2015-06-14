@@ -20,7 +20,7 @@
         <p>
             <label>Popis</label>
             <span class="field">
-                <textarea rows="5" name="description" class="longinput">{echo \Admin\Helper\FormPrinter::iset($photo,'description')}</textarea>
+                <textarea rows="5" name="description" class="width80">{echo \Admin\Helper\FormPrinter::iset($photo,'description')}</textarea>
                 {if isset($errors["description"])}
                 <label class="error">{echo join("<br/>", $errors["description"])}</label>
                 {/if}

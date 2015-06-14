@@ -39,7 +39,7 @@ class GalleryController extends Controller
      */
     private function _checkAccess(\App\Model\GalleryModel $gallery)
     {
-        if ($this->_security->isGranted('role_admin') === true ||
+        if ($this->isAdmin() === true ||
                 $gallery->getUserId() == $this->getUser()->getId()) {
             return true;
         } else {

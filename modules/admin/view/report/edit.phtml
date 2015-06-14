@@ -108,7 +108,7 @@
             <p>
                 <label>Aktivní</label>
                 <span class="field">
-                    <select name="active" class="longinput">
+                    <select name="active" class="width80">
                         {if $report->active}
                         <option value="0">Neaktivní</option>
                         <option value="1" selected>Aktivní</option>
@@ -122,7 +122,7 @@
             <p>
                 <label>Schváleno</label>
                 <span class="field">
-                    <select name="approve" class="longinput">
+                    <select name="approve" class="width80">
                         {if $report->approved == 0}
                         <option value="0" selected>Čeká na shválení</option>
                         <option value="1">Schváleno</option>
@@ -142,7 +142,7 @@
             <p>
                 <label>V archivu</label>
                 <span class="field">
-                    <select name="archive" class="longinput">
+                    <select name="archive" class="width80">
                         {if $report->archive}
                         <option value="0">Ne</option>
                         <option value="1" selected>Ano</option>
@@ -161,7 +161,7 @@
             <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($report,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($report,'metaTitle'), false, 'width80', "Výchozí hodnota: stejná jako Název")}
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -170,7 +170,7 @@
             <p>
                 <label>Meta-popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput" >{echo \Admin\Helper\FormPrinter::iset($report,'metaDescription')}</textarea>
+                    <textarea rows="5" name="metadescription" class="width80" >{echo \Admin\Helper\FormPrinter::iset($report,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -180,7 +180,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($report,'keywords'), false, 'longinput', "Oddělovač: mezera")}
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($report,'keywords'), false, 'width80', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}
@@ -244,5 +244,5 @@
 </div>
 <br class="clear-all"/>
 <div id="insert-dialog"><p></p></div>
-<script type="text/javascript" src="/public/js/custom/news.js"></script>
+<script type="text/javascript" src="/public/js/custom/build/news.js"></script>
 {/if}

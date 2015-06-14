@@ -22,7 +22,7 @@
         <p>
             <label>Veřejná/soukromá</label>
             <span class="field">
-                <select class="longinput" name="public">
+                <select class="width80" name="public">
                     <option value="0">Soukromá</option>
                     <option value="1" selected>Veřejná</option>
                 </select>
@@ -31,7 +31,7 @@
         <p>
             <label>Popis*</label>
             <span class="field">
-                <textarea class="longinput" name="description" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($gallery,'description')}</textarea>
+                <textarea class="width80" name="description" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($gallery,'description')}</textarea>
                 {if isset($errors["description"])}
                 <label class="error">{echo join("<br/>", $errors["description"])}</label>
                 {/if}

@@ -36,7 +36,7 @@
         <p>
             <label>Telefon</label>
             <span class="field">
-                <input type="tel" name="phone" class="longinput" value="{echo isset($user)? $user->phoneNumber: ""}" />
+                <input type="tel" name="phone" class="width80" value="{echo isset($user)? $user->phoneNumber: ""}" />
                 {if isset($errors["phoneNumber"])}
                 <label class="error">
                     {echo join("<br/>", $errors["phoneNumber"])}
@@ -52,7 +52,7 @@
         <p>
             <label>Email*</label>
             <span class="field">
-                <input required type="email" name="email" class="longinput" value="{echo isset($user)? $user->email: ""}" />
+                <input required type="email" name="email" class="width80" value="{echo isset($user)? $user->email: ""}" />
                 {if isset($errors["email"])}
                 <label class="error">
                     {echo join("<br/>", $errors["email"])}
@@ -63,7 +63,7 @@
         <p>
             <label>Heslo*</label>
             <span class="field">
-                <input required type="password" name="password" class="longinput" value=""/>
+                <input required type="password" name="password" class="width80" value=""/>
                 {if isset($errors["password"])}
                 <label class="error">
                     {echo join("<br/>", $errors["password"])}
@@ -74,7 +74,7 @@
         <p>
             <label>Potvrdit heslo*</label>
             <span class="field">
-                <input required type="password" name="password2" class="longinput" value=""/>
+                <input required type="password" name="password2" class="width80" value=""/>
                 {if isset($errors["password2"])}
                 <label class="error">
                     {echo join("<br/>", $errors["password2"])}
@@ -86,7 +86,7 @@
         <p>
             <label>Role</label>
             <span class="field">
-                <select name="role" class="longinput">
+                <select name="role" class="width80">
                     <option value="role_member">Člen</option>
                     <option value="role_participant">Člen s přístupem do administrace</option>
                     <option value="role_admin">Admin</option>
@@ -103,7 +103,7 @@
         <p>
             <label>Role</label>
             <span class="field">
-                <select name="role" class="longinput">
+                <select name="role" class="width80">
                     <option value="role_member">Člen</option>
                     <option value="role_participant">Člen s přístupem do administrace</option>
                     <option value="role_admin">Admin</option>

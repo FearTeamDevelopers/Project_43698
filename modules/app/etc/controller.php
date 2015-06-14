@@ -42,6 +42,7 @@ class Controller extends BaseController
     const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
     const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
     const SUCCESS_MESSAGE_10 = 'Heslo bylo nastaveno a posláno na email uživatele';
+    const SUCCESS_MESSAGE_11 = 'Email byl úspěšně odeslán';
     const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
     const ERROR_MESSAGE_2 = 'Nenalezeno';
     const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';

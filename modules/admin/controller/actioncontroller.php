@@ -24,7 +24,7 @@ class ActionController extends Controller
      */
     private function _checkAccess(\App\Model\ActionModel $action)
     {
-        if ($this->_security->isGranted('role_admin') === true ||
+        if ($this->isAdmin() === true ||
                 $action->getUserId() == $this->getUser()->getId()) {
             return true;
         } else {

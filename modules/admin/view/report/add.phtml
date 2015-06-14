@@ -40,7 +40,7 @@
             <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
             <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
-            <input type="hidden" name="conceptid" id="conceptid" value="{echo $conceptid}" />
+            <input type="hidden" name="conceptid" id="conceptid" value="{echo isset($conceptid) ? $conceptId:0}" />
             <input type="hidden" name="concepttype" id="concepttype" value="3" />
             <input type="hidden" name="croppedimage" class="cropit-hidden-resized-image" value="" />
 
@@ -107,7 +107,7 @@
             <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($report,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($report,'metaTitle'), false, 'width80', "Výchozí hodnota: stejná jako Název")}
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -116,7 +116,7 @@
             <p>
                 <label>Meta-popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput" >{echo \Admin\Helper\FormPrinter::iset($report,'metaDescription')}</textarea>
+                    <textarea rows="5" name="metadescription" class="width80" >{echo \Admin\Helper\FormPrinter::iset($report,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -126,7 +126,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($report,'keywords'), false, 'longinput', "Oddělovač: mezera")}
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($report,'keywords'), false, 'width80', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}
@@ -191,4 +191,4 @@
 </div>
 <br class="clear-all"/>
 <div id="insert-dialog"><p></p></div>
-<script type="text/javascript" src="/public/js/custom/news.js"></script>
+<script type="text/javascript" src="/public/js/custom/build/news.js"></script>

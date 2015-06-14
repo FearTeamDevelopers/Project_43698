@@ -182,10 +182,8 @@ class UserController extends Controller
                 $uid = $user->save();
 
                 if ($verifyEmail) {
-                    $emailBody = 'Děkujem za Vaši registraci na stránkách Hastrman.cz<br/>'
-                            . 'Po kliknutí na následující odkaz bude Váš účet aktivován<br/><br/>'
-                            . '<a href="http://' . $this->getServerHost() . '/aktivovatucet/' . $actToken . '">Aktivovat účet</a><br/><br/>'
-                            . 'S pozdravem,<br/>Hastrmani';
+                    $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Aktivovace účtu'));
+                    $emailBody = str_replace('{TOKEN}', $actToken, $emailTemplate->getBody());
 
                     if ($this->_sendEmail($emailBody, 'Hastrman - Registrace', $user->getEmail(), 'registrace@hastrman.cz')) {
                         Event::fire('app.log', array('success', 'User Id with email activation: ' . $uid));

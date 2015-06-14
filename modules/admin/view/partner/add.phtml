@@ -34,7 +34,7 @@
         <p>
             <label>WWW*</label>
             <span class="field">
-                <input type="url" required name="web" class="longinput" 
+                <input type="url" required name="web" class="width80" 
                        value="{echo isset($partner)? $partner->web: ""}"/>
                 {if isset($errors["web"])}
                 <label class="error">{echo join("<br/>", $errors["web"])}</label>
@@ -44,7 +44,7 @@
         <p>
             <label>Sekce</label>
             <span class="field">
-                <select name="section" class="longinput">
+                <select name="section" class="width80">
                     <option value="partners">Partneři</option>
                     <option value="apnea">Apnea</option>
                 </select>

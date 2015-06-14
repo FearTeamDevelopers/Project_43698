@@ -25,7 +25,7 @@
         <p>
             <label>Typ*</label>
             <span class="field">
-                <select name="mtype" class="longinput">
+                <select name="mtype" class="width80">
                     <option value="info">Info</option>
                     <option value="warning">Warning</option>
                     <option value="error">Error</option>
@@ -40,7 +40,7 @@
         <p>
             <label>Text*</label>
             <span class="field">
-                <textarea rows="10" name="text" class="longinput">{echo \Admin\Helper\FormPrinter::iset($imessage,'body')}</textarea>
+                <textarea rows="10" name="text" class="width80">{echo \Admin\Helper\FormPrinter::iset($imessage,'body')}</textarea>
                 {if isset($errors["body"])}
                 <label class="error">
                     {echo join("<br/>", $errors["body"])}
@@ -51,7 +51,7 @@
         <p>
             <label>Zobrazovat od*</label>
             <span class="field">
-                {echo \Admin\Helper\FormPrinter::textInput('dfrom', array($imessage,'displayFrom'), false, 'mediuminput datepicker')}
+                {echo \Admin\Helper\FormPrinter::textInput('dfrom', array($imessage,'displayFrom'), false, 'width60 datepicker')}
                 {if isset($errors["displayFrom"])}
                 <label class="error">
                     {echo join("<br/>", $errors["displayFrom"])}
@@ -62,7 +62,7 @@
         <p>
             <label>Zobrazovat do*</label>
             <span class="field">
-                {echo \Admin\Helper\FormPrinter::textInput('dto', array($imessage,'displayTo'), false, 'mediuminput datepicker2')}
+                {echo \Admin\Helper\FormPrinter::textInput('dto', array($imessage,'displayTo'), false, 'width60 datepicker2')}
                 {if isset($errors["displayTo"])}
                 <label class="error">
                     {echo join("<br/>", $errors["displayTo"])}

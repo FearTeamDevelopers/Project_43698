@@ -96,7 +96,10 @@ class IndexController extends Controller
         $words_in_title = count($titlecount[0]);
         $words_in_meta = $occurence;
 
-        $weight = ( $words_in_meta * self::RANKER_TERMWEIGHT + $words_in_title * self::RANKER_TITLEWEIGHT + $words_in_url * self::RANKER_URLWEIGHT + $words_in_keywords * self::RANKER_KEYWORDWEIGHT
+        $weight = ( $words_in_meta * self::RANKER_TERMWEIGHT + 
+                $words_in_title * self::RANKER_TITLEWEIGHT + 
+                $words_in_url * self::RANKER_URLWEIGHT + 
+                $words_in_keywords * self::RANKER_KEYWORDWEIGHT
                 );
 
         $newweight = intval($weight);

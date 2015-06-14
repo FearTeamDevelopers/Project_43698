@@ -40,6 +40,8 @@ class Controller extends BaseController
     const SUCCESS_MESSAGE_7 = 'Vše bylo úspěšně nahráno';
     const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
     const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
+    const SUCCESS_MESSAGE_10 = 'Heslo bylo nastaveno a posláno na email uživatele';
+    const SUCCESS_MESSAGE_11 = 'Email byl úspěšně odeslán';
     const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
     const ERROR_MESSAGE_2 = 'Nenalezeno';
     const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
@@ -47,6 +49,8 @@ class Controller extends BaseController
     const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
     const ERROR_MESSAGE_6 = 'Přísput odepřen';
     const ERROR_MESSAGE_7 = 'Heslo je příliš slabé';
+    const ERROR_MESSAGE_8 = 'Platnost hesla vzprší během %s dní';
+    const ERROR_MESSAGE_9 = 'Původní heslo není platné';
 
     /**
      * Store security context object

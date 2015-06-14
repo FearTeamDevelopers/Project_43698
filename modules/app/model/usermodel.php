@@ -92,4 +92,17 @@ class UserModel extends BasicUser
         return $str;
     }
     
+    /**
+     * 
+     * @return type
+     */
+    public static function fetchAll()
+    {
+        return self::all(
+                array('role <> ?' => 'role_superadmin'), 
+                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'), 
+                array('id' => 'asc')
+        );
+    }
+
 }

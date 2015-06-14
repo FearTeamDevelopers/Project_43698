@@ -14,7 +14,7 @@
         <p>
             <label>Modul</label>
             <span class="field">
-                <select class="longinput" name="module">
+                <select class="width80" name="module">
                     {if !empty($modules)}
                         {foreach $module in $modules}
                             <option value="{echo strtolower($module)}">{echo $module}</option>
@@ -26,7 +26,7 @@
         <p>
             <label>Z URL*</label>
             <span class="field">
-                <input class="longinput" type="text" name="fromurl" value="{echo isset($redirect)? $redirect->fromPath: ""}" />
+                <input class="width80" type="text" name="fromurl" value="{echo isset($redirect)? $redirect->fromPath: ""}" />
                 {if isset($errors["fromPath"])}
                 <label class="error">{echo join("<br/>", $errors["fromPath"])}</label>
                 {/if}
@@ -35,7 +35,7 @@
         <p>
             <label>Na URL*</label>
             <span class="field">
-                <input class="longinput" type="text" name="tourl" value="{echo isset($redirect)? $redirect->toPath: ""}" />
+                <input class="width80" type="text" name="tourl" value="{echo isset($redirect)? $redirect->toPath: ""}" />
                 {if isset($errors["toPath"])}
                 <label class="error">{echo join("<br/>", $errors["toPath"])}</label>
                 {/if}

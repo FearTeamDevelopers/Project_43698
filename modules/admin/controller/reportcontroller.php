@@ -25,7 +25,7 @@ class ReportController extends Controller
      */
     private function _checkAccess(\App\Model\ReportModel $report)
     {
-        if ($this->_security->isGranted('role_admin') === true ||
+        if ($this->isAdmin() === true ||
                 $report->getUserId() == $this->getUser()->getId()) {
             return true;
         } else {

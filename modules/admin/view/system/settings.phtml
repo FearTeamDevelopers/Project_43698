@@ -16,7 +16,7 @@
             <p>
                 <label>{echo $conf->getTitle()}</label>
                 <span class="field">
-                    <textarea name="{echo $conf->getXkey()}" rows="1" class="longinput">{echo $conf->getValue()}</textarea>
+                    <textarea name="{echo $conf->getXkey()}" rows="1" class="width80">{echo $conf->getValue()}</textarea>
                     {if isset($errors[$conf->getXkey()])}
                         <label class="error">{echo join("<br/>", $errors[$conf->getXkey()])}</label>
                     {/if}

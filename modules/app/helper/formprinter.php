@@ -24,7 +24,7 @@ class FormPrinter
      * @param type $required
      * @return type
      */
-    public static function textInput($name, $value = array(), $required = false, $class = 'longinput', $placeholder = '')
+    public static function textInput($name, $value = array(), $required = false, $class = 'width80', $placeholder = '')
     {
         $htmlTag = '<input type="text" name="' . $name. '"';
         $htmlTagEnd = '/>';
@@ -59,7 +59,7 @@ class FormPrinter
      * @param type $placeholder
      * @return type
      */
-    public static function timeInput($name, $value = array(), $required = false, $class = 'longinput', $placeholder = '')
+    public static function timeInput($name, $value = array(), $required = false, $class = 'width80', $placeholder = '')
     {
         $htmlTag = '<input type="time" name="' . $name . '"';
         $htmlTagEnd = '/>';

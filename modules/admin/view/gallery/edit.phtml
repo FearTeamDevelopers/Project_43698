@@ -27,7 +27,7 @@
         <p>
             <label>Avatar</label>
             <span class="field">
-                <select class="longinput" name="avatar">
+                <select class="width80" name="avatar">
                     {script $photos = $gallery->getPhotos()}
                     {if !empty($photos)}
                     {foreach $photo in $photos}
@@ -53,7 +53,7 @@
         <p>
             <label>Popis*</label>
             <span class="field">
-                <textarea class="longinput" name="description" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($gallery,'description')}</textarea>
+                <textarea class="width80" name="description" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($gallery,'description')}</textarea>
                 {if isset($errors["description"])}
                 <label class="error">{echo join("<br/>", $errors["description"])}</label>
                 {/if}
@@ -62,7 +62,7 @@
         <p>
             <label>Veřejná</label>
             <span class="field">
-                <select class="longinput" name="public">
+                <select class="width80" name="public">
                     {if $gallery->isPublic == 0}
                     <option value="0" selected>Soukromá</option>
                     <option value="1">Veřejná</option>
@@ -76,7 +76,7 @@
         <p>
             <label>Aktivní</label>
             <span class="field">
-                <select class="longinput" name="active">
+                <select class="width80" name="active">
                     {if $gallery->active == 0}
                     <option value="0" selected>Neaktivní</option>
                     <option value="1">Aktivní</option>

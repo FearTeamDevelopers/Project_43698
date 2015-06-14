@@ -36,6 +36,13 @@ class ModuleConfig extends Module
             'module' => 'admin',
             'controller' => 'user',
             'action' => 'logout',
+        ),
+        array(
+            'pattern' => '/admin/email/loadtemplate/:id/:lang',
+            'module' => 'admin',
+            'controller' => 'email',
+            'action' => 'loadtemplate',
+            'args' => array(':id', ':lang')
         )
     );
 

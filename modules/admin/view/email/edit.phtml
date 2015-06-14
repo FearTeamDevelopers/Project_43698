@@ -1,10 +1,11 @@
 <ul class="maintabmenu multipletabmenu">
-    <li><a href="/admin/content/">Stránky</a></li>
-    <li><a href="/admin/content/add/">Přidat stránku</a></li>
-    <li class="current"><a href="#">Editovat stránku</a></li>
+    <li><a href="/admin/email/">Šablony</a></li>
+    <li><a href="/admin/email/send/">Email</a></li>
+    <li><a href="/admin/email/add/">Nová šablona</a></li>
+    <li class="current"><a href="#">Editovat šablonu</a></li>
 </ul><!--maintabmenu-->
 
-{if isset($content)}
+{if isset($template)}
 <div class="content">
     <div class="widgetbox">
         <div class="contenttitle radiusbottom0">
@@ -15,9 +16,9 @@
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
 
             <p>
-                <label>Název stránky</label>
+                <label>Název šablony*</label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('page', array($content,'title'), true)}
+                    {echo \Admin\Helper\FormPrinter::textInput('title', array($template,'title'), true)}
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
@@ -26,7 +27,7 @@
             <p>
                 <label>Text*</label>
                 <span class="field">
-                    <textarea rows="20" name="text" id="ckeditor">{echo $content->body}</textarea>
+                    <textarea rows="20" name="text" id="ckeditor">{echo $template->body}</textarea>
                     {if isset($errors["body"])}
                     <label class="error">{echo join("<br/>", $errors["body"])}</label>
                     {/if}
@@ -40,37 +41,21 @@
                     <button id="text-link-to-content">Odkaz na stránku</button>
                 </span>
             </p>
-
-            <br/>
-            <div class="contenttitle radiusbottom0">
-                <h2 class="table"><span>Metadata</span></h2>
-            </div><!--contenttitle-->
             <p>
-                <label>Meta-Název</label>
-                <span class="field" >
-                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($content,'metaTitle'), false, 'width80', "Výchozí hodnota: stejná jako Název")}
-                    {if isset($errors["metaTitle"])}
-                    <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
-                    {/if}
-                </span>
-            </p>
-            <p>
-                <label>Meta-Popis</label>
+                <label>Text EN*</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="width80">{echo \Admin\Helper\FormPrinter::iset($content,'metaDescription')}</textarea>
-                    {if isset($errors["metaDescription"])}
-                    <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
+                    <textarea rows="20" name="texten" id="ckeditor2">{echo $template->bodyEn}</textarea>
+                    {if isset($errors["bodyEn"])}
+                    <label class="error">{echo join("<br/>", $errors["bodyEn"])}</label>
                     {/if}
-                </span>
-            </p>
-
-            <p>
-                <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
-                <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($content,'keywords'), false, 'width80', "Oddělovač: mezera")}
-                    {if isset($errors["keywords"])}
-                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
-                    {/if}
+                    <br/>
+                    <button id="clear-texten">Smazat</button>
+                    <button id="texten-new-paragraph">Nový odstavec</button>
+                    <button id="texten-link-to-gallery">Odkaz na galerii</button>
+                    <button id="texten-link-to-action">Odkaz na akci</button>
+                    <button id="texten-link-to-news">Odkaz na novinku</button>
+                    <button id="texten-link-to-report">Odkaz na reportáž</button>
+                    <button id="texten-link-to-content">Odkaz na stránku</button>
                 </span>
             </p>
 
@@ -82,7 +67,7 @@
                 <label>Aktivní</label>
                 <span class="field">
                     <select name="active" class="width80">
-                        {if $content->active}
+                        {if $template->active}
                         <option value="0">Neaktivní</option>
                         <option value="1" selected>Aktivní</option>
                         {/if}{else}
@@ -92,13 +77,29 @@
                     </select>
                 </span>
             </p>
+            {if $isSuperAdmin}
+            <p>
+                <label>Typ</label>
+                <span class="field">
+                    <select class="width80" name="type">
+                        {if $template->type == 1}
+                        <option value="1">Běžná</option>
+                        <option value="2">Systémová</option>
+                        {/if}{else}
+                        <option value="1">Běžná</option>
+                        <option value="2" selected>Systémová</option>
+                        {/else}
+                    </select>
+                </span>
+            </p>
+            {/if}
             <p class="stdformbutton">
-                <input name="submitEditContent" type="submit" value="Uložit" class="submit radius2" />
+                <input name="submitEditEmailTemplate" type="submit" value="Uložit" class="submit radius2" />
             </p>
         </form>
     </div>
 </div>
 <br class="clear-all"/>
 <div id="insert-dialog"><p></p></div>
-<script type="text/javascript" src="/public/js/custom/build/news.js"></script>
+<script type="text/javascript" src="/public/js/custom/news.js"></script>
 {/if}

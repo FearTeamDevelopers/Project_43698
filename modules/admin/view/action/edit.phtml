@@ -100,8 +100,8 @@
             <p>
                 <label>Datum - začátek</label>
                 <span class="field">
-                    Datum: {echo \Admin\Helper\FormPrinter::textInput('datestart', array($action,'startDate'), false, 'microinput datepicker2')}
-                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timestart', array($action,'startTime'), false, 'microinput')}
+                    Datum: {echo \Admin\Helper\FormPrinter::textInput('datestart', array($action,'startDate'), false, 'width20 datepicker2')}
+                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timestart', array($action,'startTime'), false, 'width20')}
 
                     {if isset($errors["startDate"])}
                     <label class="error">{echo join("<br/>", $errors["startDate"])}</label>
@@ -114,8 +114,8 @@
             <p>
                 <label>Datum - konec</label>
                 <span class="field">
-                    Datum: {echo \Admin\Helper\FormPrinter::textInput('dateend', array($action,'endDate'), false, 'microinput datepicker3')}
-                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timeend', array($action,'endTime'), false, 'microinput')}
+                    Datum: {echo \Admin\Helper\FormPrinter::textInput('dateend', array($action,'endDate'), false, 'width20 datepicker3')}
+                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timeend', array($action,'endTime'), false, 'width20')}
 
                     {if isset($errors["endDate"])}
                     <label class="error">{echo join("<br/>", $errors["endDate"])}</label>
@@ -133,7 +133,7 @@
             <p>
                 <label>Aktivní</label>
                 <span class="field">
-                    <select name="active" class="longinput">
+                    <select name="active" class="width80">
                         {if $action->active}
                         <option value="0">Neaktivní</option>
                         <option value="1" selected>Aktivní</option>
@@ -147,7 +147,7 @@
             <p>
                 <label>Schváleno</label>
                 <span class="field">
-                    <select name="approve" class="longinput">
+                    <select name="approve" class="width80">
                         {if $action->approved == 0}
                         <option value="0" selected>Čeká na shválení</option>
                         <option value="1">Schváleno</option>
@@ -167,7 +167,7 @@
             <p>
                 <label>V archivu</label>
                 <span class="field">
-                    <select name="archive" class="longinput">
+                    <select name="archive" class="width80">
                         {if $action->archive}
                         <option value="0">Ne</option>
                         <option value="1" selected>Ano</option>
@@ -186,7 +186,7 @@
             <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($action,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($action,'metaTitle'), false, 'width80', "Výchozí hodnota: stejná jako Název")}
 
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
@@ -196,7 +196,7 @@
             <p>
                 <label>Meta-popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput" >{echo \Admin\Helper\FormPrinter::iset($action,'metaDescription')}</textarea>
+                    <textarea rows="5" name="metadescription" class="width80" >{echo \Admin\Helper\FormPrinter::iset($action,'metaDescription')}</textarea>
                     
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
@@ -207,7 +207,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($action,'keywords'), false, 'longinput', "Oddělovač: mezera")}
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($action,'keywords'), false, 'width80', "Oddělovač: mezera")}
 
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
@@ -224,5 +224,5 @@
 </div>
 <br class="clear-all"/>
 <div id="insert-dialog"><p></p></div>
-<script type="text/javascript" src="/public/js/custom/news.js"></script>
+<script type="text/javascript" src="/public/js/custom/build/news.js"></script>
 {/if}

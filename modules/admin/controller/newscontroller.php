@@ -24,7 +24,7 @@ class NewsController extends Controller
      */
     private function _checkAccess(\App\Model\NewsModel $news)
     {
-        if ($this->_security->isGranted('role_admin') === true ||
+        if ($this->isAdmin() === true ||
                 $news->getUserId() == $this->getUser()->getId()) {
             return true;
         } else {

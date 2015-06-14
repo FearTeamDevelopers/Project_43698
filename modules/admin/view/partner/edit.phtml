@@ -49,7 +49,7 @@
         <p>
             <label>WWW*</label>
             <span class="field">
-                <input required type="url" name="web" class="longinput" value="{echo $partner->web}"/>
+                <input required type="url" name="web" class="width80" value="{echo $partner->web}"/>
                 {if isset($errors["web"])}
                 <label class="error">{echo join("<br/>", $errors["web"])}</label>
                 {/if}
@@ -67,7 +67,7 @@
         <p>
             <label>Aktivní</label>
             <span class="field">
-                <select name="active" class="longinput">
+                <select name="active" class="width80">
                     {if $partner->active}
                     <option value="0">Inactive</option>
                     <option value="1" selected>Active</option>

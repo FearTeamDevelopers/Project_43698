@@ -37,7 +37,7 @@
 
         <form class="stdform stdform2" method="post" action="#" >
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
-            <input type="hidden" name="conceptid" id="conceptid" value="{echo $conceptid}" />
+            <input type="hidden" name="conceptid" id="conceptid" value="{echo isset($conceptid) ? $conceptId:0}" />
             <input type="hidden" name="concepttype" id="concepttype" value="1" />
             <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
             <p>
@@ -98,8 +98,8 @@
             <p>
                 <label>Datum - začátek</label>
                 <span class="field">
-                    Datum: {echo \Admin\Helper\FormPrinter::textInput('datestart', array($action,'startDate'), false, 'microinput datepicker2')}
-                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timestart', array($action,'startTime'), false, 'microinput')}
+                    Datum: {echo \Admin\Helper\FormPrinter::textInput('datestart', array($action,'startDate'), false, 'width20 datepicker2')}
+                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timestart', array($action,'startTime'), false, 'width20')}
 
                     {if isset($errors["startDate"])}
                     <label class="error">{echo join("<br/>", $errors["startDate"])}</label>
@@ -112,8 +112,8 @@
             <p>
                 <label>Datum - konec</label>
                 <span class="field">
-                    Datum: {echo \Admin\Helper\FormPrinter::textInput('dateend', array($action,'endDate'), false, 'microinput datepicker3')}
-                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timeend', array($action,'endTime'), false, 'microinput')}
+                    Datum: {echo \Admin\Helper\FormPrinter::textInput('dateend', array($action,'endDate'), false, 'width20 datepicker3')}
+                    Čas: {echo \Admin\Helper\FormPrinter::timeInput('timeend', array($action,'endTime'), false, 'width20')}
 
                     {if isset($errors["endDate"])}
                     <label class="error">{echo join("<br/>", $errors["endDate"])}</label>
@@ -131,7 +131,7 @@
             <p>
                 <label>Meta-název</label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($action,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($action,'metaTitle'), false, 'width80', "Výchozí hodnota: stejná jako Název")}
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
                     {/if}
@@ -140,7 +140,7 @@
             <p>
                 <label>Meta-popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput" >{echo \Admin\Helper\FormPrinter::iset($action,'metaDescription')}</textarea>
+                    <textarea rows="5" name="metadescription" class="width80" >{echo \Admin\Helper\FormPrinter::iset($action,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -150,7 +150,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($action,'keywords'), false, 'longinput', "Oddělovač: mezera")}
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($action,'keywords'), false, 'width80', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}

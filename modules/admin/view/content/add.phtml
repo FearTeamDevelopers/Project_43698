@@ -47,7 +47,7 @@
             <p>
                 <label>Meta-Název</label>
                 <span class="field" >
-                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($content,'metaTitle'), false, 'longinput', "Výchozí hodnota: stejná jako Název")}
+                    {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($content,'metaTitle'), false, 'width80', "Výchozí hodnota: stejná jako Název")}
 
                     {if isset($errors["metaTitle"])}
                     <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
@@ -57,7 +57,7 @@
             <p>
                 <label>Meta-Popis</label>
                 <span class="field">
-                    <textarea rows="5" name="metadescription" class="longinput">{echo \Admin\Helper\FormPrinter::iset($content,'metaDescription')}</textarea>
+                    <textarea rows="5" name="metadescription" class="width80">{echo \Admin\Helper\FormPrinter::iset($content,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
                     <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
                     {/if}
@@ -66,7 +66,7 @@
             <p>
                 <label>Klíčová slova<small>Pro interní vyhledávač</small></label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($content,'keywords'), false, 'longinput', "Oddělovač: mezera")}
+                    {echo \Admin\Helper\FormPrinter::textInput('keywords', array($content,'keywords'), false, 'width80', "Oddělovač: mezera")}
                     {if isset($errors["keywords"])}
                     <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
                     {/if}
@@ -80,4 +80,4 @@
 </div>
 <br class="clear-all"/>
 <div id="insert-dialog"><p></p></div>
-<script type="text/javascript" src="/public/js/custom/news.js"></script>
+<script type="text/javascript" src="/public/js/custom/build/news.js"></script>

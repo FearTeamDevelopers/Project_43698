@@ -265,7 +265,14 @@ class AdvertisementController extends Controller
                     }
                     
                     $subject = 'Hastrman - Bazar - Dotaz k inzerátu';
-                    $this->_sendEmail($this->_getEmailBody($ad, $message), $subject, $sendTo, 'bazar@hastrman.cz');
+                    $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Dotaz k inzerátu'));
+                    $emailBody = str_replace(
+                            array('{ADLINK}', '{AUTHOR}', '{AUTHOREMAIL}', '{MESSAGE}'), 
+                            array('<a href="http://' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a>',
+                                $message->getMsAuthor(), $message->getMsEmail(), $message->getMessage()), 
+                            $emailTemplate->getBody());
+                    
+                    $this->_sendEmail($emailBody, $subject, $sendTo, 'bazar@hastrman.cz');
 
                     $message->messageSent = 1;
                     $messageId = $message->save();
