@@ -55,7 +55,7 @@ class RedirectController extends Controller
                 $id = $redirect->save();
 
                 Event::fire('admin.log', array('success', 'Redirect id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/redirect/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($redirect->getErrors())));
@@ -79,7 +79,7 @@ class RedirectController extends Controller
         $redirect = RedirectModel::first(array('id = ?' => (int) $id));
 
         if (null === $redirect) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/redirect/');
         }
@@ -101,7 +101,7 @@ class RedirectController extends Controller
                 $redirect->save();
 
                 Event::fire('admin.log', array('success', 'Redirect id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/redirect/');
             } else {
                 Event::fire('admin.log', array('fail', 'Redirect id: ' . $id,
@@ -126,14 +126,14 @@ class RedirectController extends Controller
         );
 
         if (NULL === $redirect) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
                 if ($redirect->delete()) {
                     Event::fire('admin.log', array('success', 'Redirect id: ' . $id));
                     echo 'success';
                 } else {
                     Event::fire('admin.log', array('fail', 'Redirect id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
+                    echo $this->lang('COMMON_FAIL');
                 }
         }
     }

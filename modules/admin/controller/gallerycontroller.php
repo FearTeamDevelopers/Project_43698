@@ -82,7 +82,7 @@ class GalleryController extends Controller
             $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
             if (!$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('Gallery with this title already exists');
+                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
             $gallery = new \App\Model\GalleryModel(array(
@@ -101,7 +101,7 @@ class GalleryController extends Controller
 
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/' . $id);
             } else {
                 Event::fire('admin.log', array('fail'));
@@ -125,7 +125,7 @@ class GalleryController extends Controller
         $gallery = \App\Model\GalleryModel::fetchGalleryById((int) $id);
 
         if (null === $gallery) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
@@ -146,13 +146,13 @@ class GalleryController extends Controller
         $gallery = \App\Model\GalleryModel::fetchGalleryById((int) $id);
 
         if (NULL === $gallery) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
         if (!$this->_checkAccess($gallery)) {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
@@ -168,7 +168,7 @@ class GalleryController extends Controller
             $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
             if ($gallery->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('Gallery with this title already exists');
+                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
             if (null === $gallery->userId) {
@@ -189,7 +189,7 @@ class GalleryController extends Controller
 
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/' . $id);
             } else {
                 Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
@@ -213,13 +213,13 @@ class GalleryController extends Controller
         );
 
         if (NULL === $gallery) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
         if (!$this->_checkAccess($gallery)) {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
@@ -266,11 +266,11 @@ class GalleryController extends Controller
             if ($gallery->delete()) {
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_3);
+                $view->successMessage($this->lang('DELETE_SUCCESS'));
                 self::redirect('/admin/gallery/');
             } else {
                 Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
-                $view->warningMessage(self::ERROR_MESSAGE_1);
+                $view->warningMessage($this->lang('COMMON_FAIL'));
                 self::redirect('/admin/gallery/');
             }
         }
@@ -309,13 +309,13 @@ class GalleryController extends Controller
         );
 
         if (null === $gallery) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
         if (!$this->_checkAccess($gallery)) {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
@@ -379,7 +379,7 @@ class GalleryController extends Controller
             $errors['uploadfile'] = $uploadErrors;
             
             if (empty($errors['uploadfile'])) {
-                $view->successMessage(self::SUCCESS_MESSAGE_7);
+                $view->successMessage($this->lang('UPLOAD_SUCCESS'));
                 self::redirect('/admin/gallery/detail/' . $gallery->getId());
             } else {
                 $view->set('errors', $errors);
@@ -402,18 +402,18 @@ class GalleryController extends Controller
         );
 
         if (null === $photo) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $gallery = \App\Model\GalleryModel::first(
                             array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
             );
 
             if (null === $gallery) {
-                echo self::ERROR_MESSAGE_2;
+                echo $this->lang('NOT_FOUND');
             }
 
             if (!$this->_checkAccess($gallery)) {
-                echo self::ERROR_MESSAGE_4;
+                echo $this->lang('LOW_PERMISSIONS');
             }
 
             $mainPath = $photo->getUnlinkPath();
@@ -426,7 +426,7 @@ class GalleryController extends Controller
                 echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'Photo id: ' . $id));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -444,18 +444,18 @@ class GalleryController extends Controller
         $photo = \App\Model\PhotoModel::first(array('id = ?' => (int) $id));
 
         if (null === $photo) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $gallery = \App\Model\GalleryModel::first(
                             array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
             );
 
             if (null === $gallery) {
-                echo self::ERROR_MESSAGE_2;
+                echo $this->lang('NOT_FOUND');
             }
 
             if (!$this->_checkAccess($gallery)) {
-                echo self::ERROR_MESSAGE_4;
+                echo $this->lang('LOW_PERMISSIONS');
             }
 
             if (!$photo->active) {

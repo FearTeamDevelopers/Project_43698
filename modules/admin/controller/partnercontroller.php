@@ -72,7 +72,7 @@ class PartnerController extends Controller
                             $id = $partner->save();
 
                             Event::fire('admin.log', array('success', 'Partner id: ' . $id));
-                            $view->successMessage(self::SUCCESS_MESSAGE_1);
+                            $view->successMessage($this->lang('CREATE_SUCCESS'));
                             self::redirect('/admin/partner/');
                         } else {
                             Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($partner->getErrors())));
@@ -107,7 +107,7 @@ class PartnerController extends Controller
         $partner = \App\Model\PartnerModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $partner) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/partner/');
         }
@@ -158,7 +158,7 @@ class PartnerController extends Controller
                 $partner->save();
 
                 Event::fire('admin.log', array('success', 'Partner id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/partner/');
             } else {
                 Event::fire('admin.log', array('fail', 'Partner id: ' . $id,
@@ -183,7 +183,7 @@ class PartnerController extends Controller
         );
 
         if (NULL === $partner) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $path = $partner->getUnlinkLogoPath();
 
@@ -193,7 +193,7 @@ class PartnerController extends Controller
                 echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'Partner id: ' . $id));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -225,7 +225,7 @@ class PartnerController extends Controller
                 echo self::ERROR_MESSAGE_5;
             }
         } else {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         }
     }
 
@@ -257,17 +257,17 @@ class PartnerController extends Controller
                         foreach ($partners as $partner) {
                             if (unlink($partner->getUnlinkLogoPath())) {
                                 if (!$partner->delete()) {
-                                    $errors[] = 'An error occured while deleting ' . $partner->getTitle();
+                                    $errors[] = $this->lang('DELETE_FAIL');
                                 }
                             } else {
-                                $errors[] = 'An error occured while deleting logo of ' . $partner->getTitle();
+                                $errors[] = $this->lang('DELETE_FAIL'). ' - Logo';
                             }
                         }
                     }
 
                     if (empty($errors)) {
                         Event::fire('admin.log', array('delete success', 'Partner ids: ' . join(',', $ids)));
-                        $view->successMessage(self::SUCCESS_MESSAGE_6);
+                        $view->successMessage($this->lang('DELETE_SUCCESS'));
                     } else {
                         Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                         $message = join('<br/>', $errors);
@@ -298,7 +298,7 @@ class PartnerController extends Controller
 
                     if (empty($errors)) {
                         Event::fire('admin.log', array('activate success', 'Partner ids: ' . join(',', $ids)));
-                        $view->successMessage(self::SUCCESS_MESSAGE_4);
+                        $view->successMessage($this->lang('ACTIVATE_SUCCESS'));
                     } else {
                         Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                         $message = join('<br/>', $errors);
@@ -329,7 +329,7 @@ class PartnerController extends Controller
 
                     if (empty($errors)) {
                         Event::fire('admin.log', array('deactivate success', 'Partner ids: ' . join(',', $ids)));
-                        $view->successMessage(self::SUCCESS_MESSAGE_5);
+                        $view->successMessage($this->lang('DEACTIVATE_SUCCESS'));
                     } else {
                         Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                         $message = join('<br/>', $errors);

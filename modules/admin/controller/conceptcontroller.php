@@ -80,7 +80,7 @@ class ConceptController extends Controller
         $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $concept) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($concept->delete()) {
                 Event::fire('admin.log', array('success', 'Concept id: ' . $id));
@@ -88,7 +88,7 @@ class ConceptController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Concept id: ' . $id,
                     'Errors: ' . json_encode($concept->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }

@@ -67,7 +67,7 @@ class ReportController extends Controller
             }
 
             if ($i == 50) {
-                $this->_errors['title'] = array('Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.');
+                $this->_errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
                 break;
             }
         }
@@ -100,8 +100,9 @@ class ReportController extends Controller
             $imgThumb = '';
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-        );
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/reportaz/r/' . $urlKey, '[Celý článek]'), 
+                RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
@@ -138,7 +139,7 @@ class ReportController extends Controller
         $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
         if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array('This title is already used');
+            $this->_errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
         }
 
         $fileManager = new FileManager(array(
@@ -216,6 +217,27 @@ class ReportController extends Controller
     }
 
     /**
+     * Send email notification abou new report published on web
+     */
+    private function _sendEmailNotification(\App\Model\ReportModel $report)
+    {
+        if($report->getApproved() && $this->getConfig()->report_new_notification){
+            $users = \App\Model\UserModel::all(array('getNewReportNotification = ?' => true), array('email'));
+
+            $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Nova reportaz'));
+            $emailBody = str_replace(array('{TITLE}', '{LINK}'), 
+                            array($report->getTitle(), RequestMethods::server('HTTP_HOST').'/reportaze/r/'.$report->getUrlKey()), 
+                            $emailTemplate->getBody());
+
+            if(!empty($users)){
+                foreach($users as $user){
+                    $this->_sendEmail($emailBody, 'Hastrman - Reportáž - '.$report->getTitle(), $user->getEmail());
+                }
+            }
+        }
+    }
+    
+    /**
      * Get list of all actions. Loaded via datatables ajax.
      * For more check load function.
      * 
@@ -255,11 +277,12 @@ class ReportController extends Controller
 
             if (empty($this->_errors) && $report->validate()) {
                 $id = $report->save();
+                $this->_sendEmailNotification($report);
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/report/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($this->_errors + $report->getErrors())));
@@ -309,13 +332,13 @@ class ReportController extends Controller
             $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
             if (null === $report) {
-                $view->warningMessage(self::ERROR_MESSAGE_2);
+                $view->warningMessage($this->lang('NOT_FOUND'));
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/report/');
             }
 
             if (!$this->_checkAccess($report)) {
-                $view->warningMessage(self::ERROR_MESSAGE_4);
+                $view->warningMessage($this->lang('LOW_PERMISSIONS'));
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/report/');
             }
@@ -343,7 +366,7 @@ class ReportController extends Controller
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/report/');
             } else {
                 Event::fire('admin.log', array('fail', 'Report id: ' . $id,
@@ -388,7 +411,7 @@ class ReportController extends Controller
         );
 
         if (NULL === $report) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($this->_checkAccess($report)) {
                 $imgPath = $report->getUnlinkPath();
@@ -402,10 +425,10 @@ class ReportController extends Controller
                     echo 'success';
                 } else {
                     Event::fire('admin.log', array('fail', 'Report id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
+                    echo $this->lang('COMMON_FAIL');
                 }
             } else {
-                echo self::ERROR_MESSAGE_4;
+                echo $this->lang('LOW_PERMISSIONS');
             }
         }
     }
@@ -424,10 +447,10 @@ class ReportController extends Controller
             $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
             if (NULL === $report) {
-                echo self::ERROR_MESSAGE_2;
+                echo $this->lang('NOT_FOUND');
             } else {
                 if (!$this->_checkAccess($report)) {
-                    echo self::ERROR_MESSAGE_4;
+                    echo $this->lang('LOW_PERMISSIONS');
                 }
 
                 @unlink($report->getUnlinkPath());
@@ -442,11 +465,11 @@ class ReportController extends Controller
                     echo 'success';
                 } else {
                     Event::fire('admin.log', array('fail', 'Report Id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
+                    echo $this->lang('COMMON_FAIL');
                 }
             }
         } else {
-            echo self::ERROR_MESSAGE_1;
+            echo $this->lang('COMMON_FAIL');
         }
     }
 
@@ -475,7 +498,7 @@ class ReportController extends Controller
             echo 'success';
             exit;
         }
-        echo self::ERROR_MESSAGE_1;
+        echo $this->lang('COMMON_FAIL');
         exit;
     }
 
@@ -492,7 +515,7 @@ class ReportController extends Controller
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $report) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $report->approved = 1;
 
@@ -503,6 +526,7 @@ class ReportController extends Controller
 
             if ($report->validate()) {
                 $report->save();
+                $this->_sendEmailNotification($report);
                 $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Report id: ' . $id));
@@ -510,7 +534,7 @@ class ReportController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Report id: ' . $id,
                     'Errors: ' . json_encode($report->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -528,7 +552,7 @@ class ReportController extends Controller
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $report) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $report->approved = 2;
 
@@ -545,7 +569,7 @@ class ReportController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Report id: ' . $id,
                     'Errors: ' . json_encode($report->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -580,7 +604,7 @@ class ReportController extends Controller
         $action = RequestMethods::post('action');
 
         if (empty($ids)) {
-            echo 'Nějaký řádek musí být označen';
+            echo $this->lang('NO_ROW_SELECTED');
             return;
         }
 
@@ -593,7 +617,7 @@ class ReportController extends Controller
                 if (NULL !== $reports) {
                     foreach ($reports as $report) {
                         if (!$report->delete()) {
-                            $errors[] = 'An error occured while deleting ' . $report->getTitle();
+                            $errors[] = $this->lang('DELETE_FAIL') .' - '. $report->getTitle();
                         }
                     }
                 }
@@ -601,7 +625,7 @@ class ReportController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('delete success', 'Report ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_6;
+                    echo $this->lang('DELETE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -636,7 +660,7 @@ class ReportController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('activate success', 'Report ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_4;
+                    echo $this->lang('ACTIVATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -671,7 +695,7 @@ class ReportController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('deactivate success', 'Report ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_5;
+                    echo $this->lang('DEACTIVATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -696,6 +720,7 @@ class ReportController extends Controller
 
                         if ($report->validate()) {
                             $report->save();
+                            $this->_sendEmailNotification($report);
                         } else {
                             $errors[] = "Action id {$report->getId()} - {$report->getTitle()} errors: "
                                     . join(', ', $report->getErrors());
@@ -706,7 +731,7 @@ class ReportController extends Controller
                 if (empty($errors)) {
                     Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
                     $this->getCache()->invalidate();
-                    echo self::SUCCESS_MESSAGE_2;
+                    echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -741,7 +766,7 @@ class ReportController extends Controller
                 if (empty($errors)) {
                     Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
                     $this->getCache()->invalidate();
-                    echo self::SUCCESS_MESSAGE_2;
+                    echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -750,7 +775,7 @@ class ReportController extends Controller
 
                 break;
             default:
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
                 break;
         }
     }

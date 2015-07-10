@@ -40,12 +40,12 @@ class UserController extends Controller
             $error = false;
 
             if (empty($email)) {
-                $view->set('account_error', 'Email není vyplňen');
+                $view->set('account_error', $this->lang('LOGIN_EMAIL_ERROR'));
                 $error = true;
             }
 
             if (empty($password)) {
-                $view->set('account_error', 'Heslo není vyplněno');
+                $view->set('account_error', $this->lang('LOGIN_PASS_ERROR'));
                 $error = true;
             }
 
@@ -56,26 +56,26 @@ class UserController extends Controller
                     
                     if($daysToExpiration !== false){
                         if($daysToExpiration < 14 && $daysToExpiration > 1){
-                            $view->infoMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                            $view->infoMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
                         }elseif($daysToExpiration < 5 && $daysToExpiration > 1){
-                            $view->warningMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                            $view->warningMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
                         }elseif($daysToExpiration >= 1){
-                            $view->errorMessage(sprintf(self::ERROR_MESSAGE_8, $daysToExpiration));
+                            $view->errorMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
                         }
                     }
                     
                     self::redirect('/admin/');
                 } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
-                    $view->set('account_error', 'Účet byl uzamčen. Přihlášení opakujte za 15 min.');
+                    $view->set('account_error', $this->lang('ACCOUNT_LOCKED'));
                 } catch (\THCFrame\Security\Exception\UserInactive $ex) {
-                    $view->set('account_error', 'Účet ještě nebyl aktivován');
+                    $view->set('account_error', $this->lang('ACCOUNT_INACTIVE'));
                 } catch (\THCFrame\Security\Exception\UserExpired $ex) {
-                    $view->set('account_error', 'Vypršela platnost účtu');
+                    $view->set('account_error', $this->lang('ACCOUNT_EXPIRED'));
                 } catch (\Exception $e) {
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
                     } else {
-                        $view->set('account_error', 'Email a/nebo heslo není správně');
+                        $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     }
                 }
             }
@@ -129,17 +129,17 @@ class UserController extends Controller
             $errors = array();
 
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
-                $errors['password2'] = array('Hesla se neshodují');
+                $errors['password2'] = array($this->lang('PASS_DOESNT_MATCH'));
             }
 
             $email = \App\Model\UserModel::first(array('email = ?' => RequestMethods::post('email')), array('email'));
 
             if ($email) {
-                $errors['email'] = array('Tento email se již používá');
+                $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
             }
 
             if (PasswordManager::strength(RequestMethods::post('password')) <= 0.6) {
-                $errors['password'] = array(self::ERROR_MESSAGE_7);
+                $errors['password'] = array($this->lang('PASS_WEAK'));
             }
 
             $salt = PasswordManager::createSalt();
@@ -154,7 +154,7 @@ class UserController extends Controller
                 }
 
                 if ($i == 75) {
-                    $errors['email'] = array(self::ERROR_MESSAGE_3 . ' Zkuste vytvoření uživatele opakovat později');
+                    $errors['email'] = array($this->lang('UNKNOW_ERROR'));
                     break;
                 }
             }
@@ -164,6 +164,8 @@ class UserController extends Controller
                 'lastname' => RequestMethods::post('lastname'),
                 'email' => RequestMethods::post('email'),
                 'phoneNumber' => RequestMethods::post('phone'),
+                'getNewActionNotification' => RequestMethods::post('actionNotification'),
+                'getNewReportNotification' => RequestMethods::post('reportNotification'),
                 'emailActivationToken' => null,
                 'password' => $hash,
                 'salt' => $salt,
@@ -175,7 +177,7 @@ class UserController extends Controller
                 $userId = $user->save();
 
                 Event::fire('admin.log', array('success', 'User id: ' . $userId));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/user/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $user->getErrors())));
@@ -199,7 +201,7 @@ class UserController extends Controller
                         array('active = ?' => true, 'id = ?' => $this->getUser()->getId()));
 
         if (NULL === $user) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         }
@@ -210,9 +212,10 @@ class UserController extends Controller
             if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/admin/user/');
             }
+            $errors = array();
 
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
-                $errors['password2'] = array('Hesla se neshodují');
+                $errors['password2'] = array($this->lang('PASS_DOESNT_MATCH'));
             }
 
             if (RequestMethods::post('email') != $user->email) {
@@ -221,7 +224,7 @@ class UserController extends Controller
                 );
 
                 if ($email) {
-                    $errors['email'] = array('Tento email je již použit');
+                    $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
                 }
             }
 
@@ -232,23 +235,25 @@ class UserController extends Controller
                 try{
                     $user = $user->changePassword($oldPassword, $newPass, 0.6);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
-                    $errors['oldpass'] = array(self::ERROR_MESSAGE_9);
+                    $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 }  catch (\THCFrame\Security\Exception\WeakPassword $ex){
-                    $errors['password'] = array(self::ERROR_MESSAGE_7);
+                    $errors['password'] = array($this->lang('PASS_WEAK'));
                 }
             }
-            
+
             $user->firstname = RequestMethods::post('firstname');
             $user->lastname = RequestMethods::post('lastname');
             $user->email = RequestMethods::post('email');
             $user->phoneNumber = RequestMethods::post('phone');
+            $user->getNewActionNotification = RequestMethods::post('actionNotification');
+            $user->getNewReportNotification = RequestMethods::post('reportNotification');
 
             if (empty($errors) && $user->validate()) {
                 $user->update();
                 $this->getSecurity()->setUser($user);
 
                 Event::fire('admin.log', array('success', 'User id: ' . $user->getId()));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/');
             } else {
                 Event::fire('admin.log', array('fail', 'User id: ' . $user->getId(),
@@ -270,11 +275,11 @@ class UserController extends Controller
         $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $user) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         } elseif ($user->getRole() == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         }
@@ -289,7 +294,7 @@ class UserController extends Controller
             $errors = array();
 
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
-                $errors['password2'] = array('Hesla se neshodují');
+                $errors['password2'] = array($this->lang('PASS_DOESNT_MATCH'));
             }
 
             if (RequestMethods::post('email') != $user->email) {
@@ -298,7 +303,7 @@ class UserController extends Controller
                 );
 
                 if ($email) {
-                    $errors['email'] = array('Tento email je již použit');
+                    $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
                 }
             }
 
@@ -309,9 +314,9 @@ class UserController extends Controller
                 try{
                     $user = $user->changePassword($oldPassword, $newPass, 0.6);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
-                    $errors['oldpass'] = array(self::ERROR_MESSAGE_9);
+                    $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 }  catch (\THCFrame\Security\Exception\WeakPassword $ex){
-                    $errors['password'] = array(self::ERROR_MESSAGE_7);
+                    $errors['password'] = array($this->lang('PASS_WEAK'));
                 }
             }
 
@@ -319,6 +324,8 @@ class UserController extends Controller
             $user->lastname = RequestMethods::post('lastname');
             $user->email = RequestMethods::post('email');
             $user->phoneNumber = RequestMethods::post('phone');
+            $user->getNewActionNotification = RequestMethods::post('actionNotification');
+            $user->getNewReportNotification = RequestMethods::post('reportNotification');
             $user->role = RequestMethods::post('role', $user->getRole());
             $user->active = RequestMethods::post('active');
             $user->blocked = RequestMethods::post('blocked');
@@ -327,7 +334,7 @@ class UserController extends Controller
                 $user->update();
 
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/user/');
             } else {
                 Event::fire('admin.log', array('fail', 'User id: ' . $id,
@@ -350,14 +357,14 @@ class UserController extends Controller
         $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $user) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($user->delete()) {
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
                 echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'User id: ' . $id));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -384,11 +391,11 @@ class UserController extends Controller
         $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $user) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         } elseif ($user->getRole() == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
-            $view->warningMessage(self::ERROR_MESSAGE_4);
+            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/user/');
         }
@@ -401,17 +408,17 @@ class UserController extends Controller
                 $emailBody = str_replace('{NEWPASS}', $newPass, $emailTemplate->getBody());
 
                 $this->_sendEmail($emailBody, 'Hastrman - Nové heslo', $user->getEmail());
-                $view->successMessage(self::SUCCESS_MESSAGE_10);
+                $view->successMessage($this->lang('PASS_RESET_EMAIL'));
                 Event::fire('admin.log', array('success', 'Force password change for user: ' . $user->getId()));
                 self::redirect('/admin/user/');
             } else {
-                $view->warningMessage(self::ERROR_MESSAGE_1);
+                $view->warningMessage($this->lang('COMMON_FAIL'));
                 Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
                     'Errors: ' . json_encode($user->getErrors())));
                 self::redirect('/admin/user/');
             }
         } catch (\Exception $ex) {
-            $view->errorMessage(self::ERROR_MESSAGE_3);
+            $view->errorMessage($this->lang('UNKNOW_ERROR'));
             Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
                 'Errors: ' . $ex->getMessage()));
             self::redirect('/admin/user/');

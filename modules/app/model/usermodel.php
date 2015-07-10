@@ -16,7 +16,7 @@ class UserModel extends BasicUser
      * @type text
      * @length 40
      *
-     * @validate required, alpha, min(3), max(40)
+     * @validate required, alphanumeric, min(3), max(40)
      * @label jméno
      */
     protected $_firstname;
@@ -27,7 +27,7 @@ class UserModel extends BasicUser
      * @type text
      * @length 40
      *
-     * @validate required, alpha, min(3), max(40)
+     * @validate required, alphanumeric, min(3), max(40)
      * @label prijmeni
      */
     protected $_lastname;
@@ -53,6 +53,24 @@ class UserModel extends BasicUser
      * @label activation token
      */
     protected $_emailActivationToken;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type boolean
+     * 
+     * @validate max(3)
+     */
+    protected $_getNewActionNotification;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type boolean
+     * 
+     * @validate max(3)
+     */
+    protected $_getNewReportNotification;
 
     /**
      * 

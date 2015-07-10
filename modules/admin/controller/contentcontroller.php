@@ -66,7 +66,7 @@ class ContentController extends Controller
             $urlKey = $this->_createUrlKey(RequestMethods::post('page'));
 
             if (!$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('Stránka s tímto názvem již existuje');
+                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -86,7 +86,7 @@ class ContentController extends Controller
 
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/content/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors + $content->getErrors())));
@@ -110,7 +110,7 @@ class ContentController extends Controller
         $content = \App\Model\PageContentModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $content) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/content/');
         }
@@ -126,7 +126,7 @@ class ContentController extends Controller
             $urlKey = $this->_createUrlKey(RequestMethods::post('page'));
 
             if ($content->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array('Stránka s tímto názvem již existuje');
+                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -145,7 +145,7 @@ class ContentController extends Controller
                 
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/content/');
             } else {
                 Event::fire('admin.log', array('fail', 'Content id: ' . $id,

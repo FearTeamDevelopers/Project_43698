@@ -7,51 +7,13 @@ use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Core\Lang;
 
 /**
  * Module specific controller class extending framework controller class
  */
 class Controller extends BaseController
 {
-
-//    const SUCCESS_MESSAGE_1 = 'Content has been successfully created';
-//    const SUCCESS_MESSAGE_2 = 'All changes were successfully saved';
-//    const SUCCESS_MESSAGE_3 = 'Content has been successfully deleted';
-//    const SUCCESS_MESSAGE_4 = 'Everything has been successfully activated';
-//    const SUCCESS_MESSAGE_5 = 'Everything has been successfully deactivated';
-//    const SUCCESS_MESSAGE_6 = 'Everything has been successfully deleted';
-//    const SUCCESS_MESSAGE_7 = 'Everything has been successfully uploaded';
-//    const SUCCESS_MESSAGE_8 = 'Everything has been successfully saved';
-//    const SUCCESS_MESSAGE_9 = 'Everything has been successfully added';
-//    const SUCCESS_MESSAGE_10 = 'New password has been successfully generated and sent to email';
-//    const ERROR_MESSAGE_1 = 'Oops, something went wrong';
-//    const ERROR_MESSAGE_2 = 'Not found';
-//    const ERROR_MESSAGE_3 = 'Unknown error eccured';
-//    const ERROR_MESSAGE_4 = 'You dont have permissions to do this';
-//    const ERROR_MESSAGE_5 = 'Required fields are not valid';
-//    const ERROR_MESSAGE_6 = 'Access denied';
-//    const ERROR_MESSAGE_7 = 'Password is too weak';
-
-    const SUCCESS_MESSAGE_1 = 'Vše bylo úspěšně vytovřeno';
-    const SUCCESS_MESSAGE_2 = 'Všechny změny byly úspěšně uloženy';
-    const SUCCESS_MESSAGE_3 = 'Vybraná položka byla úspěšně smazána';
-    const SUCCESS_MESSAGE_4 = 'Vše bylo úspěšně aktivováno';
-    const SUCCESS_MESSAGE_5 = 'Vše bylo úspěšně deaktivováno';
-    const SUCCESS_MESSAGE_6 = 'Vše bylo úspěšně smazáno';
-    const SUCCESS_MESSAGE_7 = 'Vše bylo úspěšně nahráno';
-    const SUCCESS_MESSAGE_8 = 'Vše bylo úspěšně uloženo';
-    const SUCCESS_MESSAGE_9 = 'Vše bylo úspěšně přidáno';
-    const SUCCESS_MESSAGE_10 = 'Heslo bylo nastaveno a posláno na email uživatele';
-    const SUCCESS_MESSAGE_11 = 'Email byl úspěšně odeslán';
-    const ERROR_MESSAGE_1 = 'Oops, něco se pokazilo';
-    const ERROR_MESSAGE_2 = 'Nenalezeno';
-    const ERROR_MESSAGE_3 = 'Nastala neznámá chyby';
-    const ERROR_MESSAGE_4 = 'Na tuto operaci nemáte oprávnění';
-    const ERROR_MESSAGE_5 = 'Povinná pole nejsou validní';
-    const ERROR_MESSAGE_6 = 'Přísput odepřen';
-    const ERROR_MESSAGE_7 = 'Heslo je příliš slabé';
-    const ERROR_MESSAGE_8 = 'Platnost hesla vzprší během %s dní';
-    const ERROR_MESSAGE_9 = 'Původní heslo není platné';
 
     /**
      * Store security context object
@@ -74,6 +36,13 @@ class Controller extends BaseController
      */
     protected $_config;
 
+    /**
+     * Store language extension
+     * @var type 
+     * @read
+     */
+    protected $_lang;
+    
     /**
      * 
      * @param type $string
@@ -151,6 +120,7 @@ class Controller extends BaseController
         $this->_security = Registry::get('security');
         $this->_cache = Registry::get('cache');
         $this->_config = Registry::get('configuration');
+        $this->_lang = Lang::getInstance();
 
         // schedule disconnect from database 
         Event::add('framework.controller.destruct.after', function($name) {
@@ -182,7 +152,7 @@ class Controller extends BaseController
         } else {
             $view = $this->getActionView();
 
-            $view->infoMessage('You has been logged out for long inactivity');
+            $view->infoMessage($this->lang('LOGIN_TIMEOUT'));
             $this->_security->logout();
             self::redirect('/admin/login');
         }
@@ -195,7 +165,7 @@ class Controller extends BaseController
     {
         if (!preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
                 '95.168.206.203' != RequestMethods::server('REMOTE_ADDR')) {
-            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
+            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
@@ -219,7 +189,7 @@ class Controller extends BaseController
     public function _member()
     {
         if ($this->_security->getUser() && $this->_security->isGranted('role_member') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
+            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
@@ -242,7 +212,7 @@ class Controller extends BaseController
     public function _participant()
     {
         if ($this->_security->getUser() && $this->_security->isGranted('role_participant') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
+            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
@@ -265,7 +235,7 @@ class Controller extends BaseController
     public function _admin()
     {
         if ($this->_security->getUser() && $this->_security->isGranted('role_admin') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
+            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
@@ -288,7 +258,7 @@ class Controller extends BaseController
     public function _superadmin()
     {
         if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized(self::ERROR_MESSAGE_6);
+            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
@@ -403,4 +373,15 @@ class Controller extends BaseController
         return $this->_security->getUser();
     }
 
+    /**
+     * 
+     * @param type $key
+     * @param type $args
+     * @return type
+     */
+    public function lang($key, $args = array())
+    {
+        return $this->getLang()->_get($key, $args);
+    }
+    
 }

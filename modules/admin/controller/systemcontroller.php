@@ -38,7 +38,7 @@ class SystemController extends Controller
             Event::fire('admin.log', array('success'));
             $this->getCache()->clearCache();
 
-            $view->successMessage('Cache has been successfully deleted');
+            $view->successMessage($this->lang('SYSTEM_DELETE_CACHE'));
             self::redirect('/admin/system/');
         }
     }
@@ -55,10 +55,10 @@ class SystemController extends Controller
 
         try {
             if ($dump->create()) {
-                $view->successMessage('Database backup has been successfully created');
+                $view->successMessage($this->lang('SYSTEM_DB_BACKUP'));
                 Event::fire('admin.log', array('success', 'Database backup'));
             } else {
-                $view->errorMessage('Database backup could not be created');
+                $view->errorMessage($this->lang('SYSTEM_DB_BACKUP_FAIL'));
                 Event::fire('admin.log', array('fail', 'Database backup'));
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
@@ -114,7 +114,7 @@ class SystemController extends Controller
             }
 
             if (empty($errors)) {
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/system/');
             } else {
                 $view->set('errors', $errors);

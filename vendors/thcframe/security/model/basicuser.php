@@ -322,7 +322,7 @@ class BasicUser extends Model
         $passExpiration = Registry::get('configuration')->security->passwordExpiration;
 
         if ((int) $passExpiration === 0) {
-            $this->_passExpire = 0;
+            $this->_passExpire = '3000-01-01 00:00:00';
         } else {
             $passExp = Date::getInstance()->dateAdd(time(), 'Y-m-d', 0, 0, $passExpiration);
             $this->_passExpire = $passExp;
@@ -340,7 +340,7 @@ class BasicUser extends Model
         $accExpiration = Registry::get('configuration')->security->accountExpiration;
 
         if ((int) $accExpiration === 0) {
-            $this->_accountExpire = 0;
+            $this->_accountExpire = '3000-01-01 00:00:00';
         } else {
             $accExpirationDate = Date::getInstance()->dateAdd(time(), 'Y-m-d', 0, 0, $accExpiration);
             $this->_accountExpire = $accExpirationDate;

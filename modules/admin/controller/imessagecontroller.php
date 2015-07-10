@@ -55,7 +55,7 @@ class ImessageController extends Controller
                 $id = $imessage->save();
 
                 Event::fire('admin.log', array('success', 'Imessage id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/imessage/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($imessage->getErrors())));
@@ -78,7 +78,7 @@ class ImessageController extends Controller
         $imessage = \Admin\Model\ImessageModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $imessage) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->willRenderActionView = false;
             self::redirect('/admin/imessage/');
         } 
@@ -101,7 +101,7 @@ class ImessageController extends Controller
                 $imessage->save();
 
                 Event::fire('admin.log', array('success', 'Imessage id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/imessage/');
             } else {
                 Event::fire('admin.log', array('fail', 'Imessage id: ' . $id,
@@ -123,14 +123,14 @@ class ImessageController extends Controller
         $imessage = \Admin\Model\ImessageModel::first(array('id = ?' => $id));
 
         if (NULL === $imessage) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($imessage->delete()) {
                 Event::fire('admin.log', array('success', 'Imessage id: ' . $id));
                 echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'Imessage id: ' . $id));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }

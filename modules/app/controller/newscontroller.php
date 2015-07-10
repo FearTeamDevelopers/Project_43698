@@ -171,7 +171,7 @@ class NewsController extends Controller
         
         if(null === $news){
             $this->_willRenderActionView = false;
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/news/');
         }
         

@@ -230,7 +230,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::fetchActiveByKey($uniquekey);
 
         if ($ad === null) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/nenalezeno');
         }
@@ -442,7 +442,7 @@ class AdvertisementController extends Controller
 
                     if (empty($errors['uploadfile'])) {
                         Event::fire('app.log', array('success', 'Ad id: ' . $id));
-                        $view->successMessage(self::SUCCESS_MESSAGE_1);
+                        $view->successMessage($this->lang('CREATE_SUCCESS'));
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     } else {
                         Event::fire('app.log', array('fail', 'Errors: ' . json_encode($errors + $ad->getErrors())));
@@ -452,7 +452,7 @@ class AdvertisementController extends Controller
                     }
                 } else {
                     Event::fire('app.log', array('success', 'Ad id: ' . $id));
-                    $view->successMessage('Inzerát' . self::SUCCESS_MESSAGE_1);
+                    $view->successMessage('Inzerát' . $this->lang('CREATE_SUCCESS'));
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
@@ -479,7 +479,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
 
         if (NULL === $ad) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/bazar');
         }
@@ -570,7 +570,7 @@ class AdvertisementController extends Controller
 
                         if (empty($errors['uploadfile'])) {
                             Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
-                            $view->successMessage(self::SUCCESS_MESSAGE_2);
+                            $view->successMessage($this->lang('UPDATE_SUCCESS'));
                             self::redirect('/bazar/r/' . $ad->getUniqueKey());
                         } else {
                             Event::fire('app.log', array('fail',
@@ -579,12 +579,12 @@ class AdvertisementController extends Controller
                         }
                     } else {
                         Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
-                        $view->successMessage(self::SUCCESS_MESSAGE_2 . ', ale více fotek už není možné nahrát');
+                        $view->successMessage($this->lang('UPDATE_SUCCESS') . ', ale více fotek už není možné nahrát');
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     }
                 } else {
                     Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
-                    $view->successMessage(self::SUCCESS_MESSAGE_2);
+                    $view->successMessage($this->lang('UPDATE_SUCCESS'));
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
@@ -608,7 +608,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $ad) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $adId = $ad->getId();
             
@@ -617,7 +617,7 @@ class AdvertisementController extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Ad id: ' . $adId));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -636,7 +636,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $ad) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->willRenderLayoutView = false;
             self::redirect('/bazar');
         }
@@ -645,11 +645,11 @@ class AdvertisementController extends Controller
 
         if ($ad->delete()) {
             Event::fire('app.log', array('success', 'Ad id: ' . $adId));
-            $view->successMessage(self::SUCCESS_MESSAGE_6);
+            $view->successMessage($this->lang('DELETE_SUCCESS'));
             self::redirect('/bazar');
         } else {
             Event::fire('app.log', array('fail', 'Ad id: ' . $adId));
-            $view->warningMessage(self::ERROR_MESSAGE_1);
+            $view->warningMessage($this->lang('COMMON_FAIL'));
         }
     }
 
@@ -666,7 +666,7 @@ class AdvertisementController extends Controller
         $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $adImage) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $imgMain = $adImage->getUnlinkPath();
             $imgThumb = $adImage->getUnlinkThumbPath();
@@ -679,7 +679,7 @@ class AdvertisementController extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'AdImage id: ' . $adImage->getId()));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -736,7 +736,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
 
         if (NULL === $ad) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $ad->hasAvailabilityRequest = true;
 
@@ -747,7 +747,7 @@ class AdvertisementController extends Controller
             } else {
                 Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId(),
                     'Errors: '.  json_encode($ad->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }

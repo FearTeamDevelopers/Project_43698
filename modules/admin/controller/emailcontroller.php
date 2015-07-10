@@ -62,7 +62,7 @@ class EmailController extends Controller
             $email->body = RequestMethods::post('text');
             
             if(empty(RequestMethods::post('singlerecipients')) && empty(RequestMethods::post('grouprecipients'))){
-                $errors['recipientlist'] = array('Nejsou vybráni žádní příjemci');
+                $errors['recipientlist'] = array($this->lang('EMAIL_NO_RECIPIENTS'));
             }
             
             if(empty($errors) && $email->type == 1){
@@ -71,10 +71,10 @@ class EmailController extends Controller
                 
                 if($this->_sendEmail($email->body, $email->subject, $recipientsArr)){
                     Event::fire('admin.log', array('success', 'Email sent to: ' . $recipients));
-                    $view->successMessage(self::SUCCESS_MESSAGE_11);
+                    $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
                     self::redirect('/admin/email/');
                 }else{
-                    $view->errorMessage(self::ERROR_MESSAGE_1);
+                    $view->errorMessage($this->lang('EMAIL_SEND_FAIL'));
                     self::redirect('/admin/email/');
                 }
             }elseif(empty($errors) && $email->type == 2){
@@ -88,10 +88,10 @@ class EmailController extends Controller
                 
                 if($this->_sendEmail($email->body, $email->subject, $recipientsArr)){
                     Event::fire('admin.log', array('success', 'Email sent to: ' . implode(',', $recipientsArr)));
-                    $view->successMessage(self::SUCCESS_MESSAGE_11);
+                    $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
                     self::redirect('/admin/email/');
                 }else{
-                    $view->errorMessage(self::ERROR_MESSAGE_1);
+                    $view->errorMessage($this->lang('EMAIL_SEND_FAIL'));
                     self::redirect('/admin/email/');
                 }
             }else{
@@ -154,7 +154,7 @@ class EmailController extends Controller
                 $id = $emailTemplate->save();
 
                 Event::fire('admin.log', array('success', 'Email template id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/email/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($emailTemplate->getErrors())));
@@ -177,7 +177,7 @@ class EmailController extends Controller
         $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $emailTemplate) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/email/');
         }
@@ -199,7 +199,7 @@ class EmailController extends Controller
                 $emailTemplate->save();
                 
                 Event::fire('admin.log', array('success', 'Email template id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/email/');
             } else {
                 Event::fire('admin.log', array('fail', 'Email template id: ' . $id,
@@ -222,14 +222,14 @@ class EmailController extends Controller
         $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('id = ?' => (int)$id));
 
         if (NULL === $emailTemplate) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($emailTemplate->delete()) {
                 Event::fire('admin.log', array('success', 'Email template id: ' . $id));
                 echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'Email template id: ' . $id));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }

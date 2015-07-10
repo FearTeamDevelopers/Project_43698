@@ -65,7 +65,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::fetchById($id);
 
         if (null === $ad) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/advertisement/');
         }
 
@@ -88,14 +88,14 @@ class AdvertisementController extends Controller
         );
 
         if (NULL === $ad) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($ad->delete()) {
                 Event::fire('admin.log', array('success', 'Ad id: ' . $id));
                 echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -113,7 +113,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $ad) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($ad->active) {
                 $ad->active = 0;
@@ -128,7 +128,7 @@ class AdvertisementController extends Controller
                 echo 'success';
             } else {
                 Event::fire('admin.log', array('fail', 'Ad id: ' . $id, 'Errors: '.  json_encode($ad->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -150,7 +150,7 @@ class AdvertisementController extends Controller
             );
 
             if (null === $photo) {
-                echo self::ERROR_MESSAGE_2;
+                echo $this->lang('NOT_FOUND');
             } else {
                 $mainPath = $photo->getUnlinkPath();
                 $thumbPath = $photo->getUnlinkThumbPath();
@@ -165,11 +165,11 @@ class AdvertisementController extends Controller
                 } else {
                     Event::fire('admin.log', array('fail', 'Ad image id: ' . $imageId
                         . ' from ad: ' . $photo->getAdId()));
-                    echo self::ERROR_MESSAGE_1;
+                    echo $this->lang('COMMON_FAIL');
                 }
             }
         } else {
-            echo self::ERROR_MESSAGE_1;
+            echo $this->lang('COMMON_FAIL');
         }
     }
 
@@ -195,7 +195,7 @@ class AdvertisementController extends Controller
             $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
             if (!$this->_checkSectionUrlKey($urlKey)) {
-                $errors['title'] = array('Ad section with this title already exists');
+                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
             $adsection = new \App\Model\AdSectionModel(array(
@@ -207,7 +207,7 @@ class AdvertisementController extends Controller
                 $id = $adsection->save();
 
                 Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/advertisement/sections/');
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors+$adsection->getErrors())));
@@ -231,7 +231,7 @@ class AdvertisementController extends Controller
         $adsection = \App\Model\AdSectionModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $adsection) {
-            $view->warningMessage(self::ERROR_MESSAGE_2);
+            $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/advertisement/sections/');
         }
 
@@ -246,7 +246,7 @@ class AdvertisementController extends Controller
             $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
             if ($adsection->getUrlKey() !== $urlKey && !$this->_checkSectionUrlKey($urlKey)) {
-                $errors['title'] = array('Ad section with this title already exists');
+                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
             $adsection->title = RequestMethods::post('title');
@@ -257,7 +257,7 @@ class AdvertisementController extends Controller
                 $adsection->save();
 
                 Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/advertisement/sections/');
             } else {
                 Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
@@ -282,7 +282,7 @@ class AdvertisementController extends Controller
         );
 
         if (NULL === $adsection) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($adsection->delete()) {
                 Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
@@ -290,7 +290,7 @@ class AdvertisementController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
                     'Errors: '.  json_encode($adsection->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -308,7 +308,7 @@ class AdvertisementController extends Controller
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id, 'hasAvailabilityRequest = ?' => true));
 
         if (NULL === $ad) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $adTtl = $this->getConfig()->bazar_ad_ttl;
             
@@ -327,7 +327,7 @@ class AdvertisementController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Ad id: ' . $id,
                     'Errors: '.  json_encode($ad->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }

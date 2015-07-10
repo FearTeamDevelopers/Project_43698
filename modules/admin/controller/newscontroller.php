@@ -66,12 +66,10 @@ class NewsController extends Controller
             }
 
             if ($i == 50) {
-                $this->_errors['title'] = array('Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.');
+                $this->_errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
                 break;
             }
         }
-
-        $autoApprove = Registry::get('configuration')->news_autopublish;
 
         $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/novinky/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
 
@@ -82,7 +80,7 @@ class NewsController extends Controller
             'userId' => $this->getUser()->getId(),
             'userAlias' => $this->getUser()->getWholeName(),
             'urlKey' => $urlKeyCh,
-            'approved' => $autoApprove,
+            'approved' => $this->getConfig()->news_autopublish,
             'archive' => 0,
             'shortBody' => $shortText,
             'body' => RequestMethods::post('text'),
@@ -106,7 +104,7 @@ class NewsController extends Controller
         $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
 
         if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array('This title is already used');
+            $this->_errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
         }
 
         if (null === $object->userId) {
@@ -191,7 +189,7 @@ class NewsController extends Controller
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_1);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/news/');
             } else {
                 Event::fire('admin.log', array('fail',
@@ -242,13 +240,13 @@ class NewsController extends Controller
             $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
             if (null === $news) {
-                $view->warningMessage(self::ERROR_MESSAGE_2);
+                $view->warningMessage($this->lang('NOT_FOUND'));
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/news/');
             }
 
             if (!$this->_checkAccess($news)) {
-                $view->warningMessage(self::ERROR_MESSAGE_4);
+                $view->warningMessage($this->lang('LOW_PERMISSIONS'));
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/news/');
             }
@@ -276,7 +274,7 @@ class NewsController extends Controller
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'News id: ' . $id));
-                $view->successMessage(self::SUCCESS_MESSAGE_2);
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/news/');
             } else {
                 Event::fire('admin.log', array('fail', 'News id: ' . $id,
@@ -321,7 +319,7 @@ class NewsController extends Controller
         );
 
         if (NULL === $news) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             if ($this->_checkAccess($news)) {
                 if ($news->delete()) {
@@ -330,10 +328,10 @@ class NewsController extends Controller
                     echo 'success';
                 } else {
                     Event::fire('admin.log', array('fail', 'News id: ' . $id));
-                    echo self::ERROR_MESSAGE_1;
+                    echo $this->lang('COMMON_FAIL');
                 }
             } else {
-                echo self::ERROR_MESSAGE_4;
+                echo $this->lang('LOW_PERMISSIONS');
             }
         }
     }
@@ -351,7 +349,7 @@ class NewsController extends Controller
         $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $news) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $news->approved = 1;
 
@@ -369,7 +367,7 @@ class NewsController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'News id: ' . $id,
                     'Errors: ' . json_encode($news->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -387,7 +385,7 @@ class NewsController extends Controller
         $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $news) {
-            echo self::ERROR_MESSAGE_2;
+            echo $this->lang('NOT_FOUND');
         } else {
             $news->approved = 2;
 
@@ -404,7 +402,7 @@ class NewsController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'News id: ' . $id,
                     'Errors: ' . json_encode($news->getErrors())));
-                echo self::ERROR_MESSAGE_1;
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -439,7 +437,7 @@ class NewsController extends Controller
         $action = RequestMethods::post('action');
 
         if (empty($ids)) {
-            echo 'Nějaký řádek musí být označen';
+            echo $this->lang('NO_ROW_SELECTED');
             return;
         }
 
@@ -451,7 +449,7 @@ class NewsController extends Controller
                 if (NULL !== $news) {
                     foreach ($news as $_news) {
                         if (!$_news->delete()) {
-                            $errors[] = 'An error occured while deleting ' . $_news->getTitle();
+                            $errors[] = $this->lang('DELETE_FAIL') .' - '. $_news->getTitle();
                         }
                     }
                 }
@@ -459,7 +457,7 @@ class NewsController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('delete success', 'News ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_6;
+                    echo $this->lang('DELETE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -493,7 +491,7 @@ class NewsController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('activate success', 'News ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_4;
+                    echo $this->lang('ACTIVATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -527,7 +525,7 @@ class NewsController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('deactivate success', 'News ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_5;
+                    echo $this->lang('DEACTIVATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -562,7 +560,7 @@ class NewsController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_2;
+                    echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -597,7 +595,7 @@ class NewsController extends Controller
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
                     Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
-                    echo self::SUCCESS_MESSAGE_2;
+                    echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = join(PHP_EOL, $errors);
@@ -606,7 +604,7 @@ class NewsController extends Controller
 
                 break;
             default:
-                echo self::ERROR_MESSAGE_2;
+                echo $this->lang('NOT_FOUND');
                 break;
         }
     }
