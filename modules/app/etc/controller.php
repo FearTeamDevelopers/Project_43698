@@ -330,6 +330,17 @@ class Controller extends BaseController
     
     /**
      * 
+     * @param type $key
+     * @param type $args
+     * @return type
+     */
+    public function lang($key, $args = array())
+    {
+        return $this->getLang()->_get($key, $args);
+    }
+    
+    /**
+     * 
      */
     public function render()
     {

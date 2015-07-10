@@ -48,12 +48,12 @@ class UserController extends Controller
             $error = false;
 
             if (empty($email)) {
-                $view->set('email_error', 'Email není vyplňen');
+                $view->set('email_error', $this->lang('LOGIN_EMAIL_ERROR'));
                 $error = true;
             }
 
             if (empty($password)) {
-                $view->set('password_error', 'Heslo není vyplněno');
+                $view->set('account_error', $this->lang('LOGIN_PASS_ERROR'));
                 $error = true;
             }
 
@@ -175,7 +175,9 @@ class UserController extends Controller
                 'salt' => $salt,
                 'role' => 'role_member',
                 'active' => $active,
-                'emailActivationToken' => $actToken
+                'emailActivationToken' => $actToken,
+                'getNewActionNotification' => RequestMethods::post('actionNotification'),
+                'getNewReportNotification' => RequestMethods::post('reportNotification'),
             ));
 
             if (empty($errors) && $user->validate()) {
@@ -262,6 +264,8 @@ class UserController extends Controller
             $user->lastname = RequestMethods::post('lastname');
             $user->email = RequestMethods::post('email');
             $user->phoneNumber = RequestMethods::post('phone');
+            $user->getNewActionNotification = RequestMethods::post('actionNotification');
+            $user->getNewReportNotification = RequestMethods::post('reportNotification');
 
             if (empty($errors) && $user->validate()) {
                 $user->update();

@@ -23,6 +23,16 @@ section.wrapper.profil.singlePage
                td
                   span Email:
                td {echo $user->email}
+            tr
+               td
+                  span Informace na email:
+               |{if $user->getNewActionNotification || $user->getNewReportNotification}
+               td
+                  |{if $user->getNewActionNotification}Informace o nových akcích<br/>{/if}
+                  |{if $user->getNewReportNotification}Informace o nových reportážích{/if}
+               |{/if}{else}
+               td Nedostávám žádné informace emailem
+               |{/else}
       article.small-12.large-8.medium-8.centerBlock#edit
          a(href='#').fi-x-circle#closeEdit
          form(method='post', action='#')
@@ -55,6 +65,14 @@ section.wrapper.profil.singlePage
                         |{echo join("<br/>", $errors["phoneNumber"])}
                      |{/if}
                      input(type='tel', name='phone',value!='{echo isset($user)? $user->phoneNumber: ""}')
+               tr
+                  td
+                     span Informace na email:
+                  td
+                     label
+                          input(type='checkbox',name='actionNotification',value='1',{if $user->getNewActionNotification}checked="checked"{/if}) Informace o nových akcích
+                     label
+                          input(type='checkbox',name='reportNotification',value='1',{if $user->getNewReportNotification}checked="checked"{/if}) Informace o nových reportážích
                tr
                   td
                      span Email:

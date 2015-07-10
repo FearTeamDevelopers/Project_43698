@@ -28,7 +28,12 @@ section.wrapper.login.singlePage
                   |{echo join("<br/>", $errors["email"])}
                |{/if}
                input(type='email',placeholder='Kontaktní email', name='email',value!='{echo isset($user)? $user->email: ""}' required)
-
+               Informace na email:<br/>
+               label
+                  input(type='checkbox',name='actionNotification',value='1',{if $user->getNewActionNotification}checked="checked"{/if}) Informace o nových akcích
+               label
+                  input(type='checkbox',name='reportNotification',value='1',{if $user->getNewReportNotification}checked="checked"{/if}) Informace o nových reportážích
+                  
                |{if isset($errors["password"])}
                label.error.fi-alert
                   |{echo join("<br/>", $errors["password"])}

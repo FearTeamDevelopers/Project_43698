@@ -139,5 +139,16 @@ class Controller extends BaseController
     {
         parent::render();
     }
+    
+    /**
+     * 
+     * @param type $key
+     * @param type $args
+     * @return type
+     */
+    public function lang($key, $args = array())
+    {
+        return $this->getLang()->_get($key, $args);
+    }
 
 }

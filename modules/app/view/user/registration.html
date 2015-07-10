@@ -21,6 +21,9 @@
           <input type="password" placeholder="Heslo" pattern=".{5,}" title="min. 5 znaků" name="password" required="required"/>{if isset($errors["password2"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["password2"])}</label>{/if}
           <input type="password" placeholder="Ověření hesla" pattern=".{5,}" title="min. 5 znaků" name="password2" required="required"/>
+          Informace na email:<br/>
+          <label><input type="checkbox" name="actionNotification" value="1" {if $user->getNewActionNotification}checked="checked"{/if}/> Informace o nových akcích</label>
+          <label><input type="checkbox" name="reportNotification" value="1" {if $user->getNewReportNotification}checked="checked"{/if}/> Informace o nových reportážích</label>
           <input type="submit" name="register" value="Registrovat"/>
           <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
           <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>

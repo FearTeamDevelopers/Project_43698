@@ -24,6 +24,17 @@
           <td><span>Email:</span></td>
           <td>{echo $user->email}</td>
         </tr>
+        <tr>
+          <td><span>Informace na email:</span></td>
+          {if $user->getNewActionNotification || $user->getNewReportNotification}
+          <td>
+            {if $user->getNewActionNotification}Informace o nových akcích<br/>{/if}
+            {if $user->getNewReportNotification}Informace o nových reportážích{/if}
+          </td>
+          {/if}{else}
+          <td>Nedostávám žádné informace emailem</td>
+          {/else}
+        </tr>
       </table>
     </article>
     <article id="edit" class="small-12 large-8 medium-8 centerBlock"><a href="#" id="closeEdit" class="fi-x-circle"></a>
@@ -49,6 +60,13 @@
             <td>{if isset($errors["phoneNumber"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
               <input type="tel" name="phone" value="{echo isset($user)? $user->phoneNumber: ""}"/>
+            </td>
+          </tr>
+          <tr>
+            <td><span>Informace na email:</span></td>
+            <td>
+              <label><input type="checkbox" name="actionNotification" value="1" {if $user->getNewActionNotification}checked="checked"{/if}/> Informace o nových akcích</label>
+              <label><input type="checkbox" name="reportNotification" value="1" {if $user->getNewReportNotification}checked="checked"{/if}/> Informace o nových reportážích</label>
             </td>
           </tr>
           <tr>
