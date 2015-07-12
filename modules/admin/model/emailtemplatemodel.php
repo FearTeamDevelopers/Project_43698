@@ -137,6 +137,11 @@ class EmailTemplateModel extends Model
     {
         return self::all(array('active = ?' => true));
     }
+    
+    public static function fetchAllCommonActive()
+    {
+        return self::all(array('active = ?' => true, 'type = ?' => 1));
+    }
 
     public static function fetchCommonActiveByIdAndLang($id, $fieldName)
     {
@@ -144,10 +149,12 @@ class EmailTemplateModel extends Model
                         array('id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1), 
                         array($fieldName));
     }
-
-    public static function fetchAllCommonActive()
+    
+    public static function fetchActiveByIdAndLang($id, $fieldName)
     {
-        return self::all(array('active = ?' => true, 'type = ?' => 1));
+        return \Admin\Model\EmailTemplateModel::first(
+                        array('id = ?' => (int) $id, 'active = ?' => true), 
+                        array($fieldName));
     }
 
 }

@@ -16,7 +16,7 @@
                 <select id="content" class="width99">
                     {if !empty($contents)}
                         {foreach $content in $contents}
-                        <option value="{echo $content->getUrlKey()}">{echo $content->getPageName()}</option>
+                        <option value="{echo $content->getUrlKey()}">{echo $content->getTitle()}</option>
                         {/foreach}
                     {/if}
                 </select>

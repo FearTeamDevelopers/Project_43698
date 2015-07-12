@@ -136,7 +136,13 @@ class EmailController extends Controller
             $fieldName = 'body';
         }
         
-        $template = \Admin\Model\EmailTemplateModel::fetchCommonActiveByIdAndLang($id, $fieldName);
+        if($this->isSuperAdmin()){
+            $template = \Admin\Model\EmailTemplateModel::fetchActiveByIdAndLang($id, $fieldName);
+        }else{
+            $template = \Admin\Model\EmailTemplateModel::fetchCommonActiveByIdAndLang($id, $fieldName);
+        }
+        
+        
         
         echo json_encode(array('text' => $template->$fieldName));
         exit;
@@ -181,7 +187,7 @@ class EmailController extends Controller
                 'urlKey' => $urlKeyCh,
                 'body' => RequestMethods::post('text'),
                 'bodyEn' => RequestMethods::post('texten'),
-                'type' => RequestMethods::post('type'),
+                'type' => $this->isSuperAdmin() ? RequestMethods::post('type') : 1,
             ));
 
             if (empty($errors) && $emailTemplate->validate()) {
@@ -234,7 +240,7 @@ class EmailController extends Controller
             $emailTemplate->urlKey = $urlKey;
             $emailTemplate->body = RequestMethods::post('text');
             $emailTemplate->bodyEn = RequestMethods::post('texten');
-            $emailTemplate->type = RequestMethods::post('type');
+            $emailTemplate->type = $this->isSuperAdmin() ? RequestMethods::post('type') : 1;
             $emailTemplate->active = RequestMethods::post('active');
 
             if (empty($errors) && $emailTemplate->validate()) {
