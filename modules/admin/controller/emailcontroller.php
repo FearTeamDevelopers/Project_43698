@@ -13,6 +13,23 @@ class EmailController extends Controller
 {
 
     /**
+     * Check whether action unique identifier already exist or not
+     * 
+     * @param string $key
+     * @return boolean
+     */
+    private function _checkUrlKey($key)
+    {
+        $status = \App\Model\ActionModel::first(array('urlKey = ?' => $key));
+
+        if (null === $status) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
      * Show list of email templates
      * 
      * @before _secured, _admin
@@ -142,23 +159,40 @@ class EmailController extends Controller
                     $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/admin/email/');
             }
-            
+        
+            $errors = array();
+            $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
+
+            for ($i = 1; $i <= 50; $i++) {
+                if ($this->_checkUrlKey($urlKeyCh)) {
+                    break;
+                } else {
+                    $urlKeyCh = $urlKey . '-' . $i;
+                }
+
+                if ($i == 50) {
+                    $errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
+                    break;
+                }
+            }
+
             $emailTemplate = new \Admin\Model\EmailTemplateModel(array(
                 'title' => RequestMethods::post('title'),
+                'urlKey' => $urlKeyCh,
                 'body' => RequestMethods::post('text'),
                 'bodyEn' => RequestMethods::post('texten'),
                 'type' => RequestMethods::post('type'),
             ));
 
-            if ($emailTemplate->validate()) {
+            if (empty($errors) && $emailTemplate->validate()) {
                 $id = $emailTemplate->save();
 
                 Event::fire('admin.log', array('success', 'Email template id: ' . $id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/email/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($emailTemplate->getErrors())));
-                $view->set('errors', $emailTemplate->getErrors())
+                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors + $emailTemplate->getErrors())));
+                $view->set('errors', $errors + $emailTemplate->getErrors())
                     ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                     ->set('template', $emailTemplate);
             }
@@ -189,13 +223,21 @@ class EmailController extends Controller
                 self::redirect('/admin/email/');
             }
             
+            $errors = array();
+            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            
+            if ($emailTemplate->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
+                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            }
+            
             $emailTemplate->title = RequestMethods::post('title');
+            $emailTemplate->urlKey = $urlKey;
             $emailTemplate->body = RequestMethods::post('text');
             $emailTemplate->bodyEn = RequestMethods::post('texten');
             $emailTemplate->type = RequestMethods::post('type');
             $emailTemplate->active = RequestMethods::post('active');
 
-            if ($emailTemplate->validate()) {
+            if (empty($errors) && $emailTemplate->validate()) {
                 $emailTemplate->save();
                 
                 Event::fire('admin.log', array('success', 'Email template id: ' . $id));
@@ -203,8 +245,8 @@ class EmailController extends Controller
                 self::redirect('/admin/email/');
             } else {
                 Event::fire('admin.log', array('fail', 'Email template id: ' . $id,
-                    'Errors: '.  json_encode($emailTemplate->getErrors())));
-                $view->set('errors', $emailTemplate->getErrors())
+                    'Errors: '.  json_encode($errors + $emailTemplate->getErrors())));
+                $view->set('errors', $errors + $emailTemplate->getErrors())
                     ->set('template', $emailTemplate);
             }
         }

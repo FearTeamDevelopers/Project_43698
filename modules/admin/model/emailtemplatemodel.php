@@ -43,6 +43,18 @@ class EmailTemplateModel extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 200
+     * @unique
+     * 
+     * @validate required, alphanumeric, max(200)
+     * @label url key
+     */
+    protected $_urlKey;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 256
      * 
      * @validate html
