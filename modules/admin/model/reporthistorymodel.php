@@ -5,6 +5,7 @@ namespace Admin\Model;
 use THCFrame\Model\Model;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
+use THCFrame\Request\RequestMethods;
 
 /**
  * 
@@ -41,16 +42,6 @@ class ReportHistoryModel extends Model
      * @type integer
      * 
      * @validate numeric, max(8)
-     * @label id autora
-     */
-    protected $_createdBy;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
      * @label id editora
      */
     protected $_editedBy;
@@ -58,142 +49,13 @@ class ReportHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_active;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_approved;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_archive;
-
-    /**
-     * @column
-     * @readwrite
      * @type text
-     * @length 200
-     * @unique
+     * @length 30
      * 
-     * @validate required, alphanumeric, max(200)
-     * @label url key
-     */
-    protected $_urlKey;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 80
-     * 
-     * @validate alphanumeric, max(80)
-     * @label alias autora
-     */
-    protected $_userAlias;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate required, alphanumeric, max(150)
-     * @label nazev
-     */
-    protected $_title;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label teaser
-     */
-    protected $_shortBody;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label text
-     */
-    protected $_body;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * 
-     * @validate numeric, max(2)
-     * @label pořadí
-     */
-    protected $_rank;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 60
-     * 
-     * @validate alphanumeric, max(60)
-     * @label název fotky
-     */
-    protected $_photoName;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate max(350)
-     * @label photo path
-     */
-    protected $_imgMain;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate max(350)
-     * @label thumb path
-     */
-    protected $_imgThumb;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate alphanumeric, max(350)
+     * @validate alphanumeric, max(30)
      * @label keywords
      */
-    protected $_keywords;
+    protected $_remoteAddr;
 
     /**
      * @column
@@ -201,10 +63,10 @@ class ReportHistoryModel extends Model
      * @type text
      * @length 150
      * 
-     * @validate alphanumeric, max(150)
-     * @label meta-název
+     * @validate url, max(150)
+     * @label referrer
      */
-    protected $_metaTitle;
+    protected $_referer;
 
     /**
      * @column
@@ -213,21 +75,10 @@ class ReportHistoryModel extends Model
      * @length 256
      * 
      * @validate alphanumeric
-     * @label meta-popis
+     * @label changes
      */
-    protected $_metaDescription;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate alphanumeric, max(350)
-     * @label meta-image
-     */
-    protected $_metaImage;
-
+    protected $_changedData;
+    
     /**
      * @column
      * @readwrite
@@ -280,39 +131,51 @@ class ReportHistoryModel extends Model
     }
 
     /**
+     * Check differences between two objects
      * 
-     * @param \App\Model\ReportModel $report
+     * @param \App\Model\ReportModel $original
+     * @param \App\Model\ReportModel $edited
+     * @return void
      */
-    public static function createFromSource(\App\Model\ReportModel $report)
+    public static function logChanges(\App\Model\ReportModel $original, \App\Model\ReportModel $edited)
     {
         $sec = Registry::get('security');
         $user = $sec->getUser();
+        
+        $remoteAddr = RequestMethods::getClientIpAddress();
+        $referer = RequestMethods::server('HTTP_REFERER');
+        $changes = array();
+        
+        $reflect = new \ReflectionClass($original);
+        $properties = $reflect->getProperties();
+        $className = get_class($original);
+        
+        if(empty($properties)){
+            return;
+        }
 
+        foreach ($properties as $key => $value){
+            if($value->class == $className){
+                $propertyName = $value->getName();
+                $getProperty = 'get'.ucfirst(str_replace('_', '', $value->getName()));
+
+                if(trim((string)$original->$getProperty()) !== trim((string)$edited->$getProperty())){
+                    $changes[$propertyName] = $original->$getProperty();
+                }
+            }
+        }
+        
         $historyRecord = new self(array(
-            'originId' => $report->getId(),
-            'createdBy' => $report->getUserId(),
+            'originId' => $original->getId(),
             'editedBy' => $user->getId(),
-            'title' => $report->getTitle(),
-            'userAlias' => $report->getUserAlias(),
-            'urlKey' => $report->getUrlKey(),
-            'active' => $report->getActive(),
-            'approved' => $report->getApproved(),
-            'archive' => $report->getArchive(),
-            'shortBody' => $report->getShortBody(),
-            'body' => $report->getBody(),
-            'rank' => $report->getRank(),
-            'keywords' => $report->getKeywords(),
-            'metaTitle' => $report->getMetaTitle(),
-            'metaDescription' => $report->getMetaDescription(),
-            'metaImage' => $report->getMetaImage(),
-            'photoName' => $report->getPhotoName(),
-            'imgMain' => $report->getImgMain(),
-            'imgThumb' => $report->getImgThumb()
+            'remoteAddr' => $remoteAddr,
+            'referer' => $referer,
+            'changedData' => json_encode($changes)
         ));
-
-        if ($historyRecord->validate()) {
-            $id = $historyRecord->save();
-            Event::fire('admin.log', array('success', 'Report history id: ' . $id));
+        
+        if($historyRecord->validate()){
+            $historyRecord->save();
+            Event::fire('admin.log', array('success', 'Report '. $original->getId().' changes saved'));
         } else {
             Event::fire('admin.log', array('fail', 'Report history errors: ' . json_encode($historyRecord->getErrors())));
         }

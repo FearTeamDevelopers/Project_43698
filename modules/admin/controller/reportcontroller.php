@@ -357,11 +357,12 @@ class ReportController extends Controller
                 self::redirect('/admin/report/');
             }
 
+            $originalReport = clone $report;
             $report = $this->_editObject($report);
 
             if (empty($this->_errors) && $report->validate()) {
-                \Admin\Model\ReportHistoryModel::createFromSource($report);
                 $report->save();
+                \Admin\Model\ReportHistoryModel::logChanges($originalReport, $report);
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
@@ -386,7 +387,6 @@ class ReportController extends Controller
             if (empty($this->_errors) && $report->validate()) {
                 $session = Registry::get('session');
                 $session->set('reportPreview', $report);
-                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 self::redirect('/report/preview?action=edit');
             } else {

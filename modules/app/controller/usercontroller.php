@@ -184,7 +184,7 @@ class UserController extends Controller
                 $uid = $user->save();
 
                 if ($verifyEmail) {
-                    $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Aktivovace účtu'));
+                    $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('urlKey = ?' => 'account-activation'));
                     $emailBody = str_replace('{TOKEN}', $actToken, $emailTemplate->getBody());
 
                     if ($this->_sendEmail($emailBody, 'Hastrman - Registrace', $user->getEmail(), 'registrace@hastrman.cz')) {

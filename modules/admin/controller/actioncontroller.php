@@ -165,7 +165,7 @@ class ActionController extends Controller
         if($action->getApproved() && $this->getConfig()->action_new_notification){
             $users = \App\Model\UserModel::all(array('getNewActionNotification = ?' => true), array('email'));
 
-            $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Nova akce'));
+            $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('urlKey = ?' => 'new-action'));
             $emailBody = str_replace(array('{TITLE}', '{LINK}'), 
                             array($action->getTitle(), RequestMethods::server('HTTP_HOST').'/akce/r/'.$action->getUrlKey()), 
                             $emailTemplate->getBody());
@@ -299,11 +299,12 @@ class ActionController extends Controller
                 self::redirect('/admin/action/');
             }
 
+            $originalAction = clone $action;
             $action = $this->_editObject($action);
 
             if (empty($this->_errors) && $action->validate()) {
-                \Admin\Model\ActionHistoryModel::createFromSource($action);
                 $action->save();
+                \Admin\Model\ActionHistoryModel::logChanges($originalAction, $action);
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
@@ -328,7 +329,6 @@ class ActionController extends Controller
             if (empty($this->_errors) && $action->validate()) {
                 $session = Registry::get('session');
                 $session->set('actionPreview', $action);
-                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 self::redirect('/action/preview?action=edit');
             } else {

@@ -404,7 +404,7 @@ class UserController extends Controller
             $newPass = $user->forceResetPassword();
 
             if ($newPass !== false) {
-                $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Reset hesla'));
+                $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('urlKey = ?' => 'password-reset'));
                 $emailBody = str_replace('{NEWPASS}', $newPass, $emailTemplate->getBody());
 
                 $this->_sendEmail($emailBody, 'Hastrman - Nové heslo', $user->getEmail());

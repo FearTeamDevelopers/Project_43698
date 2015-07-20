@@ -5,6 +5,7 @@ namespace Admin\Model;
 use THCFrame\Model\Model;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
+use THCFrame\Request\RequestMethods;
 
 /**
  * 
@@ -41,16 +42,6 @@ class NewsHistoryModel extends Model
      * @type integer
      * 
      * @validate numeric, max(8)
-     * @label id autora
-     */
-    protected $_createdBy;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
      * @label id editora
      */
     protected $_editedBy;
@@ -58,109 +49,13 @@ class NewsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_active;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_approved;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_archive;
-
-    /**
-     * @column
-     * @readwrite
      * @type text
-     * @length 200
-     * @unique
+     * @length 30
      * 
-     * @validate required, alphanumeric, max(200)
-     * @label url key
-     */
-    protected $_urlKey;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 80
-     * 
-     * @validate alphanumeric, max(80)
-     * @label alias autora
-     */
-    protected $_userAlias;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate required, alphanumeric, max(150)
-     * @label nazev
-     */
-    protected $_title;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label teaser
-     */
-    protected $_shortBody;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label text
-     */
-    protected $_body;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * 
-     * @validate numeric, max(2)
-     * @label pořadí
-     */
-    protected $_rank;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 250
-     * 
-     * @validate alphanumeric, max(250)
+     * @validate alphanumeric, max(30)
      * @label keywords
      */
-    protected $_keywords;
+    protected $_remoteAddr;
 
     /**
      * @column
@@ -168,10 +63,10 @@ class NewsHistoryModel extends Model
      * @type text
      * @length 150
      * 
-     * @validate alphanumeric, max(150)
-     * @label meta-název
+     * @validate url, max(150)
+     * @label referrer
      */
-    protected $_metaTitle;
+    protected $_referer;
 
     /**
      * @column
@@ -180,10 +75,10 @@ class NewsHistoryModel extends Model
      * @length 256
      * 
      * @validate alphanumeric
-     * @label meta-popis
+     * @label changes
      */
-    protected $_metaDescription;
-
+    protected $_changedData;
+    
     /**
      * @column
      * @readwrite
@@ -236,35 +131,51 @@ class NewsHistoryModel extends Model
     }
 
     /**
+     * Check differences between two objects
      * 
-     * @param \App\Model\NewsModel $news
+     * @param \App\Model\NewsModel $original
+     * @param \App\Model\NewsModel $edited
+     * @return void
      */
-    public static function createFromSource(\App\Model\NewsModel $news)
+    public static function logChanges(\App\Model\NewsModel $original, \App\Model\NewsModel $edited)
     {
         $sec = Registry::get('security');
         $user = $sec->getUser();
+        
+        $remoteAddr = RequestMethods::getClientIpAddress();
+        $referer = RequestMethods::server('HTTP_REFERER');
+        $changes = array();
+        
+        $reflect = new \ReflectionClass($original);
+        $properties = $reflect->getProperties();
+        $className = get_class($original);
+        
+        if(empty($properties)){
+            return;
+        }
 
+        foreach ($properties as $key => $value){
+            if($value->class == $className){
+                $propertyName = $value->getName();
+                $getProperty = 'get'.ucfirst(str_replace('_', '', $value->getName()));
+
+                if(trim((string)$original->$getProperty()) !== trim((string)$edited->$getProperty())){
+                    $changes[$propertyName] = $original->$getProperty();
+                }
+            }
+        }
+        
         $historyRecord = new self(array(
-            'originId' => $news->getId(),
-            'createdBy' => $news->getUserId(),
+            'originId' => $original->getId(),
             'editedBy' => $user->getId(),
-            'title' => $news->getTitle(),
-            'userAlias' => $news->getUserAlias(),
-            'urlKey' => $news->getUrlKey(),
-            'active' => $news->getActive(),
-            'approved' => $news->getApproved(),
-            'archive' => $news->getArchive(),
-            'shortBody' => $news->getShortBody(),
-            'body' => $news->getBody(),
-            'rank' => $news->getRank(),
-            'keywords' => $news->getKeywords(),
-            'metaTitle' => $news->getMetaTitle(),
-            'metaDescription' => $news->getMetaDescription()
+            'remoteAddr' => $remoteAddr,
+            'referer' => $referer,
+            'changedData' => json_encode($changes)
         ));
-
-        if ($historyRecord->validate()) {
-            $id = $historyRecord->save();
-            Event::fire('admin.log', array('success', 'News history id: ' . $id));
+        
+        if($historyRecord->validate()){
+            $historyRecord->save();
+            Event::fire('admin.log', array('success', 'News '. $original->getId().' changes saved'));
         } else {
             Event::fire('admin.log', array('fail', 'News history errors: ' . json_encode($historyRecord->getErrors())));
         }

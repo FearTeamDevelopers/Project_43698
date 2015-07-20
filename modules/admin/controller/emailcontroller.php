@@ -142,8 +142,6 @@ class EmailController extends Controller
             $template = \Admin\Model\EmailTemplateModel::fetchCommonActiveByIdAndLang($id, $fieldName);
         }
         
-        
-        
         echo json_encode(array('text' => $template->$fieldName));
         exit;
     }

@@ -496,7 +496,8 @@ class AdvertisementController extends Controller
             if ($this->_checkCSRFToken() !== true) {
                 self::redirect('/bazar');
             }
-
+            
+            $originalAd = clone $ad;
             $errors = $uploadErrors = array();
             $uniqueKey = sha1(RequestMethods::post('title') . RequestMethods::post('content') . $this->getUser()->getId());
 
@@ -569,6 +570,7 @@ class AdvertisementController extends Controller
                         $errors['uploadfile'] = $uploadErrors;
 
                         if (empty($errors['uploadfile'])) {
+                            \App\Model\AdvertisementHistoryModel::logChanges($originalAd, $ad);
                             Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
                             $view->successMessage($this->lang('UPDATE_SUCCESS'));
                             self::redirect('/bazar/r/' . $ad->getUniqueKey());
@@ -578,11 +580,13 @@ class AdvertisementController extends Controller
                             $view->set('errors', $errors + $ad->getErrors());
                         }
                     } else {
+                        \App\Model\AdvertisementHistoryModel::logChanges($originalAd, $ad);
                         Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
                         $view->successMessage($this->lang('UPDATE_SUCCESS') . ', ale více fotek už není možné nahrát');
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     }
                 } else {
+                    \App\Model\AdvertisementHistoryModel::logChanges($originalAd, $ad);
                     Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
                     $view->successMessage($this->lang('UPDATE_SUCCESS'));
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());

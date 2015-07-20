@@ -1,6 +1,6 @@
 <?php
 
-namespace Admin\Model;
+namespace App\Model;
 
 use THCFrame\Model\Model;
 use THCFrame\Registry\Registry;
@@ -10,13 +10,13 @@ use THCFrame\Request\RequestMethods;
 /**
  * 
  */
-class ActionHistoryModel extends Model
+class AdvertisementHistoryModel extends Model
 {
 
     /**
      * @readwrite
      */
-    protected $_alias = 'ach';
+    protected $_alias = 'adh';
 
     /**
      * @column
@@ -138,7 +138,7 @@ class ActionHistoryModel extends Model
      * @param \App\Model\ActionModel $edited
      * @return void
      */
-    public static function logChanges(\App\Model\ActionModel $original, \App\Model\ActionModel $edited)
+    public static function logChanges(\App\Model\AdvertisementModel $original, \App\Model\AdvertisementModel $edited)
     {
         $sec = Registry::get('security');
         $user = $sec->getUser();
@@ -176,9 +176,9 @@ class ActionHistoryModel extends Model
         
         if($historyRecord->validate()){
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'Action '. $original->getId().' changes saved'));
+            Event::fire('admin.log', array('success', 'Advertisement '. $original->getId().' changes saved'));
         }else{
-            Event::fire('admin.log', array('fail', 'Action history errors: ' . json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', array('fail', 'Advertisement history errors: ' . json_encode($historyRecord->getErrors())));
         }
     }
 }

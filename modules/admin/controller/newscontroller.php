@@ -265,11 +265,12 @@ class NewsController extends Controller
                 self::redirect('/admin/news/');
             }
 
+            $originalNews = clone $news;
             $news = $this->_editObject($news);
 
             if (empty($this->_errors) && $news->validate()) {
-                \Admin\Model\NewsHistoryModel::createFromSource($news);
                 $news->save();
+                \Admin\Model\NewsHistoryModel::logChanges($originalNews, $news);
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
@@ -294,7 +295,6 @@ class NewsController extends Controller
             if (empty($this->_errors) && $action->validate()) {
                 $session = Registry::get('session');
                 $session->set('newsPreview', $news);
-                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 self::redirect('/news/preview?action=edit');
             } else {
