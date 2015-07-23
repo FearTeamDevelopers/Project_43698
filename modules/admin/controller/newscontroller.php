@@ -177,7 +177,7 @@ class NewsController extends Controller
 
         if (RequestMethods::post('submitAddNews')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -203,7 +203,7 @@ class NewsController extends Controller
 
         if (RequestMethods::post('submitPreviewNews')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
 

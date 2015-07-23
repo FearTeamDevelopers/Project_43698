@@ -108,8 +108,8 @@ class NewsHistoryModel extends Model
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('nw.*'))
-                ->join('tb_user', 'nw.userId = us.id', 'us', 
+        $query = self::getQuery(array('nwh.*'))
+                ->join('tb_user', 'nwh.editedBy = us.id', 'us', 
                         array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
@@ -121,10 +121,10 @@ class NewsHistoryModel extends Model
      */
     public static function fetchWithLimit($limit = 10, $page = 1)
     {
-        $query = self::getQuery(array('nw.*'))
-                ->join('tb_user', 'nw.userId = us.id', 'us', 
+        $query = self::getQuery(array('nwh.*'))
+                ->join('tb_user', 'nwh.editedBy = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
-                ->order('nw.created', 'desc')
+                ->order('nwh.created', 'desc')
                 ->limit((int) $limit, $page);
 
         return self::initialize($query);

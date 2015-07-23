@@ -37,7 +37,7 @@ class ImessageController extends Controller
 
         if (RequestMethods::post('submitAddImessage')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/imessage/');
             }
 

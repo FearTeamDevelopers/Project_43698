@@ -108,8 +108,8 @@ class ReportHistoryModel extends Model
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us', 
+        $query = self::getQuery(array('rph.*'))
+                ->join('tb_user', 'rph.editedBy = us.id', 'us', 
                         array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
@@ -121,10 +121,10 @@ class ReportHistoryModel extends Model
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us', 
+        $query = self::getQuery(array('rph.*'))
+                ->join('tb_user', 'rph.editedBy = us.id', 'us', 
                         array('us.firstname', 'us.lastname'))
-                ->order('rp.created', 'desc')
+                ->order('rph.created', 'desc')
                 ->limit((int) $limit);
 
         return self::initialize($query);

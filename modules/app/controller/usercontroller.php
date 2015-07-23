@@ -121,7 +121,7 @@ class UserController extends Controller
 
         if (RequestMethods::post('register')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/');
             }
             $errors = array();

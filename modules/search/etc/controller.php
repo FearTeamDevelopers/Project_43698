@@ -253,65 +253,6 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     */
-    protected function _mutliSubmissionProtectionToken()
-    {
-        $session = Registry::get('session');
-        $token = $session->get('submissionprotection');
-
-        if ($token === null) {
-            $token = md5(microtime());
-            $session->set('submissionprotection', $token);
-        }
-
-        return $token;
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    protected function _revalidateMutliSubmissionProtectionToken()
-    {
-        $session = Registry::get('session');
-        $session->erase('submissionprotection');
-        $token = md5(microtime());
-        $session->set('submissionprotection', $token);
-
-        return $token;
-    }
-
-    /**
-     * 
-     * @param type $token
-     */
-    protected function _checkMutliSubmissionProtectionToken($token)
-    {
-        $session = Registry::get('session');
-        $sessionToken = $session->get('submissionprotection');
-
-        if ($token == $sessionToken) {
-            $session->erase('submissionprotection');
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * 
-     */
-    protected function _checkCSRFToken()
-    {
-        if ($this->_security->getCSRF()->verifyRequest()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Load user from security context
      */
     public function getUser()

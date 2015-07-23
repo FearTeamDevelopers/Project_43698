@@ -187,7 +187,7 @@ class AdvertisementController extends Controller
 
         if (RequestMethods::post('submitAddAdSection')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/advertisement/sections/');
             }
 

@@ -74,7 +74,7 @@ class GalleryController extends Controller
 
         if (RequestMethods::post('submitAddGallery')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
@@ -325,7 +325,7 @@ class GalleryController extends Controller
 
         if (RequestMethods::post('submitAddPhoto')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
             $errors = $uploadErrors = array();

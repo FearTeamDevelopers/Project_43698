@@ -73,7 +73,7 @@ class Controller extends Base
      * @readwrite
      */
     protected $_defaultExtension = array('phtml', 'html');
-    
+
     /**
      * @readwrite
      */
@@ -100,7 +100,70 @@ class Controller extends Base
     {
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
-    
+
+    /**
+     * 
+     */
+    protected function _mutliSubmissionProtectionToken()
+    {
+        $session = Registry::get('session');
+        $token = $session->get('submissionprotection');
+
+        if ($token === null) {
+            $token = md5(microtime());
+            $session->set('submissionprotection', $token);
+        }
+
+        return $token;
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    protected function _revalidateMutliSubmissionProtectionToken()
+    {
+        $session = Registry::get('session');
+        $session->erase('submissionprotection');
+        $token = md5(microtime());
+        $session->set('submissionprotection', $token);
+
+        return $token;
+    }
+
+    /**
+     * 
+     * @param type $token
+     */
+    protected function _checkMutliSubmissionProtectionToken()
+    {
+        $session = Registry::get('session');
+        $sessionToken = $session->get('submissionprotection');
+
+        $token = RequestMethods::post('submstoken');
+
+        if ($token == $sessionToken) {
+            $session->erase('submissionprotection');
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 
+     */
+    protected function _checkCSRFToken()
+    {
+        $security = Registry::get('security');
+        
+        if ($security->getCSRF()->verifyRequest()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Static function for redirects
      * 
@@ -162,11 +225,11 @@ class Controller extends Base
         }
 
         $defaultPath = sprintf($this->_defaultPath, $module);
-        
+
         //create view instances
         if ($this->_willRenderLayoutView) {
             foreach ($this->_defaultExtension as $ext) {
-                if(file_exists(APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}")){
+                if (file_exists(APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}")) {
                     $viewFile = APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}";
                     break;
                 }
@@ -181,12 +244,12 @@ class Controller extends Base
 
         if ($this->_willRenderActionView) {
             foreach ($this->_defaultExtension as $ext) {
-                if(file_exists(APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}")){
+                if (file_exists(APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}")) {
                     $viewFile = APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}";
                     break;
                 }
             }
-            
+
             $view = new View(array(
                 'file' => $viewFile
             ));
@@ -198,6 +261,18 @@ class Controller extends Base
     }
 
     /**
+     * Object destruct
+     */
+    public function __destruct()
+    {
+        Event::fire('framework.controller.destruct.before', array($this->_name));
+
+        $this->render();
+
+        Event::fire('framework.controller.destruct.after', array($this->_name));
+    }
+
+    /**
      * Return action view
      * 
      * @return View
@@ -206,7 +281,7 @@ class Controller extends Base
     {
         return $this->_actionView;
     }
-    
+
     /**
      * Return layout view
      * 
@@ -216,7 +291,7 @@ class Controller extends Base
     {
         return $this->_layoutView;
     }
-    
+
     /**
      * Return model instance
      * 
@@ -272,14 +347,14 @@ class Controller extends Base
             if ($doLayout) {
                 $results = $this->_layoutView->render();
                 $profiler->stop();
-                
+
                 //protection against clickjacking
                 header('X-Frame-Options: deny');
                 header("Content-type: {$defaultContentType}");
                 echo $results;
             } elseif ($doAction) {
                 $profiler->stop();
-                
+
                 //protection against clickjacking
                 header('X-Frame-Options: deny');
                 header("Content-type: {$defaultContentType}");
@@ -293,18 +368,6 @@ class Controller extends Base
         }
 
         Event::fire('framework.controller.render.after', array($this->_name));
-    }
-
-    /**
-     * Object destruct
-     */
-    public function __destruct()
-    {
-        Event::fire('framework.controller.destruct.before', array($this->_name));
-
-        $this->render();
-
-        Event::fire('framework.controller.destruct.after', array($this->_name));
     }
 
 }

@@ -40,7 +40,7 @@ class PartnerController extends Controller
 
         if (RequestMethods::post('submitAddPartner')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/partner/');
             }
 

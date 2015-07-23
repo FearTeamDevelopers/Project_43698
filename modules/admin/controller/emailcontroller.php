@@ -68,7 +68,7 @@ class EmailController extends Controller
         
         if (RequestMethods::post('submitSendEmail')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/email/');
             }
             
@@ -85,6 +85,7 @@ class EmailController extends Controller
             if(empty($errors) && $email->type == 1){
                 $recipients = RequestMethods::post('singlerecipients');
                 $recipientsArr = explode(',', $recipients);
+                array_map('trim', $recipientsArr);
                 
                 if($this->_sendEmail($email->body, $email->subject, $recipientsArr)){
                     Event::fire('admin.log', array('success', 'Email sent to: ' . $recipients));
@@ -160,7 +161,7 @@ class EmailController extends Controller
 
         if (RequestMethods::post('submitAddEmailTemplate')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/email/');
             }
         

@@ -41,7 +41,7 @@ class RedirectController extends Controller
 
         if (RequestMethods::post('submitAddRedirect')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/redirect/');
             }
 

@@ -1,0 +1,13 @@
+Tlacitko pro reset filtru v bazaru
+
+Upravit css pro vsechno vytvoreny v CKeditoru viz. p s velkym marginem (novinky na hlavni strane)
+
+Emailove sablony oprava/vytvoreni
+
+Znovu zkompilovat jade soubory ve slozce 
+    app/view/action
+    app/view/user   - opravit syntaxi v profile a registration okolo checkboxu s dostavanim informaci na email
+
+? Zmena zobrazovani akci na hlavni strane i v indexu na url .../akce 
+
+? Do indexu a detailu akce pridat tlacitko zucastnim se     - pro cleny

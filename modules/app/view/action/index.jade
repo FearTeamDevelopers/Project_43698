@@ -16,6 +16,10 @@ section.wrapper.akce.pb.singlePage
             div {echo html_entity_decode($action->getShortBody())}
             a(href!='/akce/r/{echo $action->getUrlKey()}') čti více
       |{/foreach}
+   |{/if}{else}
+   section.row.container
+      div Žádné akce nejsou naplánované
+   |{/else}
    .moreWrap.large-2.medium-3.small-6.centerBlock
       a(href='/probehleakce')
          .more
@@ -24,9 +28,5 @@ section.wrapper.akce.pb.singlePage
       a(href='/archivakci')
          .more
             span Archiv akcí
-   |{/if}{else}
-   section.row.container
-      div Žádné akce nejsou naplánované
-   |{/else}
    br
    include ../components/pager

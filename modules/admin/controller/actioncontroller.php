@@ -210,7 +210,7 @@ class ActionController extends Controller
 
         if (RequestMethods::post('submitAddAction')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
@@ -236,7 +236,7 @@ class ActionController extends Controller
 
         if (RequestMethods::post('submitPreviewAction')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/action/');
             }
 

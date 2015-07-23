@@ -58,7 +58,7 @@ class ContentController extends Controller
 
         if (RequestMethods::post('submitAddContent')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/content/');
             }
             
@@ -123,6 +123,7 @@ class ContentController extends Controller
             }
             
             $errors = array();
+            $originalContent = clone $content;
             $urlKey = $this->_createUrlKey(RequestMethods::post('page'));
 
             if ($content->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
@@ -142,7 +143,7 @@ class ContentController extends Controller
 
             if (empty($errors) && $content->validate()) {
                 $content->save();
-                
+                \Admin\Model\PageContentHistoryModel::logChanges($originalContent, $content);
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));

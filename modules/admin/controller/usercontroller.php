@@ -122,7 +122,7 @@ class UserController extends Controller
 
         if (RequestMethods::post('submitAddUser')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/user/');
             }
 
@@ -359,7 +359,10 @@ class UserController extends Controller
         if (NULL === $user) {
             echo $this->lang('NOT_FOUND');
         } else {
-            if ($user->delete()) {
+            $user->deleted = true;
+            
+            if ($user->validate()) {
+                $user->save();
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
                 echo 'success';
             } else {

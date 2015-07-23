@@ -243,7 +243,7 @@ class AdvertisementController extends Controller
 
         if (RequestMethods::post('submitAdReply')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/bazar/r/' . $ad->getUniqueKey());
             }
 
@@ -357,7 +357,7 @@ class AdvertisementController extends Controller
 
         if (RequestMethods::post('submitAddAdvertisement')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/bazar');
             }
 

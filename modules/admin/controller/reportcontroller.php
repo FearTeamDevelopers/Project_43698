@@ -269,7 +269,7 @@ class ReportController extends Controller
 
         if (RequestMethods::post('submitAddReport')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/report/');
             }
 
@@ -295,7 +295,7 @@ class ReportController extends Controller
 
         if (RequestMethods::post('submitPreviewReport')) {
             if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/report/');
             }
 
