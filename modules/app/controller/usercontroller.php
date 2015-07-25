@@ -112,8 +112,7 @@ class UserController extends Controller
 
         $canonical = 'http://' . $this->getServerHost() . '/registrace';
 
-        $view->set('submstoken', $this->_mutliSubmissionProtectionToken())
-                ->set('user', $user);
+        $view->set('user', $user);
 
         $this->getLayoutView()
                 ->set('metatitle', 'Hastrman - Registrace')

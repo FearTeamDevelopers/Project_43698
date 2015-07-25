@@ -238,8 +238,7 @@ class AdvertisementController extends Controller
         $this->_checkMetaData($layoutView, $ad);
 
         $view->set('ad', $ad)
-                ->set('admessage', null)
-                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
+                ->set('admessage', null);
 
         if (RequestMethods::post('submitAdReply')) {
             if ($this->_checkCSRFToken() !== true &&
@@ -349,8 +348,7 @@ class AdvertisementController extends Controller
         $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
 
         $view->set('adsections', $adSections)
-                ->set('ad', null)
-                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
+                ->set('ad', null);
 
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Bazar - Nový inzerát');

@@ -72,6 +72,16 @@ class AdminLogModel extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 250
+     * 
+     * @validate alphanumeric, max(250)
+     */
+    protected $_httpreferer;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 256
      * 
      * @validate alphanumeric

@@ -262,7 +262,7 @@ class Security extends Base implements SecurityInterface
      * @param string $string
      * @return string|null
      */
-    public function devGetPasswordHash($string)
+    public function getPwdHash($string)
     {
         if (ENV == 'dev') {
             $salt = $this->getPasswordManager()->createSalt();

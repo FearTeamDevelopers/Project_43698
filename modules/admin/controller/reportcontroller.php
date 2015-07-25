@@ -264,8 +264,7 @@ class ReportController extends Controller
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('report', $report)
-                ->set('concepts', $reportConcepts)
-                ->set('submstoken', $this->_mutliSubmissionProtectionToken());
+                ->set('concepts', $reportConcepts);
 
         if (RequestMethods::post('submitAddReport')) {
             if ($this->_checkCSRFToken() !== true &&

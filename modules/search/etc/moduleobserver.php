@@ -3,6 +3,7 @@ namespace Search\Etc;
 
 use THCFrame\Registry\Registry;
 use THCFrame\Events\SubscriberInterface;
+use THCFrame\Request\RequestMethods;
 
 /**
  * Module specific observer class
@@ -99,6 +100,7 @@ class ModuleObserver implements SubscriberInterface
             'controller' => $controller,
             'action' => $action,
             'result' => $result,
+            'httpreferer' => RequestMethods::getHttpReferer(),
             'params' => $paramStr
         ));
 

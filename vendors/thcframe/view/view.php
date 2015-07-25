@@ -281,4 +281,16 @@ class View extends Base
         }
     }
 
+    /**
+     * 
+     * @param type $title
+     * @return \THCFrame\View\View
+     */
+    public function setTitle($title)
+    {
+        $this->_set('title', $title);
+        $this->_set('metatitle', $title);
+        return $this;
+    }
+    
 }

@@ -14,6 +14,7 @@
             <col class="con0" /><col class="con1" />
             <col class="con0" /><col class="con1" />
             <col class="con0" /><col class="con1" />
+            <col class="con0" /><col class="con1" />
         </colgroup>
         <thead>
             <tr>
@@ -23,7 +24,8 @@
                 <th class="head1">Kontroler</th>
                 <th class="head0">Akce</th>
                 <th class="head1">Stav</th>
-                <th class="head0">Parametry</th>
+                <th class="head0">Referer</th>
+                <th class="head1">Parametry</th>
             </tr>
         </thead>
         <tbody>
@@ -36,6 +38,7 @@
                 <td>{echo $logitem->controller}</td>
                 <td>{echo $logitem->action}</td>
                 <td>{echo $logitem->result}</td>
+                <td>{echo $logitem->httpreferer}</td>
                 <td>{echo $logitem->params}</td>
             </tr>
             {/foreach}

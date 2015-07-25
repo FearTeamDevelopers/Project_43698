@@ -144,4 +144,16 @@ class RequestMethods
         return json_encode($ua);
     }
 
+    /**
+     * 
+     * @return null
+     */
+    public static function getHttpReferer()
+    {
+        if ($_SERVER['HTTP_REFERER'] === false) {
+            return null;
+        } else {
+            return $_SERVER['HTTP_REFERER'];
+        }
+    }
 }
