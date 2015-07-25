@@ -55,6 +55,7 @@ class ModuleObserver implements SubscriberInterface
             'controller' => $controller,
             'action' => $action,
             'result' => $result,
+            'httpreferer' => RequestMethods::getHttpReferer(),
             'params' => $paramStr
         ));
 
