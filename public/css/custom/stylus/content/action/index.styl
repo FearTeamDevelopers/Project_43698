@@ -15,6 +15,14 @@
 		article{
 			position relative
 			padding-left 110px !important
+			header{
+				a{
+					&:hover{
+						text-decoration underline
+					}
+				}
+			}
+
 			.date{
 				background rgba(0,0,0,0.8)
 				position absolute
@@ -38,7 +46,12 @@
 				}
 			}
 		}
-
+	}
+	.moreWrap{
+		margin-top .5rem
+		&:first-of-type{
+			margin-top 2.5rem
+		}
 	}
 }
 

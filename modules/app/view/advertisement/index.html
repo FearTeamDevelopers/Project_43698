@@ -30,7 +30,7 @@
         <option value="{echo $ad->getUrlKey()}">{echo $ad->getTitle()}</option>{/foreach}
         {/else}
       </select>
-      <input type="submit" value="Zobrazit"/>
+      <input type="submit" value="Zobrazit"/>{if isset($bftype)}<a href="/bazar" class="reset">×</a>{/if}
     </form>{/if}
     <form method="GET" action="/bazar/hledat" class="search">
       <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
@@ -50,14 +50,10 @@
     </div>{if !empty($ads)}
     {foreach $ad in $ads}
     <article class="large-6 small-12 medium-6 column left">
-      <div class="imgWrapper">
-        {if !empty($ad->getImgMain())}
-        <a data-lightbox="{echo $ad->getId()}" data-title="{echo $ad->getPhotoName()}" href="{echo $ad->getImgMain()}"><img src="{echo $ad->getImgThumb()}"/></a>{/if}
-      </div>
+      <div class="imgWrapper">{if !empty($ad->getImgMain())}<a data-lightbox="{echo $ad->getId()}" data-title="{echo $ad->getPhotoName()}" href="{echo $ad->getImgMain()}"><img src="{echo $ad->getImgThumb()}"/></a>{/if}</div>
       <div class="nazev">
-        <div class="nazevWrapper">
-          <h4>{echo $ad->getTitle()}</h4>
-        </div>
+        <div class="nazevWrapper"><a href="/bazar/r/{echo $ad->getUniqueKey()}">
+            <h4>{echo $ad->getTitle()}</h4></a></div>
       </div>
       <div class="infoWrapper">
         <div class="info">{if $ad->getAdType() =='tender'}

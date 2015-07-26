@@ -7,9 +7,8 @@
     {if !empty($news)}
     {foreach $new in $news}
     <article>
-      <header>
-        <h3>{echo $new->getTitle()}</h3><span> <small>{echo "Vytvořil: ".$new->getUserAlias().", ".\App\Helper\DateFormater::t2d($new->getCreated())}</small></span>
-      </header>
+      <header><a href="/novinky/r/{echo $new->getUrlKey()}">
+          <h3>{echo $new->getTitle()}</h3></a><span><small>{echo "Vytvořil: ".$new->getUserAlias().", ".\App\Helper\DateFormater::t2d($new->getCreated())}</small></span></header>
       <div class="body">
         <div>{echo html_entity_decode($new->getShortBody())}</div><a href="/novinky/r/{echo $new->getUrlKey()}">čti více</a>
       </div>

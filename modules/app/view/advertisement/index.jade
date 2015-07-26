@@ -21,7 +21,8 @@ section.wrapper.bazar.singlePage
                 |{/if}
             .nazev
                 .nazevWrapper
-                    h4 {echo $ad->getTitle()}
+                    a(href!='/bazar/r/{echo $ad->getUniqueKey()}')
+                        h4 {echo $ad->getTitle()}
             .infoWrapper
                 .info
                     |{if $ad->getAdType() =='tender'}

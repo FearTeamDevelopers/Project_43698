@@ -39,6 +39,11 @@ section.wrapper.blue.filter
             | {/foreach}
             |{/else}
          input(type='submit' value='Zobrazit')
+         |{if isset($bftype)}
+         a(href="/bazar").reset ×
+         |{/if}
+
+
       |{/if}
       form.search(method='GET' action='/bazar/hledat')
          input(type='text' placeholder='vyhledat v bazaru...' name='adstr' required)

@@ -1,55 +1,56 @@
 include filter-template
 section.wrapper.bazar.singlePage
-   header.row
-      h2 Moje inzeráty
-   .row.container
-      |{if !empty($ads)}
-      .buttonWrapper
-         ul
-            li
-               a(href='/bazar').fi-arrow-left Bazar
-            li
-               a(href='/bazar/pridat').fi-plus Nový inzerát
+	header.row
+		h2 Moje inzeráty
+	.row.container
+		|{if !empty($ads)}
+		.buttonWrapper
+		ul
+			li
+				a(href='/bazar').fi-arrow-left Bazar
+			li
+				a(href='/bazar/pridat').fi-plus Nový inzerát
 
-      | {foreach $ad in $ads}
-      article.medium-6.column.left
-         .imgWrapper
-            |{if !empty($ad->getImgMain())}
-                a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $ad->getPhotoName()}" href!="{echo $ad->getImgMain()}")
-                    img(src!="{echo $ad->getImgThumb()}")
-            |{/if}
-         .nazev
-            .nazevWrapper
-               h4 {echo $ad->getTitle()}
-         .infoWrapper
-            .info
-               | {if $ad->getAdType() =='tender'}
-               center
-                  span.nabidka Nabídka <br/>
-               |{/if}{else}
-               center
-                  span.poptavka Poptávka <br/>
-               |{/else}
-               small
-                  span sekce:
-               span {echo " ".$ad->getSectionTitle()}<br/>
-               small
-                  span cena:
-               |{if $ad->getPrice() == "1"}
-               span.price {echo " na dohodě"}<br/>
-               |{/if}
-               |{else}
-               span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
-               |{/else}
-               a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
+		| {foreach $ad in $ads}
+		article.medium-6.column.left
+			.imgWrapper
+				| {if !empty($ad->getImgMain())}
+				a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $ad->getPhotoName()}" href!="{echo $ad->getImgMain()}")
+					img(src!="{echo $ad->getImgThumb()}")
+				|{/if}
+			.nazev
+				.nazevWrapper
+					a(href!='/bazar/r/{echo $ad->getUniqueKey()}')
+						h4 {echo $ad->getTitle()}
+			.infoWrapper
+				.info
+					| {if $ad->getAdType() =='tender'}
+					center
+						span.nabidka Nabídka <br/>
+					|{/if}{else}
+					center
+						span.poptavka Poptávka <br/>
+					|{/else}
+					small
+						span sekce:
+					span {echo " ".$ad->getSectionTitle()}<br/>
+					small
+						span cena:
+					|{if $ad->getPrice() == "1"}
+					span.price {echo " na dohodě"}<br/>
+					|{/if}
+					|{else}
+					span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
+					|{/else}
+					a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
 
-         a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')
-         a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
-         a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->getUniqueKey()}', title='Smazat')
-      | {/foreach}
-      |{/if}{else}
-      h3 Nemáte žádné inzeráty
-      |{/else}
-   include ../components/pager
+			a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')
+			a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
+			a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->getUniqueKey()}', title='Smazat')
+		| {/foreach}
+		|{/if}{else}
+		h3 Nemáte žádné inzeráty
+		|{/else}
+	include ../components/pager
 
 

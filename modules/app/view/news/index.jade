@@ -1,13 +1,14 @@
 section.wrapper.novinky.singlePage
     header.row
         h2 Novinky
-    |{if !empty($news)}    
+    |{if !empty($news)}
     section.row.container
         | {foreach $new in $news}
         article
             header
-                h3 {echo $new->getTitle()}
-                span 
+                a(href!='/novinky/r/{echo $new->getUrlKey()}')
+                    h3 {echo $new->getTitle()}
+                span
                     small {echo "Vytvořil: ".$new->getUserAlias().", ".\App\Helper\DateFormater::t2d($new->getCreated())}
             .body
                 div {echo html_entity_decode($new->getShortBody())}

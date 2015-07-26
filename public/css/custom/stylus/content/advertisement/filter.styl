@@ -11,6 +11,9 @@
 			margin-bottom 0
 			margin-left 2%
 			font-family: 'Ubuntu', sans-serif !important;
+			overflow hidden
+			text-overflow ellipsis
+			white-space nowrap
 		}
 		input[type=submit]{
 			height:2.3125rem;
@@ -24,11 +27,27 @@
 			background defaultGreen
 			border 2px outset white
 			background-image none
+			cursor pointer
 			&:hover{
 				border-color defaultGreen
 				color defaultGreen
 				background white
 			}
+		}
+		a.reset{
+			cursor pointer
+			height 2.3125rem
+			line-height 1
+			width 2.3125rem
+			text-align center
+			display inline-block
+			background-color red
+			color white
+			margin-left 2%
+			border 2px outset white
+			font-size 1.7rem
+
+
 		}
 	}
 	form.search{

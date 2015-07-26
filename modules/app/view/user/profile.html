@@ -25,15 +25,12 @@
           <td>{echo $user->email}</td>
         </tr>
         <tr>
-          <td><span>Informace na email:</span></td>
-          {if $user->getNewActionNotification || $user->getNewReportNotification}
+          <td><span>Informace na email:</span></td>{if $user->getNewActionNotification || $user->getNewReportNotification}
           <td>
             {if $user->getNewActionNotification}Informace o nových akcích<br/>{/if}
             {if $user->getNewReportNotification}Informace o nových reportážích{/if}
-          </td>
-          {/if}{else}
-          <td>Nedostávám žádné informace emailem</td>
-          {/else}
+          </td>{/if}{else}
+          <td>Nedostávám žádné informace emailem</td>{/else}
         </tr>
       </table>
     </article>
@@ -65,8 +62,21 @@
           <tr>
             <td><span>Informace na email:</span></td>
             <td>
-              <label><input type="checkbox" name="actionNotification" value="1" {if $user->getNewActionNotification}checked="checked"{/if}/> Informace o nových akcích</label>
-              <label><input type="checkbox" name="reportNotification" value="1" {if $user->getNewReportNotification}checked="checked"{/if}/> Informace o nových reportážích</label>
+              <label>{if $user->getNewActionNotification}
+                <input type="checkbox" name="actionNotification" value="1" checked="checked"/>Informace o nových akcích
+                {/if}
+                {else}
+                <input type="checkbox" name="actionNotification" value="1"/>Informace o nových akcích
+                {/else}
+              </label>
+              <label>{if $user->getNewReportNotification}
+                <input type="checkbox" name="reportNotification" value="1" checked="checked"/>Informace o nových reportážích
+                {/if}
+                {else}
+                <input type="checkbox" name="reportNotification" value="1"/>Informace o nových reportážích
+                {/else}
+              </label>
+              <label></label>
             </td>
           </tr>
           <tr>

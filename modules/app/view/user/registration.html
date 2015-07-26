@@ -16,14 +16,26 @@
           <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
           <input type="tel" placeholder="Kontaktní telefon" name="phone" value="{echo isset($user)? $user->phoneNumber: ""}"/>{if isset($errors["email"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["email"])}</label>{/if}
-          <input type="email" placeholder="Kontaktní email" name="email" value="{echo isset($user)? $user->email: ""}" required="required"/>{if isset($errors["password"])}
+          <input type="email" placeholder="Kontaktní email" name="email" value="{echo isset($user)? $user->email: ""}" required="required"/>
+          <Informace>na email:<br/></Informace>
+          <label>{if $user->getNewActionNotification}
+            <input type="checkbox" name="actionNotification" value="1" checked="checked"/>Informace o nových akcích
+            {/if}
+            {else}
+            <input type="checkbox" name="actionNotification" value="1"/>Informace o nových akcích
+            {/else}
+          </label>
+          <label>{if $user->getNewReportNotification}
+            <input type="checkbox" name="reportNotification" value="1" checked="checked"/>Informace o nových reportážích
+            {/if}
+            {else}
+            <input type="checkbox" name="reportNotification" value="1"/>Informace o nových reportážích
+            {/else}
+          </label>{if isset($errors["password"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["password"])}</label>{/if}
           <input type="password" placeholder="Heslo" pattern=".{5,}" title="min. 5 znaků" name="password" required="required"/>{if isset($errors["password2"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["password2"])}</label>{/if}
           <input type="password" placeholder="Ověření hesla" pattern=".{5,}" title="min. 5 znaků" name="password2" required="required"/>
-          Informace na email:<br/>
-          <label><input type="checkbox" name="actionNotification" value="1" {if $user->getNewActionNotification}checked="checked"{/if}/> Informace o nových akcích</label>
-          <label><input type="checkbox" name="reportNotification" value="1" {if $user->getNewReportNotification}checked="checked"{/if}/> Informace o nových reportážích</label>
           <input type="submit" name="register" value="Registrovat"/>
           <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
           <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>

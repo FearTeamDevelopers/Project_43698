@@ -1,7 +1,7 @@
 article.indexNew{
 	background white
 	color black
-	padding 15px 5px 5px;
+	padding 15px 5px 25px;
 	degr=-2deg;
 	position relative
 	margin 2em 0;
@@ -16,20 +16,22 @@ article.indexNew{
 		font-size 3em
 		font-weight 400
 	}
-	p{
-		height 100px
+	&>div{
+		height 200px
 		line-height 25px
 		overflow hidden
-		padding 0 1em
+		padding 0 1.5em
 		margin-top 1em
-		padding-left 2em
 		position: relative
 	}
 	header{
 		a{
+			text-decoration underline
+			color #000
 			&:hover{
+				text-decoration none
 				h4{
-					text-decoration underline
+					text-decoration none
 					color defaultGreen
 					&:before{
 						text-decoration none
@@ -44,7 +46,7 @@ article.indexNew{
 			color black!important
 			text-align center
 			margin 0
-
 		}
 	}
 }
+

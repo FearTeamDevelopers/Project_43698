@@ -31,6 +31,7 @@ body{
 	width 100%
 	position relative
 	background rgba(255, 255, 255, 0.7)
+	padding 0 0 30px
 	&.blue {
 		background headerColor
 		color white
@@ -51,18 +52,28 @@ body{
 			border-bottom 3px solid defaultGreen
 		}
 	}
+	.moreWrap{
+		margin-top .5rem
+		&:first-of-type{
+			margin-top 2.5rem
+		}
+	}
 	section.row.container{
+		box-shadow 0 0 3px rgba(black, .5)
 		article{
+			background-color rgba(white, .8)
 			position relative
 			padding 15px 20px
-			&:last-child{
-				margin-bottom 20px
-			}
 			span{
 				font-style italic
 				margin 0
 			}
 			header{
+				a{
+					&:hover{
+						text-decoration underline
+					}
+				}
 				h3{
 					font-size 1.2em
 					font-weight bold
@@ -84,15 +95,13 @@ body{
 					color black
 					font-weight bold
 					&:hover{
-						font-weight 900
 						text-decoration underline
-						text-transform uppercase
 					}
 				}
 			}
 			&:nth-child(odd){
 				background boxColor
-				border 1px solid defaultBLue
+				// border 1px solid defaultBLue
 				h3, p, span{
 					color white
 				}
