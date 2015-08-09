@@ -37,8 +37,8 @@
                         <td>{echo $gallery->getUserAlias()}</td>
                         <td>{echo $gallery->getCreated()}</td>
                         <td>
-                            {if ($gallery->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
-                            {if ($gallery->getUserId() == $authUser->getId())}<span class="labelProduct labelProductGray">Moje</span>{/if}
+                            {if ($gallery->active)}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}
+                            {if ($gallery->getUserId() == $authUser->getId())}<span class="infoLabel infoLabelGray">Moje</span>{/if}
                         </td>
                         <td>
                             <a href="/admin/gallery/detail/{echo $gallery->id}" class="btn btn_image2">

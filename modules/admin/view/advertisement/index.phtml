@@ -40,7 +40,7 @@
                         <td>{echo $ad->sectionTitle}</td>
                         <td>{echo $ad->getExpirationDate()}</td>
                         <td>{echo $ad->messageCount}</td>
-                        <td>{if ($ad->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}</td>
+                        <td>{if ($ad->active)}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}</td>
                         <td>{echo $ad->getCreated()}</td>
                         <td>
                             <a href="/admin/advertisement/detail/{echo $ad->getId()}" class="btn btn3 btn_search" title="Detail"></a>

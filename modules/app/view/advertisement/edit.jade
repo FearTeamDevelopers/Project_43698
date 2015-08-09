@@ -1,13 +1,13 @@
 section.wrapper.pridatInzerat.singlePage
     .row
-        form(method='post', action='#' enctype="multipart/form-data").large-8.medium-10.small-12.centerBlock.uploadForm.mv30
+        form(method="post", action="#" enctype="multipart/form-data").large-8.medium-10.small-12.centerBlock.uploadForm.mv30
             input(type="hidden", name="MAX_FILE_SIZE", value="15000000")
             table
                 tr
                     td
                         span Platnost do
                     td
-                        |{echo \App\Helper\DateFormater::t2d(\App\Helper\FormPrinter::iset($ad,'expirationDate'))}
+                        |{echo \App\Helper\DateFormater::t2d(\App\Helper\FormPrinter::iset($ad,"expirationDate"))}
                 tr
                     td
                         span Název
@@ -15,30 +15,30 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["title"])}
                         label.error {echo join("<br/>", $errors["title"])}
                         |{/if}
-                        input(type='text', name='title', required, pattern=".{5,}", title='min. 5 znaků', value!="{echo \\App\\Helper\\FormPrinter::iset($ad,'title')}")
+                        |{echo \App\Helper\FormPrinter::input("text", "title", array($ad,"title"), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků"))}
                 tr
                     td
                         span Sekce
                     td
-                        select(name='section')
+                        select(name="section")
                             | {foreach $section in $adsections}
                             | {if $ad->getSectionId() == $section->getId()}
-                            option(value!='{echo $section->getId()}', selected) {echo $section->getTitle()}
+                            option(value!="{echo $section->getId()}", selected) {echo $section->getTitle()}
                             | {/if}{else}
-                            option(value!='{echo $section->getId()}') {echo $section->getTitle()}
+                            option(value!="{echo $section->getId()}") {echo $section->getTitle()}
                             | {/else}
                             | {/foreach}
                 tr
                     td
                         span Typ
                     td
-                        select(name='type')
-                            | {if $ad->getAdType() == 'demand'}
-                            option(value='tender') Nabídka
-                            option(value='demand', selected) Poptávka
+                        select(name="type")
+                            | {if $ad->getAdType() == "demand"}
+                            option(value="tender") Nabídka
+                            option(value="demand", selected) Poptávka
                             | {/if}{else}
-                            option(value='tender', selected) Nabídka
-                            option(value='demand') Poptávka
+                            option(value="tender", selected) Nabídka
+                            option(value="demand") Poptávka
                             | {/else}
                 tr
                     td
@@ -47,7 +47,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["content"])}
                         label.error {echo join("<br/>", $errors["content"])}
                         |{/if}
-                        textarea(name='content', required, rows=8) {echo \App\Helper\FormPrinter::iset($ad,'content')}
+                        textarea(name="content", required, rows=8) {echo \App\Helper\FormPrinter::iset($ad,"content")}
                 tr
                     td
                         span Klíčová slova
@@ -55,7 +55,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["keywords"])}
                         label.error {echo join("<br/>", $errors["keywords"])}
                         |{/if}
-                        |{echo \App\Helper\FormPrinter::textInput('keywords', array($ad,'keywords'), true, '', "Pro rychlejší vyhledávání v bazaru")}
+                        |{echo \App\Helper\FormPrinter::input("text", "keywords", array($ad,"keywords"), array("placeholder" => "Pro rychlejší vyhledávání v bazaru"))}
                 tr
                     td
                         span Cena
@@ -63,7 +63,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["price"])}
                         label.error {echo join("<br/>", $errors["price"])}
                         |{/if}
-                        input(type='text', name='price', placeholder='při nevyplnění bude hodnota: \"dohodou\"', value!='{echo $ad->getPrice() == "0" ? "Dohodou":$ad->getPrice()}')
+                        |{echo \App\Helper\FormPrinter::input("text", "price", array($ad,"price"), array("placeholder" => "při nevyplnění bude hodnota: \"Dohodou\""))}
                 tr
                     td
                         span Fotky
@@ -94,4 +94,4 @@ section.wrapper.pridatInzerat.singlePage
                 tr
                     td(colspan=2)
                         input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
-                        input(type='submit', name='submitEditAdvertisement', value='Upravit').more
+                        input(type="submit", name="submitEditAdvertisement", value="Upravit").more

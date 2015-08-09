@@ -37,7 +37,7 @@
                 <td>{if $ad->getType()=="tender"}Nabídka{/if}{else}Poptávka{/else}</td>
                 <td>{echo $ad->sectionTitle}</td>
                 <td>{echo $ad->getExpirationDate()}</td>
-                <td>{if ($ad->active)}<span class="labelProduct labelProductGreen">Active</span>{/if}</td>
+                <td>{if ($ad->active)}<span class="infoLabel infoLabelGreen">Active</span>{/if}</td>
                 <td>{echo $ad->getCreated()}</td>
             </tr>
         </tbody>

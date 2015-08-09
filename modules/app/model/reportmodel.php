@@ -10,6 +10,20 @@ use THCFrame\Model\Model;
 class ReportModel extends Model
 {
     
+    const STATE_WAITING = 0;
+    const STATE_APPROVED = 1;
+    const STATE_REJECTED = 2;
+    
+    /**
+     *
+     * @var type 
+     */
+    private static $_statesConv = array(
+        self::STATE_WAITING => 'Čeká na shválení',
+        self::STATE_APPROVED => 'Schváleno',
+        self::STATE_REJECTED => 'Zamítnuto'
+    );
+    
     /**
      * @readwrite
      */
@@ -361,4 +375,14 @@ class ReportModel extends Model
         }
     }
 
+    /**
+     * Return action states
+     * 
+     * @return array
+     */
+    public static function getStates()
+    {
+        return self::$_statesConv;
+    }
+    
 }

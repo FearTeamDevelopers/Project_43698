@@ -153,8 +153,42 @@ class NewsController extends Controller
             self::redirect('/nenalezeno');
         }
         
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($news->getId(), \App\Model\CommentModel::RESOURCE_NEWS);
+        
         $this->_checkMetaData($layoutView, $news);
-        $view->set('news', $news);
+        $view->set('news', $news)
+                ->set('newcomment', null)
+                ->set('comments', $comments);
+        
+        if (RequestMethods::post('submitAddComment')) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                self::redirect('/novinky/r/'.$news->getId());
+            }
+            
+            $comment = new \App\Model\CommentModel(array(
+                'userId' => $this->getUser()->getId(),
+                'resourceId' => $news->getId(),
+                'replyTo' => RequestMethods::post('replyTo', 0),
+                'type' => \App\Model\CommentModel::RESOURCE_NEWS,
+                'body' => RequestMethods::post('text')
+            ));
+            
+            if ($comment->validate()) {
+                $id = $comment->save();
+
+                $this->getCache()->invalidate();
+                
+                Event::fire('app.log', array('success', 'Comment id: ' . $id. ' from user: '.$this->getUser()->getId()));
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
+                self::redirect('/novinky/r/'.$news->getId());
+            } else {
+                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($comment->getErrors())));
+                $view->set('errors', $comment->getErrors())
+                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                    ->set('newcomment', $comment);
+            }
+        }
     }
     
     /**

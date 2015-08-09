@@ -867,27 +867,27 @@ class ReportController extends Controller
             foreach ($reports as $report) {
                 $label = '';
                 if ($report->active) {
-                    $label .= "<span class='labelProduct labelProductGreen'>Aktivní</span>";
+                    $label .= "<span class='infoLabel infoLabelGreen'>Aktivní</span>";
                 } else {
-                    $label .= "<span class='labelProduct labelProductRed'>Neaktivní</span>";
+                    $label .= "<span class='infoLabel infoLabelRed'>Neaktivní</span>";
                 }
 
                 if ($report->approved == 1) {
-                    $label .= "<span class='labelProduct labelProductGreen'>Schváleno</span>";
+                    $label .= "<span class='infoLabel infoLabelGreen'>Schváleno</span>";
                 } elseif ($report->approved == 2) {
-                    $label .= "<span class='labelProduct labelProductRed'>Zamítnuto</span>";
+                    $label .= "<span class='infoLabel infoLabelRed'>Zamítnuto</span>";
                 } else {
-                    $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
+                    $label .= "<span class='infoLabel infoLabelOrange'>Čeká na schválení</span>";
                 }
 
                 if ($this->getUser()->getId() == $report->getUserId()) {
-                    $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
+                    $label .= "<span class='infoLabel infoLabelGray'>Moje</span>";
                 }
 
                 if ($report->archive) {
-                    $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";
+                    $archiveLabel = "<span class='infoLabel infoLabelGreen'>Ano</span>";
                 } else {
-                    $archiveLabel = "<span class='labelProduct labelProductGray'>Ne</span>";
+                    $archiveLabel = "<span class='infoLabel infoLabelGray'>Ne</span>";
                 }
 
                 $arr = array();

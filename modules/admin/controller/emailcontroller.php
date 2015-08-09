@@ -142,7 +142,7 @@ class EmailController extends Controller
             $template = \Admin\Model\EmailTemplateModel::fetchCommonActiveByIdAndLang($id, $fieldName);
         }
         
-        echo json_encode(array('text' => $template->$fieldName));
+        echo json_encode(array('text' => $template->$fieldName, 'subject' => $template->getSubject()));
         exit;
     }
 
@@ -166,7 +166,7 @@ class EmailController extends Controller
             $errors = array();
             $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-            for ($i = 1; $i <= 50; $i++) {
+            for ($i = 1; $i <= 50; $i+=1) {
                 if ($this->_checkUrlKey($urlKeyCh)) {
                     break;
                 } else {
@@ -181,6 +181,7 @@ class EmailController extends Controller
 
             $emailTemplate = new \Admin\Model\EmailTemplateModel(array(
                 'title' => RequestMethods::post('title'),
+                'subject' => RequestMethods::post('subject'),
                 'urlKey' => $urlKeyCh,
                 'body' => RequestMethods::post('text'),
                 'bodyEn' => RequestMethods::post('texten'),
@@ -234,6 +235,7 @@ class EmailController extends Controller
             }
             
             $emailTemplate->title = RequestMethods::post('title');
+            $emailTemplate->subject = RequestMethods::post('subject');
             $emailTemplate->urlKey = $urlKey;
             $emailTemplate->body = RequestMethods::post('text');
             $emailTemplate->bodyEn = RequestMethods::post('texten');

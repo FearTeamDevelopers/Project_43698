@@ -105,8 +105,44 @@ class ActionController extends Controller
             self::redirect('/nenalezeno');
         }
 
+        $attendance = \App\Model\AttendanceModel::fetchUsersByActionId($action->getId());
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
+        
         $this->_checkMetaData($layoutView, $action);
-        $view->set('action', $action);
+        $view->set('action', $action)
+                ->set('newcomment', null)
+                ->set('comments', $comments)
+                ->set('attendance', $attendance);
+        
+        if (RequestMethods::post('submitAddComment')) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                self::redirect('/akce/r/'.$action->getId());
+            }
+            
+            $comment = new \App\Model\CommentModel(array(
+                'userId' => $this->getUser()->getId(),
+                'resourceId' => $action->getId(),
+                'replyTo' => RequestMethods::post('replyTo', 0),
+                'type' => \App\Model\CommentModel::RESOURCE_ACTION,
+                'body' => RequestMethods::post('text')
+            ));
+            
+            if ($comment->validate()) {
+                $id = $comment->save();
+
+                $this->getCache()->invalidate();
+                
+                Event::fire('app.log', array('success', 'Comment id: ' . $id. ' from user: '.$this->getUser()->getId()));
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
+                self::redirect('/akce/r/'.$action->getId());
+            } else {
+                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($comment->getErrors())));
+                $view->set('errors', $comment->getErrors())
+                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                    ->set('comment', $comment);
+            }
+        }
     }
 
     /**
@@ -220,4 +256,45 @@ class ActionController extends Controller
                 ->set('act', $act);
     }
 
+    /**
+     * 
+     * @param type $actionId
+     * @param type $type
+     * @before _secured, _member
+     */
+    public function attendance($actionId, $type)
+    {
+        $this->_disableView();
+        
+        if($type != \App\Model\AttendanceModel::ACCEPT ||
+                $type != \App\Model\AttendanceModel::REJECT ||
+                $type != \App\Model\AttendanceModel::MAYBE){
+            echo $this->lang('COMMON_FAIL');
+            exit;
+        }
+        
+        $action = \App\Model\ActionModel::first(array('id = ?' => (int)$actionId));
+        
+        if (NULL === $action) {
+            echo $this->lang('NOT_FOUND');
+        }else{
+            $attendance = new \App\Model\AttendanceModel(array(
+                'userId' => $this->getUser()->getId(),
+                'resourceId' => $action->getId(),
+                'type' => (int)$type,
+                'comment' => RequestMethods::post('attcomment')
+            ));
+            
+            if($attendance->validate()){
+                $attendance->save();
+                $this->getCache()->invalidate();
+
+                Event::fire('app.log', array('success', 'Attendance - '.$type.' - action '.$action->getId().' by user: '.$this->getUser()->getId()));
+                echo 'success';
+            } else {
+                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($attendance->getErrors())));
+                echo $this->lang('COMMON_FAIL');
+            }
+        }
+    }
 }

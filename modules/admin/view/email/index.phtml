@@ -1,6 +1,6 @@
 <ul class="maintabmenu multipletabmenu">
-    <li class="current"><a href="#">Šablony</a></li>
     <li><a href="/admin/email/send/">Email</a></li>
+    <li class="current"><a href="#">Šablony</a></li>
     <li><a href="/admin/email/add/">Nová šablona</a></li>
 </ul><!--maintabmenu-->
 
@@ -34,7 +34,7 @@
                         <td>{if $email->getType()==1}Běžná{/if}{else}Systémová{/else}</td>
                         <td>{echo $email->getCreated()}</td>
                         <td>
-                            {if ($email->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
+                            {if ($email->active)}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}
                         </td>
 
                         <td>

@@ -4,25 +4,25 @@ section.wrapper.login.singlePage
          .container
             header
                h2.fi-torso Přihlášení
-            form(method='POST' action='#')
+            form(method="POST" action="#")
                |{if isset($account_error)}
                label.error.fi-alert
                   |{echo $account_error}
                |{/if}
-               input(type='email' name='email' placeholder='Váš@email.cz' required)
+               |{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Váš@email.cz"))}
                |{if isset($email_error)}
                label.error.fi-alert
                   |{echo $email_error}
                |{/if}
-               input(type='password' name='password' placeholder='Vaše heslo' required)
+               |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "placeholder" => "Vaše heslo"))}
                |{if isset($password_error)}
                label.error.fi-alert
                   |{echo $password_error}
                |{/if}
-               input(type='submit' name='submitLogin' value='Přihlásit')
+               input(type="submit" name="submitLogin" value="Přihlásit")
                |<br/><br/>
                span Zaregistrujte se a vytvořte si účet
-                    a(href='/registrace') &nbsp;zde
+                    a(href="/registrace") &nbsp;zde
                input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
 
 

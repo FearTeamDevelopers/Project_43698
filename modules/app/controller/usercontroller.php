@@ -7,6 +7,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Security\PasswordManager;
 use THCFrame\Events\Events as Event;
 use THCFrame\Core\Rand;
+use THCFrame\Registry\Registry;
 
 /**
  * 
@@ -75,11 +76,16 @@ class UserController extends Controller
                     self::redirect('/muj-profil');
                 } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_LOCKED'));
+                    Event::fire('app.log', array('fail', sprintf('Account locked for %s', $email)));
                 } catch (\THCFrame\Security\Exception\UserInactive $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_INACTIVE'));
+                    Event::fire('app.log', array('fail', sprintf('Account inactive for %s', $email)));
                 } catch (\THCFrame\Security\Exception\UserExpired $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_EXPIRED'));
+                    Event::fire('app.log', array('fail', sprintf('Account expired for %s', $email)));
                 } catch (\Exception $e) {
+                    Event::fire('app.log', array('fail', 'Exception: ' . $e->getMessage()));
+                    
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
                     } else {
@@ -137,7 +143,7 @@ class UserController extends Controller
                 $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
             }
 
-            if (PasswordManager::strength(RequestMethods::post('password')) <= 0.5) {
+            if (strlen(RequestMethods::post('password')) < 5 || PasswordManager::strength(RequestMethods::post('password')) <= 0.5) {
                 $errors['password'] = array($this->lang('PASS_WEAK'));
             }
 
@@ -221,11 +227,22 @@ class UserController extends Controller
         $canonical = 'http://' . $this->getServerHost() . '/profil';
 
         $user = \App\Model\UserModel::first(array('id = ?' => $this->getUser()->getId()));
+        $myActions = \App\Model\AttendanceModel::fetchActionsByUserId($this->getUser()->getId(), true);
+        
+        if(!empty($myActions)){
+            foreach($myActions as &$action){
+                $action->latestComments = \App\Model\CommentModel::fetchByTypeAndCreated(
+                        \App\Model\CommentModel::RESOURCE_ACTION, $action->getId(), Registry::get('session')->get('userLastLogin')
+                        );
+                unset($action);
+            }
+        }
 
         $this->getLayoutView()
                 ->set('metatile', 'Hastrman - Můj profil')
                 ->set('canonical', $canonical);
-        $view->set('user', $user);
+        $view->set('user', $user)
+                ->set('actions', $myActions);
 
         if (RequestMethods::post('editProfile')) {
             if ($this->_checkCSRFToken() !== true) {
@@ -296,7 +313,7 @@ class UserController extends Controller
 
         if ($user->activateAccount()) {
             Event::fire('app.log', array('success', 'User Id: ' . $user->getId()));
-            $view->successMessage('Účet byl aktivován');
+            $view->successMessage($this->lang('ACCOUNT_ACTIVATED'));
             self::redirect('/');
         } else {
             Event::fire('app.log', array('fail', 'User Id: ' . $user->getId(),

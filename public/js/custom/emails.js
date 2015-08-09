@@ -16,6 +16,7 @@ jQuery(document).ready(function () {
                 var template = jQuery.parseJSON(message);
 
                 CKEDITOR.instances['ckeditor'].setData(template.text);
+                jQuery('input[name=subject]').val(template.subject);
             }
         });
     });

@@ -33,8 +33,8 @@
                         <td>{echo $page->modified}</td>
                         <td>{echo $page->created}</td>
                         <td>
-                            {if $page->active}<span class="labelProduct labelProductGreen">Publikováno</span>{/if}
-                            {else}<span class="labelProduct labelProductGray">Neaktivní</span>{/else}
+                            {if $page->active}<span class="infoLabel infoLabelGreen">Publikováno</span>{/if}
+                            {else}<span class="infoLabel infoLabelGray">Neaktivní</span>{/else}
                         </td>
                         <td>
                             {if $isAdmin}<a href="/admin/content/edit/{echo $page->id}" class="btn btn3 btn_pencil" title="Upravit"></a>{/if}

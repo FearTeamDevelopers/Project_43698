@@ -23,11 +23,13 @@ class IndexController extends Controller
         $latestNews = \App\Model\NewsModel::fetchWithLimit(10);
         $latestActions = \App\Model\ActionModel::fetchWithLimit(10);
         $latestReports = \App\Model\ReportModel::fetchWithLimit(10);
-        $latestGalleries = \App\Model\GalleryModel::fetchWithLimit(10);
+        $latestComments = \App\Model\CommentModel::fetchWithLimit(10);
+        $latestUsers = \App\Model\UserModel::fetchLates();
         
         $view->set('latestnews', $latestNews)
                 ->set('latestreports', $latestReports)
-                ->set('latestgalleries', $latestGalleries)
+                ->set('latestusers', $latestUsers)
+                ->set('latestcomments', $latestComments)
                 ->set('latestactions', $latestActions)
                 ->set('imessages', $imessages);
     }

@@ -4,47 +4,46 @@ section.wrapper.login.singlePage
          .container
             header
                h2.fi-check Registrace
-            form(method='post',action='#')
+            form(method="post",action="#")
                |{if isset($errors["firstname"])}
                label.error.fi-alert
                   |{echo join("<br/>", $errors["firstname"])}
                |{/if}
-               |{echo \App\Helper\FormPrinter::textInput('firstname', array($user,'firstname'), true, '', 'Jméno')}
+               |{echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true, "placeholder" => "Jméno"))}
 
                |{if isset($errors["lastname"])}
                label.error.fi-alert
                   |{echo join("<br/>", $errors["lastname"])}
                |{/if}
-               |{echo \App\Helper\FormPrinter::textInput('lastname', array($user,'lastname'), true, '', 'Příjmení')}
+               |{echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true, "placeholder" => "Příjmení"))}
 
                |{if isset($errors["phoneNumber"])}
                label.error.fi-alert
                   |{echo join("<br/>", $errors["phoneNumber"])}
                |{/if}
-               input(type='tel',placeholder='Kontaktní telefon', name='phone',value!='{echo isset($user)? $user->phoneNumber: ""}')
+               |{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon"))}
 
                |{if isset($errors["email"])}
                label.error.fi-alert
                   |{echo join("<br/>", $errors["email"])}
                |{/if}
-               input(type='email',placeholder='Kontaktní email', name='email',value!='{echo isset($user)? $user->email: ""}' required)
-               Informace na email:<br/>
+               |{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}
+
+               span Informace na email:<br/>
                label
                   | {if $user->getNewActionNotification}
-                  input(type='checkbox',name='actionNotification',value='1',checked="checked")
+                  input(type="checkbox",name="actionNotification",value="1",checked="checked")
                   | Informace o nových akcích
-                  | {/if}
-                  | {else}
-                  input(type='checkbox',name='actionNotification',value='1')
+                  | {/if}{else}
+                  input(type="checkbox",name="actionNotification",value="1")
                   | Informace o nových akcích
                   | {/else}
                label
                   | {if $user->getNewReportNotification}
-                  input(type='checkbox',name='reportNotification',value='1',checked="checked")
+                  input(type="checkbox",name="reportNotification",value="1",checked="checked")
                   | Informace o nových reportážích
-                  | {/if}
-                  | {else}
-                  input(type='checkbox',name='reportNotification',value='1')
+                  | {/if}{else}
+                  input(type="checkbox",name="reportNotification",value="1")
                   | Informace o nových reportážích
                   | {/else}
 
@@ -52,15 +51,15 @@ section.wrapper.login.singlePage
                label.error.fi-alert
                   |{echo join("<br/>", $errors["password"])}
                |{/if}
-               input(type='password',placeholder='Heslo',pattern=".{5,}",title='min. 5 znaků', name='password' required)
+               |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Heslo"))}
 
                |{if isset($errors["password2"])}
                label.error.fi-alert
                   |{echo join("<br/>", $errors["password2"])}
                |{/if}
-               input(type='password',placeholder='Ověření hesla',pattern=".{5,}",title='min. 5 znaků', name='password2' required)
+               |{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Ověření hesla"))}
 
-               input(type='submit', name='register', value='Registrovat')
+               input(type="submit", name="register", value="Registrovat")
 
                input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
                input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")

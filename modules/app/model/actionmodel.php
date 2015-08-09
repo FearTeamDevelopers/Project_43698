@@ -9,7 +9,21 @@ use THCFrame\Model\Model;
  */
 class ActionModel extends Model
 {
-
+    
+    const STATE_WAITING = 0;
+    const STATE_APPROVED = 1;
+    const STATE_REJECTED = 2;
+    
+    /**
+     *
+     * @var type 
+     */
+    private static $_statesConv = array(
+        self::STATE_WAITING => 'Čeká na shválení',
+        self::STATE_APPROVED => 'Schváleno',
+        self::STATE_REJECTED => 'Zamítnuto'
+    );
+    
     /**
      * @readwrite
      */
@@ -62,7 +76,7 @@ class ActionModel extends Model
      * @validate max(3)
      */
     protected $_archive;
-
+    
     /**
      * @column
      * @readwrite
@@ -335,5 +349,15 @@ class ActionModel extends Model
     public static function fetchByUrlKey($urlKey)
     {
         return self::first(array('active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey));
+    }
+    
+    /**
+     * Return action states
+     * 
+     * @return array
+     */
+    public static function getStates()
+    {
+        return self::$_statesConv;
     }
 }

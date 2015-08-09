@@ -156,9 +156,43 @@ class ReportController extends Controller
         if($report === null){
             self::redirect('/nenalezeno');
         }
+        
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($report->getId(), \App\Model\CommentModel::RESOURCE_NEWS);
 
         $this->_checkMetaData($layoutView, $report);
-        $view->set('report', $report);
+        $view->set('report', $report)
+                ->set('newcomment', null)
+                ->set('comments', $comments);
+        
+        if (RequestMethods::post('submitAddComment')) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                self::redirect('/reportaze/r/'.$report->getId());
+            }
+            
+            $comment = new \App\Model\CommentModel(array(
+                'userId' => $this->getUser()->getId(),
+                'resourceId' => $report->getId(),
+                'replyTo' => RequestMethods::post('replyTo', 0),
+                'type' => \App\Model\CommentModel::RESOURCE_REPORT,
+                'body' => RequestMethods::post('text')
+            ));
+            
+            if ($comment->validate()) {
+                $id = $comment->save();
+
+                $this->getCache()->invalidate();
+                
+                Event::fire('app.log', array('success', 'Comment id: ' . $id. ' from user: '.$this->getUser()->getId()));
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
+                self::redirect('/reportaze/r/'.$report->getId());
+            } else {
+                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($comment->getErrors())));
+                $view->set('errors', $comment->getErrors())
+                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                    ->set('newcomment', $comment);
+            }
+        }
     }
 
     /**

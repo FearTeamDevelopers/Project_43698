@@ -1,6 +1,6 @@
 <ul class="maintabmenu multipletabmenu">
-    <li><a href="/admin/email/">Šablony</a></li>
     <li><a href="/admin/email/send/">Email</a></li>
+    <li><a href="/admin/email/">Šablony</a></li>
     <li><a href="/admin/email/add/">Nová šablona</a></li>
     <li class="current"><a href="#">Editovat šablonu</a></li>
 </ul><!--maintabmenu-->
@@ -18,16 +18,25 @@
             <p>
                 <label>Název šablony*</label>
                 <span class="field">
-                    {echo \Admin\Helper\FormPrinter::textInput('title', array($template,'title'), true)}
+                    {echo \Admin\Helper\FormPrinter::input('text', 'title', array($template,'title'), array('required'=>true))}
                     {if isset($errors["title"])}
                     <label class="error">{echo join("<br/>", $errors["title"])}</label>
                     {/if}
                 </span>
             </p>
             <p>
+                <label>Předmět*</label>
+                <span class="field">
+                    {echo \Admin\Helper\FormPrinter::input('text', 'subject', array($template,'subject'), array('required'=>true))}
+                    {if isset($errors["subject"])}
+                    <label class="error">{echo join("<br/>", $errors["subject"])}</label>
+                    {/if}
+                </span>
+            </p>
+            <p>
                 <label>Text*</label>
                 <span class="field">
-                    <textarea rows="20" name="text" id="ckeditor">{echo $template->body}</textarea>
+                    <textarea rows="20" name="text" id="ckeditor">{echo \Admin\Helper\FormPrinter::iset($template,'body')}</textarea>
                     {if isset($errors["body"])}
                     <label class="error">{echo join("<br/>", $errors["body"])}</label>
                     {/if}
@@ -37,14 +46,13 @@
                     <button id="text-link-to-gallery">Odkaz na galerii</button>
                     <button id="text-link-to-action">Odkaz na akci</button>
                     <button id="text-link-to-news">Odkaz na novinku</button>
-                    <button id="text-link-to-report">Odkaz na reportáž</button>
                     <button id="text-link-to-content">Odkaz na stránku</button>
                 </span>
             </p>
             <p>
                 <label>Text EN*</label>
                 <span class="field">
-                    <textarea rows="20" name="texten" id="ckeditor2">{echo $template->bodyEn}</textarea>
+                    <textarea rows="20" name="texten" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($template,'bodyEn')}</textarea>
                     {if isset($errors["bodyEn"])}
                     <label class="error">{echo join("<br/>", $errors["bodyEn"])}</label>
                     {/if}
@@ -54,7 +62,6 @@
                     <button id="texten-link-to-gallery">Odkaz na galerii</button>
                     <button id="texten-link-to-action">Odkaz na akci</button>
                     <button id="texten-link-to-news">Odkaz na novinku</button>
-                    <button id="texten-link-to-report">Odkaz na reportáž</button>
                     <button id="texten-link-to-content">Odkaz na stránku</button>
                 </span>
             </p>

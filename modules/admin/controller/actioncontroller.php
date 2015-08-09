@@ -58,7 +58,7 @@ class ActionController extends Controller
     {
         $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 50; $i+=1) {
             if ($this->_checkUrlKey($urlKeyCh)) {
                 break;
             } else {
@@ -737,27 +737,27 @@ class ActionController extends Controller
             foreach ($actions as $action) {
                 $label = '';
                 if ($action->active) {
-                    $label .= "<span class='labelProduct labelProductGreen'>Aktivní</span>";
+                    $label .= "<span class='infoLabel infoLabelGreen'>Aktivní</span>";
                 } else {
-                    $label .= "<span class='labelProduct labelProductRed'>Neaktivní</span>";
+                    $label .= "<span class='infoLabel infoLabelRed'>Neaktivní</span>";
                 }
 
-                if ($action->approved == 1) {
-                    $label .= "<span class='labelProduct labelProductGreen'>Schváleno</span>";
-                } elseif ($action->approved == 2) {
-                    $label .= "<span class='labelProduct labelProductRed'>Zamítnuto</span>";
+                if ($action->approved == \App\Model\ActionModel::STATE_APPROVED) {
+                    $label .= "<span class='infoLabel infoLabelGreen'>Schváleno</span>";
+                } elseif ($action->approved == \App\Model\ActionModel::STATE_REJECTED) {
+                    $label .= "<span class='infoLabel infoLabelRed'>Zamítnuto</span>";
                 } else {
-                    $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
+                    $label .= "<span class='infoLabel infoLabelOrange'>Čeká na schválení</span>";
                 }
 
                 if ($this->getUser()->getId() == $action->getUserId()) {
-                    $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
+                    $label .= "<span class='infoLabel infoLabelGray'>Moje</span>";
                 }
 
                 if ($action->archive) {
-                    $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";
+                    $archiveLabel = "<span class='infoLabel infoLabelGreen'>Ano</span>";
                 } else {
-                    $archiveLabel = "<span class='labelProduct labelProductGray'>Ne</span>";
+                    $archiveLabel = "<span class='infoLabel infoLabelGray'>Ne</span>";
                 }
 
                 $arr = array();
@@ -770,6 +770,8 @@ class ActionController extends Controller
 
                 $tempStr = "\"";
                 if ($this->isAdmin() || $action->userId == $this->getUser()->getId()) {
+                    $tempStr .= "<a href='/admin/action/showcomments/" . $action->id . "' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
+                    $tempStr .= "<a href='/admin/action/getuserlist/" . $action->id . "' class='btn btn3 btn_users dialog' value='Účastníci' title='Zobrazit účastníky'></a>";
                     $tempStr .= "<a href='/admin/action/edit/" . $action->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/action/delete/" . $action->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
@@ -828,6 +830,65 @@ class ActionController extends Controller
             exit;
         }else{
             echo 'notfound';
+            exit;
+        }
+    }
+    
+    /**
+     * Show comments for specific action
+     * 
+     * @before _secured, _admin
+     * @param int $id
+     */
+    public function showComments($id)
+    {
+        $view = $this->getActionView();
+        $this->getLayoutView()
+                ->setTitle($this->lang('TITLE_ACTION_COMMENTS'));
+        
+        $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id), array('id'));
+
+        if (null === $action) {
+            $view->warningMessage($this->lang('NOT_FOUND'));
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/action/');
+        }
+
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
+        
+        $view->set('comments', $comments)
+                ->set('action', $action);
+    }
+    
+    /**
+     * 
+     * @before _secured, _participant
+     * @param type $actionId
+     */
+    public function getUserList($actionId)
+    {
+        $this->_disableView();
+        
+        $attUsers = \App\Model\AttendanceModel::fetchUsersByActionId($actionId);
+        $returnStr = '';
+        
+        if(!empty($attUsers)){
+            foreach ($attUsers as $key => $user){
+                $returnStr .= $user->getFirstname() . ' ' . $user->getLastname();
+                
+                if($user->getType() == \App\Model\AttendanceModel::ACCEPT){
+                    $returnStr .= ' - Zúčastní se'.PHP_EOL;
+                }elseif($user->getType() == \App\Model\AttendanceModel::REJECT){
+                    $returnStr .= ' - Nezúčastní se'.PHP_EOL;
+                }else{
+                    $returnStr .= ' - Neví'.PHP_EOL;
+                }
+            }
+
+            echo $returnStr;
+            exit;
+        } else {
+            echo 'Žádní účastníci';
             exit;
         }
     }

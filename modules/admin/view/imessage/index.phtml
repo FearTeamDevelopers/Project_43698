@@ -26,16 +26,17 @@
         <tbody>
 
             {if (!empty($imessages))}
+                {script $types=\Admin\Model\ImessageModel::getTypes()}
                 {foreach $message in $imessages}
                     <tr>
                         <td>{echo $message->getTitle()}</td>
-                        <td>{echo ucfirst($message->getMessageType())}</td>
+                        <td>{echo $types[$message->getMessageType()]}</td>
                         <td>{echo $message->getBody()}</td>
                         <td>{echo $message->getDisplayFrom()}</td>
                         <td>{echo $message->getDisplayTo()}</td>
                         <td>{echo $message->getCreated()}</td>
                         <td>
-                            {if ($message->active)}<span class="labelProduct labelProductGreen">Aktivní</span>{/if}
+                            {if ($message->active)}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}
                         </td>
 
                         <td>

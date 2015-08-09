@@ -5,12 +5,12 @@ section.wrapper.bazar.detail.singlePage
       .buttonWrapper
          ul
             li
-               a(href='/bazar').fi-arrow-left Bazar
+               a(href="/bazar").fi-arrow-left Bazar
             |{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
             li
-               a(href!='/bazar/upravit/{echo $ad->getUniqueKey()}').fi-pencil Upravit
+               a(href!="/bazar/upravit/{echo $ad->getUniqueKey()}").fi-pencil Upravit
             li
-               a(href!='/bazar/odstranit/{echo $ad->getUniqueKey()}').fi-trash Smazat
+               a(href!="/bazar/odstranit/{echo $ad->getUniqueKey()}").fi-trash Smazat
             |{/if}
       article.large-12
          .row
@@ -21,16 +21,16 @@ section.wrapper.bazar.detail.singlePage
                   |{foreach $image in $images}
                   |{if $image_i == 0}
                   .mainImage.large-12
-                     a(href!='{echo $image->getImgMain()}' data-lightbox!="bla")
-                        img(src!='{echo $image->getImgMain()}')
+                     a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
+                        img(src!="{echo $image->getImgMain()}")
                   |{if count($images)>1}
-                  a(href='#').fi-arrow-down.dropdown zobrazit více fotek
+                  a(href="#").fi-arrow-down.dropdown zobrazit více fotek
                   |{/if}
                   |{/if}{else}
 
                   .thumbImage.large-5.small-12.medium-6.column.left
-                     a(href!='{echo $image->getImgMain()}' data-lightbox!="bla")
-                        img(src!='{echo $image->getImgThumb()}')
+                     a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
+                        img(src!="{echo $image->getImgThumb()}")
 
                   |{/else}
                   |{/foreach}
@@ -49,7 +49,7 @@ section.wrapper.bazar.detail.singlePage
                   span.price {echo " na dohodě"}<br/>
                   |{/if}
                   |{else}
-                  span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
+                  span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
                   |{/else}
             |{/if}
             |{else}
@@ -65,7 +65,7 @@ section.wrapper.bazar.detail.singlePage
                   span.price {echo " na dohodě"}<br/>
                   |{/if}
                   |{else}
-                  span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
+                  span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
                   |{/else}
             |{/else}
          .row
@@ -73,20 +73,20 @@ section.wrapper.bazar.detail.singlePage
                .info.description
                   div {echo $ad->content} <br/>
                   .large-4.medium-6.small-12.centerBlock.mv10
-                     a.sendEmail(href='#sendEmail')
+                     a.sendEmail(href="#sendEmail")
                         .more.blue
                            span Odpovědět na Inzerát
       .row
          .large-6.medium-9.small-12.centerBlock
-            form#sendEmail.mv30(method='post', action='#')
+            form#sendEmail.mv30(method="post", action="#")
                label Jméno:
-                  input(type="text" name='name' required value!="{echo \\App\\Helper\\FormPrinter::iset($admessage,'msAuthor')}")
+                  |{echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
                label Email:
-                  input(type="email" name='email' required value!="{echo \\App\\Helper\\FormPrinter::iset($admessage,'msEmail')}")
+                  |{echo \App\Helper\FormPrinter::input("email", "email", array($admessage,"msEmail"), array("required"=>true))}
                label Text:
-                  textarea(name='message' rows=6 required) {echo \App\Helper\FormPrinter::iset($admessage,'message')}
+                  textarea(name="message" rows=6 required) {echo \App\Helper\FormPrinter::iset($admessage,"message")}
                label Chcete poslat kopii na svůj email?
-                  input(type="checkbox" name='getemailcopy')
-               a.submitEmail(href='#')
+                  input(type="checkbox" name="getemailcopy")
+               a.submitEmail(href="#")
                   .more
                      span Odeslat

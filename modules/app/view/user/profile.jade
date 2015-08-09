@@ -3,11 +3,11 @@ section.wrapper.profil.singlePage
       .buttonWrapper.large-8.medium-12.small-12.centerBlock
          ul
             li
-               a(href='/bazar/pridat').fi-plus Nový inzerát
+               a(href="/bazar/pridat").fi-plus Nový inzerát
             li
-               a(href='/bazar/moje-inzeraty').fi-page-copy Moje inzeráty
+               a(href="/bazar/moje-inzeraty").fi-page-copy Moje inzeráty
             li
-               a(href='#').fi-pencil#openEdit Upravit údaje
+               a(href="#").fi-pencil#openEdit Upravit údaje
    .row
       article.small-12.large-8.medium-8.centerBlock#info
          table
@@ -34,8 +34,8 @@ section.wrapper.profil.singlePage
                td Nedostávám žádné informace emailem
                |{/else}
       article.small-12.large-8.medium-8.centerBlock#edit
-         a(href='#').fi-x-circle#closeEdit
-         form(method='post', action='#')
+         a(href="#").fi-x-circle#closeEdit
+         form(method="post", action="#")
             input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
             table
                tr
@@ -46,7 +46,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         | {echo join("<br/>", $errors["firstname"])}
                      | {/if}
-                     |{echo \App\Helper\FormPrinter::textInput('firstname', array($user,'firstname'), true, '')}
+                     |{echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true))}
                tr
                   td
                      span Příjmení:
@@ -55,7 +55,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["lastname"])}
                      |{/if}
-                     |{echo \App\Helper\FormPrinter::textInput('lastname', array($user,'lastname'), true, '')}
+                     |{echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true))}
                tr
                   td
                      span Telefon:
@@ -64,27 +64,27 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["phoneNumber"])}
                      |{/if}
-                     input(type='tel', name='phone',value!='{echo isset($user)? $user->phoneNumber: ""}')
+                     |{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"))}
                tr
                   td
                      span Informace na email:
                   td
                      label
                         | {if $user->getNewActionNotification}
-                        input(type='checkbox',name='actionNotification',value='1', checked='checked')
+                        input(type="checkbox",name="actionNotification",value="1", checked="checked")
                         | Informace o nových akcích
                         | {/if}
                         | {else}
-                        input(type='checkbox',name='actionNotification',value='1')
+                        input(type="checkbox",name="actionNotification",value="1")
                         | Informace o nových akcích
                         | {/else}
                      label
                         | {if $user->getNewReportNotification}
-                        input(type='checkbox',name='reportNotification',value='1', checked="checked")
+                        input(type="checkbox",name="reportNotification",value="1", checked="checked")
                         | Informace o nových reportážích
                         | {/if}
                         | {else}
-                        input(type='checkbox',name='reportNotification',value='1')
+                        input(type="checkbox",name="reportNotification",value="1")
                         | Informace o nových reportážích
                         | {/else}
                      label
@@ -96,7 +96,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["email"])}
                      |{/if}
-                     input(type='email', name='email',value!='{echo isset($user)? $user->email: ""}' required)
+                     |{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true))}
                tr
                   td
                      span Původní heslo:
@@ -105,7 +105,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["oldpass"])}
                      |{/if}
-                     input(type='password', placeholder='nepovinné...',pattern=".{5,}",title='min. 5 znaků', name='oldpass')
+                     |{echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
                tr
                   td
                      span Heslo:
@@ -114,7 +114,7 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["password"])}
                      |{/if}
-                     input(type='password', placeholder='nepovinné...',pattern=".{5,}",title='min. 5 znaků', name='password')
+                     |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
                tr
                   td
                      span Ověření hesla:
@@ -123,9 +123,9 @@ section.wrapper.profil.singlePage
                      label.error.fi-alert
                         |{echo join("<br/>", $errors["password2"])}
                      |{/if}
-                     input(type='password',pattern=".{5,}",title='min. 5 znaků', name='password2', placeholder='nepovinné...')
+                     |{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
 
 
                tr
                   td(colspan=2)
-                     input(type='submit', name='editProfile', value='Upravit').more
+                     input(type="submit", name="editProfile", value="Upravit").more

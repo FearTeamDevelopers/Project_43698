@@ -15,9 +15,9 @@ class DevController extends Controller
     /**
      * Fill database tables tb_action, tb_news and tb_report with testing data
      * For database filling use these urls:
-     *      /admin/system/filldatabase/1    - for tb_news
-     *      /admin/system/filldatabase/2    - for tb_action
-     *      /admin/system/filldatabase/3    - for tb_report
+     *      /admin/dev/filldatabase/1    - for tb_news
+     *      /admin/dev/filldatabase/2    - for tb_action
+     *      /admin/dev/filldatabase/3    - for tb_report
      * 
      * @before _secured, _superadmin
      */
@@ -48,7 +48,7 @@ class DevController extends Controller
                 . 'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
 
         if ((int) $type == 1) {
-            for ($i = 0; $i < $ROW_COUNT; $i++) {
+            for ($i = 0; $i < $ROW_COUNT; $i+=1) {
                 $news = new \App\Model\NewsModel(array(
                     'title' => 'News-' . $i . '-' . time(),
                     'userId' => 1,
@@ -71,7 +71,7 @@ class DevController extends Controller
         }
 
         if ((int) $type == 2) {
-            for ($i = 0; $i < $ROW_COUNT; $i++) {
+            for ($i = 0; $i < $ROW_COUNT; $i+=1) {
                 $date = new \DateTime();
                 $date->add(new \DateInterval('P' . (int) $i . 'D'));
                 $startDate = $date->format('Y-m-d');
@@ -102,7 +102,7 @@ class DevController extends Controller
         }
 
         if ((int) $type == 3) {
-            for ($i = 0; $i < $ROW_COUNT; $i++) {
+            for ($i = 0; $i < $ROW_COUNT; $i+=1) {
                 $report = new \App\Model\ReportModel(array(
                     'title' => 'Report-' . $i . '-' . time(),
                     'userId' => 1,

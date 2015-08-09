@@ -58,7 +58,7 @@ class NewsController extends Controller
     {
         $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 50; $i+=1) {
             if ($this->_checkUrlKey($urlKeyCh)) {
                 break;
             } else {
@@ -697,27 +697,27 @@ class NewsController extends Controller
             foreach ($news as $_news) {
                 $label = '';
                 if ($_news->active) {
-                    $label .= "<span class='labelProduct labelProductGreen'>Aktivní</span>";
+                    $label .= "<span class='infoLabel infoLabelGreen'>Aktivní</span>";
                 } else {
-                    $label .= "<span class='labelProduct labelProductRed'>Neaktivní</span>";
+                    $label .= "<span class='infoLabel infoLabelRed'>Neaktivní</span>";
                 }
 
-                if ($_news->approved == 1) {
-                    $label .= "<span class='labelProduct labelProductGreen'>Schváleno</span>";
-                } elseif ($_news->approved == 2) {
-                    $label .= "<span class='labelProduct labelProductRed'>Zamítnuto</span>";
+                if ($_news->approved == \App\Model\NewsModel::STATE_APPROVED) {
+                    $label .= "<span class='infoLabel infoLabelGreen'>Schváleno</span>";
+                } elseif ($_news->approved == \App\Model\NewsModel::STATE_REJECTED) {
+                    $label .= "<span class='infoLabel infoLabelRed'>Zamítnuto</span>";
                 } else {
-                    $label .= "<span class='labelProduct labelProductOrange'>Čeká na schválení</span>";
+                    $label .= "<span class='infoLabel infoLabelOrange'>Čeká na schválení</span>";
                 }
 
                 if ($this->getUser()->getId() == $_news->getUserId()) {
-                    $label .= "<span class='labelProduct labelProductGray'>Moje</span>";
+                    $label .= "<span class='infoLabel infoLabelGray'>Moje</span>";
                 }
 
                 if ($_news->archive) {
-                    $archiveLabel = "<span class='labelProduct labelProductGreen'>Ano</span>";
+                    $archiveLabel = "<span class='infoLabel infoLabelGreen'>Ano</span>";
                 } else {
-                    $archiveLabel = "<span class='labelProduct labelProductGray'>Ne</span>";
+                    $archiveLabel = "<span class='infoLabel infoLabelGray'>Ne</span>";
                 }
 
                 $arr = array();
@@ -730,6 +730,7 @@ class NewsController extends Controller
 
                 $tempStr = "\"";
                 if ($this->isAdmin() || $_news->userId == $this->getUser()->getId()) {
+                    $tempStr .= "<a href='/admin/news/showcomments/" . $_news->id . "' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
                     $tempStr .= "<a href='/admin/news/edit/" . $_news->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/news/delete/" . $_news->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
@@ -790,5 +791,30 @@ class NewsController extends Controller
             echo 'notfound';
             exit;
         }
+    }
+    
+    /**
+     * 
+     * @before _secured, _admin
+     * @param int $id
+     */
+    public function showComments($id)
+    {
+        $view = $this->getActionView();
+        $this->getLayoutView()
+                ->setTitle($this->lang('TITLE_NEWS_COMMENTS'));
+
+        $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id), array('id'));
+
+        if (null === $news) {
+            $view->warningMessage($this->lang('NOT_FOUND'));
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/action/');
+        }
+
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($news->getId(), \App\Model\CommentModel::RESOURCE_NEWS);
+
+        $view->set('comments', $comments)
+                ->set('news', $news);
     }
 }

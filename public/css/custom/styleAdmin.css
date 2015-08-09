@@ -132,24 +132,6 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .tabmenu li a:hover { text-decoration: none; color: #333; }
 .tabmenu li.current a { background: #ddd; color: #333; }
 
-/***COLUMNS***/
-.one_half{ width:48.5%; }
-.one_third{ width:31.16%; }
-.two_third{ width:65.83%; }
-.one_fourth{ width:22.5%; }
-.three_fourth{ width:74.5%; }
-.one_fifth{ width:17.3%; }
-.two_fifth{ width:38.1%; }
-.three_fifth{ width:58.9%; }
-.four_fifth{ width:67.7%; }
-.one_sixth{ width:13.83%; }
-.five_sixth{ width:83.17%; }
-
-.one_half,.one_third,.two_third,.three_fourth,.one_fourth,.one_fifth,
-.two_fifth,.three_fifth,.four_fifth,.one_sixth,.five_sixth{ position:relative; margin-right:3%; float:left; }
-
-.last{ margin-right:0 !important; clear:right; }
-
 /**********MAIN CONTENT STYLES*******/
 .mainwrapper { margin: 10px; position: relative; }
 
@@ -240,7 +222,7 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .maintabmenu li.current a:hover, .maintabmenu li.ui-state-active a:hover { text-shadow: none; }
 
 .content { 
-    padding: 20px; border: 1px solid #ddd; background: #fff; margin-top: -1px; position: relative; line-height: 21px; 
+    padding-top: 20px; padding-bottom: 20px; border: 1px solid #ddd; background: #fff; margin-top: -1px; position: relative; line-height: 21px; 
     -moz-border-radius: 0 2px 2px 2px; -webkit-border-radius: 0 2px 2px 2px; border-radius: 0 2px 2px 2px;
     -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee;
     overflow: hidden;
@@ -344,6 +326,13 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
     background: #fcfcfc url(../../images/admin/titlebg.png) repeat-x top left; padding: 6px 5px 7px 5px; border: 1px solid #bbb; margin: 0; outline: none;
     -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd; font-size: 13px; color: #666; 
 }
+
+.attendtable thead tr td {text-align: center;}
+.attendtable thead tr td:first-child {width: 300px;}
+.attendtable tbody tr td {text-align: center;}
+.attendtable tbody tr td.bg-green {background-color: green;}
+.attendtable tbody tr td.bg-red {background-color: red;}
+.attendtable tbody tr td.bg-orange {background-color: orange;}
 
 /***** DYNAMIC TABLE *****/
 .dataTables_wrapper { position: relative; color: #555;}
@@ -863,6 +852,7 @@ a.btn_table { background-position: -82px -480px; }
 .padding0 { padding: 0 !important; }
 .width50 { width: 50px !important; }
 .width100 { width: 100px !important; }
+.width200 { width: 200px !important; }
 .stdform .vsmallinput { width: 60px; }
 .floatleft { float: left; }
 .floatright { float: right; }
@@ -918,7 +908,7 @@ a.btn_table { background-position: -82px -480px; }
 .category-detail div {margin-top: 5px;}
 
 /****PRODUCTLIST LABEL********/
-.labelProduct{
+.infoLabel{
     color:white;
     font-size:11px;
     height:16px;
@@ -931,11 +921,11 @@ a.btn_table { background-position: -82px -480px; }
     border-radius:3px;
     margin-left: 3px;
 }
-.labelProductGreen{background-color:green;}
-.labelProductBlue{background-color:blue;}
-.labelProductGray{background-color:gray;}
-.labelProductRed{background-color:red;}
-.labelProductOrange{background-color:orange;}
+.infoLabelGreen{background-color:green;}
+.infoLabelBlue{background-color:blue;}
+.infoLabelGray{background-color:gray;}
+.infoLabelRed{background-color:red;}
+.infoLabelOrange{background-color:orange;}
 
 @media screen and (max-width: 1024px) {
     .maincontent { margin-right: 260px; margin-left: 230px; }

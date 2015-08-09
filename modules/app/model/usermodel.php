@@ -122,5 +122,20 @@ class UserModel extends BasicUser
                 array('id' => 'asc')
         );
     }
+    
+    /**
+     * 
+     * @param type $limit
+     * @return type
+     */
+    public static function fetchLates($limit = 10)
+    {
+        return self::all(
+                array('role <> ?' => 'role_superadmin', 'active = ?' => true, 'blocked = ?' => false), 
+                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'), 
+                array('created' => 'desc'),
+                (int)$limit
+        );
+    }
 
 }

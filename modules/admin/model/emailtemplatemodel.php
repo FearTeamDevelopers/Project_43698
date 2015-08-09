@@ -55,6 +55,17 @@ class EmailTemplateModel extends Model
      * @column
      * @readwrite
      * @type text
+     * @length 200
+     * 
+     * @validate alphanumeric, max(200)
+     * @label subject
+     */
+    protected $_subject;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
      * @length 256
      * 
      * @validate html
@@ -147,14 +158,14 @@ class EmailTemplateModel extends Model
     {
         return \Admin\Model\EmailTemplateModel::first(
                         array('id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1), 
-                        array($fieldName));
+                        array($fieldName, 'subject'));
     }
     
     public static function fetchActiveByIdAndLang($id, $fieldName)
     {
         return \Admin\Model\EmailTemplateModel::first(
                         array('id = ?' => (int) $id, 'active = ?' => true), 
-                        array($fieldName));
+                        array($fieldName, 'subject'));
     }
 
 }
