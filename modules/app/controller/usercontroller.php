@@ -189,10 +189,11 @@ class UserController extends Controller
                 $uid = $user->save();
 
                 if ($verifyEmail) {
-                    $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('urlKey = ?' => 'account-activation'));
-                    $emailBody = str_replace('{TOKEN}', $actToken, $emailTemplate->getBody());
+                    $data = array('{TOKEN}' => $actToken);
+                    $email = \Admin\Model\EmailModel::loadAndPrepare('aktivace-uctu', $data);
+                    $email->setRecipient($user->getEmail());
 
-                    if ($this->_sendEmail($emailBody, 'Hastrman - Registrace', $user->getEmail(), 'registrace@hastrman.cz')) {
+                    if ($email->send(false, 'registrace@hastrman.cz')) {
                         Event::fire('app.log', array('success', 'User Id with email activation: ' . $uid));
                         $view->successMessage($this->lang('REGISTRATION_EMAIL_SUCCESS'));
                     } else {

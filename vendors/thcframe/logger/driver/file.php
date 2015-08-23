@@ -95,14 +95,16 @@ class File extends Logger\Driver
             $time = '';
         }
         
-        $user = Registry::get('security')->getUser();
-        
-        if($user === null){
-            $userName = '(annonymous) - ';
-        }else{
-            $userName = '('.$user->getWholeName().') - ';
+        $userName = '(annonymous) - ';
+        $sec = Registry::get('security');
+        if (isset($sec)) {
+            $user = $sec->getUser();
+
+            if ($user !== null) {
+                $userName = '(' . $user->getWholeName() . ') - ';
+            }
         }
-        
+
         $message = $time.$userName.$message . PHP_EOL;
 
         if ($file !== null) {

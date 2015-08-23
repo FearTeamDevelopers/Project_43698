@@ -224,15 +224,17 @@ class ReportController extends Controller
         if($report->getApproved() && $this->getConfig()->report_new_notification){
             $users = \App\Model\UserModel::all(array('getNewReportNotification = ?' => true), array('email'));
 
-            $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Nova reportaz'));
-            $emailBody = str_replace(array('{TITLE}', '{LINK}'), 
-                            array($report->getTitle(), RequestMethods::server('HTTP_HOST').'/reportaze/r/'.$report->getUrlKey()), 
-                            $emailTemplate->getBody());
-
             if(!empty($users)){
+                $data = array('{TITLE}' => '<a href="http://' . $this->getServerHost() . '/report/r/' .$report->getUrlKey() . '">' . $report->getTitle() . '</a>',
+                    '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody())
+                        );
+                $email = \Admin\Model\EmailModel::loadAndPrepare('nova-reportaz', $data);
+                
                 foreach($users as $user){
-                    $this->_sendEmail($emailBody, 'Hastrman - Reportáž - '.$report->getTitle(), $user->getEmail());
+                    $email->setRecipient($user->getEmail());
                 }
+                
+                $email->send(true);
             }
         }
     }
@@ -900,6 +902,7 @@ class ReportController extends Controller
                 
                 $tempStr = "\"";
                 if ($this->isAdmin() || $report->userId == $this->getUser()->getId()) {
+                    $tempStr .= "<a href='/admin/report/showcomments/" . $report->id . "' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
                     $tempStr .= "<a href='/admin/report/edit/" . $report->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/report/delete/" . $report->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
@@ -960,5 +963,31 @@ class ReportController extends Controller
             echo 'notfound';
             exit;
         }
+    }
+    
+    /**
+     * Show comments for specific action
+     * 
+     * @before _secured, _admin
+     * @param int $id
+     */
+    public function showComments($id)
+    {
+        $view = $this->getActionView();
+        $this->getLayoutView()
+                ->setTitle($this->lang('TITLE_REPORT_COMMENTS'));
+        
+        $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id), array('id'));
+
+        if (null === $report) {
+            $view->warningMessage($this->lang('NOT_FOUND'));
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/report/');
+        }
+
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($report->getId(), \App\Model\CommentModel::RESOURCE_REPORT);
+        
+        $view->set('comments', $comments)
+                ->set('report', $report);
     }
 }

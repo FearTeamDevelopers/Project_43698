@@ -730,7 +730,6 @@ class NewsController extends Controller
 
                 $tempStr = "\"";
                 if ($this->isAdmin() || $_news->userId == $this->getUser()->getId()) {
-                    $tempStr .= "<a href='/admin/news/showcomments/" . $_news->id . "' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
                     $tempStr .= "<a href='/admin/news/edit/" . $_news->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/news/delete/" . $_news->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
@@ -791,30 +790,5 @@ class NewsController extends Controller
             echo 'notfound';
             exit;
         }
-    }
-    
-    /**
-     * 
-     * @before _secured, _admin
-     * @param int $id
-     */
-    public function showComments($id)
-    {
-        $view = $this->getActionView();
-        $this->getLayoutView()
-                ->setTitle($this->lang('TITLE_NEWS_COMMENTS'));
-
-        $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id), array('id'));
-
-        if (null === $news) {
-            $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/action/');
-        }
-
-        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($news->getId(), \App\Model\CommentModel::RESOURCE_NEWS);
-
-        $view->set('comments', $comments)
-                ->set('news', $news);
     }
 }

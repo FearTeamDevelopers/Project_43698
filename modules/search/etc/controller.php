@@ -93,49 +93,6 @@ class Controller extends BaseController
 
     /**
      * 
-     * @param type $body
-     * @param type $subject
-     * @param type $sendTo
-     * @param type $sendFrom
-     * @return boolean
-     */
-    protected function _sendEmail($body, $subject, $sendTo = null, $sendFrom = null)
-    {
-        try {
-            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-            $transport = \Swift_MailTransport::newInstance();
-            $mailer = \Swift_Mailer::newInstance($transport);
-
-            $message = \Swift_Message::newInstance(null)
-                    ->setSubject($subject)
-                    ->setBody($body, 'text/html');
-
-            if (null === $sendTo) {
-                $message->setTo($this->getConfig()->system->adminemail);
-            } else {
-                $message->setTo($sendTo);
-            }
-
-            if (null === $sendFrom) {
-                $message->setFrom('info@hastrman.cz');
-            } else {
-                $message->setFrom($sendFrom);
-            }
-
-            if ($mailer->send($message)) {
-                return true;
-            } else {
-                Event::fire('admin.log', array('fail', 'No email sent'));
-                return false;
-            }
-        } catch (\Exception $ex) {
-            Event::fire('admin.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
-            return false;
-        }
-    }
-
-    /**
-     * 
      * @param type $options
      */
     public function __construct($options = array())

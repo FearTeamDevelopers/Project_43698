@@ -612,13 +612,16 @@ class StringMethods
     }
 
     /**
-     * exho alias
+     * Prepare text for inserting into email template
      * 
-     * @param string $data
+     * @param string $text
+     * @return string
      */
-    public static function echos($data)
+    public static function prepareEmailText($text)
     {
-        self::exho($data);
+        $prepared = str_replace(array('</p>', '</div>'), '<br/>', $text);
+        $prepared = strip_tags($prepared,'<br/><br><a><img/><img><table><tr><td><tbody><meta/><meta>');
+        
+        return $prepared;
     }
-
 }

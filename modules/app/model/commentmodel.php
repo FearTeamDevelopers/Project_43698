@@ -162,7 +162,7 @@ class CommentModel extends Model
      * @param type $type
      * @return type
      */
-    public static function fetchCommentsByResourceAndType($resourceId, $type)
+    public static function fetchCommentsByResourceAndType($resourceId, $type, $limit = 15)
     {
         $query = self::getQuery(array('cm.*'))
                 ->join('tb_user', 'cm.userId = us.id', 'us', 
@@ -170,7 +170,8 @@ class CommentModel extends Model
                 ->where('cm.resourceId = ?', (int) $resourceId)
                 ->where('cm.type = ?', (int)$type)
                 ->where('cm.replyTo = ?', 0)
-                ->order('cm.created', 'desc');
+                ->order('cm.created', 'desc')
+                ->limit((int) $limit);
 
         $comments = self::initialize($query);
 
@@ -188,7 +189,7 @@ class CommentModel extends Model
      * @param type $actionId
      * @param type $created
      */
-    public static function fetchByTypeAndCreated($type, $resourceId, $created)
+    public static function fetchByTypeAndCreated($type, $resourceId, $created, $limit = 15)
     {
         $types = array_values(self::$_resourceConv);
         
@@ -202,7 +203,8 @@ class CommentModel extends Model
                 ->where('cm.resourceId = ?', (int) $resourceId)
                 ->where('cm.created >= ?', (int) $created)
                 ->where('cm.type = ?', (int)$type)
-                ->order('cm.created', 'desc');
+                ->order('cm.created', 'desc')
+                ->limit((int) $limit);
 
         $comments = self::initialize($query);
         

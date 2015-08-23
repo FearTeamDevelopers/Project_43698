@@ -224,19 +224,31 @@ jQuery(document).ready(function () {
         return false;
     });
     
-    jQuery('select[name=type]').change(function(){
+    jQuery('select[name=type]').change(function () {
         var type = jQuery(this).children('option:selected').val();
-        
-        if(type == 1){
-            if(jQuery('#singleRecipient').hasClass('nodisplay')){
+
+        if (type == 1) {
+            if (jQuery('#singleRecipient').hasClass('nodisplay')) {
                 jQuery('#singleRecipient').removeClass('nodisplay');
                 jQuery('#groupRecipient').addClass('nodisplay');
+                jQuery('#actionRecipient').addClass('nodisplay');
             }
-        }else{
-            if(jQuery('#groupRecipient').hasClass('nodisplay')){
+        } else if (type == 2) {
+            if (jQuery('#groupRecipient').hasClass('nodisplay')) {
                 jQuery('#groupRecipient').removeClass('nodisplay');
                 jQuery('#singleRecipient').addClass('nodisplay');
+                jQuery('#actionRecipient').addClass('nodisplay');
             }
+        } else if (type == 3) {
+            if (jQuery('#actionRecipient').hasClass('nodisplay')) {
+                jQuery('#actionRecipient').removeClass('nodisplay');
+                jQuery('#singleRecipient').addClass('nodisplay');
+                jQuery('#groupRecipient').addClass('nodisplay');
+            }
+        } else {
+            jQuery('#singleRecipient').addClass('nodisplay');
+            jQuery('#groupRecipient').addClass('nodisplay');
+            jQuery('#actionRecipient').addClass('nodisplay');
         }
     });
 });

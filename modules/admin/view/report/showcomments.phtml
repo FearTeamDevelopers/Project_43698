@@ -1,9 +1,9 @@
 <ul class="maintabmenu multipletabmenu">
-    <li><a href="/admin/news/">Novinky</a></li>
-    <li><a href="/admin/news/add/">Přidat novinku</a></li>
-    <li><a href="/admin/news/edit/{echo $news->getId()}">Upravit novinku</a></li>
-    <li class="current"><a href="#">Komentáře k novince</a></li>
-    <li><a href="/admin/news/help/">Nápověda</a></li>
+    <li><a href="/admin/report/">Reportáže</a></li>
+    <li><a href="/admin/report/add/">Přidat Reportáž</a></li>
+    <li><a href="/admin/report/edit/{echo $report->getId()}">Upravit Reportáž</a></li>
+    <li class="current"><a href="#">Komentáře k reportáži</a></li>
+    <li><a href="/admin/report/help/">Nápověda</a></li>
 </ul><!--maintabmenu-->
 
 <div class="content">
@@ -44,18 +44,19 @@
                         {/if}
                     {/foreach}
                 {/macro}
-                
+
                 {foreach $comment in $comments}
                     <tr>
                         <td>{echo $comment->getId()}</td>
                         <td>{echo $comment->getFirstname()." ".$comment->getLastname()}</td>
                         <td>{echo $comment->getBody()}</td>
                         <td>{echo $comment->getCreated()}</td>
-
+                        
                         <td>
                             <a href="/admin/comment/delete/{echo $comment->getId()}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>
                         </td>
                     </tr>
+                    
                     {if !empty($comment->_replies)}
                         {echo showReplies($comment->_replies)}
                     {/if}

@@ -33,29 +33,6 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Prepare email body
-     * 
-     * @param \App\Model\AdvertisementModel $ad
-     * @param \App\Model\AdMessageModel $message
-     * @return string
-     */
-    private function _getEmailBody(\App\Model\AdvertisementModel $ad, \App\Model\AdMessageModel $message)
-    {
-        $body = '<div>'
-                . '<strong>Dotaz k inzerátu<strong><br/>'
-                . 'Byl odeslán následující dotaz k inzerátu na serveru <a href="http://' . $this->getServerHost() . '">Hastrman.cz</a>:'
-                . '<br/><br/>'
-                . 'Inzerát: <a href="http://' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a><br/>'
-                . 'Jméno: ' . $message->getMsAuthor() . '<br/>'
-                . 'Email: ' . $message->getMsEmail() . '<br/>'
-                . 'Text: <br/>' . $message->getMessage() . '</div>'
-                . '<br/><br/>'
-                . 'S pozdravem<br/>tým Hastrman';
-
-        return $body;
-    }
-
-    /**
      * Check whether ad unique identifier already exist or not
      * 
      * @param string $str
@@ -257,28 +234,33 @@ class AdvertisementController extends Controller
 
             if ($message->validate()) {
                 try {
+                    $data = array(
+                        '{ADLINK}' => '<a href="http://' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a>',
+                        '{AUTHOR}' => $message->getMsAuthor(),
+                        '{AUTHOREMAIL}' => $message->getMsEmail(),
+                        '{MESSAGE}' => StringMethods::prepareEmailText($message->getMessage())
+                    );
+                    $email = \Admin\Model\EmailModel::loadAndPrepare('dotaz-k-inzeratu', $data);
+
                     if ($message->getSendEmailCopy() == 1) {
-                        $sendTo = array($message->getMsEmail(), $ad->getEmail());
+                        $email->setRecipients(array($message->getMsEmail(), $ad->getEmail()));
                     } else {
-                        $sendTo = $ad->getEmail();
+                        $email->setRecipient($ad->getEmail());
                     }
-                    
-                    $subject = 'Hastrman - Bazar - Dotaz k inzerátu';
-                    $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('title = ?' => 'Dotaz k inzerátu'));
-                    $emailBody = str_replace(
-                            array('{ADLINK}', '{AUTHOR}', '{AUTHOREMAIL}', '{MESSAGE}'), 
-                            array('<a href="http://' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a>',
-                                $message->getMsAuthor(), $message->getMsEmail(), $message->getMessage()), 
-                            $emailTemplate->getBody());
-                    
-                    $this->_sendEmail($emailBody, $subject, $sendTo, 'bazar@hastrman.cz');
 
-                    $message->messageSent = 1;
-                    $messageId = $message->save();
+                    if ($email->send(true, 'bazar@hastrman.cz')) {
+                        $message->messageSent = 1;
+                        $messageId = $message->save();
 
-                    Event::fire('app.log', array('success', 'Message with Id: ' . $messageId . ' send for Ad Id: ' . $ad->getId()));
-                    $view->successMessage('Dotaz byl úspěšně odeslán');
-                    self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                        Event::fire('app.log', array('success', 'Message with Id: ' . $messageId . ' send for Ad Id: ' . $ad->getId()));
+                        $view->successMessage('Dotaz byl úspěšně odeslán');
+                        self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                    } else {
+                        Event::fire('app.log', array('fail', 'Email not send for Ad Id: ' . $ad->getId(),
+                            'Error: ' . $ex->getMessage()));
+                        $view->errorMessage('Nepodařilo se odeslat dotaz k inzerátu, opakujte akci později');
+                        self::redirect('/bazar/r/' . $ad->getUniqueKey());
+                    }
                 } catch (\Exception $ex) {
                     \THCFrame\Core\Core::getLogger()->log($ex->getMessage());
 

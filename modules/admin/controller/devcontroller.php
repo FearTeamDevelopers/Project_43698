@@ -308,9 +308,15 @@ class DevController extends Controller
     public function testSendEmail()
     {
         $this->_disableView();
-        
-        $this->_sendEmail('Test message', 'Hastrman test email');
-        print('<pre>'.print_r('Send', true).'</pre>');die;
+
+        $email = new \Admin\Model\EmailModel(array(
+            'body' => 'Test message',
+            'subject' => 'Hastrman test email'
+        ));
+        $email->send();
+
+        print('<pre>' . print_r('Send', true) . '</pre>');
+        die;
     }
   
 }

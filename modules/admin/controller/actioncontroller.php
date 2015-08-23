@@ -164,16 +164,18 @@ class ActionController extends Controller
     {
         if($action->getApproved() && $this->getConfig()->action_new_notification){
             $users = \App\Model\UserModel::all(array('getNewActionNotification = ?' => true), array('email'));
-
-            $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('urlKey = ?' => 'new-action'));
-            $emailBody = str_replace(array('{TITLE}', '{LINK}'), 
-                            array($action->getTitle(), RequestMethods::server('HTTP_HOST').'/akce/r/'.$action->getUrlKey()), 
-                            $emailTemplate->getBody());
-
+            
             if(!empty($users)){
+                $data = array('{TITLE}' => '<a href="http://' . $this->getServerHost() . '/akce/r/' .$action->getUrlKey() . '">' . $action->getTitle() . '</a>',
+                    '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody())
+                        );
+                $email = \Admin\Model\EmailModel::loadAndPrepare('nova-akce', $data);
+                
                 foreach($users as $user){
-                    $this->_sendEmail($emailBody, 'Hastrman - Akce - '.$action->getTitle(), $user->getEmail());
+                    $email->setRecipient($user->getEmail());
                 }
+                
+                $email->send(true);
             }
         }
     }

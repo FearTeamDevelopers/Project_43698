@@ -5,6 +5,7 @@ namespace Admin\Controller;
 use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
+use THCFrame\Core\StringMethods;
 
 /**
  * Controller for email templates management and mass email sending
@@ -39,9 +40,9 @@ class EmailController extends Controller
         $view = $this->getActionView();
         
         if($this->isSuperAdmin()){
-            $templates = \Admin\Model\EmailTemplateModel::fetchAll();
+            $templates = \Admin\Model\EmailModel::fetchAll();
         }else{
-            $templates = \Admin\Model\EmailTemplateModel::fetchAllCommon();
+            $templates = \Admin\Model\EmailModel::fetchAllCommon();
         }
         
         $view->set('emails', $templates);
@@ -57,13 +58,16 @@ class EmailController extends Controller
         $view = $this->getActionView();
         
         if($this->isSuperAdmin()){
-            $templates = \Admin\Model\EmailTemplateModel::fetchAllActive();
+            $templates = \Admin\Model\EmailModel::fetchAllActive();
         }else{
-            $templates = \Admin\Model\EmailTemplateModel::fetchAllCommonActive();
+            $templates = \Admin\Model\EmailModel::fetchAllCommonActive();
         }
         
+        $actions = \App\Model\ActionModel::fetchActiveWithLimit(0);
+        
         $view->set('email', null)
-                ->set('templates', $templates);
+                ->set('templates', $templates)
+                ->set('actions', $actions);
         
         if (RequestMethods::post('submitSendEmail')) {
             if ($this->_checkCSRFToken() !== true &&
@@ -72,10 +76,13 @@ class EmailController extends Controller
             }
             
             $errors = array();
-            $email = new \stdClass();
-            $email->type = RequestMethods::post('type');
-            $email->subject = RequestMethods::post('subject');
-            $email->body = RequestMethods::post('text');
+            $email = new \Admin\Model\EmailModel(array(
+                'type' => RequestMethods::post('type'),
+                'subject' => RequestMethods::post('subject'),
+                'body' => StringMethods::prepareEmailText(stripslashes(RequestMethods::post('text')))
+            ));
+            
+            $email->populate();
             
             if(empty(RequestMethods::post('singlerecipients')) && empty(RequestMethods::post('grouprecipients'))){
                 $errors['recipientlist'] = array($this->lang('EMAIL_NO_RECIPIENTS'));
@@ -85,8 +92,9 @@ class EmailController extends Controller
                 $recipients = RequestMethods::post('singlerecipients');
                 $recipientsArr = explode(',', $recipients);
                 array_map('trim', $recipientsArr);
+                $email->setRecipients($recipientsArr);
                 
-                if($this->_sendEmail($email->body, $email->subject, $recipientsArr)){
+                if($email->send()){
                     Event::fire('admin.log', array('success', 'Email sent to: ' . $recipients));
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
                     self::redirect('/admin/email/');
@@ -103,8 +111,29 @@ class EmailController extends Controller
                     $recipientsArr[] = $user->getEmail();
                 }
                 
-                if($this->_sendEmail($email->body, $email->subject, $recipientsArr)){
+                $email->setRecipients($recipientsArr);
+                
+                if($email->send()){
                     Event::fire('admin.log', array('success', 'Email sent to: ' . implode(',', $recipientsArr)));
+                    $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
+                    self::redirect('/admin/email/');
+                }else{
+                    $view->errorMessage($this->lang('EMAIL_SEND_FAIL'));
+                    self::redirect('/admin/email/');
+                }
+            }elseif(empty($errors) && $email->type == 3){
+                $actionId = RequestMethods::post('actionid');
+                $recipients = \App\Model\AttendanceModel::fetchUsersByActionId($actionId);
+                
+                if(!empty($recipients)){
+                    foreach($recipients as $recipient){
+                        $email->setRecipient($recipient->email);
+                    }
+                }
+                
+                if($email->send()){
+                    $recipientStr = $email->getRecipientsToString(','); 
+                    Event::fire('admin.log', array('success', 'Email sent to: ' . $recipientStr));
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
                     self::redirect('/admin/email/');
                 }else{
@@ -137,12 +166,12 @@ class EmailController extends Controller
         }
         
         if($this->isSuperAdmin()){
-            $template = \Admin\Model\EmailTemplateModel::fetchActiveByIdAndLang($id, $fieldName);
+            $template = \Admin\Model\EmailModel::fetchActiveByIdAndLang($id, $fieldName);
         }else{
-            $template = \Admin\Model\EmailTemplateModel::fetchCommonActiveByIdAndLang($id, $fieldName);
+            $template = \Admin\Model\EmailModel::fetchCommonActiveByIdAndLang($id, $fieldName);
         }
         
-        echo json_encode(array('text' => $template->$fieldName, 'subject' => $template->getSubject()));
+        echo json_encode(array('text' => stripslashes($template->$fieldName), 'subject' => $template->getSubject()));
         exit;
     }
 
@@ -179,12 +208,12 @@ class EmailController extends Controller
                 }
             }
 
-            $emailTemplate = new \Admin\Model\EmailTemplateModel(array(
+            $emailTemplate = new \Admin\Model\EmailModel(array(
                 'title' => RequestMethods::post('title'),
                 'subject' => RequestMethods::post('subject'),
                 'urlKey' => $urlKeyCh,
-                'body' => RequestMethods::post('text'),
-                'bodyEn' => RequestMethods::post('texten'),
+                'body' => stripslashes(RequestMethods::post('text')),
+                'bodyEn' => stripslashes(RequestMethods::post('texten')),
                 'type' => $this->isSuperAdmin() ? RequestMethods::post('type') : 1,
             ));
 
@@ -212,7 +241,7 @@ class EmailController extends Controller
     {
         $view = $this->getActionView();
 
-        $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('id = ?' => (int) $id));
+        $emailTemplate = \Admin\Model\EmailModel::first(array('id = ?' => (int) $id));
 
         if (NULL === $emailTemplate) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -237,8 +266,8 @@ class EmailController extends Controller
             $emailTemplate->title = RequestMethods::post('title');
             $emailTemplate->subject = RequestMethods::post('subject');
             $emailTemplate->urlKey = $urlKey;
-            $emailTemplate->body = RequestMethods::post('text');
-            $emailTemplate->bodyEn = RequestMethods::post('texten');
+            $emailTemplate->body = stripslashes(RequestMethods::post('text'));
+            $emailTemplate->bodyEn = stripslashes(RequestMethods::post('texten'));
             $emailTemplate->type = $this->isSuperAdmin() ? RequestMethods::post('type') : 1;
             $emailTemplate->active = RequestMethods::post('active');
 
@@ -266,7 +295,7 @@ class EmailController extends Controller
     {
         $this->_disableView();
 
-        $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('id = ?' => (int)$id));
+        $emailTemplate = \Admin\Model\EmailModel::first(array('id = ?' => (int)$id));
 
         if (NULL === $emailTemplate) {
             echo $this->lang('NOT_FOUND');

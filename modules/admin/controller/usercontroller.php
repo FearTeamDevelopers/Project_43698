@@ -411,10 +411,11 @@ class UserController extends Controller
             $newPass = $user->forceResetPassword();
 
             if ($newPass !== false) {
-                $emailTemplate = \Admin\Model\EmailTemplateModel::first(array('urlKey = ?' => 'password-reset'));
-                $emailBody = str_replace('{NEWPASS}', $newPass, $emailTemplate->getBody());
+                $data = array('{NEWPASS}' => $newPass);
+                $email = \Admin\Model\EmailModel::loadAndPrepare('reset-hesla', $data);
+                $email->setRecipient($user->getEmail())
+                        ->send();
 
-                $this->_sendEmail($emailBody, 'Hastrman - Nové heslo', $user->getEmail());
                 $view->successMessage($this->lang('PASS_RESET_EMAIL'));
                 Event::fire('admin.log', array('success', 'Force password change for user: ' . $user->getId()));
                 self::redirect('/admin/user/');

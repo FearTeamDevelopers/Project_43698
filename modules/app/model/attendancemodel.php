@@ -133,7 +133,7 @@ class AttendanceModel extends Model
     {
         $query = self::getQuery(array('at.id', 'at.type', 'at.comment'))
                 ->join('tb_user', 'at.userId = us.id', 'us', 
-                        array('us.id' => 'usId', 'us.firstname', 'us.lastname'))
+                        array('us.id' => 'usId', 'us.firstname', 'us.lastname', 'us.email'))
                 ->where('at.actionId = ?', (int)$actionId)
                 ->order('us.lastname', 'ASC');
         

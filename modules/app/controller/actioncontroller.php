@@ -140,7 +140,7 @@ class ActionController extends Controller
                 Event::fire('app.log', array('fail', 'Errors: '.  json_encode($comment->getErrors())));
                 $view->set('errors', $comment->getErrors())
                     ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
-                    ->set('comment', $comment);
+                    ->set('newcomment', $comment);
             }
         }
     }

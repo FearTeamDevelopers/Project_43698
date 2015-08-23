@@ -113,9 +113,9 @@
                             <td>{echo $news->getUserAlias()}</td>
                             <td>{echo $news->getCreated()}</td>
                             <td>
-                                {if $news->getApproved() == 0}Čeká na schválení{/if}
-                                {elseif $news->getApproved() == 1}Schváleno{/elseif}
-                                {else}Zamítnuto{/else}
+                                {if $news->getApproved() == 0}<span class="infoLabel infoLabelOrange">Čeká na schválení</span>{/if}
+                                {elseif $news->getApproved() == 1}<span class="infoLabel infoLabelGreen">Schváleno</span>{/elseif}
+                                {else}<span class="infoLabel infoLabelRed">Zamítnuto</span>{/else}
                             </td>
                         </tr>
                         {/foreach}
@@ -151,9 +151,9 @@
                             <td>{echo $report->getUserAlias()}</td>
                             <td>{echo $report->getCreated()}</td>
                             <td>
-                                {if $report->getApproved() == 0}Čeká na schválení{/if}
-                                {elseif $report->getApproved() == 1}Schváleno{/elseif}
-                                {else}Zamítnuto{/else}
+                                {if $report->getApproved() == 0}<span class="infoLabel infoLabelOrange">Čeká na schválení</span>{/if}
+                                {elseif $report->getApproved() == 1}<span class="infoLabel infoLabelGreen">Schváleno</span>{/elseif}
+                                {else}<span class="infoLabel infoLabelRed">Zamítnuto</span>{/else}
                             </td>
                         </tr>
                         {/foreach}
@@ -191,9 +191,9 @@
                             <td>{echo $action->getUserAlias()}</td>
                             <td>{echo $action->getCreated()}</td>
                             <td>
-                                {if $action->getApproved() == 0}Čeká na schválení{/if}
-                                {elseif $action->getApproved() == 1}Schváleno{/elseif}
-                                {else}Zamítnuto{/else}
+                                {if $action->getApproved() == 0}<span class="infoLabel infoLabelOrange">Čeká na schválení</span>{/if}
+                                {elseif $action->getApproved() == 1}<span class="infoLabel infoLabelGreen">Schváleno</span>{/elseif}
+                                {else}<span class="infoLabel infoLabelRed">Zamítnuto</span>{/else}
                             </td>
                         </tr>
                         {/foreach}
