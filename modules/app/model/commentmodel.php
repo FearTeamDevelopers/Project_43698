@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class CommentModel extends Model
 {
-
     const RESOURCE_ACTION = 1;
     const RESOURCE_NEWS = 2;
     const RESOURCE_REPORT = 3;
@@ -96,6 +95,7 @@ class CommentModel extends Model
 
     /**
      * @readwrite
+     *
      * @var array
      */
     public $_replies;
@@ -116,27 +116,26 @@ class CommentModel extends Model
     }
 
     /**
-     * 
      * @return array
      */
     public static function fetchAll()
     {
         $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', 
+                ->join('tb_user', 'cm.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
     }
 
     /**
-     * Called from admin module
+     * Called from admin module.
      * 
      * @return array
      */
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', 
+                ->join('tb_user', 'cm.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->order('cm.created', 'desc')
                 ->limit((int) $limit);
@@ -145,30 +144,30 @@ class CommentModel extends Model
     }
 
     /**
-     * 
      * @param type $userId
+     *
      * @return type
      */
     public static function fetchByUserId($userId)
     {
-        return self::all(array('userId = ?' => (int) $userId), 
+        return self::all(array('userId = ?' => (int) $userId),
                 array('*'),
                 array('created' => 'desc'));
     }
 
     /**
-     * 
      * @param type $resourceId
      * @param type $type
+     *
      * @return type
      */
     public static function fetchCommentsByResourceAndType($resourceId, $type, $limit = 15)
     {
         $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', 
+                ->join('tb_user', 'cm.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->where('cm.resourceId = ?', (int) $resourceId)
-                ->where('cm.type = ?', (int)$type)
+                ->where('cm.type = ?', (int) $type)
                 ->where('cm.replyTo = ?', 0)
                 ->order('cm.created', 'desc')
                 ->limit((int) $limit);
@@ -185,35 +184,34 @@ class CommentModel extends Model
     }
 
     /**
-     * 
      * @param type $actionId
      * @param type $created
      */
     public static function fetchByTypeAndCreated($type, $resourceId, $created, $limit = 15)
     {
         $types = array_values(self::$_resourceConv);
-        
-        if(!in_array($type, $types)){
-            return null;
+
+        if (!in_array($type, $types)) {
+            return;
         }
-        
+
         $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', 
+                ->join('tb_user', 'cm.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->where('cm.resourceId = ?', (int) $resourceId)
                 ->where('cm.created >= ?', (int) $created)
-                ->where('cm.type = ?', (int)$type)
+                ->where('cm.type = ?', (int) $type)
                 ->order('cm.created', 'desc')
                 ->limit((int) $limit);
 
         $comments = self::initialize($query);
-        
+
         return $comments;
     }
-    
+
     /**
-     * 
      * @param type $id
+     *
      * @return type
      */
     public static function fetchReplies($id)
@@ -232,18 +230,16 @@ class CommentModel extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getReplies()
     {
         $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', 
+                ->join('tb_user', 'cm.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->where('cm.replyTo = ?', $this->getId())
                 ->order('cm.created', 'desc');
 
         return self::initialize($query);
     }
-
 }

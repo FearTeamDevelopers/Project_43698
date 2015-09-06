@@ -13,14 +13,14 @@ use THCFrame\Core\StringMethods;
  */
 class ActionController extends Controller
 {
-
     private $_errors = array();
 
     /**
-     * Check whether user has access to action or not
+     * Check whether user has access to action or not.
      * 
      * @param \App\Model\ActionModel $action
-     * @return boolean
+     *
+     * @return bool
      */
     private function _checkAccess(\App\Model\ActionModel $action)
     {
@@ -33,10 +33,11 @@ class ActionController extends Controller
     }
 
     /**
-     * Check whether action unique identifier already exist or not
+     * Check whether action unique identifier already exist or not.
      * 
      * @param string $key
-     * @return boolean
+     *
+     * @return bool
      */
     private function _checkUrlKey($key)
     {
@@ -50,7 +51,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Create and return new action object
+     * Create and return new action object.
      * 
      * @return \App\Model\ActionModel
      */
@@ -62,7 +63,7 @@ class ActionController extends Controller
             if ($this->_checkUrlKey($urlKeyCh)) {
                 break;
             } else {
-                $urlKeyCh = $urlKey . '-' . $i;
+                $urlKeyCh = $urlKey.'-'.$i;
             }
 
             if ($i == 50) {
@@ -71,8 +72,8 @@ class ActionController extends Controller
             }
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                array('/akce/r/' . $urlKey, '[Celý článek]'), 
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
+                array('/akce/r/'.$urlKey, '[Celý článek]'),
                 RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -93,16 +94,17 @@ class ActionController extends Controller
             'endTime' => RequestMethods::post('timeend'),
             'keywords' => $keywords,
             'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-            'metaDescription' => RequestMethods::post('metadescription')
+            'metaDescription' => RequestMethods::post('metadescription'),
         ));
 
         return $action;
     }
 
     /**
-     * Edit existing action object
+     * Edit existing action object.
      * 
      * @param \App\Model\ActionModel $object
+     *
      * @return \App\Model\ActionModel
      */
     private function _editObject(\App\Model\ActionModel $object)
@@ -119,7 +121,7 @@ class ActionController extends Controller
         }
 
         $shortText = str_replace(
-                array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+                array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/'.$urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
         );
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -144,7 +146,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Check if there is object used for preview saved in session
+     * Check if there is object used for preview saved in session.
      * 
      * @return \App\Model\ActionModel
      */
@@ -156,25 +158,25 @@ class ActionController extends Controller
 
         return $action;
     }
-    
+
     /**
-     * Send email notification abou new action published on web
+     * Send email notification abou new action published on web.
      */
     private function _sendEmailNotification(\App\Model\ActionModel $action)
     {
-        if($action->getApproved() && $this->getConfig()->action_new_notification){
+        if ($action->getApproved() && $this->getConfig()->action_new_notification) {
             $users = \App\Model\UserModel::all(array('getNewActionNotification = ?' => true), array('email'));
-            
-            if(!empty($users)){
-                $data = array('{TITLE}' => '<a href="http://' . $this->getServerHost() . '/akce/r/' .$action->getUrlKey() . '">' . $action->getTitle() . '</a>',
-                    '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody())
+
+            if (!empty($users)) {
+                $data = array('{TITLE}' => '<a href="http://'.$this->getServerHost().'/akce/r/'.$action->getUrlKey().'">'.$action->getTitle().'</a>',
+                    '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody()),
                         );
                 $email = \Admin\Model\EmailModel::loadAndPrepare('nova-akce', $data);
-                
-                foreach($users as $user){
+
+                foreach ($users as $user) {
                     $email->setRecipient($user->getEmail());
                 }
-                
+
                 $email->send(true);
             }
         }
@@ -188,11 +190,10 @@ class ActionController extends Controller
      */
     public function index()
     {
-        
     }
 
     /**
-     * Create new action
+     * Create new action.
      * 
      * @before _secured, _participant
      */
@@ -203,7 +204,7 @@ class ActionController extends Controller
 
         $actionConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION, ),
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('action', $action)
@@ -223,11 +224,11 @@ class ActionController extends Controller
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
-                Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                Event::fire('admin.log', array('success', 'Action id: '.$id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/action/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($this->_errors + $action->getErrors())));
+                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($this->_errors + $action->getErrors())));
                 $view->set('errors', $this->_errors + $action->getErrors())
                         ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('action', $action)
@@ -259,10 +260,11 @@ class ActionController extends Controller
     }
 
     /**
-     * Edit existing action
+     * Edit existing action.
      * 
      * @before _secured, _participant
-     * @param int   $id     action id
+     *
+     * @param int $id action id
      */
     public function edit($id)
     {
@@ -288,8 +290,8 @@ class ActionController extends Controller
 
         $actionConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION), 
-                array('id', 'created', 'modified'), 
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION, ),
+                array('id', 'created', 'modified'),
                 array('created' => 'DESC'), 10);
 
         $view->set('action', $action)
@@ -309,12 +311,12 @@ class ActionController extends Controller
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
-                Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                Event::fire('admin.log', array('success', 'Action id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/action/');
             } else {
-                Event::fire('admin.log', array('fail', 'Action id: ' . $id,
-                    'Errors: ' . json_encode($this->_errors + $action->getErrors())));
+                Event::fire('admin.log', array('fail', 'Action id: '.$id,
+                    'Errors: '.json_encode($this->_errors + $action->getErrors()), ));
                 $view->set('errors', $this->_errors + $action->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -340,10 +342,11 @@ class ActionController extends Controller
     }
 
     /**
-     * Delete existing action
+     * Delete existing action.
      * 
      * @before _secured, _participant
-     * @param int   $id     action id
+     *
+     * @param int $id action id
      */
     public function delete($id)
     {
@@ -353,17 +356,17 @@ class ActionController extends Controller
                         array('id = ?' => (int) $id), array('id', 'userId')
         );
 
-        if (NULL === $action) {
+        if (null === $action) {
             echo $this->lang('NOT_FOUND');
         } else {
             if ($this->_checkAccess($action)) {
                 if ($action->delete()) {
                     $this->getCache()->invalidate();
-                    Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                    Event::fire('admin.log', array('success', 'Action id: '.$id));
                     echo 'success';
                 } else {
-                    Event::fire('admin.log', array('fail', 'Action id: ' . $id,
-                        'Errors: ' . json_encode($this->_errors + $action->getErrors())));
+                    Event::fire('admin.log', array('fail', 'Action id: '.$id,
+                        'Errors: '.json_encode($this->_errors + $action->getErrors()), ));
                     echo $this->lang('COMMON_FAIL');
                 }
             } else {
@@ -373,10 +376,11 @@ class ActionController extends Controller
     }
 
     /**
-     * Approve new action
+     * Approve new action.
      * 
      * @before _secured, _admin
-     * @param int   $id     action id
+     *
+     * @param int $id action id
      */
     public function approveAction($id)
     {
@@ -384,7 +388,7 @@ class ActionController extends Controller
 
         $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id));
 
-        if (NULL === $action) {
+        if (null === $action) {
             echo $this->lang('NOT_FOUND');
         } else {
             $action->approved = 1;
@@ -399,21 +403,22 @@ class ActionController extends Controller
                 $this->_sendEmailNotification($action);
                 $this->getCache()->invalidate();
 
-                Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                Event::fire('admin.log', array('success', 'Action id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Action id: ' . $id,
-                    'Errors: ' . json_encode($this->_errors + $action->getErrors())));
+                Event::fire('admin.log', array('fail', 'Action id: '.$id,
+                    'Errors: '.json_encode($this->_errors + $action->getErrors()), ));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Reject new action
+     * Reject new action.
      * 
      * @before _secured, _admin
-     * @param int   $id     action id
+     *
+     * @param int $id action id
      */
     public function rejectAction($id)
     {
@@ -421,7 +426,7 @@ class ActionController extends Controller
 
         $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id));
 
-        if (NULL === $action) {
+        if (null === $action) {
             echo $this->lang('NOT_FOUND');
         } else {
             $action->approved = 2;
@@ -434,18 +439,18 @@ class ActionController extends Controller
             if ($action->validate()) {
                 $action->save();
 
-                Event::fire('admin.log', array('success', 'Action id: ' . $id));
+                Event::fire('admin.log', array('success', 'Action id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Action id: ' . $id,
-                    'Errors: ' . json_encode($this->_errors + $action->getErrors())));
+                Event::fire('admin.log', array('fail', 'Action id: '.$id,
+                    'Errors: '.json_encode($this->_errors + $action->getErrors()), ));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Return list of actions to insert action link to content
+     * Return list of actions to insert action link to content.
      * 
      * @before _secured, _participant
      */
@@ -460,7 +465,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Execute basic operation over multiple actions
+     * Execute basic operation over multiple actions.
      * 
      * @before _secured, _admin
      */
@@ -475,6 +480,7 @@ class ActionController extends Controller
 
         if (empty($ids)) {
             echo $this->lang('NO_ROW_SELECTED');
+
             return;
         }
 
@@ -484,21 +490,21 @@ class ActionController extends Controller
                                 array('id IN ?' => $ids), array('id', 'title')
                 );
 
-                if (NULL !== $actions) {
+                if (null !== $actions) {
                     foreach ($actions as $action) {
                         if (!$action->delete()) {
-                            $errors[] = $this->lang('DELETE_FAIL') .' - '. $action->getTitle();
+                            $errors[] = $this->lang('DELETE_FAIL').' - '.$action->getTitle();
                         }
                     }
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('delete success', 'Action ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('delete success', 'Action ids: '.implode(',', $ids)));
                     $this->getCache()->invalidate();
                     echo $this->lang('DELETE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('delete fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -506,10 +512,10 @@ class ActionController extends Controller
             case 'activate':
                 $actions = \App\Model\ActionModel::all(array(
                             'id IN ?' => $ids,
-                            'active = ?' => false
+                            'active = ?' => false,
                 ));
 
-                if (NULL !== $actions) {
+                if (null !== $actions) {
                     foreach ($actions as $action) {
                         $action->active = true;
 
@@ -522,18 +528,18 @@ class ActionController extends Controller
                             $action->save();
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . join(', ', $action->getErrors());
+                                    .implode(', ', $action->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('activate success', 'Action ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('activate success', 'Action ids: '.implode(',', $ids)));
                     $this->getCache()->invalidate();
                     echo $this->lang('ACTIVATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('activate fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -541,10 +547,10 @@ class ActionController extends Controller
             case 'deactivate':
                 $actions = \App\Model\ActionModel::all(array(
                             'id IN ?' => $ids,
-                            'active = ?' => true
+                            'active = ?' => true,
                 ));
 
-                if (NULL !== $actions) {
+                if (null !== $actions) {
                     foreach ($actions as $action) {
                         $action->active = false;
 
@@ -557,18 +563,18 @@ class ActionController extends Controller
                             $action->save();
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . join(', ', $action->getErrors());
+                                    .implode(', ', $action->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('deactivate success', 'Action ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('deactivate success', 'Action ids: '.implode(',', $ids)));
                     $this->getCache()->invalidate();
                     echo $this->lang('DEACTIVATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -576,10 +582,10 @@ class ActionController extends Controller
             case 'approve':
                 $actions = \App\Model\ActionModel::all(array(
                             'id IN ?' => $ids,
-                            'approved IN ?' => array(0, 2)
+                            'approved IN ?' => array(0, 2),
                 ));
 
-                if (NULL !== $actions) {
+                if (null !== $actions) {
                     foreach ($actions as $action) {
                         $action->approved = 1;
 
@@ -593,18 +599,18 @@ class ActionController extends Controller
                             $this->_sendEmailNotification($action);
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . join(', ', $action->getErrors());
+                                    .implode(', ', $action->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('approve success', 'Action ids: '.implode(',', $ids)));
                     $this->getCache()->invalidate();
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('approve fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -612,10 +618,10 @@ class ActionController extends Controller
             case 'reject':
                 $actions = \App\Model\ActionModel::all(array(
                             'id IN ?' => $ids,
-                            'approved IN ?' => array(0, 1)
+                            'approved IN ?' => array(0, 1),
                 ));
 
-                if (NULL !== $actions) {
+                if (null !== $actions) {
                     foreach ($actions as $action) {
                         $action->approved = 2;
 
@@ -628,18 +634,18 @@ class ActionController extends Controller
                             $action->save();
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . join(', ', $action->getErrors());
+                                    .implode(', ', $action->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('reject success', 'Action ids: '.implode(',', $ids)));
                     $this->getCache()->invalidate();
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('reject fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -651,7 +657,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Response for ajax call from datatables plugin
+     * Response for ajax call from datatables plugin.
      * 
      * @before _secured, _participant
      */
@@ -667,7 +673,7 @@ class ActionController extends Controller
 
             $query = \App\Model\ActionModel::getQuery(
                             array('ac.id', 'ac.userId', 'ac.userAlias', 'ac.title',
-                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created'))
+                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created', ))
                     ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
                     ->wheresql($whereCond, $search, $search, $search);
 
@@ -703,7 +709,7 @@ class ActionController extends Controller
         } else {
             $query = \App\Model\ActionModel::getQuery(
                             array('ac.id', 'ac.userId', 'ac.userAlias', 'ac.title',
-                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created'))
+                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created', ))
                     ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
             if (RequestMethods::issetpost('iSortCol_0')) {
@@ -732,7 +738,7 @@ class ActionController extends Controller
 
         $draw = $page + 1 + time();
 
-        $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
+        $str = '{ "draw": '.$draw.', "recordsTotal": '.$count.', "recordsFiltered": '.$count.', "data": [';
 
         $returnArr = array();
         if (null !== $actions) {
@@ -763,52 +769,51 @@ class ActionController extends Controller
                 }
 
                 $arr = array();
-                $arr [] = "[ \"" . $action->getId() . "\"";
-                $arr [] = "\"" . htmlentities($action->getTitle()) . "\"";
-                $arr [] = "\"" . $action->getUserAlias() . "\"";
-                $arr [] = "\"" . $action->getCreated() . "\"";
-                $arr [] = "\"" . $label . "\"";
-                $arr [] = "\"" . $archiveLabel . "\"";
+                $arr [] = '[ "'.$action->getId().'"';
+                $arr [] = '"'.htmlentities($action->getTitle()).'"';
+                $arr [] = '"'.$action->getUserAlias().'"';
+                $arr [] = '"'.$action->getCreated().'"';
+                $arr [] = '"'.$label.'"';
+                $arr [] = '"'.$archiveLabel.'"';
 
-                $tempStr = "\"";
+                $tempStr = '"';
                 if ($this->isAdmin() || $action->userId == $this->getUser()->getId()) {
-                    $tempStr .= "<a href='/admin/action/showcomments/" . $action->id . "' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
-                    $tempStr .= "<a href='/admin/action/getuserlist/" . $action->id . "' class='btn btn3 btn_users dialog' value='Účastníci' title='Zobrazit účastníky'></a>";
-                    $tempStr .= "<a href='/admin/action/edit/" . $action->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
-                    $tempStr .= "<a href='/admin/action/delete/" . $action->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
+                    $tempStr .= "<a href='/admin/action/showcomments/".$action->id."' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
+                    $tempStr .= "<a href='/admin/action/getuserlist/".$action->id."' class='btn btn3 btn_users dialog' value='Účastníci' title='Zobrazit účastníky'></a>";
+                    $tempStr .= "<a href='/admin/action/edit/".$action->id."' class='btn btn3 btn_pencil' title='Upravit'></a>";
+                    $tempStr .= "<a href='/admin/action/delete/".$action->id."' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
                 if ($this->isAdmin() && $action->approved == 0) {
-                    $tempStr .= "<a href='/admin/action/approveaction/" . $action->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
-                    $tempStr .= "<a href='/admin/action/rejectaction/" . $action->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                    $tempStr .= "<a href='/admin/action/approveaction/".$action->id."' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/action/rejectaction/".$action->id."' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
                 }
 
-                $arr [] = $tempStr . "\"]";
-                $returnArr[] = join(',', $arr);
+                $arr [] = $tempStr.'"]';
+                $returnArr[] = implode(',', $arr);
             }
 
-            $str .= join(',', $returnArr) . "]}";
+            $str .= implode(',', $returnArr).']}';
 
             echo $str;
         } else {
-            $str .= "[ \"\",\"\",\"\",\"\",\"\",\"\",\"\"]]}";
+            $str .= '[ "","","","","","",""]]}';
 
             echo $str;
         }
     }
 
     /**
-     * Show help for action section
+     * Show help for action section.
      * 
      * @before _secured, _participant
      */
     public function help()
     {
-        
     }
-    
+
     /**
-     * Load concept into active form
+     * Load concept into active form.
      * 
      * @before _secured, _participant
      */
@@ -816,8 +821,8 @@ class ActionController extends Controller
     {
         $this->_disableView();
         $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
-        
-        if(null !== $concept){
+
+        if (null !== $concept) {
             $conceptArr = array(
                 'conceptid' => $concept->getId(),
                 'title' => $concept->getTitle(),
@@ -825,21 +830,22 @@ class ActionController extends Controller
                 'body' => $concept->getBody(),
                 'keywords' => $concept->getKeywords(),
                 'metatitle' => $concept->getMetaTitle(),
-                'metadescription' => $concept->getMetaDescription()
+                'metadescription' => $concept->getMetaDescription(),
             );
-            
+
             echo json_encode($conceptArr);
             exit;
-        }else{
+        } else {
             echo 'notfound';
             exit;
         }
     }
-    
+
     /**
-     * Show comments for specific action
+     * Show comments for specific action.
      * 
      * @before _secured, _admin
+     *
      * @param int $id
      */
     public function showComments($id)
@@ -847,7 +853,7 @@ class ActionController extends Controller
         $view = $this->getActionView();
         $this->getLayoutView()
                 ->setTitle($this->lang('TITLE_ACTION_COMMENTS'));
-        
+
         $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id), array('id'));
 
         if (null === $action) {
@@ -857,32 +863,32 @@ class ActionController extends Controller
         }
 
         $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
-        
+
         $view->set('comments', $comments)
                 ->set('action', $action);
     }
-    
+
     /**
-     * 
      * @before _secured, _participant
+     *
      * @param type $actionId
      */
     public function getUserList($actionId)
     {
         $this->_disableView();
-        
+
         $attUsers = \App\Model\AttendanceModel::fetchUsersByActionId($actionId);
         $returnStr = '';
-        
-        if(!empty($attUsers)){
-            foreach ($attUsers as $key => $user){
-                $returnStr .= $user->getFirstname() . ' ' . $user->getLastname();
-                
-                if($user->getType() == \App\Model\AttendanceModel::ACCEPT){
+
+        if (!empty($attUsers)) {
+            foreach ($attUsers as $key => $user) {
+                $returnStr .= $user->getFirstname().' '.$user->getLastname();
+
+                if ($user->getType() == \App\Model\AttendanceModel::ACCEPT) {
                     $returnStr .= ' - Zúčastní se'.PHP_EOL;
-                }elseif($user->getType() == \App\Model\AttendanceModel::REJECT){
+                } elseif ($user->getType() == \App\Model\AttendanceModel::REJECT) {
                     $returnStr .= ' - Nezúčastní se'.PHP_EOL;
-                }else{
+                } else {
                     $returnStr .= ' - Neví'.PHP_EOL;
                 }
             }

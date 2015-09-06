@@ -13,12 +13,12 @@ use THCFrame\Registry\Registry;
  */
 class GalleryController extends Controller
 {
-
     /**
-     * Check whether gallery unique identifier already exist or not
+     * Check whether gallery unique identifier already exist or not.
      * 
      * @param string $key
-     * @return boolean
+     *
+     * @return bool
      */
     private function _checkUrlKey($key)
     {
@@ -32,10 +32,11 @@ class GalleryController extends Controller
     }
 
     /**
-     * Check whether user has access to gallery or not
+     * Check whether user has access to gallery or not.
      * 
      * @param \App\Model\GalleryModel $gallery
-     * @return boolean
+     *
+     * @return bool
      */
     private function _checkAccess(\App\Model\GalleryModel $gallery)
     {
@@ -48,7 +49,7 @@ class GalleryController extends Controller
     }
 
     /**
-     * Get list of all gelleries
+     * Get list of all gelleries.
      * 
      * @before _secured, _participant
      */
@@ -62,7 +63,7 @@ class GalleryController extends Controller
     }
 
     /**
-     * Create new gallery
+     * Create new gallery.
      * 
      * @before _secured, _participant
      */
@@ -91,16 +92,16 @@ class GalleryController extends Controller
                 'urlKey' => $urlKey,
                 'avatarPhotoId' => 0,
                 'description' => RequestMethods::post('description'),
-                'rank' => RequestMethods::post('rank', 1)
+                'rank' => RequestMethods::post('rank', 1),
             ));
 
             if (empty($errors) && $gallery->validate()) {
                 $id = $gallery->save();
 
                 $this->getCache()->invalidate();
-                Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
+                Event::fire('admin.log', array('success', 'Gallery id: '.$id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
-                self::redirect('/admin/gallery/detail/' . $id);
+                self::redirect('/admin/gallery/detail/'.$id);
             } else {
                 Event::fire('admin.log', array('fail'));
                 $view->set('gallery', $gallery)
@@ -111,10 +112,11 @@ class GalleryController extends Controller
     }
 
     /**
-     * Show detail of existing gallery
+     * Show detail of existing gallery.
      * 
      * @before _secured, _participant
-     * @param int   $id     gallery id
+     *
+     * @param int $id gallery id
      */
     public function detail($id)
     {
@@ -132,10 +134,11 @@ class GalleryController extends Controller
     }
 
     /**
-     * Edit existing gallery
+     * Edit existing gallery.
      * 
      * @before _secured, _participant
-     * @param int   $id     gallery id
+     *
+     * @param int $id gallery id
      */
     public function edit($id)
     {
@@ -143,7 +146,7 @@ class GalleryController extends Controller
 
         $gallery = \App\Model\GalleryModel::fetchGalleryById((int) $id);
 
-        if (NULL === $gallery) {
+        if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
@@ -186,21 +189,22 @@ class GalleryController extends Controller
                 $gallery->save();
 
                 $this->getCache()->invalidate();
-                Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
+                Event::fire('admin.log', array('success', 'Gallery id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
-                self::redirect('/admin/gallery/detail/' . $id);
+                self::redirect('/admin/gallery/detail/'.$id);
             } else {
-                Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Gallery id: '.$id));
                 $view->set('errors', $gallery->getErrors());
             }
         }
     }
 
     /**
-     * Delete existing gallery and all photos (files and db)
+     * Delete existing gallery and all photos (files and db).
      * 
      * @before _secured, _participant
-     * @param int   $id     gallery id
+     *
+     * @param int $id gallery id
      */
     public function delete($id)
     {
@@ -210,7 +214,7 @@ class GalleryController extends Controller
                         array('id = ?' => (int) $id), array('id', 'title', 'created', 'userId')
         );
 
-        if (NULL === $gallery) {
+        if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
             $this->_willRenderActionView = false;
             self::redirect('/admin/gallery/');
@@ -242,7 +246,7 @@ class GalleryController extends Controller
 
             $photos = \App\Model\PhotoModel::all(array('galleryId = ?' => (int) $id), array('id'));
 
-            if(!empty($photos)){
+            if (!empty($photos)) {
                 $ids = array();
                 foreach ($photos as $colPhoto) {
                     $ids[] = $colPhoto->getId();
@@ -250,8 +254,8 @@ class GalleryController extends Controller
 
                 \App\Model\PhotoModel::deleteAll(array('id IN ?' => $ids));
 
-                $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getId();
-                $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getId();
+                $path = APP_PATH.'/'.$pathToImages.'/gallery/'.$gallery->getId();
+                $pathThumbs = APP_PATH.'/'.$pathToThumbs.'/gallery/'.$gallery->getId();
 
                 if ($path == $pathThumbs) {
                     $fm->remove($path);
@@ -263,11 +267,11 @@ class GalleryController extends Controller
 
             if ($gallery->delete()) {
                 $this->getCache()->invalidate();
-                Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
+                Event::fire('admin.log', array('success', 'Gallery id: '.$id));
                 $view->successMessage($this->lang('DELETE_SUCCESS'));
                 self::redirect('/admin/gallery/');
             } else {
-                Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Gallery id: '.$id));
                 $view->warningMessage($this->lang('COMMON_FAIL'));
                 self::redirect('/admin/gallery/');
             }
@@ -275,7 +279,7 @@ class GalleryController extends Controller
     }
 
     /**
-     * Return list of galleries to insert gallery link to content
+     * Return list of galleries to insert gallery link to content.
      * 
      * @before _secured, _participant
      */
@@ -290,10 +294,11 @@ class GalleryController extends Controller
     }
 
     /**
-     * Upload photo into gallery
+     * Upload photo into gallery.
      * 
      * @before _secured, _participant
-     * @param int   $id     gallery id
+     *
+     * @param int $id gallery id
      */
     public function addPhoto($id)
     {
@@ -302,7 +307,7 @@ class GalleryController extends Controller
         $gallery = \App\Model\GalleryModel::first(
                         array(
                     'id = ?' => (int) $id,
-                    'active = ?' => true
+                    'active = ?' => true,
                         ), array('id', 'title', 'userId')
         );
 
@@ -332,10 +337,10 @@ class GalleryController extends Controller
                 'thumbHeight' => $this->getConfig()->thumb_height,
                 'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                 'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-                'maxImageHeight' => $this->getConfig()->photo_maxheight
+                'maxImageHeight' => $this->getConfig()->photo_maxheight,
             ));
 
-            $fileErrors = $fileManager->uploadImage('uploadfile', 'gallery/' . $gallery->getId(), time() . '_')->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('uploadfile', 'gallery/'.$gallery->getId(), time().'_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
@@ -358,15 +363,15 @@ class GalleryController extends Controller
                             'format' => $info['format'],
                             'width' => $file->getWidth(),
                             'height' => $file->getHeight(),
-                            'size' => $file->getSize()
+                            'size' => $file->getSize(),
                         ));
 
                         if ($photo->validate()) {
                             $aid = $photo->save();
 
-                            Event::fire('admin.log', array('success', 'Photo id: ' . $aid . ' in gallery ' . $gallery->getId()));
+                            Event::fire('admin.log', array('success', 'Photo id: '.$aid.' in gallery '.$gallery->getId()));
                         } else {
-                            Event::fire('admin.log', array('fail', 'Photo in gallery ' . $gallery->getId()));
+                            Event::fire('admin.log', array('fail', 'Photo in gallery '.$gallery->getId()));
                             $uploadErrors += $photo->getErrors();
                         }
                     }
@@ -374,10 +379,10 @@ class GalleryController extends Controller
             }
 
             $errors['uploadfile'] = $uploadErrors;
-            
+
             if (empty($errors['uploadfile'])) {
                 $view->successMessage($this->lang('UPLOAD_SUCCESS'));
-                self::redirect('/admin/gallery/detail/' . $gallery->getId());
+                self::redirect('/admin/gallery/detail/'.$gallery->getId());
             } else {
                 $view->set('errors', $errors);
             }
@@ -385,10 +390,11 @@ class GalleryController extends Controller
     }
 
     /**
-     * Delete photo
+     * Delete photo.
      * 
      * @before _secured, _participant
-     * @param int   $id     photo id
+     *
+     * @param int $id photo id
      */
     public function deletePhoto($id)
     {
@@ -419,20 +425,21 @@ class GalleryController extends Controller
             if ($photo->delete()) {
                 @unlink($mainPath);
                 @unlink($thumbPath);
-                Event::fire('admin.log', array('success', 'Photo id: ' . $id));
+                Event::fire('admin.log', array('success', 'Photo id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Photo id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Photo id: '.$id));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Change photo state (active/inactive)
+     * Change photo state (active/inactive).
      * 
      * @before _secured, _participant
-     * @param int   $id     photo id
+     *
+     * @param int $id photo id
      */
     public function changePhotoStatus($id)
     {
@@ -460,23 +467,22 @@ class GalleryController extends Controller
 
                 if ($photo->validate()) {
                     $photo->save();
-                    Event::fire('admin.log', array('success', 'Photo id: ' . $id));
+                    Event::fire('admin.log', array('success', 'Photo id: '.$id));
                     echo 'active';
                 } else {
-                    echo join('<br/>', $photo->getErrors());
+                    echo implode('<br/>', $photo->getErrors());
                 }
             } elseif ($photo->active) {
                 $photo->active = false;
 
                 if ($photo->validate()) {
                     $photo->save();
-                    Event::fire('admin.log', array('success', 'Photo id: ' . $id));
+                    Event::fire('admin.log', array('success', 'Photo id: '.$id));
                     echo 'inactive';
                 } else {
-                    echo join('<br/>', $photo->getErrors());
+                    echo implode('<br/>', $photo->getErrors());
                 }
             }
         }
     }
-
 }

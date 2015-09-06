@@ -5,11 +5,10 @@ namespace Search\Model;
 use THCFrame\Model\Model;
 
 /**
- * Log ORM class
+ * Log ORM class.
  */
 class AdminLogModel extends Model
 {
-
     /**
      * @column
      * @readwrite
@@ -57,7 +56,7 @@ class AdminLogModel extends Model
      * @validate alpha, max(50)
      */
     protected $_action;
-    
+
     /**
      * @column
      * @readwrite
@@ -111,5 +110,4 @@ class AdminLogModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-
 }

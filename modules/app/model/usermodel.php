@@ -9,7 +9,6 @@ use THCFrame\Security\Model\BasicUser;
  */
 class UserModel extends BasicUser
 {
-
     /**
      * @column
      * @readwrite
@@ -42,7 +41,7 @@ class UserModel extends BasicUser
      * @label telefon
      */
     protected $_phoneNumber;
-    
+
     /**
      * @column
      * @readwrite
@@ -53,7 +52,7 @@ class UserModel extends BasicUser
      * @label activation token
      */
     protected $_emailActivationToken;
-    
+
     /**
      * @column
      * @readwrite
@@ -62,7 +61,7 @@ class UserModel extends BasicUser
      * @validate max(3)
      */
     protected $_getNewActionNotification;
-    
+
     /**
      * @column
      * @readwrite
@@ -90,52 +89,49 @@ class UserModel extends BasicUser
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-    
+
     /**
-     * 
      * @return type
      */
     public function getWholeName()
     {
-        return $this->_firstname . ' ' . $this->_lastname;
+        return $this->_firstname.' '.$this->_lastname;
     }
 
     /**
-     * 
      * @return type
      */
     public function __toString()
     {
         $str = "Id: {$this->_id} <br/>Email: {$this->_email} <br/> Name: {$this->_firstname} {$this->_lastname}";
+
         return $str;
     }
-    
+
     /**
-     * 
      * @return type
      */
     public static function fetchAll()
     {
         return self::all(
-                array('role <> ?' => 'role_superadmin'), 
-                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'), 
+                array('role <> ?' => 'role_superadmin'),
+                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'),
                 array('id' => 'asc')
         );
     }
-    
+
     /**
-     * 
      * @param type $limit
+     *
      * @return type
      */
     public static function fetchLates($limit = 10)
     {
         return self::all(
-                array('role <> ?' => 'role_superadmin', 'active = ?' => true, 'blocked = ?' => false), 
-                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'), 
+                array('role <> ?' => 'role_superadmin', 'active = ?' => true, 'blocked = ?' => false),
+                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'),
                 array('created' => 'desc'),
-                (int)$limit
+                (int) $limit
         );
     }
-
 }

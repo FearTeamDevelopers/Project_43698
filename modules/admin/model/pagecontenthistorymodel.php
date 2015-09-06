@@ -12,7 +12,6 @@ use THCFrame\Request\RequestMethods;
  */
 class PageContentHistoryModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -35,7 +34,7 @@ class PageContentHistoryModel extends Model
      * @label id zdroje
      */
     protected $_originId;
-    
+
     /**
      * @column
      * @readwrite
@@ -78,7 +77,7 @@ class PageContentHistoryModel extends Model
      * @label changes
      */
     protected $_changedData;
-    
+
     /**
      * @column
      * @readwrite
@@ -103,20 +102,19 @@ class PageContentHistoryModel extends Model
     }
 
     /**
-     * 
      * @return array
      */
     public static function fetchAll()
     {
         $query = self::getQuery(array('pch.*'))
-                ->join('tb_user', 'pch.editedBy = us.id', 'us', 
+                ->join('tb_user', 'pch.editedBy = us.id', 'us',
                         array('us.firstname', 'us.lastname'));
-        
+
         return self::initialize($query);
     }
 
     /**
-     * Called from admin module
+     * Called from admin module.
      * 
      * @return array
      */
@@ -126,59 +124,58 @@ class PageContentHistoryModel extends Model
                 ->join('tb_user', 'pch.editedBy = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->order('pch.created', 'desc')
-                ->limit((int)$limit);
+                ->limit((int) $limit);
 
         return self::initialize($query);
     }
-    
+
     /**
-     * Check differences between two objects
+     * Check differences between two objects.
      * 
      * @param \App\Model\PageContentModel $original
      * @param \App\Model\PageContentModel $edited
-     * @return void
      */
     public static function logChanges(\App\Model\PageContentModel $original, \App\Model\PageContentModel $edited)
     {
         $sec = Registry::get('security');
         $user = $sec->getUser();
-        
+
         $remoteAddr = RequestMethods::getClientIpAddress();
         $referer = RequestMethods::server('HTTP_REFERER');
         $changes = array();
-        
+
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
         $className = get_class($original);
-        
-        if(empty($properties)){
+
+        if (empty($properties)) {
             return;
         }
 
-        foreach ($properties as $key => $value){
-            if($value->class == $className){
+        foreach ($properties as $key => $value) {
+            if ($value->class == $className) {
                 $propertyName = $value->getName();
                 $getProperty = 'get'.ucfirst(str_replace('_', '', $value->getName()));
 
-                if(trim((string)$original->$getProperty()) !== trim((string)$edited->$getProperty())){
+                if (trim((string) $original->$getProperty()) !== trim((string) $edited->$getProperty())) {
                     $changes[$propertyName] = $original->$getProperty();
                 }
             }
         }
-        
+
         $historyRecord = new self(array(
             'originId' => $original->getId(),
             'editedBy' => $user->getId(),
             'remoteAddr' => $remoteAddr,
             'referer' => $referer,
-            'changedData' => json_encode($changes)
+            'changedData' => json_encode($changes),
         ));
-        
-        if($historyRecord->validate()){
+
+        if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'PageContent '. $original->getId().' changes saved'));
-        }else{
-            Event::fire('admin.log', array('fail', 'PageContent history errors: ' . json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', array('success', 'PageContent '.$original->getId().' changes saved'));
+        } else {
+            Event::fire('admin.log', array('fail', 'PageContent history errors: '.json_encode($historyRecord->getErrors())));
         }
     }
 }

@@ -10,11 +10,10 @@ use THCFrame\Date\Date;
  */
 class AttendanceModel extends Model
 {
-
     const ACCEPT = 1;
     const REJECT = 2;
     const MAYBE = 3;
-    
+
     /**
      * @readwrite
      */
@@ -100,62 +99,61 @@ class AttendanceModel extends Model
         if (empty($this->$raw)) {
             $this->setCreated(date('Y-m-d H:i:s'));
         }
-        
+
         $this->setModified(date('Y-m-d H:i:s'));
     }
 
     /**
-     * 
      * @param type $userId
+     *
      * @return type
      */
     public static function fetchActionsByUserId($userId, $future = false)
     {
         $query = self::getQuery(array('at.id', 'at.type', 'at.comment'))
-                ->join('tb_action', 'at.actionId = ac.id', 'ac', 
-                        array('ac.id' => 'acId','ac.title', 'ac.urlKey', 'ac.startDate', 'ac.endDate'))
-                ->where('at.userId = ?', (int)$userId)
+                ->join('tb_action', 'at.actionId = ac.id', 'ac',
+                        array('ac.id' => 'acId', 'ac.title', 'ac.urlKey', 'ac.startDate', 'ac.endDate'))
+                ->where('at.userId = ?', (int) $userId)
                 ->order('ac.startDate', 'ASC');
-        
-        if($future === true){
+
+        if ($future === true) {
             $query->where('ac.startDate >= ?', date('Y-m-d'));
         }
-        
+
         return self::initialize($query);
     }
 
     /**
-     * 
      * @param type $actionId
+     *
      * @return type
      */
     public static function fetchUsersByActionId($actionId)
     {
         $query = self::getQuery(array('at.id', 'at.type', 'at.comment'))
-                ->join('tb_user', 'at.userId = us.id', 'us', 
+                ->join('tb_user', 'at.userId = us.id', 'us',
                         array('us.id' => 'usId', 'us.firstname', 'us.lastname', 'us.email'))
-                ->where('at.actionId = ?', (int)$actionId)
+                ->where('at.actionId = ?', (int) $actionId)
                 ->order('us.lastname', 'ASC');
-        
+
         return self::initialize($query);
     }
-    
+
     /**
-     * 
      * @return type
      */
     public static function fetchPercentAttendance($type)
     {
-        if(!array_key_exists($type, ActionModel::getTypes())){
-            return null;
+        if (!array_key_exists($type, ActionModel::getTypes())) {
+            return;
         }
-        
+
         $totalCount = ActionModel::count(array('active = ?' => true, 'startDate <= ?' => date('Y-m-d'), 'actionType' => $type));
 
         $query = self::getQuery(array('at.*', 'COUNT(at.id)' => 'cnt'))
-                ->join('tb_user', 'us.id = at.userId', 'us', 
+                ->join('tb_user', 'us.id = at.userId', 'us',
                         array('us.firstname', 'us.lastname'))
-                ->join('tb_action', 'at.actionId = ac.id', 'ac', 
+                ->join('tb_action', 'at.actionId = ac.id', 'ac',
                         array('ac.startDate'))
                 ->where('at.type = ?', self::ACCEPT)
                 ->where('ac.actionType = ?', $type)
@@ -169,7 +167,7 @@ class AttendanceModel extends Model
 
         if ($attend !== null) {
             foreach ($attend as $value) {
-                $ra[$value->firstname . ' ' . $value->lastname] = round(($value->cnt / $totalCount) * 100, 2);
+                $ra[$value->firstname.' '.$value->lastname] = round(($value->cnt / $totalCount) * 100, 2);
             }
 
             return $ra;
@@ -177,9 +175,8 @@ class AttendanceModel extends Model
             return null;
         }
     }
-    
+
     /**
-     * 
      * @param type $month
      * @param type $year
      */
@@ -188,15 +185,15 @@ class AttendanceModel extends Model
         $firstDay = Date::getInstance()->getFirstDayOfMonth($month, $year);
         $lastDay = Date::getInstance()->getLastDayOfMonth($month, $year);
         $returnArr = array();
-        
+
         $usersQ = self::getQuery(array('distinct userId'))
-                ->join('tb_user', 'us.id = at.userId', 'us', 
+                ->join('tb_user', 'us.id = at.userId', 'us',
                             array('us.firstname', 'us.lastname'));
-        
+
         $users = self::initialize($usersQ);
 
-        if(!empty($users)){
-            foreach($users as $user){
+        if (!empty($users)) {
+            foreach ($users as $user) {
                 $attQ = self::getQuery(array('at.actionId', 'at.type', 'at.comment'))
                         ->join('tb_action', 'at.actionId = ac.id', 'ac',
                                 array('ac.actionType', 'ac.startDate', 'ac.endDate'))
@@ -206,19 +203,19 @@ class AttendanceModel extends Model
                         ->order('ac.startDate', 'asc');
 
                 $attendance = self::initialize($attQ);
-                
-                if(!empty($attendance)){
-                    foreach ($attendance as $attend){
-                        $rec = array('type' => $attend->getType(), 
-                                    'comment' => $attend->getComment());
+
+                if (!empty($attendance)) {
+                    foreach ($attendance as $attend) {
+                        $rec = array('type' => $attend->getType(),
+                                    'comment' => $attend->getComment(), );
                         $returnArr[$user->getUserId().'|'.$user->getFirstname().' '.$user->getLastname()][$attend->getActionType().'|'.$attend->getStartDate()] = $rec;
                     }
-                }else{
+                } else {
                     $returnArr[$user->getUserId().'|'.$user->getFirstname().' '.$user->getLastname()] = array();
                 }
             }
         }
-        
+
         return $returnArr;
     }
 }

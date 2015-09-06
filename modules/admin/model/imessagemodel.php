@@ -9,21 +9,19 @@ use THCFrame\Model\Model;
  */
 class ImessageModel extends Model
 {
-
     const TYPE_INFO = 1;
     const TYPE_WARNING = 2;
     const TYPE_ERROR = 3;
-    
+
     /**
-     *
-     * @var array 
+     * @var array
      */
     private static $_typesConv = array(
         self::TYPE_INFO => 'Info',
         self::TYPE_WARNING => 'Warning',
-        self::TYPE_ERROR => 'Error'
+        self::TYPE_ERROR => 'Error',
     );
-    
+
     /**
      * @readwrite
      */
@@ -159,7 +157,6 @@ class ImessageModel extends Model
     }
 
     /**
-     * 
      * @return array
      */
     public static function fetchAll()
@@ -169,18 +166,17 @@ class ImessageModel extends Model
 
         return self::initialize($query);
     }
-    
+
     /**
-     * 
      * @return array
      */
     public static function fetchActive()
     {
         return self::all(array('displayFrom <= ?' => date('Y-m-d', time()), 'displayTo >= ?' => date('Y-m-d', time()), 'active = ?' => true));
     }
-    
+
     /**
-     * Get imessage types
+     * Get imessage types.
      * 
      * @return array
      */

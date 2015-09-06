@@ -9,9 +9,8 @@ use App\Etc\Controller;
  */
 class GalleryController extends Controller
 {
-
     /**
-     * Get list of galleries
+     * Get list of galleries.
      * 
      * @param int $page
      */
@@ -20,16 +19,16 @@ class GalleryController extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
-        
+
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/galerie';
+            $canonical = 'http://'.$this->getServerHost().'/galerie';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/galerie/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/galerie/p/'.$page;
         }
-        
+
         $content = $this->getCache()->get('galerie-'.$page);
 
         if (null !== $content) {
@@ -39,15 +38,15 @@ class GalleryController extends Controller
             $galleries = \App\Model\GalleryModel::fetchPublicActiveGalleries(30, $page);
             $this->getCache()->set('galerie-'.$page, $galleries);
         }
-        
+
         $galleryCount = \App\Model\GalleryModel::count(
                         array('active = ?' => true,
-                            'isPublic = ?' => true)
+                            'isPublic = ?' => true, )
         );
         $galleryPageCount = ceil($galleryCount / 30);
 
         $this->_pagerMetaLinks($galleryPageCount, $page, '/galerie/p/');
-        
+
         $view->set('galleries', $galleries)
                 ->set('currentpage', $page)
                 ->set('pagerpathprefix', '/galerie')
@@ -58,7 +57,7 @@ class GalleryController extends Controller
     }
 
     /**
-     * Show gallery detail with photos displayed in grid
+     * Show gallery detail with photos displayed in grid.
      * 
      * @param string $urlKey
      */
@@ -73,14 +72,14 @@ class GalleryController extends Controller
         if ($gallery === null) {
             self::redirect('/nenalezeno');
         }
-        
+
         $photos = \App\Model\PhotoModel::fetchPhotosByGalleryIdPaged($gallery->getId(), $limit, $page);
 
         $photosCount = \App\Model\PhotoModel::count(array('active = ?' => true, 'galleryId = ?' => $gallery->getId()));
         $photosPageCount = ceil($photosCount / 30);
-        
+
         $this->_pagerMetaLinks($photosPageCount, $page, '/galerie/'.$gallery->getUrlKey().'/p/');
-        $canonical = 'http://' . $this->getServerHost() . '/galerie/r/' . $gallery->getUrlKey();
+        $canonical = 'http://'.$this->getServerHost().'/galerie/r/'.$gallery->getUrlKey();
 
         $view->set('gallery', $gallery)
                 ->set('photos', $photos)
@@ -89,11 +88,11 @@ class GalleryController extends Controller
                 ->set('pagecount', $photosPageCount);
 
         $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Galerie - ' . $gallery->getTitle());
+                ->set('metatitle', 'Hastrman - Galerie - '.$gallery->getTitle());
     }
-    
+
     /**
-     * Show gallery detail as slide show
+     * Show gallery detail as slide show.
      * 
      * @param string $urlKey
      */
@@ -107,16 +106,15 @@ class GalleryController extends Controller
         if ($galleryNoPhotos === null) {
             self::redirect('/nenalezeno');
         }
-        
+
         $gallery = $galleryNoPhotos->getActPhotosForGallery();
 
-        $canonical = 'http://' . $this->getServerHost() . '/galerie/r/' . $gallery->getUrlKey();
+        $canonical = 'http://'.$this->getServerHost().'/galerie/r/'.$gallery->getUrlKey();
 
         $view->set('gallery', $gallery);
 
         $layoutView->set('canonical', $canonical)
                 ->set('includejssorslider', 1)
-                ->set('metatitle', 'Hastrman - Galerie - ' . $gallery->getTitle());
+                ->set('metatitle', 'Hastrman - Galerie - '.$gallery->getTitle());
     }
-
 }

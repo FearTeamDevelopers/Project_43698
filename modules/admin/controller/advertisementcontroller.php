@@ -11,12 +11,12 @@ use THCFrame\Request\RequestMethods;
  */
 class AdvertisementController extends Controller
 {
-
     /**
-     * Check whether unique ad section identifier already exist or not
+     * Check whether unique ad section identifier already exist or not.
      * 
      * @param string $key
-     * @return boolean
+     *
+     * @return bool
      */
     private function _checkSectionUrlKey($key)
     {
@@ -30,7 +30,7 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Get list of all advertisements
+     * Get list of all advertisements.
      * 
      * @before _secured, _participant
      */
@@ -42,7 +42,7 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Get list of advertisement sections
+     * Get list of advertisement sections.
      * 
      * @before _secured, _participant
      */
@@ -54,10 +54,11 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Show detail of existing ad
+     * Show detail of existing ad.
      * 
      * @before _secured, _participant
-     * @param int   $id     ad id
+     *
+     * @param int $id ad id
      */
     public function detail($id)
     {
@@ -73,38 +74,40 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Delete existing ad
+     * Delete existing ad.
      * 
      * @before _secured, _admin
-     * @param int   $id     ad id
+     *
+     * @param int $id ad id
      */
     public function delete($id)
     {
         $this->_disableView();
 
         $ad = \App\Model\AdvertisementModel::first(
-                        array('id = ?' => (int) $id), 
+                        array('id = ?' => (int) $id),
                         array('id')
         );
 
-        if (NULL === $ad) {
+        if (null === $ad) {
             echo $this->lang('NOT_FOUND');
         } else {
             if ($ad->delete()) {
-                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                Event::fire('admin.log', array('success', 'Ad id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Ad id: '.$id));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Change ad state (active/inactive)
+     * Change ad state (active/inactive).
      * 
      * @before _secured, _admin
-     * @param int   $id     ad id
+     *
+     * @param int $id ad id
      */
     public function changeState($id)
     {
@@ -112,7 +115,7 @@ class AdvertisementController extends Controller
 
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id));
 
-        if (NULL === $ad) {
+        if (null === $ad) {
             echo $this->lang('NOT_FOUND');
         } else {
             if ($ad->active) {
@@ -124,20 +127,21 @@ class AdvertisementController extends Controller
             if ($ad->validate()) {
                 $ad->save();
 
-                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                Event::fire('admin.log', array('success', 'Ad id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id, 'Errors: '.  json_encode($ad->getErrors())));
+                Event::fire('admin.log', array('fail', 'Ad id: '.$id, 'Errors: '.json_encode($ad->getErrors())));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Delete image from ad
+     * Delete image from ad.
      * 
      * @before _secured, _admin
-     * @param int   $imageId     image id
+     *
+     * @param int $imageId image id
      */
     public function deleteAdImage($imageId)
     {
@@ -145,7 +149,7 @@ class AdvertisementController extends Controller
 
         if ($this->_checkCSRFToken()) {
             $photo = \App\Model\AdImageModel::first(
-                            array('id = ?' => (int) $imageId), 
+                            array('id = ?' => (int) $imageId),
                             array('id', 'adId', 'imgMain', 'imgThumb')
             );
 
@@ -159,12 +163,12 @@ class AdvertisementController extends Controller
                     @unlink($mainPath);
                     @unlink($thumbPath);
 
-                    Event::fire('admin.log', array('success', 'Ad image id: ' . $imageId
-                        . ' from ad: ' . $photo->getAdId()));
+                    Event::fire('admin.log', array('success', 'Ad image id: '.$imageId
+                        .' from ad: '.$photo->getAdId(), ));
                     echo 'success';
                 } else {
-                    Event::fire('admin.log', array('fail', 'Ad image id: ' . $imageId
-                        . ' from ad: ' . $photo->getAdId()));
+                    Event::fire('admin.log', array('fail', 'Ad image id: '.$imageId
+                        .' from ad: '.$photo->getAdId(), ));
                     echo $this->lang('COMMON_FAIL');
                 }
             }
@@ -174,7 +178,7 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Create new section for advertisements
+     * Create new section for advertisements.
      * 
      * @before _secured, _admin
      */
@@ -199,29 +203,30 @@ class AdvertisementController extends Controller
 
             $adsection = new \App\Model\AdSectionModel(array(
                 'title' => RequestMethods::post('title'),
-                'urlKey' => $urlKey
+                'urlKey' => $urlKey,
             ));
 
             if (empty($errors) && $adsection->validate()) {
                 $id = $adsection->save();
 
-                Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
+                Event::fire('admin.log', array('success', 'AdSection id: '.$id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/advertisement/sections/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.  json_encode($errors+$adsection->getErrors())));
+                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($errors + $adsection->getErrors())));
                 $view->set('adsection', $adsection)
                         ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
-                        ->set('errors', $errors+ $adsection->getErrors());
+                        ->set('errors', $errors + $adsection->getErrors());
             }
         }
     }
 
     /**
-     * Edit existing advertisement section
+     * Edit existing advertisement section.
      * 
      * @before _secured, _admin
-     * @param int   $id     section id
+     *
+     * @param int $id section id
      */
     public function editSection($id)
     {
@@ -229,7 +234,7 @@ class AdvertisementController extends Controller
 
         $adsection = \App\Model\AdSectionModel::first(array('id = ?' => (int) $id));
 
-        if (NULL === $adsection) {
+        if (null === $adsection) {
             $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/advertisement/sections/');
         }
@@ -255,22 +260,23 @@ class AdvertisementController extends Controller
             if (empty($errors) && $adsection->validate()) {
                 $adsection->save();
 
-                Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
+                Event::fire('admin.log', array('success', 'AdSection id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/advertisement/sections/');
             } else {
-                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
-                    'Errors: '.  json_encode($errors + $adsection->getErrors())));
+                Event::fire('admin.log', array('fail', 'AdSection id: '.$id,
+                    'Errors: '.json_encode($errors + $adsection->getErrors()), ));
                 $view->set('errors', $errors + $adsection->getErrors());
             }
         }
     }
 
     /**
-     * Delete existing advertisement section
+     * Delete existing advertisement section.
      * 
      * @before _secured, _admin
-     * @param int   $id     section id
+     *
+     * @param int $id section id
      */
     public function deleteSection($id)
     {
@@ -280,25 +286,26 @@ class AdvertisementController extends Controller
                         array('id = ?' => (int) $id), array('id')
         );
 
-        if (NULL === $adsection) {
+        if (null === $adsection) {
             echo $this->lang('NOT_FOUND');
         } else {
             if ($adsection->delete()) {
-                Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
+                Event::fire('admin.log', array('success', 'AdSection id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
-                    'Errors: '.  json_encode($adsection->getErrors())));
+                Event::fire('admin.log', array('fail', 'AdSection id: '.$id,
+                    'Errors: '.json_encode($adsection->getErrors()), ));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Extend ad availability for specific amount of days
+     * Extend ad availability for specific amount of days.
      * 
      * @before _secured, _admin
-     * @param int   $id     ad id
+     *
+     * @param int $id ad id
      */
     public function extendAvailability($id)
     {
@@ -306,13 +313,13 @@ class AdvertisementController extends Controller
 
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id, 'hasAvailabilityRequest = ?' => true));
 
-        if (NULL === $ad) {
+        if (null === $ad) {
             echo $this->lang('NOT_FOUND');
         } else {
             $adTtl = $this->getConfig()->bazar_ad_ttl;
-            
+
             $date = new \DateTime();
-            $date->add(new \DateInterval('P'.(int)$adTtl.'D'));
+            $date->add(new \DateInterval('P'.(int) $adTtl.'D'));
             $expirationDate = $date->format('Y-m-d');
 
             $ad->hasAvailabilityRequest = false;
@@ -321,11 +328,11 @@ class AdvertisementController extends Controller
             if ($ad->validate()) {
                 $ad->save();
 
-                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                Event::fire('admin.log', array('success', 'Ad id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id,
-                    'Errors: '.  json_encode($ad->getErrors())));
+                Event::fire('admin.log', array('fail', 'Ad id: '.$id,
+                    'Errors: '.json_encode($ad->getErrors()), ));
                 echo $this->lang('COMMON_FAIL');
             }
         }

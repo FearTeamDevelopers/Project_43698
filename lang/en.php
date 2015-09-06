@@ -15,16 +15,16 @@ return array(
     'MASSACTION_FAIL' => 'An uknown error occured during mass action',
     'UPLOAD_SUCCESS' => 'Upload has been successfully finished',
     'UPLOAD_FAIL' => 'An uknown error occured during file upload',
-    
+
     'COMMON_SUCCESS' => 'Everything went well',
     'COMMON_FAIL' => 'Oops, something went wrong',
     'COMMON_VALIDATION_FAIL' => 'Required fields are not valid',
-    
+
     'UNKNOW_ERROR' => 'Unknown error eccured',
     'NOT_FOUND' => 'Not found',
     'ACCESS_DENIED' => 'Access denied',
     'LOW_PERMISSIONS' => 'You dont have permissions to do this',
-    
+
     'PASS_RESET_EMAIL' => 'Password has been reset and sent to email',
     'PASS_RESET' => 'Password has been reset',
     'PASS_EXPIRATION' => 'Password will expire in %s days',
@@ -32,12 +32,12 @@ return array(
     'PASS_WEAK' => 'Password is too weak',
     'PASS_ORIGINAL_NOT_CORRECT' => 'The original password is not correct',
     'PASS_DOESNT_MATCH' => 'Passwords doesnt match',
-    
+
     'EMAIL_IS_TAKEN' => 'E-mail is already used',
     'EMAIL_SEND_SUCCESS' => 'E-mail was successfully sent',
     'EMAIL_SEND_FAIL' => 'An unknown error occurred during sending email',
     'EMAIL_NO_RECIPIENTS' => 'No recipient is selected',
-    
+
     'LOGIN_COMMON_ERROR' => 'E-mail or password is not correct',
     'LOGIN_EMAIL_ERROR' => 'E-mail is required',
     'LOGIN_PASS_ERROR' => 'Password is required',
@@ -46,21 +46,21 @@ return array(
     'ACCOUNT_INACTIVE' => 'The account has not been activated yet',
     'ACCOUNT_EXPIRED' => 'The account has expired',
     'ACCOUNT_ACTIVATED' => 'The account has been activated',
-    
+
     'REGISTRATION_SUCCESS' => 'Registration has been successfull',
     'REGISTRATION_EMAIL_SUCCESS' => 'Registration has been successfull. Confirm your e-mail address and activate your account',
     'REGISTRATION_EMAIL_FAIL' => 'An unknown error occured during sending e-mail with activation link, please repeat registration later',
     'REGISTRATION_FAIL' => 'Try repeat registration later',
-    
+
     'ARTICLE_UNIQUE_ID' => 'Article unique id cannot be created. Please create new title.',
     'ARTICLE_TITLE_IS_USED' => 'This title is already used',
-    
+
     'NO_ROW_SELECTED' => 'No row selected',
-    
+
     'SYSTEM_DELETE_CACHE' => 'Cache has been successfully deleted',
     'SYSTEM_DB_BACKUP' => 'Database backup has been successfully created',
     'SYSTEM_DB_BACKUP_FAIL' => 'Database backup could not be created',
-    
+
     //controller customs
     'TITLE_DEFAULT' => 'Sokol',
     'TITLE_DEFAULT_ADMIN' => 'Sokol - Administration',
@@ -69,17 +69,17 @@ return array(
     'TITLE_ACTION_EDIT' => 'Action - Edit',
     'TITLE_ACTION_COMMENTS' => 'Action - Comments',
     'TITLE_ACTION_ATTEND' => 'Action - Attendance',
-    
+
     'TITLE_NEWS_INDEX' => 'News',
     'TITLE_NEWS_ADD' => 'News - Add',
     'TITLE_NEWS_EDIT' => 'News - Edit',
     'TITLE_NEWS_COMMENTS' => 'News - Comments',
-    
+
     'TITLE_REPORT_INDEX' => 'Reports',
     'TITLE_REPORT_ADD' => 'Reports - Add',
     'TITLE_REPORT_EDIT' => 'Reports - Edit',
     'TITLE_REPORT_COMMENTS' => 'Reports - Comments',
-    
+
     'TITLE_USER_LOGIN' => 'Log In',
     'TITLE_USER_INDEX' => 'Users',
     'TITLE_USER_ADD' => 'User - Add',

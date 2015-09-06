@@ -4,20 +4,18 @@ namespace Admin\Controller;
 
 use Admin\Etc\Controller;
 use THCFrame\Core\StringMethods;
-use THCFrame\Filesystem\FileManager;
 
 /**
  * 
  */
 class DevController extends Controller
 {
-
     /**
      * Fill database tables tb_action, tb_news and tb_report with testing data
      * For database filling use these urls:
      *      /admin/dev/filldatabase/1    - for tb_news
      *      /admin/dev/filldatabase/2    - for tb_action
-     *      /admin/dev/filldatabase/3    - for tb_report
+     *      /admin/dev/filldatabase/3    - for tb_report.
      * 
      * @before _secured, _superadmin
      */
@@ -45,23 +43,23 @@ class DevController extends Controller
         unset($content);
 
         $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
-                . 'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
+                .'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
 
         if ((int) $type == 1) {
             for ($i = 0; $i < $ROW_COUNT; $i+=1) {
                 $news = new \App\Model\NewsModel(array(
-                    'title' => 'News-' . $i . '-' . time(),
+                    'title' => 'News-'.$i.'-'.time(),
                     'userId' => 1,
                     'userAlias' => 'System',
-                    'urlKey' => 'news-' . $i . '-' . time(),
+                    'urlKey' => 'news-'.$i.'-'.time(),
                     'approved' => 1,
                     'archive' => 0,
                     'shortBody' => $SHORT_TEXT,
                     'body' => $LARGE_TEXT,
                     'rank' => 1,
                     'keywords' => 'news',
-                    'metaTitle' => 'News-' . $i . '-' . time(),
-                    'metaDescription' => $META_DESC
+                    'metaTitle' => 'News-'.$i.'-'.time(),
+                    'metaDescription' => $META_DESC,
                 ));
 
                 $news->save();
@@ -73,14 +71,14 @@ class DevController extends Controller
         if ((int) $type == 2) {
             for ($i = 0; $i < $ROW_COUNT; $i+=1) {
                 $date = new \DateTime();
-                $date->add(new \DateInterval('P' . (int) $i . 'D'));
+                $date->add(new \DateInterval('P'.(int) $i.'D'));
                 $startDate = $date->format('Y-m-d');
 
                 $action = new \App\Model\ActionModel(array(
-                    'title' => 'Action-' . $i . '-' . time(),
+                    'title' => 'Action-'.$i.'-'.time(),
                     'userId' => 1,
                     'userAlias' => 'System',
-                    'urlKey' => 'action-' . $i . '-' . time(),
+                    'urlKey' => 'action-'.$i.'-'.time(),
                     'approved' => 1,
                     'archive' => 0,
                     'shortBody' => $SHORT_TEXT,
@@ -91,8 +89,8 @@ class DevController extends Controller
                     'startTime' => '',
                     'endTime' => '',
                     'keywords' => 'action',
-                    'metaTitle' => 'Action-' . $i . '-' . time(),
-                    'metaDescription' => $META_DESC
+                    'metaTitle' => 'Action-'.$i.'-'.time(),
+                    'metaDescription' => $META_DESC,
                 ));
 
                 $action->save();
@@ -104,22 +102,22 @@ class DevController extends Controller
         if ((int) $type == 3) {
             for ($i = 0; $i < $ROW_COUNT; $i+=1) {
                 $report = new \App\Model\ReportModel(array(
-                    'title' => 'Report-' . $i . '-' . time(),
+                    'title' => 'Report-'.$i.'-'.time(),
                     'userId' => 1,
                     'userAlias' => 'System',
-                    'urlKey' => 'report-' . $i . '-' . time(),
+                    'urlKey' => 'report-'.$i.'-'.time(),
                     'approved' => 1,
                     'archive' => 0,
                     'shortBody' => $SHORT_TEXT,
                     'body' => $LARGE_TEXT,
                     'rank' => 1,
                     'keywords' => 'report',
-                    'metaTitle' => 'Report-' . $i . '-' . time(),
+                    'metaTitle' => 'Report-'.$i.'-'.time(),
                     'metaDescription' => $META_DESC,
                     'metaImage' => '',
                     'photoName' => '',
                     'imgMain' => '',
-                    'imgThumb' => ''
+                    'imgThumb' => '',
                 ));
 
                 $report->save();
@@ -130,8 +128,8 @@ class DevController extends Controller
     }
 
     /**
-     * 
      * @param type $string
+     *
      * @return type
      */
     protected function _createUrlKey($string)
@@ -140,6 +138,7 @@ class DevController extends Controller
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
         $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
+
         return strtolower($return);
     }
 
@@ -167,6 +166,7 @@ class DevController extends Controller
                     return 5;
                 }
             }
+
             return false;
         }
     }
@@ -188,7 +188,7 @@ class DevController extends Controller
             'host' => 'localhost',
             'username' => 'root',
             'password' => '',
-            'schema' => 'hastrman_old'
+            'schema' => 'hastrman_old',
         ));
 
         $insertReportSql = "INSERT INTO `tb_report` VALUES (default, 2, 1, 1, 1, '%s', 'Bohumír Kuhn', '%s', '%s', '%s', default, default, default, default, default, '%s', '%s', default, '%s', '%s');";
@@ -209,17 +209,17 @@ class DevController extends Controller
                 $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
+                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
                 $urlKey = $this->_createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'report');
                 if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i++) {
+                    for ($i = 1; $i <= 50; $i+=1) {
                         if (!$this->_checkUrlKey($urlKey, $urlKeys, 'report')) {
                             break;
                         } else {
-                            $urlKey = $urlKey . '-' . $i;
+                            $urlKey = $urlKey.'-'.$i;
                         }
                     }
                 } elseif ($urlKeyCheck === 5) {
@@ -230,7 +230,7 @@ class DevController extends Controller
 
                 $sql = sprintf($insertReportSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
                 \THCFrame\Core\Core::getLogger()->log($sql, 'system', FILE_APPEND, false);
-                $contentCount++;
+                $contentCount+=1;
             }
         }
 
@@ -240,17 +240,17 @@ class DevController extends Controller
                 $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
+                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
                 $urlKey = $this->_createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'action');
                 if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i++) {
+                    for ($i = 1; $i <= 50; $i+=1) {
                         if (!$this->_checkUrlKey($urlKey, $urlKeys, 'action')) {
                             break;
                         } else {
-                            $urlKey = $urlKey . '-' . $i;
+                            $urlKey = $urlKey.'-'.$i;
                         }
                     }
                 } elseif ($urlKeyCheck === 5) {
@@ -261,7 +261,7 @@ class DevController extends Controller
 
                 $sql = sprintf($insertActionSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
                 \THCFrame\Core\Core::getLogger()->log($sql, 'system', FILE_APPEND, false);
-                $contentCount++;
+                $contentCount+=1;
             }
         }
 
@@ -271,17 +271,17 @@ class DevController extends Controller
                 $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
+                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
                 $urlKey = $this->_createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'news');
                 if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i++) {
+                    for ($i = 1; $i <= 50; $i+=1) {
                         if (!$this->_checkUrlKey($urlKey, $urlKeys, 'news')) {
                             break;
                         } else {
-                            $urlKey = $urlKey . '-' . $i;
+                            $urlKey = $urlKey.'-'.$i;
                         }
                     }
                 } elseif ($urlKeyCheck === 5) {
@@ -292,13 +292,13 @@ class DevController extends Controller
 
                 $sql = sprintf($insertNewsSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
                 \THCFrame\Core\Core::getLogger()->log($sql, 'system', FILE_APPEND, false);
-                $contentCount++;
+                $contentCount+=1;
             }
         }
 
         $db->disconnect();
 
-        print('<pre>' . print_r($contentCount, true) . '</pre>');
+        print('<pre>'.print_r($contentCount, true).'</pre>');
         die;
     }
 
@@ -311,12 +311,11 @@ class DevController extends Controller
 
         $email = new \Admin\Model\EmailModel(array(
             'body' => 'Test message',
-            'subject' => 'Hastrman test email'
+            'subject' => 'Hastrman test email',
         ));
         $email->send();
 
-        print('<pre>' . print_r('Send', true) . '</pre>');
+        print('<pre>'.print_r('Send', true).'</pre>');
         die;
     }
-  
 }

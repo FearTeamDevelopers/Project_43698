@@ -11,9 +11,8 @@ use THCFrame\Registry\Registry;
  */
 class NewsController extends Controller
 {
-
     /**
-     * Check if are set specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values.
      */
     private function _checkMetaData($layoutView, \App\Model\NewsModel $object)
     {
@@ -27,7 +26,7 @@ class NewsController extends Controller
             $layoutView->set('metadescription', $object->getMetaDescription());
         }
 
-        $canonical = 'http://' . $this->getServerHost() . '/novinky/r/' . $object->getUrlKey();
+        $canonical = 'http://'.$this->getServerHost().'/novinky/r/'.$object->getUrlKey();
 
         $layoutView->set('canonical', $canonical)
                 ->set('article', 1)
@@ -38,7 +37,7 @@ class NewsController extends Controller
     }
 
     /**
-     * Get list of news
+     * Get list of news.
      * 
      * @param int $page
      */
@@ -49,30 +48,30 @@ class NewsController extends Controller
 
         $articlesPerPage = $this->getConfig()->news_per_page;
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
-        
+
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/novinky';
+            $canonical = 'http://'.$this->getServerHost().'/novinky';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/novinky/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/novinky/p/'.$page;
         }
-        
-        $content = $this->getCache()->get('news-' . $page);
-        
+
+        $content = $this->getCache()->get('news-'.$page);
+
         if (null !== $content) {
             $news = $content;
         } else {
             $news = \App\Model\NewsModel::fetchActiveWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('news-' . $page, $news);
+            $this->getCache()->set('news-'.$page, $news);
         }
 
         $newsCount = \App\Model\NewsModel::count(
                         array('active = ?' => true,
                             'archive = ?' => false,
-                            'approved = ?' => 1)
+                            'approved = ?' => 1, )
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
@@ -88,7 +87,7 @@ class NewsController extends Controller
     }
 
     /**
-     * Get list of archivated news
+     * Get list of archivated news.
      * 
      * @param int $page
      */
@@ -99,30 +98,30 @@ class NewsController extends Controller
 
         $articlesPerPage = $this->getConfig()->news_per_page;
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
-        
+
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/archivnovinek';
+            $canonical = 'http://'.$this->getServerHost().'/archivnovinek';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/archivnovinek/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/archivnovinek/p/'.$page;
         }
-        
-        $content = $this->getCache()->get('news-arch-' . $page);
-        
+
+        $content = $this->getCache()->get('news-arch-'.$page);
+
         if (null !== $content) {
             $news = $content;
         } else {
             $news = \App\Model\NewsModel::fetchArchivatedWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('news-arch-' . $page, $news);
+            $this->getCache()->set('news-arch-'.$page, $news);
         }
 
         $newsCount = \App\Model\NewsModel::count(
                         array('active = ?' => true,
                             'archive = ?' => true,
-                            'approved = ?' => 1)
+                            'approved = ?' => 1, )
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
@@ -136,9 +135,9 @@ class NewsController extends Controller
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Novinky - Archiv');
     }
-    
+
     /**
-     * Show news detail
+     * Show news detail.
      * 
      * @param string $urlKey
      */
@@ -158,7 +157,7 @@ class NewsController extends Controller
     }
 
     /**
-     * Preview of news created in administration but not saved into db
+     * Preview of news created in administration but not saved into db.
      * 
      * @before _secured, _participant
      */
@@ -166,17 +165,17 @@ class NewsController extends Controller
     {
         $view = $this->getActionView();
         $session = Registry::get('session');
-        
+
         $news = $session->get('newsPreview');
-        
-        if(null === $news){
+
+        if (null === $news) {
             $this->_willRenderActionView = false;
             $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/news/');
         }
-        
+
         $act = RequestMethods::get('action');
-        
+
         $view->set('news', $news)
             ->set('act', $act);
     }

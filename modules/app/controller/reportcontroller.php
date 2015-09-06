@@ -11,9 +11,8 @@ use THCFrame\Registry\Registry;
  */
 class ReportController extends Controller
 {
-
     /**
-     * Check if are set specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values.
      */
     private function _checkMetaData($layoutView, \App\Model\ReportModel $object)
     {
@@ -31,7 +30,7 @@ class ReportController extends Controller
             $layoutView->set('metadescription', $object->getMetaDescription());
         }
 
-        $canonical = 'http://' . $this->getServerHost() . '/reportaze/r/' . $object->getUrlKey();
+        $canonical = 'http://'.$this->getServerHost().'/reportaze/r/'.$object->getUrlKey();
 
         $layoutView->set('canonical', $canonical)
                 ->set('article', 1)
@@ -42,7 +41,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Get list of reports
+     * Get list of reports.
      *
      * @param int $page
      */
@@ -53,30 +52,30 @@ class ReportController extends Controller
 
         $articlesPerPage = $this->getConfig()->reports_per_page;
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/reportaze';
+            $canonical = 'http://'.$this->getServerHost().'/reportaze';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/reportaze/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/reportaze/p/'.$page;
         }
 
-        $content = $this->getCache()->get('report-' . $page);
+        $content = $this->getCache()->get('report-'.$page);
 
         if (null !== $content) {
             $reports = $content;
         } else {
             $reports = \App\Model\ReportModel::fetchActiveWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('report-' . $page, $reports);
+            $this->getCache()->set('report-'.$page, $reports);
         }
 
         $reportCount = \App\Model\ReportModel::count(
                         array('active = ?' => true,
                             'archive = ?' => false,
-                            'approved = ?' => 1)
+                            'approved = ?' => 1, )
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
@@ -92,7 +91,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Show archivated actions
+     * Show archivated actions.
      *
      * @param type $page
      */
@@ -103,30 +102,30 @@ class ReportController extends Controller
 
         $articlesPerPage = $this->getConfig()->reports_per_page;
 
-        if($page <= 0){
+        if ($page <= 0) {
             $page = 1;
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/archivreportazi';
+            $canonical = 'http://'.$this->getServerHost().'/archivreportazi';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/archivreportazi/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/archivreportazi/p/'.$page;
         }
 
-        $content = $this->getCache()->get('report-arch-' . $page);
+        $content = $this->getCache()->get('report-arch-'.$page);
 
         if (null !== $content) {
             $reports = $content;
         } else {
             $reports = \App\Model\ReportModel::fetchArchivatedWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('report-arch-' . $page, $reports);
+            $this->getCache()->set('report-arch-'.$page, $reports);
         }
 
         $reportCount = \App\Model\ReportModel::count(
                         array('active = ?' => true,
                             'archive = ?' => true,
-                            'approved = ?' => 1)
+                            'approved = ?' => 1, )
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
@@ -142,7 +141,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Show report detail
+     * Show report detail.
      *
      * @param string $urlKey
      */
@@ -153,41 +152,41 @@ class ReportController extends Controller
 
         $report = \App\Model\ReportModel::fetchByUrlKey($urlKey);
 
-        if($report === null){
+        if ($report === null) {
             self::redirect('/nenalezeno');
         }
-        
+
         $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($report->getId(), \App\Model\CommentModel::RESOURCE_NEWS);
 
         $this->_checkMetaData($layoutView, $report);
         $view->set('report', $report)
                 ->set('newcomment', null)
                 ->set('comments', $comments);
-        
+
         if (RequestMethods::post('submitAddComment')) {
             if ($this->_checkCSRFToken() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/reportaze/r/'.$report->getId());
             }
-            
+
             $comment = new \App\Model\CommentModel(array(
                 'userId' => $this->getUser()->getId(),
                 'resourceId' => $report->getId(),
                 'replyTo' => RequestMethods::post('replyTo', 0),
                 'type' => \App\Model\CommentModel::RESOURCE_REPORT,
-                'body' => RequestMethods::post('text')
+                'body' => RequestMethods::post('text'),
             ));
-            
+
             if ($comment->validate()) {
                 $id = $comment->save();
 
                 $this->getCache()->invalidate();
-                
-                Event::fire('app.log', array('success', 'Comment id: ' . $id. ' from user: '.$this->getUser()->getId()));
+
+                Event::fire('app.log', array('success', 'Comment id: '.$id.' from user: '.$this->getUser()->getId()));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/reportaze/r/'.$report->getId());
             } else {
-                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($comment->getErrors())));
+                Event::fire('app.log', array('fail', 'Errors: '.json_encode($comment->getErrors())));
                 $view->set('errors', $comment->getErrors())
                     ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                     ->set('newcomment', $comment);
@@ -196,7 +195,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Preview of report created in administration but not saved into db
+     * Preview of report created in administration but not saved into db.
      *
      * @before _secured, _participant
      */
@@ -207,7 +206,7 @@ class ReportController extends Controller
 
         $report = $session->get('reportPreview');
 
-        if(null === $report){
+        if (null === $report) {
             $this->_willRenderActionView = false;
             $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/report/');
@@ -218,5 +217,4 @@ class ReportController extends Controller
         $view->set('report', $report)
             ->set('act', $act);
     }
-
 }

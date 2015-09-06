@@ -14,14 +14,14 @@ use THCFrame\Core\StringMethods;
  */
 class ReportController extends Controller
 {
-
     private $_errors = array();
 
     /**
-     * Check whether user has access to report or not
+     * Check whether user has access to report or not.
      * 
      * @param \App\Model\ReportModel $report
-     * @return boolean
+     *
+     * @return bool
      */
     private function _checkAccess(\App\Model\ReportModel $report)
     {
@@ -34,10 +34,11 @@ class ReportController extends Controller
     }
 
     /**
-     * Check whether report unique identifier already exist or not
+     * Check whether report unique identifier already exist or not.
      * 
      * @param type $key
-     * @return boolean
+     *
+     * @return bool
      */
     private function _checkUrlKey($key)
     {
@@ -51,7 +52,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Create and return new report object
+     * Create and return new report object.
      * 
      * @return \App\Model\ReportModel
      */
@@ -59,11 +60,11 @@ class ReportController extends Controller
     {
         $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 50; $i+=1) {
             if ($this->_checkUrlKey($urlKeyCh)) {
                 break;
             } else {
-                $urlKeyCh = $urlKey . '-' . $i;
+                $urlKeyCh = $urlKey.'-'.$i;
             }
 
             if ($i == 50) {
@@ -77,10 +78,10 @@ class ReportController extends Controller
             'thumbHeight' => $this->getConfig()->thumb_height,
             'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
             'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-            'maxImageHeight' => $this->getConfig()->photo_maxheight
+            'maxImageHeight' => $this->getConfig()->photo_maxheight,
         ));
 
-        $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
+        $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time().'_')->getUploadErrors();
         $files = $fileManager->getUploadedFiles();
 
         if (!empty($fileErrors)) {
@@ -100,8 +101,8 @@ class ReportController extends Controller
             $imgThumb = '';
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                array('/reportaz/r/' . $urlKey, '[Celý článek]'), 
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
+                array('/reportaz/r/'.$urlKey, '[Celý článek]'),
                 RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -122,16 +123,17 @@ class ReportController extends Controller
             'metaImage' => $imgMain,
             'photoName' => $urlKey,
             'imgMain' => $imgMain,
-            'imgThumb' => $imgThumb
+            'imgThumb' => $imgThumb,
         ));
 
         return $report;
     }
 
     /**
-     * Edit existing report object
+     * Edit existing report object.
      * 
      * @param \App\Model\ReportModel $object
+     *
      * @return \\App\Model\ReportModel
      */
     private function _editObject(\App\Model\ReportModel $object)
@@ -147,12 +149,12 @@ class ReportController extends Controller
             'thumbHeight' => $this->getConfig()->thumb_height,
             'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
             'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-            'maxImageHeight' => $this->getConfig()->photo_maxheight
+            'maxImageHeight' => $this->getConfig()->photo_maxheight,
         ));
 
         $imgMain = $imgThumb = '';
         if ($object->imgMain == '') {
-            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time() . '_')->getUploadErrors();
+            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time().'_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
@@ -178,7 +180,7 @@ class ReportController extends Controller
             $object->userAlias = $this->getUser()->getWholeName();
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/'.$urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
         );
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -203,7 +205,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Check if there is object used for preview saved in session
+     * Check if there is object used for preview saved in session.
      * 
      * @return \App\Model\ReportModel
      */
@@ -217,28 +219,28 @@ class ReportController extends Controller
     }
 
     /**
-     * Send email notification abou new report published on web
+     * Send email notification abou new report published on web.
      */
     private function _sendEmailNotification(\App\Model\ReportModel $report)
     {
-        if($report->getApproved() && $this->getConfig()->report_new_notification){
+        if ($report->getApproved() && $this->getConfig()->report_new_notification) {
             $users = \App\Model\UserModel::all(array('getNewReportNotification = ?' => true), array('email'));
 
-            if(!empty($users)){
-                $data = array('{TITLE}' => '<a href="http://' . $this->getServerHost() . '/report/r/' .$report->getUrlKey() . '">' . $report->getTitle() . '</a>',
-                    '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody())
+            if (!empty($users)) {
+                $data = array('{TITLE}' => '<a href="http://'.$this->getServerHost().'/report/r/'.$report->getUrlKey().'">'.$report->getTitle().'</a>',
+                    '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody()),
                         );
                 $email = \Admin\Model\EmailModel::loadAndPrepare('nova-reportaz', $data);
-                
-                foreach($users as $user){
+
+                foreach ($users as $user) {
                     $email->setRecipient($user->getEmail());
                 }
-                
+
                 $email->send(true);
             }
         }
     }
-    
+
     /**
      * Get list of all actions. Loaded via datatables ajax.
      * For more check load function.
@@ -247,11 +249,10 @@ class ReportController extends Controller
      */
     public function index()
     {
-        
     }
 
     /**
-     * Create new report
+     * Create new report.
      * 
      * @before _secured, _participant
      */
@@ -262,7 +263,7 @@ class ReportController extends Controller
 
         $reportConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_REPORT),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_REPORT, ),
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('report', $report)
@@ -282,11 +283,11 @@ class ReportController extends Controller
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
-                Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                Event::fire('admin.log', array('success', 'Report id: '.$id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/report/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($this->_errors + $report->getErrors())));
+                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($this->_errors + $report->getErrors())));
                 $view->set('errors', $this->_errors + $report->getErrors())
                         ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('report', $report)
@@ -319,10 +320,11 @@ class ReportController extends Controller
     }
 
     /**
-     * Edit existing report
+     * Edit existing report.
      * 
      * @before _secured, _participant
-     * @param int   $id     report id
+     *
+     * @param int $id report id
      */
     public function edit($id)
     {
@@ -344,10 +346,10 @@ class ReportController extends Controller
                 self::redirect('/admin/report/');
             }
         }
-        
+
         $reportConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_REPORT),
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_REPORT, ),
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('report', $report)
@@ -367,12 +369,12 @@ class ReportController extends Controller
                 $this->getCache()->invalidate();
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
-                Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                Event::fire('admin.log', array('success', 'Report id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/report/');
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
-                    'Errors: ' . json_encode($this->_errors + $report->getErrors())));
+                Event::fire('admin.log', array('fail', 'Report id: '.$id,
+                    'Errors: '.json_encode($this->_errors + $report->getErrors()), ));
                 $view->set('errors', $this->_errors + $report->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -398,10 +400,11 @@ class ReportController extends Controller
     }
 
     /**
-     * Delete existing report
+     * Delete existing report.
      * 
      * @before _secured, _participant
-     * @param int   $id     report id
+     *
+     * @param int $id report id
      */
     public function delete($id)
     {
@@ -411,21 +414,21 @@ class ReportController extends Controller
                         array('id = ?' => (int) $id), array('id', 'userId')
         );
 
-        if (NULL === $report) {
+        if (null === $report) {
             echo $this->lang('NOT_FOUND');
         } else {
             if ($this->_checkAccess($report)) {
                 $imgPath = $report->getUnlinkPath();
                 $thumbPath = $report->getUnlinkThumbPath();
-                
+
                 if ($report->delete()) {
                     @unlink($imgPath);
                     @unlink($thumbPath);
                     $this->getCache()->invalidate();
-                    Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                    Event::fire('admin.log', array('success', 'Report id: '.$id));
                     echo 'success';
                 } else {
-                    Event::fire('admin.log', array('fail', 'Report id: ' . $id));
+                    Event::fire('admin.log', array('fail', 'Report id: '.$id));
                     echo $this->lang('COMMON_FAIL');
                 }
             } else {
@@ -435,10 +438,11 @@ class ReportController extends Controller
     }
 
     /**
-     * Delete report image
+     * Delete report image.
      * 
      * @before _secured, _participant
-     * @param int   $id     report id
+     *
+     * @param int $id report id
      */
     public function deleteMainPhoto($id)
     {
@@ -447,7 +451,7 @@ class ReportController extends Controller
         if ($this->_checkCSRFToken()) {
             $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
-            if (NULL === $report) {
+            if (null === $report) {
                 echo $this->lang('NOT_FOUND');
             } else {
                 if (!$this->_checkAccess($report)) {
@@ -462,10 +466,10 @@ class ReportController extends Controller
                 if ($report->validate()) {
                     $report->save();
 
-                    Event::fire('admin.log', array('success', 'Report Id: ' . $id));
+                    Event::fire('admin.log', array('success', 'Report Id: '.$id));
                     echo 'success';
                 } else {
-                    Event::fire('admin.log', array('fail', 'Report Id: ' . $id));
+                    Event::fire('admin.log', array('fail', 'Report Id: '.$id));
                     echo $this->lang('COMMON_FAIL');
                 }
             }
@@ -475,7 +479,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Delete image in report preview
+     * Delete image in report preview.
      * 
      * @before _secured, _participant
      */
@@ -487,13 +491,13 @@ class ReportController extends Controller
         $photo = $session->get('reportPreviewPhoto');
 
         if (null !== $photo && !empty($photo)) {
-            for ($i = 0; $i < count($photo); $i++) {
-                if (file_exists(APP_PATH . $photo[$i])) {
-                    unlink(APP_PATH . $photo[$i]);
-                } elseif (file_exists('.' . $photo[$i])) {
-                    unlink('.' . $photo[$i]);
-                } elseif (file_exists('./' . $photo[$i])) {
-                    unlink('./' . $photo[$i]);
+            for ($i = 0; $i < count($photo); ++$i) {
+                if (file_exists(APP_PATH.$photo[$i])) {
+                    unlink(APP_PATH.$photo[$i]);
+                } elseif (file_exists('.'.$photo[$i])) {
+                    unlink('.'.$photo[$i]);
+                } elseif (file_exists('./'.$photo[$i])) {
+                    unlink('./'.$photo[$i]);
                 }
             }
             echo 'success';
@@ -504,10 +508,11 @@ class ReportController extends Controller
     }
 
     /**
-     * Approve new report
+     * Approve new report.
      * 
      * @before _secured, _admin
-     * @param int   $id     report id
+     *
+     * @param int $id report id
      */
     public function approveReport($id)
     {
@@ -515,7 +520,7 @@ class ReportController extends Controller
 
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
-        if (NULL === $report) {
+        if (null === $report) {
             echo $this->lang('NOT_FOUND');
         } else {
             $report->approved = 1;
@@ -530,21 +535,22 @@ class ReportController extends Controller
                 $this->_sendEmailNotification($report);
                 $this->getCache()->invalidate();
 
-                Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                Event::fire('admin.log', array('success', 'Report id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
-                    'Errors: ' . json_encode($report->getErrors())));
+                Event::fire('admin.log', array('fail', 'Report id: '.$id,
+                    'Errors: '.json_encode($report->getErrors()), ));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Reject new report
+     * Reject new report.
      * 
      * @before _secured, _admin
-     * @param int   $id     report id
+     *
+     * @param int $id report id
      */
     public function rejectReport($id)
     {
@@ -552,7 +558,7 @@ class ReportController extends Controller
 
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
-        if (NULL === $report) {
+        if (null === $report) {
             echo $this->lang('NOT_FOUND');
         } else {
             $report->approved = 2;
@@ -565,18 +571,18 @@ class ReportController extends Controller
             if ($report->validate()) {
                 $report->save();
 
-                Event::fire('admin.log', array('success', 'Report id: ' . $id));
+                Event::fire('admin.log', array('success', 'Report id: '.$id));
                 echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Report id: ' . $id,
-                    'Errors: ' . json_encode($report->getErrors())));
+                Event::fire('admin.log', array('fail', 'Report id: '.$id,
+                    'Errors: '.json_encode($report->getErrors()), ));
                 echo $this->lang('COMMON_FAIL');
             }
         }
     }
 
     /**
-     * Return list of reports to insert report link to content
+     * Return list of reports to insert report link to content.
      * 
      * @before _secured, _participant
      */
@@ -591,7 +597,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Execute basic operation over multiple actions
+     * Execute basic operation over multiple actions.
      * 
      * @before _secured, _admin
      */
@@ -606,6 +612,7 @@ class ReportController extends Controller
 
         if (empty($ids)) {
             echo $this->lang('NO_ROW_SELECTED');
+
             return;
         }
 
@@ -615,21 +622,21 @@ class ReportController extends Controller
                                 array('id IN ?' => $ids), array('id', 'title')
                 );
 
-                if (NULL !== $reports) {
+                if (null !== $reports) {
                     foreach ($reports as $report) {
                         if (!$report->delete()) {
-                            $errors[] = $this->lang('DELETE_FAIL') .' - '. $report->getTitle();
+                            $errors[] = $this->lang('DELETE_FAIL').' - '.$report->getTitle();
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
-                    Event::fire('admin.log', array('delete success', 'Report ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('delete success', 'Report ids: '.implode(',', $ids)));
                     echo $this->lang('DELETE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('delete fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -637,10 +644,10 @@ class ReportController extends Controller
             case 'activate':
                 $reports = \App\Model\ReportModel::all(array(
                             'id IN ?' => $ids,
-                            'active = ?' => false
+                            'active = ?' => false,
                 ));
 
-                if (NULL !== $reports) {
+                if (null !== $reports) {
                     foreach ($reports as $report) {
                         $report->active = true;
 
@@ -653,18 +660,18 @@ class ReportController extends Controller
                             $report->save();
                         } else {
                             $errors[] = "Report id {$report->getId()} - {$report->getTitle()} errors: "
-                                    . join(', ', $report->getErrors());
+                                    .implode(', ', $report->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
-                    Event::fire('admin.log', array('activate success', 'Report ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('activate success', 'Report ids: '.implode(',', $ids)));
                     echo $this->lang('ACTIVATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('activate fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -672,10 +679,10 @@ class ReportController extends Controller
             case 'deactivate':
                 $reports = \App\Model\ReportModel::all(array(
                             'id IN ?' => $ids,
-                            'active = ?' => true
+                            'active = ?' => true,
                 ));
 
-                if (NULL !== $reports) {
+                if (null !== $reports) {
                     foreach ($reports as $report) {
                         $report->active = false;
 
@@ -688,18 +695,18 @@ class ReportController extends Controller
                             $report->save();
                         } else {
                             $errors[] = "Report id {$report->getId()} - {$report->getTitle()} errors: "
-                                    . join(', ', $report->getErrors());
+                                    .implode(', ', $report->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->invalidate();
-                    Event::fire('admin.log', array('deactivate success', 'Report ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('deactivate success', 'Report ids: '.implode(',', $ids)));
                     echo $this->lang('DEACTIVATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -707,10 +714,10 @@ class ReportController extends Controller
             case 'approve':
                 $reports = \App\Model\ReportModel::all(array(
                             'id IN ?' => $ids,
-                            'approved IN ?' => array(0, 2)
+                            'approved IN ?' => array(0, 2),
                 ));
 
-                if (NULL !== $reports) {
+                if (null !== $reports) {
                     foreach ($reports as $report) {
                         $report->approved = 1;
 
@@ -724,18 +731,18 @@ class ReportController extends Controller
                             $this->_sendEmailNotification($report);
                         } else {
                             $errors[] = "Action id {$report->getId()} - {$report->getTitle()} errors: "
-                                    . join(', ', $report->getErrors());
+                                    .implode(', ', $report->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('approve success', 'Action ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('approve success', 'Action ids: '.implode(',', $ids)));
                     $this->getCache()->invalidate();
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('approve fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -743,10 +750,10 @@ class ReportController extends Controller
             case 'reject':
                 $reports = \App\Model\ReportModel::all(array(
                             'id IN ?' => $ids,
-                            'approved IN ?' => array(0, 1)
+                            'approved IN ?' => array(0, 1),
                 ));
 
-                if (NULL !== $reports) {
+                if (null !== $reports) {
                     foreach ($reports as $report) {
                         $report->approved = 2;
 
@@ -759,18 +766,18 @@ class ReportController extends Controller
                             $report->save();
                         } else {
                             $errors[] = "Action id {$report->getId()} - {$report->getTitle()} errors: "
-                                    . join(', ', $report->getErrors());
+                                    .implode(', ', $report->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('reject success', 'Action ids: ' . join(',', $ids)));
+                    Event::fire('admin.log', array('reject success', 'Action ids: '.implode(',', $ids)));
                     $this->getCache()->invalidate();
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
-                    $message = join(PHP_EOL, $errors);
+                    Event::fire('admin.log', array('reject fail', 'Errors:'.json_encode($errors)));
+                    $message = implode(PHP_EOL, $errors);
                     echo $message;
                 }
 
@@ -782,7 +789,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Response for ajax call from datatables plugin
+     * Response for ajax call from datatables plugin.
      * 
      * @before _secured, _participant
      */
@@ -798,7 +805,7 @@ class ReportController extends Controller
 
             $query = \App\Model\ReportModel::getQuery(
                             array('rp.id', 'rp.userId', 'rp.userAlias', 'rp.title',
-                                'rp.active', 'rp.approved', 'rp.archive', 'rp.created'))
+                                'rp.active', 'rp.approved', 'rp.archive', 'rp.created', ))
                     ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
                     ->wheresql($whereCond, $search, $search, $search);
 
@@ -834,7 +841,7 @@ class ReportController extends Controller
         } else {
             $query = \App\Model\ReportModel::getQuery(
                             array('rp.id', 'rp.userId', 'rp.userAlias', 'rp.title',
-                                'rp.active', 'rp.approved', 'rp.archive', 'rp.created'))
+                                'rp.active', 'rp.approved', 'rp.archive', 'rp.created', ))
                     ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
             if (RequestMethods::issetpost('iSortCol_0')) {
@@ -862,7 +869,7 @@ class ReportController extends Controller
 
         $draw = $page + 1 + time();
 
-        $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
+        $str = '{ "draw": '.$draw.', "recordsTotal": '.$count.', "recordsFiltered": '.$count.', "data": [';
 
         $returnArr = array();
         if (null !== $reports) {
@@ -893,51 +900,50 @@ class ReportController extends Controller
                 }
 
                 $arr = array();
-                $arr [] = "[ \"" . $report->getId() . "\"";
-                $arr [] = "\"" . htmlentities($report->getTitle()) . "\"";
-                $arr [] = "\"" . $report->getUserAlias() . "\"";
-                $arr [] = "\"" . $report->getCreated() . "\"";
-                $arr [] = "\"" . $label . "\"";
-                $arr [] = "\"" . $archiveLabel . "\"";
-                
-                $tempStr = "\"";
+                $arr [] = '[ "'.$report->getId().'"';
+                $arr [] = '"'.htmlentities($report->getTitle()).'"';
+                $arr [] = '"'.$report->getUserAlias().'"';
+                $arr [] = '"'.$report->getCreated().'"';
+                $arr [] = '"'.$label.'"';
+                $arr [] = '"'.$archiveLabel.'"';
+
+                $tempStr = '"';
                 if ($this->isAdmin() || $report->userId == $this->getUser()->getId()) {
-                    $tempStr .= "<a href='/admin/report/showcomments/" . $report->id . "' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
-                    $tempStr .= "<a href='/admin/report/edit/" . $report->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
-                    $tempStr .= "<a href='/admin/report/delete/" . $report->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
+                    $tempStr .= "<a href='/admin/report/showcomments/".$report->id."' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
+                    $tempStr .= "<a href='/admin/report/edit/".$report->id."' class='btn btn3 btn_pencil' title='Upravit'></a>";
+                    $tempStr .= "<a href='/admin/report/delete/".$report->id."' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
                 if ($this->isAdmin() && $report->approved == 0) {
-                    $tempStr .= "<a href='/admin/report/approvereport/" . $report->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
-                    $tempStr .= "<a href='/admin/report/rejectreport/" . $report->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                    $tempStr .= "<a href='/admin/report/approvereport/".$report->id."' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/report/rejectreport/".$report->id."' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
                 }
 
-                $arr [] = $tempStr . "\"]";
-                $returnArr[] = join(',', $arr);
+                $arr [] = $tempStr.'"]';
+                $returnArr[] = implode(',', $arr);
             }
 
-            $str .= join(',', $returnArr) . "]}";
+            $str .= implode(',', $returnArr).']}';
 
             echo $str;
         } else {
-            $str .= "[ \"\",\"\",\"\",\"\",\"\",\"\",\"\"]]}";
+            $str .= '[ "","","","","","",""]]}';
 
             echo $str;
         }
     }
 
     /**
-     * Show help for report section
+     * Show help for report section.
      * 
      * @before _secured, _participant
      */
     public function help()
     {
-        
     }
-    
+
     /**
-     * Load concept into active form
+     * Load concept into active form.
      * 
      * @before _secured, _participant
      */
@@ -945,8 +951,8 @@ class ReportController extends Controller
     {
         $this->_disableView();
         $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
-        
-        if(null !== $concept){
+
+        if (null !== $concept) {
             $conceptArr = array(
                 'conceptid' => $concept->getId(),
                 'title' => $concept->getTitle(),
@@ -954,21 +960,22 @@ class ReportController extends Controller
                 'body' => $concept->getBody(),
                 'keywords' => $concept->getKeywords(),
                 'metatitle' => $concept->getMetaTitle(),
-                'metadescription' => $concept->getMetaDescription()
+                'metadescription' => $concept->getMetaDescription(),
             );
-            
+
             echo json_encode($conceptArr);
             exit;
-        }else{
+        } else {
             echo 'notfound';
             exit;
         }
     }
-    
+
     /**
-     * Show comments for specific action
+     * Show comments for specific action.
      * 
      * @before _secured, _admin
+     *
      * @param int $id
      */
     public function showComments($id)
@@ -976,7 +983,7 @@ class ReportController extends Controller
         $view = $this->getActionView();
         $this->getLayoutView()
                 ->setTitle($this->lang('TITLE_REPORT_COMMENTS'));
-        
+
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id), array('id'));
 
         if (null === $report) {
@@ -986,7 +993,7 @@ class ReportController extends Controller
         }
 
         $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($report->getId(), \App\Model\CommentModel::RESOURCE_REPORT);
-        
+
         $view->set('comments', $comments)
                 ->set('report', $report);
     }

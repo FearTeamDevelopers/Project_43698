@@ -9,21 +9,19 @@ use THCFrame\Model\Model;
  */
 class ReportModel extends Model
 {
-    
     const STATE_WAITING = 0;
     const STATE_APPROVED = 1;
     const STATE_REJECTED = 2;
-    
+
     /**
-     *
-     * @var type 
+     * @var type
      */
     private static $_statesConv = array(
         self::STATE_WAITING => 'Čeká na shválení',
         self::STATE_APPROVED => 'Schváleno',
-        self::STATE_REJECTED => 'Zamítnuto'
+        self::STATE_REJECTED => 'Zamítnuto',
     );
-    
+
     /**
      * @readwrite
      */
@@ -132,7 +130,7 @@ class ReportModel extends Model
      * @label text
      */
     protected $_body;
-    
+
     /**
      * @column
      * @readwrite
@@ -257,7 +255,7 @@ class ReportModel extends Model
             $this->setCreated(date('Y-m-d H:i:s'));
             $this->setActive(true);
         }
-        
+
         $shortText = preg_replace('/https:/i', 'http:', $this->getShortBody());
         $text = preg_replace('/https:/i', 'http:', $this->getBody());
         $this->setShortBody($shortText);
@@ -266,90 +264,95 @@ class ReportModel extends Model
     }
 
     /**
-     * 
      * @return array
      */
     public static function fetchAll()
     {
         $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us', 
+                ->join('tb_user', 'rp.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'));
-        
+
         return self::initialize($query);
     }
 
     /**
-     * Called from admin module
+     * Called from admin module.
+     *
      * @return array
      */
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us', 
+                ->join('tb_user', 'rp.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->order('rp.created', 'desc')
-                ->limit((int)$limit);
+                ->limit((int) $limit);
 
         return self::initialize($query);
     }
-    
+
     /**
-     * Called from app module
+     * Called from app module.
+     *
      * @param type $limit
+     *
      * @return type
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 
-                        'imgMain', 'imgThumb', 'photoName'), 
-                array('rank' => 'desc','created' => 'desc'), 
+        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false),
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
+                        'imgMain', 'imgThumb', 'photoName', ),
+                array('rank' => 'desc', 'created' => 'desc'),
                 $limit, $page
         );
-        
+
         return $reports;
     }
-    
+
     /**
-     * Called from app module
+     * Called from app module.
+     *
      * @param type $limit
+     *
      * @return type
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 
-                    'imgMain', 'imgThumb', 'photoName'), 
-                array('rank' => 'desc', 'created' => 'desc'), 
+        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true),
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
+                    'imgMain', 'imgThumb', 'photoName', ),
+                array('rank' => 'desc', 'created' => 'desc'),
                 $limit, $page
         );
-        
+
         return $reports;
     }
-    
+
     /**
-     * Called from app module
+     * Called from app module.
+     *
      * @param type $urlKey
+     *
      * @return type
      */
     public static function fetchByUrlKey($urlKey)
     {
         return self::first(array('active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey));
     }
-    
+
     /**
-     * 
      * @return type
      */
     public function getUnlinkPath($type = true)
     {
         if ($type) {
-            if (file_exists(APP_PATH . $this->_imgMain)) {
-                return APP_PATH . $this->_imgMain;
-            } elseif (file_exists('.' . $this->_imgMain)) {
-                return '.' . $this->_imgMain;
-            } elseif (file_exists('./' . $this->_imgMain)) {
-                return './' . $this->_imgMain;
+            if (file_exists(APP_PATH.$this->_imgMain)) {
+                return APP_PATH.$this->_imgMain;
+            } elseif (file_exists('.'.$this->_imgMain)) {
+                return '.'.$this->_imgMain;
+            } elseif (file_exists('./'.$this->_imgMain)) {
+                return './'.$this->_imgMain;
             }
         } else {
             return $this->_imgMain;
@@ -357,18 +360,17 @@ class ReportModel extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getUnlinkThumbPath($type = true)
     {
         if ($type) {
-            if (file_exists(APP_PATH . $this->_imgThumb)) {
-                return APP_PATH . $this->_imgThumb;
-            } elseif (file_exists('.' . $this->_imgThumb)) {
-                return '.' . $this->_imgThumb;
-            } elseif (file_exists('./' . $this->_imgThumb)) {
-                return './' . $this->_imgThumb;
+            if (file_exists(APP_PATH.$this->_imgThumb)) {
+                return APP_PATH.$this->_imgThumb;
+            } elseif (file_exists('.'.$this->_imgThumb)) {
+                return '.'.$this->_imgThumb;
+            } elseif (file_exists('./'.$this->_imgThumb)) {
+                return './'.$this->_imgThumb;
             }
         } else {
             return $this->_imgThumb;
@@ -376,7 +378,7 @@ class ReportModel extends Model
     }
 
     /**
-     * Return action states
+     * Return action states.
      * 
      * @return array
      */
@@ -384,5 +386,4 @@ class ReportModel extends Model
     {
         return self::$_statesConv;
     }
-    
 }

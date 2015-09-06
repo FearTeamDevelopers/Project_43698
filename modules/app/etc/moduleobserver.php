@@ -6,36 +6,33 @@ use THCFrame\Registry\Registry;
 use THCFrame\Events\SubscriberInterface;
 
 /**
- * Module specific observer class
+ * Module specific observer class.
  */
 class ModuleObserver implements SubscriberInterface
 {
-
     /**
-     * 
      * @return type
      */
     public function getSubscribedEvents()
     {
         return array(
-            'app.log' => 'appLog'
+            'app.log' => 'appLog',
         );
     }
 
     /**
-     * 
      * @param array $params
      */
     public function appLog()
     {
         $params = func_get_args();
-        
+
         $security = Registry::get('security');
         $user = $security->getUser();
         if ($user === null) {
             $userId = 'annonymous';
         } else {
-            $userId = $user->getWholeName() . ':' . $user->getId();
+            $userId = $user->getWholeName().':'.$user->getId();
         }
 
         $router = Registry::get('router');
@@ -50,7 +47,7 @@ class ModuleObserver implements SubscriberInterface
 
             $paramStr = '';
             if (!empty($params)) {
-                $paramStr = join(', ', $params);
+                $paramStr = implode(', ', $params);
             }
         } else {
             $result = 'fail';
@@ -64,12 +61,11 @@ class ModuleObserver implements SubscriberInterface
             'action' => $action,
             'result' => $result,
             'httpreferer' => RequestMethods::getHttpReferer(),
-            'params' => $paramStr
+            'params' => $paramStr,
         ));
 
         if ($log->validate()) {
             $log->save();
         }
     }
-
 }

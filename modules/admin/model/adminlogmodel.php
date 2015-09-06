@@ -5,11 +5,10 @@ namespace Admin\Model;
 use THCFrame\Model\Model;
 
 /**
- * Log ORM class
+ * Log ORM class.
  */
 class AdminLogModel extends Model
 {
-
     /**
      * @column
      * @readwrite
@@ -121,5 +120,4 @@ class AdminLogModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-
 }

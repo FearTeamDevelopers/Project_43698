@@ -12,9 +12,8 @@ use THCFrame\Request\Request;
  */
 class IndexController extends Controller
 {
-
     /**
-     * Check if are set specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values.
      */
     private function _checkMetaData($layoutView, Model $object)
     {
@@ -29,60 +28,60 @@ class IndexController extends Controller
         }
 
         $canonical = "http://{$this->getServerHost()}{$uri}";
-        
+
         $layoutView->set('canonical', $canonical)
                 ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
                 ->set('metaogtype', 'website');
     }
 
     /**
-     * Landing page
+     * Landing page.
      */
     public function index()
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $canonical = 'http://' . $this->getServerHost();
+        $canonical = 'http://'.$this->getServerHost();
 
         $cachedNews = $this->getCache()->get('index-news');
-        
-        if(null !== $cachedNews){
+
+        if (null !== $cachedNews) {
             $news = $cachedNews;
             unset($cachedNews);
-        }else{
+        } else {
             $news = \App\Model\NewsModel::fetchActiveWithLimit(4);
             $this->getCache()->set('index-news', $news);
         }
-        
+
         $cachedActions = $this->getCache()->get('index-actions');
-        
-        if(null !== $cachedActions){
+
+        if (null !== $cachedActions) {
             $actions = $cachedActions;
             unset($cachedActions);
-        }else{
+        } else {
             $actions = \App\Model\ActionModel::fetchActiveWithLimit(6);
             $this->getCache()->set('index-actions', $actions);
         }
-        
+
         $cachedReports = $this->getCache()->get('index-reports');
-        
-        if(null !== $cachedReports){
+
+        if (null !== $cachedReports) {
             $reports = $cachedReports;
             unset($cachedReports);
-        }else{
+        } else {
             $reports = \App\Model\ReportModel::fetchActiveWithLimit(7);
             $this->getCache()->set('index-reports', $reports);
         }
-        
+
         $cachedPartners = $this->getCache()->get('index-partners');
-        
-        if(null !== $cachedPartners){
+
+        if (null !== $cachedPartners) {
             $partners = $cachedPartners;
             unset($cachedPartners);
-        }else{
+        } else {
             $partners = \App\Model\PartnerModel::all(
-                    array('active = ?' => true), 
-                    array('*'), 
+                    array('active = ?' => true),
+                    array('*'),
                     array('rank' => 'desc', 'created' => 'desc')
             );
             $this->getCache()->set('index-partners', $partners);
@@ -92,20 +91,20 @@ class IndexController extends Controller
                 ->set('actions', $actions)
                 ->set('partners', $partners)
                 ->set('reports', $reports);
-        
+
         $layoutView->set('includecarousel', 1)
                 ->set('canonical', $canonical);
     }
 
     /**
-     * Default method for content loading
+     * Default method for content loading.
      */
     public function loadContent($urlKey)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
 
-        $content = $this->getCache()->get('content_' . $urlKey);
+        $content = $this->getCache()->get('content_'.$urlKey);
 
         if (null !== $content) {
             $content = $content;
@@ -115,49 +114,49 @@ class IndexController extends Controller
             if ($content === null) {
                 self::redirect('/nenalezeno');
             }
-            
-            $this->getCache()->set('content_' . $urlKey, $content);
+
+            $this->getCache()->set('content_'.$urlKey, $content);
         }
-        
+
         $this->_checkMetaData($layoutView, $content);
-        
+
         $view->set('content', $content);
     }
 
     /**
-     * Custom 404 page
+     * Custom 404 page.
      */
     public function notFound()
     {
-        $canonical = 'http://' . $this->getServerHost().'/nenalezeno';
-        
+        $canonical = 'http://'.$this->getServerHost().'/nenalezeno';
+
         $this->getLayoutView()
                 ->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Stránka nenalezena');
     }
 
     /**
-     * Search in application, exclude advertisements
+     * Search in application, exclude advertisements.
      */
     public function search($page = 1)
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
         $articlesPerPage = $this->getConfig()->search_results_per_page;
-        
-        if($page <= 0){
+
+        if ($page <= 0) {
             $page = 1;
         }
-        
-        $canonical = 'http://' . $this->getServerHost() . '/hledat';
-        
+
+        $canonical = 'http://'.$this->getServerHost().'/hledat';
+
         $requestUrl = 'http://'.$this->getServerHost().'/dosearch/'.$page;
         $parameters = array('str' => RequestMethods::get('str'));
-        
+
         $request = new Request();
         $response = $request->request('post', $requestUrl, $parameters);
         $urls = json_decode($response, true);
-        
+
         if (null !== $urls) {
             $articleCount = array_shift($urls);
 
@@ -169,9 +168,9 @@ class IndexController extends Controller
                     ->set('currentpage', $page)
                     ->set('pagecount', $searchPageCount)
                     ->set('pagerpathprefix', '/hledat')
-                    ->set('pagerpathpostfix', '?' . http_build_query($parameters));
+                    ->set('pagerpathpostfix', '?'.http_build_query($parameters));
         }
-        
+
         $layoutView->set('canonical', $canonical)
                 ->set('metatitle', 'Hastrman - Hledat');
     }

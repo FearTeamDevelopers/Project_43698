@@ -9,21 +9,19 @@ use THCFrame\Model\Model;
  */
 class ActionModel extends Model
 {
-    
     const STATE_WAITING = 0;
     const STATE_APPROVED = 1;
     const STATE_REJECTED = 2;
-    
+
     /**
-     *
-     * @var type 
+     * @var type
      */
     private static $_statesConv = array(
         self::STATE_WAITING => 'Čeká na shválení',
         self::STATE_APPROVED => 'Schváleno',
-        self::STATE_REJECTED => 'Zamítnuto'
+        self::STATE_REJECTED => 'Zamítnuto',
     );
-    
+
     /**
      * @readwrite
      */
@@ -76,7 +74,7 @@ class ActionModel extends Model
      * @validate max(3)
      */
     protected $_archive;
-    
+
     /**
      * @column
      * @readwrite
@@ -153,7 +151,7 @@ class ActionModel extends Model
      * @label datum začátek
      */
     protected $_startDate;
-    
+
     /**
      * @column
      * @readwrite
@@ -164,7 +162,7 @@ class ActionModel extends Model
      * @label datum konec
      */
     protected $_endDate;
-    
+
     /**
      * @column
      * @readwrite
@@ -175,7 +173,7 @@ class ActionModel extends Model
      * @label čas začátek
      */
     protected $_startTime;
-    
+
     /**
      * @column
      * @readwrite
@@ -186,7 +184,7 @@ class ActionModel extends Model
      * @label čas konec
      */
     protected $_endTime;
-    
+
     /**
      * @column
      * @readwrite
@@ -219,7 +217,7 @@ class ActionModel extends Model
      * @label meta-popis
      */
     protected $_metaDescription;
-    
+
     /**
      * @column
      * @readwrite
@@ -252,7 +250,7 @@ class ActionModel extends Model
             $this->setCreated(date('Y-m-d H:i:s'));
             $this->setActive(true);
         }
-        
+
         $shortText = preg_replace('/https:/i', 'http:', $this->getShortBody());
         $text = preg_replace('/https:/i', 'http:', $this->getBody());
         $this->setShortBody($shortText);
@@ -261,51 +259,51 @@ class ActionModel extends Model
     }
 
     /**
-     * 
      * @return array
      */
     public static function fetchAll()
     {
         $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us', 
+                ->join('tb_user', 'ac.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'));
-        
+
         return self::initialize($query);
     }
 
     /**
-     * Called from admin module
+     * Called from admin module.
      * 
      * @return array
      */
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us', 
+                ->join('tb_user', 'ac.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->order('ac.created', 'desc')
-                ->limit((int)$limit);
+                ->limit((int) $limit);
 
         return self::initialize($query);
     }
-    
+
     /**
-     * Called from app module
+     * Called from app module.
      * 
      * @param type $limit
+     *
      * @return type
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
         if ($limit === 0) {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), 
-                    array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
+            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())),
+                    array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
                     array('rank' => 'desc', 'startDate' => 'asc')
             );
         } else {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), 
-                    array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
-                    array('rank' => 'desc', 'startDate' => 'asc'), 
+            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())),
+                    array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
+                    array('rank' => 'desc', 'startDate' => 'asc'),
                     $limit, $page
             );
         }
@@ -314,52 +312,55 @@ class ActionModel extends Model
     }
 
     /**
-     * Called from app module
+     * Called from app module.
      * 
      * @param type $limit
+     *
      * @return type
      */
     public static function fetchOldWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
-                array('rank' => 'desc', 'startDate' => 'desc'), 
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())),
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
+                array('rank' => 'desc', 'startDate' => 'desc'),
                 $limit, $page
         );
-        
+
         return $actions;
     }
-    
+
     /**
-     * Called from app module
+     * Called from app module.
      * 
      * @param type $limit
+     *
      * @return type
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), 
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
-                array('rank' => 'desc', 'startDate' => 'desc'), 
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true),
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
+                array('rank' => 'desc', 'startDate' => 'desc'),
                 $limit, $page
         );
-        
+
         return $actions;
     }
-    
+
     /**
-     * Called from app module
+     * Called from app module.
      * 
      * @param type $urlKey
+     *
      * @return type
      */
     public static function fetchByUrlKey($urlKey)
     {
         return self::first(array('active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey));
     }
-    
+
     /**
-     * Return action states
+     * Return action states.
      * 
      * @return array
      */

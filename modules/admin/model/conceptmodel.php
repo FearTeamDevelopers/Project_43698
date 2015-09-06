@@ -5,15 +5,14 @@ namespace Admin\Model;
 use THCFrame\Model\Model;
 
 /**
- * Concept ORM class
+ * Concept ORM class.
  */
 class ConceptModel extends Model
 {
-
     const CONCEPT_TYPE_ACTION = 1;
     const CONCEPT_TYPE_NEWS = 2;
     const CONCEPT_TYPE_REPORT = 3;
-    
+
     /**
      * @column
      * @readwrite
@@ -141,5 +140,4 @@ class ConceptModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-
 }

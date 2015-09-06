@@ -14,7 +14,6 @@ use THCFrame\Registry\Registry;
  */
 class UserController extends Controller
 {
-
     private function _checkEmailActToken($token)
     {
         $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
@@ -27,13 +26,13 @@ class UserController extends Controller
     }
 
     /**
-     * App module login
+     * App module login.
      */
     public function login()
     {
         $view = $this->getActionView();
 
-        $canonical = 'http://' . $this->getServerHost() . '/prihlasit';
+        $canonical = 'http://'.$this->getServerHost().'/prihlasit';
 
         $this->getLayoutView()
                 ->set('metatitle', 'Hastrman - Přihlásit se')
@@ -62,17 +61,17 @@ class UserController extends Controller
                 try {
                     $this->getSecurity()->authenticate($email, $password);
                     $daysToExpiration = $this->getSecurity()->getUser()->getDaysToPassExpiration();
-                    
-                    if($daysToExpiration !== false){
-                        if($daysToExpiration < 14 && $daysToExpiration > 1){
+
+                    if ($daysToExpiration !== false) {
+                        if ($daysToExpiration < 14 && $daysToExpiration > 1) {
                             $view->infoMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
-                        }elseif($daysToExpiration < 5 && $daysToExpiration > 1){
+                        } elseif ($daysToExpiration < 5 && $daysToExpiration > 1) {
                             $view->warningMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
-                        }elseif($daysToExpiration >= 1){
+                        } elseif ($daysToExpiration >= 1) {
                             $view->errorMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
                         }
                     }
-                    
+
                     self::redirect('/muj-profil');
                 } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_LOCKED'));
@@ -84,8 +83,8 @@ class UserController extends Controller
                     $view->set('account_error', $this->lang('ACCOUNT_EXPIRED'));
                     Event::fire('app.log', array('fail', sprintf('Account expired for %s', $email)));
                 } catch (\Exception $e) {
-                    Event::fire('app.log', array('fail', 'Exception: ' . $e->getMessage()));
-                    
+                    Event::fire('app.log', array('fail', 'Exception: '.$e->getMessage()));
+
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
                     } else {
@@ -97,7 +96,7 @@ class UserController extends Controller
     }
 
     /**
-     * App module logout
+     * App module logout.
      */
     public function logout()
     {
@@ -109,14 +108,14 @@ class UserController extends Controller
     }
 
     /**
-     * Registration. Create only members without access into administration
+     * Registration. Create only members without access into administration.
      */
     public function registration()
     {
         $view = $this->getActionView();
         $user = null;
 
-        $canonical = 'http://' . $this->getServerHost() . '/registrace';
+        $canonical = 'http://'.$this->getServerHost().'/registrace';
 
         $view->set('user', $user);
 
@@ -158,7 +157,7 @@ class UserController extends Controller
             }
 
             $actToken = Rand::randStr(50);
-            for ($i = 1; $i <= 75; $i++) {
+            for ($i = 1; $i <= 75; $i+=1) {
                 if ($this->_checkEmailActToken($actToken)) {
                     break;
                 } else {
@@ -166,7 +165,7 @@ class UserController extends Controller
                 }
 
                 if ($i == 75) {
-                    $errors['email'] = array($this->lang('UNKNOW_ERROR') . $this->lang('REGISTRATION_FAIL'));
+                    $errors['email'] = array($this->lang('UNKNOW_ERROR').$this->lang('REGISTRATION_FAIL'));
                     break;
                 }
             }
@@ -194,16 +193,16 @@ class UserController extends Controller
                     $email->setRecipient($user->getEmail());
 
                     if ($email->send(false, 'registrace@hastrman.cz')) {
-                        Event::fire('app.log', array('success', 'User Id with email activation: ' . $uid));
+                        Event::fire('app.log', array('success', 'User Id with email activation: '.$uid));
                         $view->successMessage($this->lang('REGISTRATION_EMAIL_SUCCESS'));
                     } else {
-                        Event::fire('app.log', array('fail', 'Email not send for User Id: ' . $uid));
+                        Event::fire('app.log', array('fail', 'Email not send for User Id: '.$uid));
                         $user->delete();
                         $view->errorMessage($this->lang('REGISTRATION_EMAIL_FAIL'));
                         self::redirect('/');
                     }
                 } else {
-                    Event::fire('app.log', array('success', 'User Id: ' . $uid));
+                    Event::fire('app.log', array('success', 'User Id: '.$uid));
                     $view->successMessage($this->lang('REGISTRATION_SUCCESS'));
                 }
 
@@ -216,7 +215,7 @@ class UserController extends Controller
     }
 
     /**
-     * Edit user currently logged in
+     * Edit user currently logged in.
      * 
      * @before _secured, _member
      */
@@ -225,13 +224,13 @@ class UserController extends Controller
         $view = $this->getActionView();
         $errors = array();
 
-        $canonical = 'http://' . $this->getServerHost() . '/profil';
+        $canonical = 'http://'.$this->getServerHost().'/profil';
 
         $user = \App\Model\UserModel::first(array('id = ?' => $this->getUser()->getId()));
         $myActions = \App\Model\AttendanceModel::fetchActionsByUserId($this->getUser()->getId(), true);
-        
-        if(!empty($myActions)){
-            foreach($myActions as &$action){
+
+        if (!empty($myActions)) {
+            foreach ($myActions as &$action) {
                 $action->latestComments = \App\Model\CommentModel::fetchByTypeAndCreated(
                         \App\Model\CommentModel::RESOURCE_ACTION, $action->getId(), Registry::get('session')->get('userLastLogin')
                         );
@@ -267,12 +266,12 @@ class UserController extends Controller
             $oldPassword = RequestMethods::post('oldpass');
             if (!empty($oldPassword)) {
                 $newPass = RequestMethods::post('password');
-                
-                try{
+
+                try {
                     $user = $user->changePassword($oldPassword, $newPass);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
-                }  catch (\THCFrame\Security\Exception\WeakPassword $ex){
+                } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
                     $errors['password'] = array($this->lang('PASS_WEAK'));
                 }
             }
@@ -297,9 +296,9 @@ class UserController extends Controller
     }
 
     /**
-     * Activate account via activation link send by email
+     * Activate account via activation link send by email.
      * 
-     * @param string    $key    activation token
+     * @param string $key activation token
      */
     public function activateAccount($key)
     {
@@ -313,15 +312,14 @@ class UserController extends Controller
         }
 
         if ($user->activateAccount()) {
-            Event::fire('app.log', array('success', 'User Id: ' . $user->getId()));
+            Event::fire('app.log', array('success', 'User Id: '.$user->getId()));
             $view->successMessage($this->lang('ACCOUNT_ACTIVATED'));
             self::redirect('/');
         } else {
-            Event::fire('app.log', array('fail', 'User Id: ' . $user->getId(),
-                'Errors: ' . json_encode($user->getErrors())));
+            Event::fire('app.log', array('fail', 'User Id: '.$user->getId(),
+                'Errors: '.json_encode($user->getErrors()), ));
             $view->warningMessage($this->lang('COMMON_FAIL'));
             self::redirect('/');
         }
     }
-
 }

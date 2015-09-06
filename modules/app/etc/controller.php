@@ -10,48 +10,51 @@ use THCFrame\Core\StringMethods;
 use THCFrame\Core\Lang;
 
 /**
- * Module specific controller class extending framework controller class
+ * Module specific controller class extending framework controller class.
  */
 class Controller extends BaseController
 {
-
     /**
-     * Store security context object
-     * @var THCFrame\Security\Security 
+     * Store security context object.
+     *
+     * @var THCFrame\Security\Security
      * @read
      */
     protected $_security;
 
     /**
-     * Store initialized cache object
-     * @var THCFrame\Cache\Cache 
+     * Store initialized cache object.
+     *
+     * @var THCFrame\Cache\Cache
      * @read
      */
     protected $_cache;
 
     /**
-     * Store configuration
-     * @var THCFrame\Configuration\Configuration 
+     * Store configuration.
+     *
+     * @var THCFrame\Configuration\Configuration
      * @read
      */
     protected $_config;
 
     /**
-     * Store language extension
-     * @var THCFrame\Core\Lang 
+     * Store language extension.
+     *
+     * @var THCFrame\Core\Lang
      * @read
      */
     protected $_lang;
 
     /**
-     * Store server host name
-     * @var type 
+     * Store server host name.
+     *
+     * @var type
      * @read
      */
     protected $_serverHost;
-    
+
     /**
-     * 
      * @param type $options
      */
     public function __construct($options = array())
@@ -65,7 +68,7 @@ class Controller extends BaseController
         $this->_lang = Lang::getInstance();
 
         // schedule disconnect from database 
-        Event::add('framework.controller.destruct.after', function($name) {
+        Event::add('framework.controller.destruct.after', function ($name) {
             Registry::get('database')->disconnectAll();
         });
 
@@ -82,7 +85,7 @@ class Controller extends BaseController
                 'metaogtype' => $this->getConfig()->meta_og_type,
                 'metaogimage' => $this->getConfig()->meta_og_image,
                 'metaogsitename' => $this->getConfig()->meta_og_site_name,
-                'showfeedback' => $this->getConfig()->show_feedback
+                'showfeedback' => $this->getConfig()->show_feedback,
             );
 
             $this->getCache()->set('global_meta_data', $metaData);
@@ -100,8 +103,8 @@ class Controller extends BaseController
     }
 
     /**
-     * 
      * @param type $string
+     *
      * @return type
      */
     protected function _createUrlKey($string)
@@ -110,11 +113,11 @@ class Controller extends BaseController
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
         $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
+
         return strtolower($return);
     }
 
     /**
-     * 
      * @param type $pageCount
      * @param type $page
      * @param type $path
@@ -131,33 +134,33 @@ class Controller extends BaseController
 
             $this->getLayoutView()
                     ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', $path . $prevPage)
+                    ->set('pagedprevlink', $path.$prevPage)
                     ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', $path . $nextPage);
+                    ->set('pagednextlink', $path.$nextPage);
         }
     }
 
     /**
-     * Disable view, used for ajax calls
+     * Disable view, used for ajax calls.
      */
     protected function _disableView()
     {
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
     }
-    
+
     /**
-     * 
      * @param type $body
      * @param type $subject
      * @param type $sendTo
      * @param type $sendFrom
-     * @return boolean
+     *
+     * @return bool
      */
     protected function _sendEmail($body, $subject, $sendTo = null, $sendFrom = null)
     {
         try {
-            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+            require_once APP_PATH.'/vendors/swiftmailer/swift_required.php';
             $transport = \Swift_MailTransport::newInstance();
             $mailer = \Swift_Mailer::newInstance($transport);
 
@@ -181,10 +184,12 @@ class Controller extends BaseController
                 return true;
             } else {
                 Event::fire('admin.log', array('fail', 'No email sent'));
+
                 return false;
             }
         } catch (\Exception $ex) {
-            Event::fire('admin.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
+            Event::fire('admin.log', array('fail', 'Error while sending email: '.$ex->getMessage()));
+
             return false;
         }
     }
@@ -226,8 +231,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     protected function isMember()
     {
@@ -249,8 +253,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     protected function isParticipant()
     {
@@ -262,24 +265,24 @@ class Controller extends BaseController
     }
 
     /**
-     * Load user from security context
+     * Load user from security context.
      */
     public function getUser()
     {
         return $this->_security->getUser();
     }
-    
+
     /**
-     * 
      * @param type $key
      * @param type $args
+     *
      * @return type
      */
     public function lang($key, $args = array())
     {
         return $this->getLang()->_get($key, $args);
     }
-    
+
     /**
      * 
      */
@@ -308,5 +311,4 @@ class Controller extends BaseController
 
         parent::render();
     }
-
 }

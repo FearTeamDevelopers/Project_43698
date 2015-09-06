@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class AdSectionModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -32,7 +31,7 @@ class AdSectionModel extends Model
      * @validate max(3)
      */
     protected $_active;
-    
+
     /**
      * @column
      * @readwrite
@@ -44,7 +43,7 @@ class AdSectionModel extends Model
      * @label url key
      */
     protected $_urlKey;
-    
+
     /**
      * @column
      * @readwrite
@@ -55,7 +54,7 @@ class AdSectionModel extends Model
      * @label název
      */
     protected $_title;
-    
+
     /**
      * @column
      * @readwrite
@@ -75,16 +74,18 @@ class AdSectionModel extends Model
      * @validate datetime, max(22)
      */
     protected $_modified;
-    
+
     /**
      * @readwrite
-     * @var type 
+     *
+     * @var type
      */
     protected $_adTenderCount;
-    
+
     /**
      * @readwrite
-     * @var type 
+     *
+     * @var type
      */
     protected $_adDemandCount;
 
@@ -104,36 +105,33 @@ class AdSectionModel extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public static function fetchAll()
     {
         $sections = self::all(
                 array(),
-                array('ads.*', 
+                array('ads.*',
                     '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="tender")' => 'adTenderCount',
-                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand")' => 'adDemandCount')
+                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand")' => 'adDemandCount', )
                 );
-        
+
         return $sections;
     }
-    
+
     /**
-     * 
      * @return type
      */
     public static function fetchAllActive()
     {
         $sections = self::all(
                 array('ads.active = ?' => true),
-                array('ads.*', 
+                array('ads.*',
                     '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="tender" AND adv.active=1)' => 'adTenderCount',
                     '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand" AND adv.active=1)' => 'adDemandCount',
                     )
                 );
-        
+
         return $sections;
     }
-
 }

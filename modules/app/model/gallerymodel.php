@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class GalleryModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -31,7 +30,7 @@ class GalleryModel extends Model
      * @validate numeric, max(8)
      */
     protected $_userId;
-    
+
     /**
      * @column
      * @readwrite
@@ -157,49 +156,51 @@ class GalleryModel extends Model
     }
 
     /**
-     * 
      * @return array
      */
     public static function fetchAll()
     {
         $query = self::getQuery(array('gl.*'))
-                ->join('tb_user', 'gl.userId = us.id', 'us', 
+                ->join('tb_user', 'gl.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'));
-        
+
         return self::initialize($query);
     }
 
     /**
-     * Called from admin module
+     * Called from admin module.
+     *
      * @return array
      */
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('gl.*'))
-                ->join('tb_user', 'gl.userId = us.id', 'us', 
+                ->join('tb_user', 'gl.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->order('gl.created', 'desc')
-                ->limit((int)$limit);
+                ->limit((int) $limit);
 
         return self::initialize($query);
     }
-    
+
     /**
-     * Called from admin module
+     * Called from admin module.
      * 
      * @param type $id
+     *
      * @return type
      */
     public static function fetchGalleryById($id)
     {
         $galleryQuery = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', 
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph',
                         array('ph.imgMain', 'ph.imgThumb'))
                 ->where('gl.id = ?', (int) $id);
         $galleryArr = self::initialize($galleryQuery);
 
         if (!empty($galleryArr)) {
             $gallery = array_shift($galleryArr);
+
             return $gallery->getAllPhotosForGallery();
         } else {
             return null;
@@ -207,15 +208,16 @@ class GalleryModel extends Model
     }
 
     /**
-     * Called from app module
+     * Called from app module.
      * 
      * @param type $urlkey
+     *
      * @return type
      */
     public static function fetchPublicActiveGalleryByUrlkey($urlkey)
     {
         $galleryQuery = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', 
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph',
                         array('ph.imgMain', 'ph.imgThumb'))
                 ->where('gl.urlKey = ?', $urlkey)
                 ->where('gl.active = ?', true)
@@ -224,6 +226,7 @@ class GalleryModel extends Model
 
         if (!empty($galleryArr)) {
             $gallery = array_shift($galleryArr);
+
             return $gallery;
         } else {
             return null;
@@ -231,14 +234,14 @@ class GalleryModel extends Model
     }
 
     /**
-     * Called from app module
+     * Called from app module.
      * 
      * @param type $year
      */
     public static function fetchPublicActiveGalleries($limit = 30, $page = 1)
     {
         $query = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', 
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph',
                         array('ph.imgMain', 'ph.imgThumb'))
                 ->where('gl.active = ?', true)
                 ->where('gl.isPublic = ?', true)
@@ -250,7 +253,6 @@ class GalleryModel extends Model
     }
 
     /**
-     * 
      * @return \App\Model\GalleryModel
      */
     public function getAllPhotosForGallery()
@@ -263,13 +265,12 @@ class GalleryModel extends Model
     }
 
     /**
-     * 
      * @return \App\Model\GalleryModel
      */
     public function getActPhotosForGallery()
     {
         $photos = \App\Model\PhotoModel::all(
-                array('galleryId = ?' => $this->getId(), 'active = ?' => true), 
+                array('galleryId = ?' => $this->getId(), 'active = ?' => true),
                 array('*'),
                 array('rank' => 'desc', 'created' => 'desc')
         );

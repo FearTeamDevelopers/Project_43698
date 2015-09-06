@@ -7,11 +7,10 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 
 /**
- * Email template ORM class
+ * Email template ORM class.
  */
 class EmailModel extends Model
 {
-
     /**
      * @column
      * @readwrite
@@ -52,7 +51,7 @@ class EmailModel extends Model
      * @label url key
      */
     protected $_urlKey;
-    
+
     /**
      * @column
      * @readwrite
@@ -63,7 +62,7 @@ class EmailModel extends Model
      * @label subject
      */
     protected $_subject;
-    
+
     /**
      * @column
      * @readwrite
@@ -118,10 +117,11 @@ class EmailModel extends Model
 
     /**
      * @readwrite
+     *
      * @var array
      */
     protected $_recipients = array();
-    
+
     /**
      * 
      */
@@ -141,7 +141,7 @@ class EmailModel extends Model
     {
         return self::all();
     }
-    
+
     public static function fetchAllCommon()
     {
         return self::all(array('type = ?' => 1));
@@ -151,12 +151,12 @@ class EmailModel extends Model
     {
         return \Admin\Model\EmailModel::first(array('id = ?' => (int) $id));
     }
-    
+
     public static function fetchAllActive()
     {
         return self::all(array('active = ?' => true));
     }
-    
+
     public static function fetchAllCommonActive()
     {
         return self::all(array('active = ?' => true, 'type = ?' => 1));
@@ -165,72 +165,74 @@ class EmailModel extends Model
     public static function fetchCommonActiveByIdAndLang($id, $fieldName)
     {
         return \Admin\Model\EmailModel::first(
-                        array('id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1), 
+                        array('id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1),
                         array($fieldName, 'subject'));
     }
-    
+
     public static function fetchActiveByIdAndLang($id, $fieldName)
     {
         return \Admin\Model\EmailModel::first(
-                        array('id = ?' => (int) $id, 'active = ?' => true), 
+                        array('id = ?' => (int) $id, 'active = ?' => true),
                         array($fieldName, 'subject'));
     }
 
     /**
-     * 
      * @param type $urlKey
      * @param type $data
+     *
      * @return type
      */
     public static function loadAndPrepare($urlKey, $data = array())
     {
-        if(empty($data)){
-            return null;
+        if (empty($data)) {
+            return;
         }
-        
+
         $email = self::first(array('urlKey = ?' => $urlKey));
-        
-        if(empty($email)){
-            return null;
+
+        if (empty($email)) {
+            return;
         }
-        
+
         $emailText = str_replace('{MAINURL}', 'http://'.RequestMethods::server('HTTP_HOST'), $email->getBody());
-        
-        foreach($data as $key => $value){
+
+        foreach ($data as $key => $value) {
             $emailText = str_replace($key, $value, $emailText);
         }
         $email->_body = $emailText;
+
         return $email;
     }
-    
+
     /**
-     * 
      * @param type $data
+     *
      * @return \Admin\Model\EmailModel
      */
     public function populate($data = array())
     {
         $emailText = str_replace('{MAINURL}', 'http://'.RequestMethods::server('HTTP_HOST'), $this->getBody());
-        
-        foreach($data as $key => $value){
+
+        foreach ($data as $key => $value) {
             $emailText = str_replace($key, $value, $emailText);
         }
-        
+
         $this->_body = $emailText;
+
         return $this;
     }
-    
+
     /**
-     * 
      * @param type $sendTo
      * @param type $sendFrom
      * @param type $oneByOne
-     * @return boolean
+     *
+     * @return bool
      */
     public function send($oneByOne = false, $sendFrom = null)
     {
         try {
-            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
+            require_once APP_PATH.'/vendors/swiftmailer/swift_required.php';
             $transport = \Swift_MailTransport::newInstance();
             $mailer = \Swift_Mailer::newInstance($transport);
 
@@ -242,7 +244,7 @@ class EmailModel extends Model
                 $defaultEmail = Registry::get('configuration')->system->defaultemail;
                 $message->setFrom($defaultEmail);
             } else {
-                if(!$this->_validateEmail($sendFrom)){
+                if (!$this->_validateEmail($sendFrom)) {
                     return false;
                 }
                 $message->setFrom($sendFrom);
@@ -261,6 +263,7 @@ class EmailModel extends Model
                             Event::fire('admin.log', array('fail', 'No email sent'));
                         }
                     }
+
                     return $error;
                 }
             } else {
@@ -275,23 +278,26 @@ class EmailModel extends Model
                     return true;
                 } else {
                     Event::fire('admin.log', array('fail', 'No email sent'));
+
                     return false;
                 }
             }
         } catch (\Exception $ex) {
-            Event::fire('admin.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
+            Event::fire('admin.log', array('fail', 'Error while sending email: '.$ex->getMessage()));
+
             return false;
         }
     }
-    
+
     public function setRecipient($email)
     {
-        if(!empty($email) && $this->_validateEmail($email)){
+        if (!empty($email) && $this->_validateEmail($email)) {
             $this->_recipients[] = $email;
         }
+
         return $this;
     }
-    
+
     public function setRecipients(array $emails)
     {
         foreach ($emails as $email) {
@@ -299,19 +305,20 @@ class EmailModel extends Model
                 $this->_recipients[] = $email;
             }
         }
+
         return $this;
     }
-    
+
     public function getRecipients()
     {
         return $this->_recipients;
     }
-    
+
     public function getRecipientsToString($glue = ';')
     {
-        if(!empty($this->_recipients)){
+        if (!empty($this->_recipients)) {
             return implode($glue, $this->_recipients);
-        }else{
+        } else {
             return '';
         }
     }

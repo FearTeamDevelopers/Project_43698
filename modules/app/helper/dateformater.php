@@ -3,18 +3,17 @@
 namespace App\Helper;
 
 /**
- * Helper class for quick date formating
+ * Helper class for quick date formating.
  */
 class DateFormater
 {
-
     const BASE_DATETIME_FORMAT = 'j.n. Y H:i';
     const BASE_DATE_FORMAT = 'j.n. Y';
     const BASE_TIME_FORMAT = 'H:i';
 
     /**
-     * 
      * @param type $texttime
+     *
      * @return type
      */
     public static function t2dt($texttime)
@@ -27,8 +26,8 @@ class DateFormater
     }
 
     /**
-     * 
      * @param type $texttime
+     *
      * @return type
      */
     public static function t2d($texttime)
@@ -41,8 +40,8 @@ class DateFormater
     }
 
     /**
-     *
      * @param type $texttime
+     *
      * @return type
      */
     public static function t2t($texttime)
@@ -55,7 +54,6 @@ class DateFormater
     }
 
     /**
-     *
      * @param type $date
      */
     public static function g2dn($date)
@@ -68,7 +66,6 @@ class DateFormater
     }
 
     /**
-     *
      * @param type $date
      */
     public static function g2yy($date)
@@ -79,20 +76,21 @@ class DateFormater
             return date('Y', time());
         }
     }
-    
+
     /**
-     *
      * @param type $date
      */
     public static function g2mn($date)
     {
         $czechMonths = array(1 => 'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec');
-        
+
         if (!empty($date)) {
             $month = date('n', strtotime($date));
+
             return $czechMonths[$month];
         } else {
             $month = date('n', time());
+
             return $czechMonths[$month];
         }
     }

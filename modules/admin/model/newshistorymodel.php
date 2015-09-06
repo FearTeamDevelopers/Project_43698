@@ -12,7 +12,6 @@ use THCFrame\Request\RequestMethods;
  */
 class NewsHistoryModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -78,7 +77,7 @@ class NewsHistoryModel extends Model
      * @label changes
      */
     protected $_changedData;
-    
+
     /**
      * @column
      * @readwrite
@@ -103,26 +102,26 @@ class NewsHistoryModel extends Model
     }
 
     /**
-     * 
      * @return array
      */
     public static function fetchAll()
     {
         $query = self::getQuery(array('nwh.*'))
-                ->join('tb_user', 'nwh.editedBy = us.id', 'us', 
+                ->join('tb_user', 'nwh.editedBy = us.id', 'us',
                         array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
     }
 
     /**
-     * Called from admin module
+     * Called from admin module.
+     *
      * @return array
      */
     public static function fetchWithLimit($limit = 10, $page = 1)
     {
         $query = self::getQuery(array('nwh.*'))
-                ->join('tb_user', 'nwh.editedBy = us.id', 'us', 
+                ->join('tb_user', 'nwh.editedBy = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->order('nwh.created', 'desc')
                 ->limit((int) $limit, $page);
@@ -131,54 +130,52 @@ class NewsHistoryModel extends Model
     }
 
     /**
-     * Check differences between two objects
+     * Check differences between two objects.
      * 
      * @param \App\Model\NewsModel $original
      * @param \App\Model\NewsModel $edited
-     * @return void
      */
     public static function logChanges(\App\Model\NewsModel $original, \App\Model\NewsModel $edited)
     {
         $sec = Registry::get('security');
         $user = $sec->getUser();
-        
+
         $remoteAddr = RequestMethods::getClientIpAddress();
         $referer = RequestMethods::server('HTTP_REFERER');
         $changes = array();
-        
+
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
         $className = get_class($original);
-        
-        if(empty($properties)){
+
+        if (empty($properties)) {
             return;
         }
 
-        foreach ($properties as $key => $value){
-            if($value->class == $className){
+        foreach ($properties as $key => $value) {
+            if ($value->class == $className) {
                 $propertyName = $value->getName();
                 $getProperty = 'get'.ucfirst(str_replace('_', '', $value->getName()));
 
-                if(trim((string)$original->$getProperty()) !== trim((string)$edited->$getProperty())){
+                if (trim((string) $original->$getProperty()) !== trim((string) $edited->$getProperty())) {
                     $changes[$propertyName] = $original->$getProperty();
                 }
             }
         }
-        
+
         $historyRecord = new self(array(
             'originId' => $original->getId(),
             'editedBy' => $user->getId(),
             'remoteAddr' => $remoteAddr,
             'referer' => $referer,
-            'changedData' => json_encode($changes)
+            'changedData' => json_encode($changes),
         ));
-        
-        if($historyRecord->validate()){
+
+        if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'News '. $original->getId().' changes saved'));
+            Event::fire('admin.log', array('success', 'News '.$original->getId().' changes saved'));
         } else {
-            Event::fire('admin.log', array('fail', 'News history errors: ' . json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', array('fail', 'News history errors: '.json_encode($historyRecord->getErrors())));
         }
     }
-
 }

@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class PageContentModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -88,7 +87,7 @@ class PageContentModel extends Model
      * @label klíčová slova
      */
     protected $_keywords;
-    
+
     /**
      * @column
      * @readwrite
@@ -147,7 +146,6 @@ class PageContentModel extends Model
     }
 
     /**
-     * 
      * @param type $urlKey
      */
     public static function fetchByUrlKey($urlKey)

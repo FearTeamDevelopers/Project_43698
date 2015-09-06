@@ -10,42 +10,45 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Core\Lang;
 
 /**
- * Module specific controller class extending framework controller class
+ * Module specific controller class extending framework controller class.
  */
 class Controller extends BaseController
 {
-
     /**
-     * Store security context object
-     * @var THCFrame\Security\Security 
+     * Store security context object.
+     *
+     * @var THCFrame\Security\Security
      * @read
      */
     protected $_security;
 
     /**
-     * Store initialized cache object
-     * @var THCFrame\Cache\Cache 
+     * Store initialized cache object.
+     *
+     * @var THCFrame\Cache\Cache
      * @read
      */
     protected $_cache;
 
     /**
-     * Store configuration
-     * @var THCFrame\Configuration\Configuration 
+     * Store configuration.
+     *
+     * @var THCFrame\Configuration\Configuration
      * @read
      */
     protected $_config;
 
     /**
-     * Store language extension
-     * @var THCFrame\Core\Lang 
+     * Store language extension.
+     *
+     * @var THCFrame\Core\Lang
      * @read
      */
     protected $_lang;
-    
+
     /**
-     * 
      * @param type $string
+     *
      * @return type
      */
     protected function _createUrlKey($string)
@@ -54,11 +57,12 @@ class Controller extends BaseController
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
         $cleaned = StringMethods::fastClean($preCleaned);
         $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
+
         return strtolower($return);
     }
 
     /**
-     * Disable view, used for ajax calls
+     * Disable view, used for ajax calls.
      */
     protected function _disableView()
     {
@@ -67,7 +71,6 @@ class Controller extends BaseController
     }
 
     /**
-     * 
      * @param type $options
      */
     public function __construct($options = array())
@@ -80,7 +83,7 @@ class Controller extends BaseController
         $this->_lang = Lang::getInstance();
 
         // schedule disconnect from database 
-        Event::add('framework.controller.destruct.after', function($name) {
+        Event::add('framework.controller.destruct.after', function ($name) {
             Registry::get('database')->disconnectAll();
         });
     }
@@ -127,8 +130,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     protected function isCron()
     {
@@ -151,8 +153,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     protected function isMember()
     {
@@ -174,8 +175,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     protected function isParticipant()
     {
@@ -197,8 +197,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     protected function isAdmin()
     {
@@ -220,8 +219,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     protected function isSuperAdmin()
     {
@@ -266,7 +264,7 @@ class Controller extends BaseController
     }
 
     /**
-     * Load user from security context
+     * Load user from security context.
      */
     public function getUser()
     {
@@ -274,14 +272,13 @@ class Controller extends BaseController
     }
 
     /**
-     * 
      * @param type $key
      * @param type $args
+     *
      * @return type
      */
     public function lang($key, $args = array())
     {
         return $this->getLang()->_get($key, $args);
     }
-    
 }

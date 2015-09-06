@@ -11,9 +11,8 @@ use THCFrame\Registry\Registry;
  */
 class ActionController extends Controller
 {
-
     /**
-     * Check if are set specific metadata or leave their default values
+     * Check if are set specific metadata or leave their default values.
      */
     private function _checkMetaData($layoutView, \App\Model\ActionModel $object)
     {
@@ -27,7 +26,7 @@ class ActionController extends Controller
             $layoutView->set('metadescription', $object->getMetaDescription());
         }
 
-        $canonical = 'http://' . $this->getServerHost() . '/akce/r/' . $object->getUrlKey();
+        $canonical = 'http://'.$this->getServerHost().'/akce/r/'.$object->getUrlKey();
 
         $layoutView->set('canonical', $canonical)
                 ->set('article', 1)
@@ -38,7 +37,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Get list of actions
+     * Get list of actions.
      * 
      * @param int $page
      */
@@ -54,26 +53,26 @@ class ActionController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/akce';
+            $canonical = 'http://'.$this->getServerHost().'/akce';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/akce/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/akce/p/'.$page;
         }
 
-        $content = $this->getCache()->get('akce-' . $page);
+        $content = $this->getCache()->get('akce-'.$page);
 
         if (null !== $content) {
             $actions = $content;
         } else {
             $actions = \App\Model\ActionModel::fetchActiveWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('akce-' . $page, $actions);
+            $this->getCache()->set('akce-'.$page, $actions);
         }
 
         $actionCount = \App\Model\ActionModel::count(
                         array('active = ?' => true,
                             'approved = ?' => 1,
                             'archive = ?' => false,
-                            'startDate >= ?' => date('Y-m-d', time()))
+                            'startDate >= ?' => date('Y-m-d', time()), )
         );
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
@@ -90,7 +89,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Show action detail
+     * Show action detail.
      * 
      * @param string $urlKey
      */
@@ -107,37 +106,37 @@ class ActionController extends Controller
 
         $attendance = \App\Model\AttendanceModel::fetchUsersByActionId($action->getId());
         $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
-        
+
         $this->_checkMetaData($layoutView, $action);
         $view->set('action', $action)
                 ->set('newcomment', null)
                 ->set('comments', $comments)
                 ->set('attendance', $attendance);
-        
+
         if (RequestMethods::post('submitAddComment')) {
             if ($this->_checkCSRFToken() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/akce/r/'.$action->getId());
             }
-            
+
             $comment = new \App\Model\CommentModel(array(
                 'userId' => $this->getUser()->getId(),
                 'resourceId' => $action->getId(),
                 'replyTo' => RequestMethods::post('replyTo', 0),
                 'type' => \App\Model\CommentModel::RESOURCE_ACTION,
-                'body' => RequestMethods::post('text')
+                'body' => RequestMethods::post('text'),
             ));
-            
+
             if ($comment->validate()) {
                 $id = $comment->save();
 
                 $this->getCache()->invalidate();
-                
-                Event::fire('app.log', array('success', 'Comment id: ' . $id. ' from user: '.$this->getUser()->getId()));
+
+                Event::fire('app.log', array('success', 'Comment id: '.$id.' from user: '.$this->getUser()->getId()));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/akce/r/'.$action->getId());
             } else {
-                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($comment->getErrors())));
+                Event::fire('app.log', array('fail', 'Errors: '.json_encode($comment->getErrors())));
                 $view->set('errors', $comment->getErrors())
                     ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                     ->set('newcomment', $comment);
@@ -146,7 +145,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Show archivated actions
+     * Show archivated actions.
      * 
      * @param type $page
      */
@@ -162,9 +161,9 @@ class ActionController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/archivakci';
+            $canonical = 'http://'.$this->getServerHost().'/archivakci';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/archivakci/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/archivakci/p/'.$page;
         }
 
         $actions = \App\Model\ActionModel::fetchArchivatedWithLimit($articlesPerPage, $page);
@@ -172,7 +171,7 @@ class ActionController extends Controller
         $actionCount = \App\Model\ActionModel::count(
                         array('active = ?' => true,
                             'approved = ?' => 1,
-                            'archive = ?' => true)
+                            'archive = ?' => true, )
         );
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
@@ -189,7 +188,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Show old but not archivated actions
+     * Show old but not archivated actions.
      * 
      * @param type $page
      */
@@ -205,9 +204,9 @@ class ActionController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/probehleakce';
+            $canonical = 'http://'.$this->getServerHost().'/probehleakce';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/probehleakce/p/' . $page;
+            $canonical = 'http://'.$this->getServerHost().'/probehleakce/p/'.$page;
         }
 
         $actions = \App\Model\ActionModel::fetchOldWithLimit($articlesPerPage, $page);
@@ -216,7 +215,7 @@ class ActionController extends Controller
                         array('active = ?' => true,
                             'approved = ?' => 1,
                             'archive = ?' => false,
-                            'startDate <= ?' => date('Y-m-d', time()))
+                            'startDate <= ?' => date('Y-m-d', time()), )
         );
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
@@ -233,7 +232,7 @@ class ActionController extends Controller
     }
 
     /**
-     * Preview of action created in administration but not saved into db
+     * Preview of action created in administration but not saved into db.
      * 
      * @before _secured, _participant
      */
@@ -257,7 +256,6 @@ class ActionController extends Controller
     }
 
     /**
-     * 
      * @param type $actionId
      * @param type $type
      * @before _secured, _member
@@ -265,34 +263,34 @@ class ActionController extends Controller
     public function attendance($actionId, $type)
     {
         $this->_disableView();
-        
-        if($type != \App\Model\AttendanceModel::ACCEPT ||
+
+        if ($type != \App\Model\AttendanceModel::ACCEPT ||
                 $type != \App\Model\AttendanceModel::REJECT ||
-                $type != \App\Model\AttendanceModel::MAYBE){
+                $type != \App\Model\AttendanceModel::MAYBE) {
             echo $this->lang('COMMON_FAIL');
             exit;
         }
-        
-        $action = \App\Model\ActionModel::first(array('id = ?' => (int)$actionId));
-        
-        if (NULL === $action) {
+
+        $action = \App\Model\ActionModel::first(array('id = ?' => (int) $actionId));
+
+        if (null === $action) {
             echo $this->lang('NOT_FOUND');
-        }else{
+        } else {
             $attendance = new \App\Model\AttendanceModel(array(
                 'userId' => $this->getUser()->getId(),
                 'resourceId' => $action->getId(),
-                'type' => (int)$type,
-                'comment' => RequestMethods::post('attcomment')
+                'type' => (int) $type,
+                'comment' => RequestMethods::post('attcomment'),
             ));
-            
-            if($attendance->validate()){
+
+            if ($attendance->validate()) {
                 $attendance->save();
                 $this->getCache()->invalidate();
 
                 Event::fire('app.log', array('success', 'Attendance - '.$type.' - action '.$action->getId().' by user: '.$this->getUser()->getId()));
                 echo 'success';
             } else {
-                Event::fire('app.log', array('fail', 'Errors: '.  json_encode($attendance->getErrors())));
+                Event::fire('app.log', array('fail', 'Errors: '.json_encode($attendance->getErrors())));
                 echo $this->lang('COMMON_FAIL');
             }
         }

@@ -8,13 +8,11 @@ use THCFrame\Events\SubscriberInterface;
 use THCFrame\Security\Model\SecLogModel;
 
 /**
- * Module specific observer class
+ * Module specific observer class.
  */
 class ModuleObserver implements SubscriberInterface
 {
-
     /**
-     * 
      * @return type
      */
     public function getSubscribedEvents()
@@ -26,7 +24,6 @@ class ModuleObserver implements SubscriberInterface
     }
 
     /**
-     * 
      * @param array $params
      */
     public function adminLog()
@@ -35,13 +32,13 @@ class ModuleObserver implements SubscriberInterface
 
         $router = Registry::get('router');
         $route = $router->getLastRoute();
-        
+
         $security = Registry::get('security');
         $user = $security->getUser();
         if ($user === null) {
             $userId = 'annonymous';
         } else {
-            $userId = $user->getWholeName() . ':' . $user->getId();
+            $userId = $user->getWholeName().':'.$user->getId();
         }
 
         $module = $route->getModule();
@@ -53,7 +50,7 @@ class ModuleObserver implements SubscriberInterface
 
             $paramStr = '';
             if (!empty($params)) {
-                $paramStr = join(', ', $params);
+                $paramStr = implode(', ', $params);
             }
         } else {
             $result = 'fail';
@@ -67,7 +64,7 @@ class ModuleObserver implements SubscriberInterface
             'action' => $action,
             'result' => $result,
             'httpreferer' => RequestMethods::getHttpReferer(),
-            'params' => $paramStr
+            'params' => $paramStr,
         ));
 
         if ($log->validate()) {
@@ -92,7 +89,7 @@ class ModuleObserver implements SubscriberInterface
         if ($security->getUser() === null) {
             $userId = 'annonymous';
         } else {
-            $userId = $security->getUser()->getWholeName() . ':' . $security->getUser()->getId();
+            $userId = $security->getUser()->getWholeName().':'.$security->getUser()->getId();
         }
 
         $module = $route->getModule();
@@ -100,7 +97,7 @@ class ModuleObserver implements SubscriberInterface
         $action = $route->getAction();
 
         if (!empty($params)) {
-            $paramStr = join(', ', $params);
+            $paramStr = implode(', ', $params);
         } else {
             $paramStr = '';
         }
@@ -112,12 +109,11 @@ class ModuleObserver implements SubscriberInterface
             'action' => $action,
             'userAgent' => $ubrowser,
             'userIp' => $uip,
-            'params' => $paramStr
+            'params' => $paramStr,
         ));
 
         if ($log->validate()) {
             $log->save();
         }
     }
-
 }

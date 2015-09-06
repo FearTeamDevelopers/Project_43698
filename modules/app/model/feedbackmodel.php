@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class FeedbackModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -78,5 +77,4 @@ class FeedbackModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-
 }

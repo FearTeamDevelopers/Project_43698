@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class AdMessageModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -120,5 +119,4 @@ class AdMessageModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-
 }

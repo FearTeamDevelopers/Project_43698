@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class SearchIndexModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -19,7 +18,7 @@ class SearchIndexModel extends Model
      * @read
      */
     protected $_databaseIdent = 'search';
-    
+
     /**
      * @column
      * @readwrite
@@ -71,7 +70,7 @@ class SearchIndexModel extends Model
      * @label source title
      */
     protected $_sourceTitle;
-    
+
     /**
      * @column
      * @readwrite
@@ -82,7 +81,7 @@ class SearchIndexModel extends Model
      * @label source meta description
      */
     protected $_sourceMetaDescription;
-    
+
     /**
      * @column
      * @readwrite
@@ -91,7 +90,7 @@ class SearchIndexModel extends Model
      * @validate datetime, max(22)
      */
     protected $_sourceCreated;
-    
+
     /**
      * @column
      * @readwrite
@@ -111,7 +110,7 @@ class SearchIndexModel extends Model
      * @label weight
      */
     protected $_weight;
-    
+
     /**
      * @column
      * @readwrite
@@ -145,5 +144,4 @@ class SearchIndexModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-
 }

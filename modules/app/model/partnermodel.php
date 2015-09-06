@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class PartnerModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -123,16 +122,15 @@ class PartnerModel extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getUnlinkLogoPath($type = true)
     {
         if ($type && !empty($this->_logo)) {
-            if (file_exists('./' . $this->_logo)) {
-                return './' . $this->_logo;
-            } elseif (file_exists('.' . $this->_logo)) {
-                return '.' . $this->_logo;
+            if (file_exists('./'.$this->_logo)) {
+                return './'.$this->_logo;
+            } elseif (file_exists('.'.$this->_logo)) {
+                return '.'.$this->_logo;
             } elseif (file_exists($this->_logo)) {
                 return $this->_logo;
             }
@@ -140,5 +138,4 @@ class PartnerModel extends Model
             return $this->_logo;
         }
     }
-
 }

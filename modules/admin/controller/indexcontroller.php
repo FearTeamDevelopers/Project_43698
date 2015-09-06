@@ -9,9 +9,8 @@ use Admin\Etc\Controller;
  */
 class IndexController extends Controller
 {
-
     /**
-     * Get some basic info for dashboard
+     * Get some basic info for dashboard.
      * 
      * @before _secured, _participant
      */
@@ -25,7 +24,7 @@ class IndexController extends Controller
         $latestReports = \App\Model\ReportModel::fetchWithLimit(10);
         $latestComments = \App\Model\CommentModel::fetchWithLimit(10);
         $latestUsers = \App\Model\UserModel::fetchLates();
-        
+
         $view->set('latestnews', $latestNews)
                 ->set('latestreports', $latestReports)
                 ->set('latestusers', $latestUsers)
@@ -33,5 +32,4 @@ class IndexController extends Controller
                 ->set('latestactions', $latestActions)
                 ->set('imessages', $imessages);
     }
-
 }

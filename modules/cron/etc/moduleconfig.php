@@ -5,11 +5,10 @@ namespace Cron\Etc;
 use THCFrame\Module\Module;
 
 /**
- * Class for module specific settings
+ * Class for module specific settings.
  */
 class ModuleConfig extends Module
 {
-
     /**
      * @read
      */
@@ -22,7 +21,8 @@ class ModuleConfig extends Module
 
     /**
      * @read
-     * @var array 
+     *
+     * @var array
      */
     protected $_routes = array(
         array(
@@ -54,7 +54,6 @@ class ModuleConfig extends Module
             'module' => 'cron',
             'controller' => 'index',
             'action' => 'systemcheck',
-        )
+        ),
     );
-
 }

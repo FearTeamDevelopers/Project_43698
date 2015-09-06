@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class SearchIndexLogModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -19,7 +18,7 @@ class SearchIndexLogModel extends Model
      * @read
      */
     protected $_databaseIdent = 'search';
-    
+
     /**
      * @column
      * @readwrite
@@ -49,7 +48,7 @@ class SearchIndexLogModel extends Model
      * @label table
      */
     protected $_idxTableAlias;
-    
+
     /**
      * @column
      * @readwrite
@@ -60,7 +59,7 @@ class SearchIndexLogModel extends Model
      * @label run by
      */
     protected $_runBy;
-    
+
     /**
      * @column
      * @readwrite
@@ -80,7 +79,7 @@ class SearchIndexLogModel extends Model
      * @label words count
      */
     protected $_wordsCount;
-    
+
     /**
      * @column
      * @readwrite
@@ -114,5 +113,4 @@ class SearchIndexLogModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-
 }

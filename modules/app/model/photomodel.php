@@ -9,7 +9,6 @@ use THCFrame\Model\Model;
  */
 class PhotoModel extends Model
 {
-
     /**
      * @readwrite
      */
@@ -185,7 +184,6 @@ class PhotoModel extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getFormatedSize($unit = 'kb')
@@ -196,28 +194,27 @@ class PhotoModel extends Model
             'b' => 1,
             'kb' => 1024,
             'mb' => pow(1024, 2),
-            'gb' => pow(1024, 3)
+            'gb' => pow(1024, 3),
         );
 
         $result = $bytes / $units[strtolower($unit)];
-        $result = strval(round($result, 2)) . ' ' . strtoupper($unit);
+        $result = strval(round($result, 2)).' '.strtoupper($unit);
 
         return $result;
     }
 
     /**
-     * 
      * @return type
      */
     public function getUnlinkPath($type = true)
     {
         if ($type && !empty($this->_imgMain)) {
-            if (file_exists(APP_PATH . $this->_imgMain)) {
-                return APP_PATH . $this->_imgMain;
-            } elseif (file_exists('.' . $this->_imgMain)) {
-                return '.' . $this->_imgMain;
-            } elseif (file_exists('./' . $this->_imgMain)) {
-                return './' . $this->_imgMain;
+            if (file_exists(APP_PATH.$this->_imgMain)) {
+                return APP_PATH.$this->_imgMain;
+            } elseif (file_exists('.'.$this->_imgMain)) {
+                return '.'.$this->_imgMain;
+            } elseif (file_exists('./'.$this->_imgMain)) {
+                return './'.$this->_imgMain;
             }
         } else {
             return $this->_imgMain;
@@ -225,18 +222,17 @@ class PhotoModel extends Model
     }
 
     /**
-     * 
      * @return type
      */
     public function getUnlinkThumbPath($type = true)
     {
         if ($type && !empty($this->_imgThumb)) {
-            if (file_exists(APP_PATH . $this->_imgThumb)) {
-                return APP_PATH . $this->_imgThumb;
-            } elseif (file_exists('.' . $this->_imgThumb)) {
-                return '.' . $this->_imgThumb;
-            } elseif (file_exists('./' . $this->_imgThumb)) {
-                return './' . $this->_imgThumb;
+            if (file_exists(APP_PATH.$this->_imgThumb)) {
+                return APP_PATH.$this->_imgThumb;
+            } elseif (file_exists('.'.$this->_imgThumb)) {
+                return '.'.$this->_imgThumb;
+            } elseif (file_exists('./'.$this->_imgThumb)) {
+                return './'.$this->_imgThumb;
             }
         } else {
             return $this->_imgThumb;
@@ -244,20 +240,19 @@ class PhotoModel extends Model
     }
 
     /**
-     * 
      * @param type $galleryId
      * @param type $limit
      * @param type $page
+     *
      * @return type
      */
     public static function fetchPhotosByGalleryIdPaged($galleryId, $limit = 30, $page = 1)
     {
         return self::all(
-                    array('active = ?' => true, 'galleryId = ?' => (int) $galleryId), 
-                    array('*'), 
-                    array('rank' => 'desc', 'created' => 'desc'), 
+                    array('active = ?' => true, 'galleryId = ?' => (int) $galleryId),
+                    array('*'),
+                    array('rank' => 'desc', 'created' => 'desc'),
                     $limit, $page
         );
     }
-
 }
