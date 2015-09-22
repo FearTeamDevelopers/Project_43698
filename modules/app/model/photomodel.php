@@ -184,6 +184,26 @@ class PhotoModel extends Model
     }
 
     /**
+     * Delete ad record and connected images
+     * 
+     * @return type
+     */
+    public function delete()
+    {
+        $imgMain = $this->getUnlinkPath();
+        $imgThumb = $this->getUnlinkThumbPath();
+
+        $state = parent::delete();
+
+        if ($state != -1) {
+            @unlink($imgMain);
+            @unlink($imgThumb);
+        }
+
+        return $state;
+    }
+    
+    /**
      * @return type
      */
     public function getFormatedSize($unit = 'kb')

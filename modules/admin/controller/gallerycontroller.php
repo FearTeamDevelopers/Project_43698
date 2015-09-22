@@ -427,12 +427,7 @@ class GalleryController extends Controller
                 echo $this->lang('LOW_PERMISSIONS');
             }
 
-            $mainPath = $photo->getUnlinkPath();
-            $thumbPath = $photo->getUnlinkThumbPath();
-
             if ($photo->delete()) {
-                @unlink($mainPath);
-                @unlink($thumbPath);
                 Event::fire('admin.log', array('success', 'Photo id: '.$id));
                 echo 'success';
             } else {

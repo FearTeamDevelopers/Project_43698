@@ -148,27 +148,24 @@ class AdvertisementController extends Controller
         $this->_disableView();
 
         if ($this->_checkCSRFToken()) {
-            $photo = \App\Model\AdImageModel::first(
-                            array('id = ?' => (int) $imageId),
-                            array('id', 'adId', 'imgMain', 'imgThumb')
-            );
+            $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $imageId));
+            $ad = \App\Model\AdvertisementModel::first(array('id = ?' => $adImage->getAdId()));
+        
+            if($adImage->getId() === $ad->getMainPhotoId()){
+                $ad->mainPhotoId = null;
+            }
 
-            if (null === $photo) {
+            if (null === $adImage) {
                 echo $this->lang('NOT_FOUND');
             } else {
-                $mainPath = $photo->getUnlinkPath();
-                $thumbPath = $photo->getUnlinkThumbPath();
-
-                if ($photo->delete()) {
-                    @unlink($mainPath);
-                    @unlink($thumbPath);
+                if ($adImage->delete()) {
 
                     Event::fire('admin.log', array('success', 'Ad image id: '.$imageId
-                        .' from ad: '.$photo->getAdId(), ));
+                        .' from ad: '.$adImage->getAdId(), ));
                     echo 'success';
                 } else {
                     Event::fire('admin.log', array('fail', 'Ad image id: '.$imageId
-                        .' from ad: '.$photo->getAdId(), ));
+                        .' from ad: '.$adImage->getAdId(), ));
                     echo $this->lang('COMMON_FAIL');
                 }
             }
