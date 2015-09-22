@@ -5,12 +5,11 @@ section.wrapper.bazar.singlePage
 	.row.container
 		|{if !empty($ads)}
 		.buttonWrapper
-		ul
-			li
-				a(href='/bazar').fi-arrow-left Bazar
-			li
-				a(href='/bazar/pridat').fi-plus Nový inzerát
-
+                    ul
+                            li
+                                    a(href='/bazar').fi-arrow-left Bazar
+                            li
+                                    a(href='/bazar/pridat').fi-plus Nový inzerát
 		| {foreach $ad in $ads}
 		article.medium-6.column.left
 			.imgWrapper
@@ -26,22 +25,29 @@ section.wrapper.bazar.singlePage
 				.info
 					| {if $ad->getAdType() =='tender'}
 					center
-						span.nabidka Nabídka <br/>
+						span.nabidka Nabídka 
 					|{/if}{else}
 					center
-						span.poptavka Poptávka <br/>
+						span.poptavka Poptávka 
 					|{/else}
 					small
 						span sekce:
-					span {echo " ".$ad->getSectionTitle()}<br/>
+					span {echo " ".$ad->getSectionTitle()}
+                                        |<br/>
 					small
 						span cena:
 					|{if $ad->getPrice() == "1"}
-					span.price {echo " na dohodě"}<br/>
+					span.price {echo " na dohodě"}
+                                        |<br/>
 					|{/if}
 					|{else}
-					span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
+					span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}
+                                        |<br/>
 					|{/else}
+                                        small
+                                                span platnost do:
+                                        span {echo " ".\App\Helper\DateFormater::t2d($ad->getExpirationDate())}
+                                        |<br/>
 					a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
 
 			a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')

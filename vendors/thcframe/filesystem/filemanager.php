@@ -8,6 +8,7 @@ use THCFrame\Registry\Registry;
 use THCFrame\Filesystem\Image;
 use THCFrame\Filesystem\File;
 use THCFrame\Core\StringMethods;
+use THCFrame\Core\Lang;
 
 /**
  * FileManager class
@@ -19,6 +20,11 @@ class FileManager extends Base
     const FILE_CHMOD = 0644;
     const MAX_FILE_UPLOAD_SIZE = 15000000;
 
+    /**
+     * @read
+     */
+    protected $_lang;
+    
     /**
      * @read
      */
@@ -89,6 +95,7 @@ class FileManager extends Base
     {
         parent::__construct($options);
 
+        $this->_lang = Lang::getInstance();
         $configuration = Registry::get('configuration');
 
         if (!empty($configuration->files)) {
@@ -469,29 +476,29 @@ class FileManager extends Base
                     //check for upload errors
                     switch ($error) {
                         case UPLOAD_ERR_INI_SIZE:
-                            $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the upload_max_filesize directive in php.ini', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
                             break;
                         case UPLOAD_ERR_FORM_SIZE:
-                            $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the MAX_FILE_SIZE directive that was specified in the HTML form', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
                             break;
                         case UPLOAD_ERR_PARTIAL:
-                            $this->_uploadErrors[] = sprintf('The uploaded file %s was only partially uploaded', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
                             break;
                         case UPLOAD_ERR_NO_FILE:
-                            $this->_uploadErrors[] = "No file was uploaded";
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
                             break;
                         case UPLOAD_ERR_NO_TMP_DIR:
-                            $this->_uploadErrors[] = "Missing a temporary folder";
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                             break;
                         case UPLOAD_ERR_CANT_WRITE:
-                            $this->_uploadErrors[] = sprintf('Failed to write file %s to disk', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
                             break;
                         case UPLOAD_ERR_EXTENSION:
-                            $this->_uploadErrors[] = "File upload stopped by extension";
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                             break;
 
                         default:
-                            $this->_uploadErrors[] = sprintf('Unknown upload error occured while uploading file %s', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
                             break;
                     }
                     continue;
@@ -547,29 +554,29 @@ class FileManager extends Base
 
                 switch ($error) {
                     case UPLOAD_ERR_INI_SIZE:
-                        $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the upload_max_filesize directive in php.ini', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
                         break;
                     case UPLOAD_ERR_FORM_SIZE:
-                        $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the MAX_FILE_SIZE directive that was specified in the HTML form', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
                         break;
                     case UPLOAD_ERR_PARTIAL:
-                        $this->_uploadErrors[] = sprintf('The uploaded file %s was only partially uploaded', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
                         break;
                     case UPLOAD_ERR_NO_FILE:
-                        $this->_uploadErrors[] = "No file was uploaded";
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
                         break;
                     case UPLOAD_ERR_NO_TMP_DIR:
-                        $this->_uploadErrors[] = "Missing a temporary folder";
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                         break;
                     case UPLOAD_ERR_CANT_WRITE:
-                        $this->_uploadErrors[] = sprintf('Failed to write file %s to disk', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
                         break;
                     case UPLOAD_ERR_EXTENSION:
-                        $this->_uploadErrors[] = "File upload stopped by extension";
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                         break;
 
                     default:
-                        $this->_uploadErrors[] = sprintf('Unknown upload error occured while uploading file %s', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
                         break;
                 }
             }
@@ -643,29 +650,29 @@ class FileManager extends Base
                     //check for upload errors
                     switch ($error) {
                         case UPLOAD_ERR_INI_SIZE:
-                            $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the upload_max_filesize directive in php.ini', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
                             break;
                         case UPLOAD_ERR_FORM_SIZE:
-                            $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the MAX_FILE_SIZE directive that was specified in the HTML form', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
                             break;
                         case UPLOAD_ERR_PARTIAL:
-                            $this->_uploadErrors[] = sprintf('The uploaded file %s was only partially uploaded', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
                             break;
                         case UPLOAD_ERR_NO_FILE:
-                            $this->_uploadErrors[] = "No file was uploaded";
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
                             break;
                         case UPLOAD_ERR_NO_TMP_DIR:
-                            $this->_uploadErrors[] = "Missing a temporary folder";
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                             break;
                         case UPLOAD_ERR_CANT_WRITE:
-                            $this->_uploadErrors[] = sprintf('Failed to write file %s to disk', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
                             break;
                         case UPLOAD_ERR_EXTENSION:
-                            $this->_uploadErrors[] = "File upload stopped by extension";
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                             break;
 
                         default:
-                            $this->_uploadErrors[] = sprintf('Unknown upload error occured while uploading file %s', $name);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
                             break;
                     }
                     continue;
@@ -754,29 +761,29 @@ class FileManager extends Base
 
                 switch ($error) {
                     case UPLOAD_ERR_INI_SIZE:
-                        $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the upload_max_filesize directive in php.ini', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
                         break;
                     case UPLOAD_ERR_FORM_SIZE:
-                        $this->_uploadErrors[] = sprintf('The uploaded file %s exceeds the MAX_FILE_SIZE directive that was specified in the HTML form', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
                         break;
                     case UPLOAD_ERR_PARTIAL:
-                        $this->_uploadErrors[] = sprintf('The uploaded file %s was only partially uploaded', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
                         break;
                     case UPLOAD_ERR_NO_FILE:
-                        $this->_uploadErrors[] = "No file was uploaded";
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
                         break;
                     case UPLOAD_ERR_NO_TMP_DIR:
-                        $this->_uploadErrors[] = "Missing a temporary folder";
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                         break;
                     case UPLOAD_ERR_CANT_WRITE:
-                        $this->_uploadErrors[] = sprintf('Failed to write file %s to disk', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
                         break;
                     case UPLOAD_ERR_EXTENSION:
-                        $this->_uploadErrors[] = "File upload stopped by extension";
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                         break;
 
                     default:
-                        $this->_uploadErrors[] = sprintf('Unknown upload error occured while uploading file %s', $name);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
                         break;
                 }
             }

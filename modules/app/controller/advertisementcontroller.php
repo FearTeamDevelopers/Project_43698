@@ -534,7 +534,7 @@ class AdvertisementController extends Controller
                                 if ($adImage->validate()) {
                                     $adImageId = $adImage->save();
 
-                                    if ($i == 0) {
+                                    if ($i == 0 && empty($ad->mainPhotoId)) {
                                         $ad->mainPhotoId = $adImageId;
                                         if ($ad->validate()) {
                                             $ad->save();
@@ -600,6 +600,14 @@ class AdvertisementController extends Controller
         } else {
             $adId = $ad->getId();
 
+            $adImages = \App\Model\AdImageModel::all(array('adId = ?' => $adId));
+
+            if ($adImages !== null) {
+                foreach ($adImages as $image) {
+                    $image->delete();
+                }
+            }
+
             if ($ad->delete()) {
                 Event::fire('app.log', array('success', 'Ad id: '.$adId));
                 echo 'success';
@@ -621,17 +629,24 @@ class AdvertisementController extends Controller
     {
         $this->willRenderLayoutView = false;
         $view = $this->getActionView();
-
+        
         $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
 
         if (null === $ad) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->willRenderLayoutView = false;
             self::redirect('/bazar');
         }
 
         $adId = $ad->getId();
 
+        $adImages = \App\Model\AdImageModel::all(array('adId = ?' => $adId));
+        
+        if($adImages !== null){
+            foreach($adImages as $image){
+                $image->delete();
+            }
+        }
+        
         if ($ad->delete()) {
             Event::fire('app.log', array('success', 'Ad id: '.$adId));
             $view->successMessage($this->lang('DELETE_SUCCESS'));
@@ -654,17 +669,17 @@ class AdvertisementController extends Controller
         $this->_disableView();
 
         $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
-
+        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => $adImage->getAdId()));
+        
+        if($adImage->getId() === $ad->getMainPhotoId()){
+            $ad->mainPhotoId = null;
+        }
+        
         if (null === $adImage) {
             echo $this->lang('NOT_FOUND');
         } else {
-            $imgMain = $adImage->getUnlinkPath();
-            $imgThumb = $adImage->getUnlinkThumbPath();
-
             if ($adImage->delete()) {
-                @unlink($imgMain);
-                @unlink($imgThumb);
-
+                $ad->save();
                 Event::fire('app.log', array('success', 'AdImage id: '.$adImage->getId()));
                 echo 'success';
             } else {
@@ -717,10 +732,10 @@ class AdvertisementController extends Controller
      * Create request for availability extend.
      * 
      * @before _secured, _member
-     *
+     * 
      * @param string $uniqueKey ad key
      */
-    public function sendAvailabilityExtendRequest($uniqueKey)
+    public function extendAdExpiration($uniqueKey)
     {
         $this->_disableView();
 
@@ -742,8 +757,78 @@ class AdvertisementController extends Controller
             }
         }
     }
+    
+    /**
+     * Create request for availability extend form alert email
+     * 
+     * @param string $uniqueKey
+     * @param string $token
+     */
+    public function extendAdExpirationFromEmail($uniqueKey, $token)
+    {
+        $view = $this->getActionView();
+        $this->_disableView();
+        
+        $ad = \App\Model\AdvertisementModel::first(
+                array('uniqueKey = ?' => $uniqueKey, 
+                    'availabilityRequestToken = ?' => $token,
+                    'availabilityRequestTokenExpiration >= ?' => date('Y-m-d H:i:s')));
 
+        if (null === $ad) {
+            $view->warningMessage($this->lang('NOT_FOUND'));
+        } else {
+            $ad->hasAvailabilityRequest = true;
+            $ad->availabilityRequestToken = '';
+            $ad->availabilityRequestTokenExpiration = null;
+
+            if ($ad->validate()) {
+                $ad->save();
+                Event::fire('app.log', array('success', 'Ad id: '.$ad->getId()));
+                $view->successMessage($this->lang('ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS'));
+            } else {
+                Event::fire('app.log', array('fail', 'Ad id: '.$ad->getId(),
+                    'Errors: '.json_encode($ad->getErrors()), ));
+                $view->errorMessage($this->lang('COMMON_FAIL'));
+            }
+        }
+        
+        self::redirect('/');
+    }
+
+    /**
+     * Set advertisement new main photo
+     * 
+     * @before _secured, _member
+     * 
+     * @param integer $adId
+     * @param integer $photoId
+     */
     public function setNewMainPhoto($adId, $photoId)
     {
+        $this->_disableView();
+        
+        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int)$adId));
+        
+        if (null === $ad) {
+            echo $this->lang('NOT_FOUND');
+        } else {
+            $adPhoto = \App\Model\AdImageModel::first(array('adId = ?' => (int) $adId, 'id = ?' => (int) $photoId));
+
+            if (null === $adPhoto) {
+                echo $this->lang('AD_PHOTO_NOT_FOUND');
+            } else {
+                $ad->mainPhotoId = $photoId;
+
+                if ($ad->validate()) {
+                    $ad->save();
+                    Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId().' new main photo: '.$photoId));
+                    echo 'active';
+                } else {
+                    Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId().' new main photo: '.$photoId,
+                        'Errors: ' . json_encode($ad->getErrors()),));
+                    echo $this->lang('COMMON_FAIL');
+                }
+            }
+        }
     }
 }

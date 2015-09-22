@@ -3,6 +3,7 @@
 namespace THCFrame\Core;
 
 use THCFrame\Core\Exception;
+use THCFrame\Registry\Registry;
 
 /**
  * StringMethods class
@@ -219,6 +220,22 @@ class StringMethods
         }
 
         return null;
+    }
+
+    /**
+     * Return hash of given string or object
+     * 
+     * @param string|object $string
+     * @param string        $algo
+     * @return string
+     */
+    public static function getHash($string, $algo = null)
+    {
+        if($algo === null){
+            $algo = Registry::get('configuration')->security->encoder;
+        }
+        
+        return hash_hmac($algo, $string, '');
     }
 
     /**

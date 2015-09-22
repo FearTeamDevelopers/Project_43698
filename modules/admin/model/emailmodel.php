@@ -5,6 +5,7 @@ namespace Admin\Model;
 use THCFrame\Model\Model;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
 
 /**
  * Email template ORM class.

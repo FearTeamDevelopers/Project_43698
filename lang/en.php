@@ -15,6 +15,7 @@ return array(
     'MASSACTION_FAIL' => 'An uknown error occured during mass action',
     'UPLOAD_SUCCESS' => 'Upload has been successfully finished',
     'UPLOAD_FAIL' => 'An uknown error occured during file upload',
+    'CHANGES_SAVED' => 'All changes have been successfully saved',
 
     'COMMON_SUCCESS' => 'Everything went well',
     'COMMON_FAIL' => 'Oops, something went wrong',
@@ -28,6 +29,8 @@ return array(
     'PASS_RESET_EMAIL' => 'Password has been reset and sent to email',
     'PASS_RESET' => 'Password has been reset',
     'PASS_EXPIRATION' => 'Password will expire in %s days',
+    'PASS_EXPIRATION_TOMORROW' => 'Tomorrow your password will expire',
+    'PASS_IN_HISTORY' => 'Password must be different than previous two',
     'PASS_EXPIRED' => 'The password has expired',
     'PASS_WEAK' => 'Password is too weak',
     'PASS_ORIGINAL_NOT_CORRECT' => 'The original password is not correct',
@@ -42,9 +45,11 @@ return array(
     'LOGIN_EMAIL_ERROR' => 'E-mail is required',
     'LOGIN_PASS_ERROR' => 'Password is required',
     'LOGIN_TIMEOUT' => 'You has been logged out for long inactivity',
+    'LOGOUT_PASS_EXP_CHECK' => 'You havent change your password yer. You will not be able to login.',
     'ACCOUNT_LOCKED' => 'The account is locked',
     'ACCOUNT_INACTIVE' => 'The account has not been activated yet',
     'ACCOUNT_EXPIRED' => 'The account has expired',
+    'ACCOUNT_PASS_EXPIRED' => 'The password has expired. For setting new password contanct system administrator.',
     'ACCOUNT_ACTIVATED' => 'The account has been activated',
 
     'REGISTRATION_SUCCESS' => 'Registration has been successfull',
@@ -85,4 +90,17 @@ return array(
     'TITLE_USER_ADD' => 'User - Add',
     'TITLE_USER_EDIT' => 'User - Edit',
     'TITLE_USER_PROFILE' => 'My Profile',
+    
+    'ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS' => 'Advertisement availability request has been successfully sent',
+    'AD_PHOTO_NOT_FOUND' => 'No such a photo is connected to the advertisement',
+    
+    //UPLOAD ERRORS
+    'UPLOAD_ERR_INI_SIZE' => 'The uploaded file %s exceeds the upload_max_filesize directive in php.ini',
+    'UPLOAD_ERR_FORM_SIZE' => 'The uploaded file %s exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+    'UPLOAD_ERR_PARTIAL' => 'The uploaded file %s was only partially uploaded',
+    'UPLOAD_ERR_NO_FILE' => 'No file was uploaded',
+    'UPLOAD_ERR_NO_TMP_DIR' => 'Missing a temporary folder',
+    'UPLOAD_ERR_CANT_WRITE' => 'Failed to write file %s to disk',
+    'UPLOAD_ERR_EXTENSION' => 'File upload stopped by extension',
+    'UPLOAD_ERR_DEFAULT' => 'Unknown upload error occured while uploading file %s',
 );

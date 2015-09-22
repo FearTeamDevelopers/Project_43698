@@ -55,5 +55,11 @@ class ModuleConfig extends Module
             'controller' => 'index',
             'action' => 'systemcheck',
         ),
+        array(
+            'pattern' => '/c/adexpirationcheck',
+            'module' => 'cron',
+            'controller' => 'adv',
+            'action' => 'checkadexpirations',
+        ),
     );
 }

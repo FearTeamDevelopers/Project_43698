@@ -9,7 +9,7 @@ section.wrapper.login.singlePage
                label.error.fi-alert
                   |{echo $account_error}
                |{/if}
-               |{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Váš@email.cz"))}
+               |{echo \App\Helper\FormPrinter::input("email", "email", array(), array("required"=>true, "placeholder" => "Váš@email.cz"))}
                |{if isset($email_error)}
                label.error.fi-alert
                   |{echo $email_error}

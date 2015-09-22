@@ -132,7 +132,7 @@ jQuery(document).ready(function ($) {
     //delete image in grid list
     jQuery('.ajaxDeleteImage').click(function (event) {
         event.preventDefault();
-        var parent = jQuery(this);
+        var clicked = jQuery(this);
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
@@ -148,11 +148,11 @@ jQuery(document).ready(function ($) {
                     jQuery("#loader, .loader").show();
                     jQuery.post(url, {csrf: csrf}, function (msg) {
                         if (msg == 'success') {
-                            jQuery("#loader, .loader").hide();
-                            parent.children('img').hide('explode', 500);
+                            clicked.parent('span').hide('explode', 500);
                         } else {
                             alert(msg);
                         }
+                        jQuery("#loader, .loader").hide();
                     });
                     jQuery(this).dialog("close");
                 },
@@ -179,12 +179,14 @@ jQuery(document).ready(function ($) {
             modal: true,
             buttons: {
                 "Smazat": function () {
+                    jQuery("#loader, .loader").show();
                     jQuery.post(url, {csrf: csrf}, function (msg) {
                         if (msg == 'success') {
                             parentTr.fadeOut();
                         } else {
                             alert(msg);
                         }
+                        jQuery("#loader, .loader").hide();
                     });
                     jQuery(this).dialog("close");
                 },
@@ -230,13 +232,14 @@ jQuery(document).ready(function ($) {
     jQuery('.ajaxChangestate').click(function () {
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
-
+        jQuery("#loader, .loader").show();
         jQuery.post(url, {csrf: csrf}, function (msg) {
             if (msg == 'active' || msg == 'inactive') {
                 location.reload();
             } else {
                 alert(msg);
             }
+            jQuery("#loader, .loader").hide();
         });
 
         return false;

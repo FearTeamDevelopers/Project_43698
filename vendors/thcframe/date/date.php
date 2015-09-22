@@ -84,10 +84,7 @@ class Date
      */
     public function format($datetime, $format = 'Y-m-d H:i:s')
     {
-        $date = new \DateTime($datetime);
-        $date->format($format);
-
-        return $date;
+        return date($format, strtotime($datetime));
     }
 
     /**
@@ -99,9 +96,9 @@ class Date
     public function getFormatedCurDate($format = 'cz')
     {
         if (strtolower($format) == 'cz') {
-            return $this->format(time(), self::CZ_BASE_DATE_FORMAT);
+            return $this->format(date('Y-m-d'), self::CZ_BASE_DATE_FORMAT);
         } elseif (strtolower($format) == 'system') {
-            return $this->format(time(), self::SYSTEM_BASE_DATE_FORMAT);
+            return $this->format(date('Y-m-d'), self::SYSTEM_BASE_DATE_FORMAT);
         } else {
             throw new \THCFrame\Date\Exception\Argument('Unsupported date format');
         }
@@ -116,9 +113,9 @@ class Date
     public function getFormatedCurDatetime($format = 'cz')
     {
         if (strtolower($format) == 'cz') {
-            return $this->format(time(), self::CZ_BASE_DATETIME_FORMAT);
+            return $this->format(date('Y-m-d H:i:s'), self::CZ_BASE_DATETIME_FORMAT);
         } elseif (strtolower($format) == 'system') {
-            return $this->format(time(), self::SYSTEM_BASE_DATETIME_FORMAT);
+            return $this->format(date('Y-m-d H:i:s'), self::SYSTEM_BASE_DATETIME_FORMAT);
         } else {
             throw new \THCFrame\Date\Exception\Argument('Unsupported datetime format');
         }
@@ -187,9 +184,9 @@ class Date
         $interval = $datetime1->diff($datetime2);
 
         if ($useSign) {
-            return $interval->format('%R%a');
+            return (int) $interval->format('%r%a');
         } else {
-            return $interval->format('%a');
+            return (int) $interval->format('%a');
         }
     }
 

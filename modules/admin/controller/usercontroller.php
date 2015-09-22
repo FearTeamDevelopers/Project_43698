@@ -7,6 +7,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Security\PasswordManager;
 use THCFrame\Core\Rand;
+use THCFrame\Core\StringMethods;
 
 /**
  * 
@@ -57,8 +58,8 @@ class UserController extends Controller
                             $view->infoMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
                         } elseif ($daysToExpiration < 5 && $daysToExpiration > 1) {
                             $view->warningMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
-                        } elseif ($daysToExpiration >= 1) {
-                            $view->errorMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
+                        } elseif ($daysToExpiration <= 1) {
+                            $view->errorMessage($this->lang('PASS_EXPIRATION_TOMORROW'));
                         }
                     }
 
@@ -72,6 +73,12 @@ class UserController extends Controller
                 } catch (\THCFrame\Security\Exception\UserExpired $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_EXPIRED'));
                     Event::fire('admin.log', array('fail', sprintf('Account expired for %s', $email)));
+                } catch (\THCFrame\Security\Exception\UserNotExists $ex) {
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
+                    Event::fire('app.log', array('fail', sprintf('User %s does not exists', $email)));
+                } catch (\THCFrame\Security\Exception\UserPassExpired $ex) {
+                    $view->set('account_error', $this->lang('ACCOUNT_PASS_EXPIRED'));
+                    Event::fire('app.log', array('fail', sprintf('Password has expired for user %s', $email)));
                 } catch (\Exception $e) {
                     Event::fire('admin.log', array('fail', 'Exception: '.$e->getMessage()));
 
@@ -90,8 +97,19 @@ class UserController extends Controller
      */
     public function logout()
     {
+        $view = $this->getActionView();
+        
+        if($this->getUser() !== null && $this->getUser()->getForcePassChange() == true){
+            $view->errorMessage($this->lang('LOGOUT_PASS_EXP_CHECK'));
+            $this->getUser()
+                    ->setForcePassChange(false)
+                    ->update();
+            self::redirect('/admin/user/profile/');
+            exit;
+        }
+        
         $this->_disableView();
-
+        
         $this->getSecurity()->logout();
         self::redirect('/admin/');
     }
@@ -146,6 +164,7 @@ class UserController extends Controller
 
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
+            $cleanHash = StringMethods::getHash(RequestMethods::post('password'));
 
             $actToken = Rand::randStr(50);
             for ($i = 1; $i <= 75; $i+=1) {
@@ -170,6 +189,7 @@ class UserController extends Controller
                 'getNewReportNotification' => RequestMethods::post('reportNotification'),
                 'emailActivationToken' => null,
                 'password' => $hash,
+                'passwordHistory1' => $cleanHash,
                 'salt' => $salt,
                 'active' => true,
                 'role' => RequestMethods::post('role', 'role_member'),
@@ -195,7 +215,7 @@ class UserController extends Controller
      * 
      * @before _secured, _participant
      */
-    public function updateProfile()
+    public function profile()
     {
         $view = $this->getActionView();
 
@@ -240,6 +260,8 @@ class UserController extends Controller
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
                     $errors['password'] = array($this->lang('PASS_WEAK'));
+                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex){
+                    $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
                 }
             }
 
@@ -320,6 +342,8 @@ class UserController extends Controller
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
                     $errors['password'] = array($this->lang('PASS_WEAK'));
+                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex){
+                    $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
                 }
             }
 

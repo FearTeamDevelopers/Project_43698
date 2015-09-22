@@ -15,6 +15,7 @@ return array(
     'MASSACTION_FAIL' => 'Během provádění hromadné akce se vyskytla neznámá chyba',
     'UPLOAD_SUCCESS' => 'Soubor byl úspěšně nahrán',
     'UPLOAD_FAIL' => 'Během uploadu se vyskytla neznámá chyba',
+    'CHANGES_SAVED' => 'Změny byly úspěšně uloženy',
 
     'COMMON_SUCCESS' => 'Všechno proběhlo v pořádku',
     'COMMON_FAIL' => 'Oops, něco se pokazilo',
@@ -28,6 +29,8 @@ return array(
     'PASS_RESET_EMAIL' => 'Heslo bylo vyresetováno a odesláno na email uživatele',
     'PASS_RESET' => 'Heslo bylo vyresetováno',
     'PASS_EXPIRATION' => 'Platnost hesla vyprší během %s dní',
+    'PASS_EXPIRATION_TOMORROW' => 'Platnost hesla vyprší během zítřka',
+    'PASS_IN_HISTORY' => 'Heslo musí být jiné než poslední dvě',
     'PASS_EXPIRED' => 'Platnost hesla vypršela',
     'PASS_WEAK' => 'Heslo je příliš slabé',
     'PASS_ORIGINAL_NOT_CORRECT' => 'Původní heslo není správně',
@@ -42,9 +45,11 @@ return array(
     'LOGIN_EMAIL_ERROR' => 'Email není vyplněn',
     'LOGIN_PASS_ERROR' => 'Heslo není vyplněno',
     'LOGIN_TIMEOUT' => 'Byl jste odhlášen z důvodu dlouhé neaktivity',
+    'LOGOUT_PASS_EXP_CHECK' => 'Ještě jste si nezměnil heslo. Pokud tak neučiníte, tak se zítra nebudete moci přihlásit.',
     'ACCOUNT_LOCKED' => 'Účet je uzamknut',
     'ACCOUNT_INACTIVE' => 'Účet ještě nebyl aktivován',
     'ACCOUNT_EXPIRED' => 'Platnost účtu vypršela',
+    'ACCOUNT_PASS_EXPIRED' => 'Platnost hesla vypršela. Nastavení nového hesla musí provést administrátor.',
     'ACCOUNT_ACTIVATED' => 'Účet byl aktivován',
 
     'REGISTRATION_SUCCESS' => 'Registrace byla úspěšná',
@@ -85,4 +90,17 @@ return array(
     'TITLE_USER_ADD' => 'Uživatelé - Přidat',
     'TITLE_USER_EDIT' => 'Uživatelé - Upravit',
     'TITLE_USER_PROFILE' => 'Můj Profil',
+    
+    'ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS' => 'Žádost o prodloužení platnosti inzerátu byla úspěšně odeslána',
+    'AD_PHOTO_NOT_FOUND' => 'Daný inzerát takovou fotku nemá',
+    
+    //UPLOAD ERRORS
+    'UPLOAD_ERR_INI_SIZE' => 'Narávaný soubor %s překročil maximální velikost natavenou v php.ini',
+    'UPLOAD_ERR_FORM_SIZE' => 'Narávaný soubor %s překročil maximální velikost natavenou v HTML formuláři',
+    'UPLOAD_ERR_PARTIAL' => 'Soubor %s byl nahrán pouze částečně',
+    'UPLOAD_ERR_NO_FILE' => 'Žádný soubor nebyl nahrán',
+    'UPLOAD_ERR_NO_TMP_DIR' => 'Chybí složka pro dočasné soubory',
+    'UPLOAD_ERR_CANT_WRITE' => 'Chyba při zápisu souboru %s na disk',
+    'UPLOAD_ERR_EXTENSION' => 'File upload stopped by extension',
+    'UPLOAD_ERR_DEFAULT' => 'Nastala neočekávaná chyba při nahrávání souboru %s',
 );

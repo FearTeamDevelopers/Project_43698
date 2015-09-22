@@ -846,6 +846,7 @@ a.btn_table { background-position: -82px -480px; }
 .block { display: block; }
 .margintop10 { margin-top: 10px; }
 .marginright15 { margin-right: 15px; }
+.marginleft15 {margin-left: 15px; }
 .textright { text-align: right; }
 .noright { margin-right: 0; }
 .radiusbottom0 { -moz-border-radius: 2px 2px 0 0; -webkit-border-radius: 2px 2px 0 0; border-radius: 2px 2px 0 0; }

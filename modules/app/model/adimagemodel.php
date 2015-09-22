@@ -144,4 +144,25 @@ class AdImageModel extends Model
             return $this->_imgThumb;
         }
     }
+  
+    /**
+     * Delete ad record and connected images
+     * 
+     * @return type
+     */
+    public function delete()
+    {
+        $imgMain = $this->getUnlinkPath();
+        $imgThumb = $this->getUnlinkThumbPath();
+
+        $state = parent::delete();
+
+        if ($state != -1) {
+            @unlink($imgMain);
+            @unlink($imgThumb);
+        }
+
+        return $state;
+    }
+
 }

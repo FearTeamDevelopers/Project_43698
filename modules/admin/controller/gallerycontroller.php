@@ -300,36 +300,33 @@ class GalleryController extends Controller
      *
      * @param int $id gallery id
      */
-    public function addPhoto($id)
+    public function upload()
     {
-        $view = $this->getActionView();
+        $this->_disableView();
 
-        $gallery = \App\Model\GalleryModel::first(
-                        array(
-                    'id = ?' => (int) $id,
-                    'active = ?' => true,
-                        ), array('id', 'title', 'userId')
-        );
+        if (RequestMethods::post('submitUpload')) {
+            
+            $galleryId = RequestMethods::post('galleryid');
 
-        if (null === $gallery) {
-            $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/gallery/');
-        }
+            $gallery = \App\Model\GalleryModel::first(
+                            array(
+                        'id = ?' => (int) $galleryId,
+                        'active = ?' => true,
+                            ), array('id', 'title', 'userId')
+            );
 
-        if (!$this->_checkAccess($gallery)) {
-            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/gallery/');
-        }
-
-        $view->set('gallery', $gallery);
-
-        if (RequestMethods::post('submitAddPhoto')) {
-            if ($this->_checkCSRFToken() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
-                self::redirect('/admin/gallery/');
+            if (null === $gallery) {
+                header('HTTP/1.0 404 Not Found');
+                echo $this->lang('NOT_FOUND');
+                exit;
             }
+
+            if (!$this->_checkAccess($gallery)) {
+                header('HTTP/1.0 401 Unauthorized');
+                echo $this->lang('LOW_PERMISSIONS');
+                exit;
+            }
+            
             $errors = $uploadErrors = array();
 
             $fileManager = new FileManager(array(
@@ -340,11 +337,14 @@ class GalleryController extends Controller
                 'maxImageHeight' => $this->getConfig()->photo_maxheight,
             ));
 
-            $fileErrors = $fileManager->uploadImage('uploadfile', 'gallery/'.$gallery->getId(), time().'_')->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('file', 'gallery/'.$gallery->getId(), time().'_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
-                $uploadErrors += $fileErrors;
+                header('HTTP/1.0 400 Bad Request');
+                \THCFrame\Core\Core::getLogger()->log('Gallery image upload fail: '.print_r($fileErrors, true));
+                echo implode('<br/>', $fileErrors);
+                exit;
             }
 
             if (!empty($files)) {
@@ -372,7 +372,12 @@ class GalleryController extends Controller
                             Event::fire('admin.log', array('success', 'Photo id: '.$aid.' in gallery '.$gallery->getId()));
                         } else {
                             Event::fire('admin.log', array('fail', 'Photo in gallery '.$gallery->getId()));
-                            $uploadErrors += $photo->getErrors();
+                            \THCFrame\Core\Core::getLogger()->log('Gallery image create db record fail: '.print_r($photo->getErrors(), true));
+                            $error = \THCFrame\Core\ArrayMethods::flatten($photo->getErrors());
+                            
+                            header('HTTP/1.0 400 Bad Request');
+                            echo implode('<br/>', $error);
+                            exit;
                         }
                     }
                 }
@@ -381,10 +386,13 @@ class GalleryController extends Controller
             $errors['uploadfile'] = $uploadErrors;
 
             if (empty($errors['uploadfile'])) {
-                $view->successMessage($this->lang('UPLOAD_SUCCESS'));
-                self::redirect('/admin/gallery/detail/'.$gallery->getId());
+                header('HTTP/1.0 200 OK');
+                echo $this->lang('UPLOAD_SUCCESS');
+                exit;
             } else {
-                $view->set('errors', $errors);
+                header('HTTP/1.0 400 Bad Request');
+                echo $this->lang('UPLOAD_FAIL');
+                exit;
             }
         }
     }

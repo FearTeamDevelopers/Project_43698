@@ -44,6 +44,14 @@ class Controller extends BaseController
      * @read
      */
     protected $_lang;
+    
+    /**
+     * Store server host name.
+     *
+     * @var type
+     * @read
+     */
+    protected $_serverHost;
 
     /**
      * @param type $options
@@ -56,6 +64,7 @@ class Controller extends BaseController
         $this->_cache = Registry::get('cache');
         $this->_config = Registry::get('configuration');
         $this->_lang = Lang::getInstance();
+        $this->_serverHost = RequestMethods::server('HTTP_HOST');
 
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;

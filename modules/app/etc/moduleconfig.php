@@ -100,8 +100,22 @@ class ModuleConfig extends Module
             'pattern' => '/bazar/prodlouzit/:uniquekey',
             'module' => 'app',
             'controller' => 'advertisement',
-            'action' => 'sendavailabilityextendrequest',
+            'action' => 'extendadexpiration',
             'args' => ':uniquekey',
+        ),
+        array(
+            'pattern' => '/bazar/prodlouzit/:uniquekey/:token',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'extendadexpirationfromemail',
+            'args' => array(':uniquekey', ':token'),
+        ),
+        array(
+            'pattern' => '/bazar/nastavitfoto/:adid/:imageid',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'setnewmainphoto',
+            'args' => array(':adid', ':imageid'),
         ),
         array(
             'pattern' => '/bazar/p/:page',

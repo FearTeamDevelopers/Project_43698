@@ -8,6 +8,7 @@ use THCFrame\Security\PasswordManager;
 use THCFrame\Events\Events as Event;
 use THCFrame\Core\Rand;
 use THCFrame\Registry\Registry;
+use THCFrame\Core\StringMethods;
 
 /**
  * 
@@ -56,7 +57,7 @@ class UserController extends Controller
                 $view->set('account_error', $this->lang('LOGIN_PASS_ERROR'));
                 $error = true;
             }
-
+            
             if (!$error) {
                 try {
                     $this->getSecurity()->authenticate($email, $password);
@@ -67,8 +68,8 @@ class UserController extends Controller
                             $view->infoMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
                         } elseif ($daysToExpiration < 5 && $daysToExpiration > 1) {
                             $view->warningMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
-                        } elseif ($daysToExpiration >= 1) {
-                            $view->errorMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
+                        } elseif ($daysToExpiration <= 1) {
+                            $view->errorMessage($this->lang('PASS_EXPIRATION_TOMORROW'));
                         }
                     }
 
@@ -82,6 +83,12 @@ class UserController extends Controller
                 } catch (\THCFrame\Security\Exception\UserExpired $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_EXPIRED'));
                     Event::fire('app.log', array('fail', sprintf('Account expired for %s', $email)));
+                } catch (\THCFrame\Security\Exception\UserNotExists $ex) {
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
+                    Event::fire('app.log', array('fail', sprintf('User %s does not exists', $email)));
+                } catch (\THCFrame\Security\Exception\UserPassExpired $ex) {
+                    $view->set('account_error', $this->lang('ACCOUNT_PASS_EXPIRED'));
+                    Event::fire('app.log', array('fail', sprintf('Password has expired for user %s', $email)));
                 } catch (\Exception $e) {
                     Event::fire('app.log', array('fail', 'Exception: '.$e->getMessage()));
 
@@ -100,9 +107,19 @@ class UserController extends Controller
      */
     public function logout()
     {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
-
+        $view = $this->getActionView();
+        
+        if($this->getUser() !== null && $this->getUser()->getForcePassChange() == true){
+            $view->errorMessage($this->lang('LOGOUT_PASS_EXP_CHECK'));
+            $this->getUser()
+                    ->setForcePassChange(false)
+                    ->update();
+            self::redirect('/muj-profil');
+            exit;
+        }
+        
+        $this->_disableView();
+        
         $this->getSecurity()->logout();
         self::redirect('/');
     }
@@ -148,6 +165,7 @@ class UserController extends Controller
 
             $salt = PasswordManager::createSalt();
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
+            $cleanHash = StringMethods::getHash(RequestMethods::post('password'));
             $verifyEmail = $this->getConfig()->registration_verif_email;
 
             if ($verifyEmail) {
@@ -176,6 +194,7 @@ class UserController extends Controller
                 'email' => RequestMethods::post('email'),
                 'phoneNumber' => RequestMethods::post('phone'),
                 'password' => $hash,
+                'passwordHistory1' => $cleanHash,
                 'salt' => $salt,
                 'role' => 'role_member',
                 'active' => $active,
@@ -208,6 +227,8 @@ class UserController extends Controller
 
                 self::redirect('/');
             } else {
+                Event::fire('app.log', array('fail', 'User id: '.$id,
+                    'Errors: '.json_encode($errors + $user->getErrors()), ));
                 $view->set('errors', $errors + $user->getErrors())
                         ->set('user', $user);
             }
@@ -273,6 +294,8 @@ class UserController extends Controller
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
                     $errors['password'] = array($this->lang('PASS_WEAK'));
+                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex){
+                    $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
                 }
             }
 
@@ -290,6 +313,8 @@ class UserController extends Controller
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/muj-profil');
             } else {
+                Event::fire('app.log', array('fail', 'User id: '.$user->getId(),
+                    'Errors: '.json_encode($errors + $user->getErrors()), ));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }

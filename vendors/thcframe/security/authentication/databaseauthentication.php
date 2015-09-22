@@ -129,11 +129,9 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      */
     public function authenticate($name, $pass)
     {
-        
-
         $user = \App\Model\UserModel::first(
                         array("{$this->_name} = ?" => $name), array('id', "{$this->_name}", "{$this->_pass}",
-                    'salt', 'active', 'blocked', 'lastLogin', 'role',
+                    'salt', 'active', 'blocked', 'lastLogin', 'role', 'passExpire', 'accountExpire',
                     'totalLoginAttempts', 'lastLoginAttempt', 'firstLoginAttempt'));
 
         if ($user === null) {
@@ -170,7 +168,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
 
                 throw new Exception\BruteForceAttack('WARNING: Brute Force Attack Detected.');
             } else {
-                throw new Exception\WrongPassword($errMessage);
+                throw new Exception\WrongPassword();
             }
         }
     }

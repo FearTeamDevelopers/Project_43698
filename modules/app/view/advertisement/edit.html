@@ -12,7 +12,7 @@
           <td><span>Název</span></td>
           <td>{if isset($errors["title"])}
             <label class="error">{echo join("<br/>", $errors["title"])}</label>{/if}
-            |{echo \App\Helper\FormPrinter::input("text", "title", array($ad,"title"), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků"))}
+            {echo \App\Helper\FormPrinter::input("text", "title", array($ad,"title"), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků"))}
           </td>
         </tr>
         <tr>
@@ -69,16 +69,28 @@
         </tr>
         <tr>
           <td><span>Nahrané fotky</span></td>
-          <td><span class="field">
-              {script $images = $ad->getImages()}
-              {if $images !== null}
-              {foreach $image in $images}<a href="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage"><img src="{echo $image->getImgThumb()}"/></a>{/foreach}
-              {/if}</span></td>
+          <td>
+              <span class="field">
+                  {script $images = $ad->getImages()}
+                  {if $images !== null}
+                      {foreach $image in $images}
+                      <span style="display: inline;float: left; margin-right: 10px;">
+                            <img src="{echo $image->getImgThumb()}" style="height: 110px; margin-bottom: 5px;" /><br/>
+                            <a href="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage fi-trash"></a>
+                            {if $ad->getMainPhotoId() != $image->getId()}
+                              <a href="/bazar/nastavitfoto/{echo $ad->getId()}/{echo $image->getId()}" title="Nastavit jako hlavní fotku" class="ajaxChangestate fi-arrow-up"></a>
+                            {/if}
+                        </span>
+                          
+                      {/foreach}
+                  {/if}
+              </span>
+          </td>
         </tr>
         <tr>
           <td colspan="2">
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
-            <input type="submit" name="submitEditAdvertisement" value="Upravit" class="more"/>
+            <input type="submit" name="submitEditAdvertisement" value="Uložit" class="more"/>
           </td>
         </tr>
       </table>

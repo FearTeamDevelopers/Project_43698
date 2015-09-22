@@ -38,6 +38,11 @@ class PasswordManager extends Base
     protected $_secret;
 
     /**
+     * @var PasswordManager
+     */
+    private static $_instance = null;
+    
+    /**
      * Set of supported keyboard layouts for password strength detection
      * 
      * @var array
@@ -55,6 +60,21 @@ class PasswordManager extends Base
     }
 
     /**
+     * 
+     * @return type
+     */
+    public static function getInstance()
+    {
+        $configuration = Registry::get('configuration');
+        
+        if(self::$_instance === null){
+            self::$_instance = new static($configuration->security);
+        }
+
+        return self::$_instance;
+    }
+
+    /**
      * Static wrapper for hashPassword function
      * 
      * @param string $pass          password in plain-text
@@ -64,9 +84,7 @@ class PasswordManager extends Base
      */
     public static function hashPassword($pass, $dynamicSalt = '', $algo = '')
     {
-        $configuration = Registry::get('configuration');
-            
-        $pm = new static($configuration->security);
+        $pm = self::getInstance();
         return $pm->getPasswordHash($pass, $dynamicSalt, $algo);
     }
     
@@ -103,9 +121,7 @@ class PasswordManager extends Base
      */
     public static function validatePassword($newPassword, $oldHash, $oldSalt)
     {
-        $configuration = Registry::get('configuration');
-            
-        $pm = new static($configuration->security);
+        $pm = self::getInstance();
         return $pm->isPasswordValid($newPassword, $oldHash, $oldSalt);
     }
     

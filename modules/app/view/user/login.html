@@ -8,7 +8,7 @@
         </header>
         <form method="POST" action="#">{if isset($account_error)}
           <label class="error fi-alert">{echo $account_error}</label>{/if}
-          {echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Váš@email.cz"))}
+          {echo \App\Helper\FormPrinter::input("email", "email", array(), array("required"=>true, "placeholder" => "Váš@email.cz"))}
           {if isset($email_error)}<label class="error fi-alert">{echo $email_error}</label>{/if}
           {echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "placeholder" => "Vaše heslo"))}
           {if isset($password_error)}<label class="error fi-alert">{echo $password_error}</label>{/if}

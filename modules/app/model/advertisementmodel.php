@@ -157,6 +157,26 @@ class AdvertisementModel extends Model
      * @validate max(3)
      */
     protected $_hasAvailabilityRequest;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 22
+     * 
+     * @validate max(130)
+     */
+    protected $_availabilityRequestToken;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
+     */
+    protected $_availabilityRequestTokenExpiration;
 
     /**
      * @column
@@ -475,7 +495,7 @@ class AdvertisementModel extends Model
     public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
         $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                                'adv.title', 'adv.price', 'adv.created', ))
+                                'adv.title', 'adv.price', 'adv.created', 'adv.expirationDate' ))
                 ->join('tb_user', 'adv.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -517,5 +537,41 @@ class AdvertisementModel extends Model
         }
 
         return $ad;
+    }
+    
+    /**
+     * Return advertisements that are going to expire in x days based on parameters
+     * Advertisements returned in array are grouped by author email
+     * 
+     * @param integer $min
+     * @param integer $max
+     * @return array
+     */
+    public static function expireInDays($min = 1, $max = 7)
+    {
+        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.title',
+                                        'adv.created', 'adv.expirationDate', 'datediff(expirationDate, curdate())' => 'expireIn' ))
+                ->join('tb_user', 'adv.userId = us.id', 'us',
+                        array('us.firstname', 'us.lastname', 'us.email'))
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
+                        array('ads.title' => 'sectionTitle'))
+                ->where('adv.active = ?', true)
+                ->where('adv.hasAvailabilityRequest = ?', false)
+                ->where('datediff(expirationDate, curdate()) between '.(int)$min.' and '.(int)$max)
+                ->order('adv.created', 'desc');
+
+        $ads = self::initialize($query);
+        $returnArr = array();
+        
+        if (!empty($ads)) {
+            foreach ($ads as $ad) {
+                $returnArr[$ad->email][] = array('uniqueKey' => $ad->uniqueKey, 
+                    'expireIn' => $ad->expireIn,
+                    'title' => $ad->title,
+                    'created' => $ad->created);
+            }
+        }
+        
+        return $returnArr;
     }
 }
