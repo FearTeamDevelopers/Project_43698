@@ -104,6 +104,13 @@ class ModuleConfig extends Module
             'args' => ':uniquekey',
         ),
         array(
+            'pattern' => '/bazar/prodano/:uniquekey',
+            'module' => 'app',
+            'controller' => 'advertisement',
+            'action' => 'setstatetosold',
+            'args' => ':uniquekey',
+        ),
+        array(
             'pattern' => '/bazar/prodlouzit/:uniquekey/:token',
             'module' => 'app',
             'controller' => 'advertisement',
@@ -256,6 +263,13 @@ class ModuleConfig extends Module
             'controller' => 'gallery',
             'action' => 'detail',
             'args' => array(':urlkey',':page'),
+        ),
+        array(
+            'pattern' => '/akce/ucast/:id/:type',
+            'module' => 'app',
+            'controller' => 'action',
+            'action' => 'attendance',
+            'args' => array(':id',':type'),
         ),
     );
 }

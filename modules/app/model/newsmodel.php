@@ -58,7 +58,7 @@ class NewsModel extends Model
     /**
      * @column
      * @readwrite
-     * @type boolean
+     * @type tinyint
      * @index
      * 
      * @validate max(3)

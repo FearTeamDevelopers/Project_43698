@@ -1,8 +1,34 @@
-
 <section class="wrapper singlePage">
-  <div class="row container">
-    <header>
-      <h1>{echo $action->getTitle()}</h1><span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span><br/><span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->getStartDate())}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->getEndDate())}</strong></span><br/>{if !empty($action->startTime)}<span>Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/></span>{/if}
-    </header>{echo html_entity_decode($action->getBody())}
-  </div>
+    <div class="row container">
+        <header>
+            <h1>{echo $action->getTitle()}</h1>
+            {if $isMember}
+            <div class="buttonWrapper">
+                <ul>
+                    {if $authuseratt != \App\Model\AttendanceModel::ACCEPT}
+                    <li><a href="/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::ACCEPT}" class="fi-check ajaxChangestate">Zúčastním se</a></li>
+                    {/if}
+                    {if $authuseratt != \App\Model\AttendanceModel::MAYBE}
+                    <li><a href="/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::MAYBE}" class="fi-info ajaxChangestate">Ještě nevím</a></li>
+                    {/if}
+                    {if $authuseratt != \App\Model\AttendanceModel::REJECT}
+                    <li><a href="/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::REJECT}" class="fi-x ajaxChangestate">Nezúčastním se</a></li>
+                    {/if}
+                </ul>
+            </div>
+            {/if}
+            <span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span>
+            <hr/>
+            <span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->getStartDate())}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->getEndDate())}</strong></span><br/>
+            {if !empty($action->startTime)}<span>Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/></span>{/if}
+        </header>{echo html_entity_decode($action->getBody())}
+    </div>
+    {if $isMember && !empty($attendance)}
+    <div class="row container">
+        <hr/>
+        <strong>Zúčastní se: </strong>{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}<br/>
+        <strong>Ještě neví: </strong>{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}<br/>
+        <strong>Nezúčastní se: </strong>{script $rejectStr = implode(", ", $attendance[\App\Model\AttendanceModel::REJECT])}{echo $rejectStr}
+    </div>
+    {/if}
 </section>

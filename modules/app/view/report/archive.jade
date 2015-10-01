@@ -11,7 +11,9 @@ section.wrapper.reports.singlePage
                     small {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}
             .body
                 div {echo html_entity_decode($report->getShortBody())}
-                a(href!='/reportaze/r/{echo $report->getUrlKey()}') čti více
+                |{if $deviceType === 'computer'}
+                a.readMore(href!='/reportaze/r/{echo $report->getUrlKey()}') čti více
+                |{/if}
         | {/foreach}
         |{/if}
     include ../components/pager

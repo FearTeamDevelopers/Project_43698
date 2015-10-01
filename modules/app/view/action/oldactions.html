@@ -14,7 +14,8 @@
       <header><a href="/akce/r/{echo $action->getUrlKey()}">
           <h3>{echo $action->getTitle()}</h3></a><span><small>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</small></span></header>
       <div class="body">
-        <div>{echo html_entity_decode($action->getShortBody())}</div><a href="/akce/r/{echo $action->getUrlKey()}">čti více</a>
+        <div>{echo html_entity_decode($action->getShortBody())}</div>
+        {if $deviceType === 'computer'}<a href="/akce/r/{echo $action->getUrlKey()}" class="readMore">čti více</a>{/if}
       </div>
     </article>{/foreach}
     {/if}

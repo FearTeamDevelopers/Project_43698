@@ -20,7 +20,7 @@ section.wrapper.bazar.singlePage
 			.nazev
 				.nazevWrapper
 					a(href!='/bazar/r/{echo $ad->getUniqueKey()}')
-						h4 {echo $ad->getTitle()}
+						h4 {if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}PRODÁNO - {/if}{echo $ad->getTitle()}
 			.infoWrapper
 				.info
 					| {if $ad->getAdType() =='tender'}
@@ -49,10 +49,12 @@ section.wrapper.bazar.singlePage
                                         span {echo " ".\App\Helper\DateFormater::t2d($ad->getExpirationDate())}
                                         |<br/>
 					a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
-
-			a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')
-			a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
+                        |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+                        a.buttonTab.sell.ajaxReload.fi-dollar(href!='/bazar/prodano/{echo $ad->getUniqueKey()}', title='Prodáno')
+                        a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')
+                        a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
 			a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->getUniqueKey()}', title='Smazat')
+                        |{/if}
 		| {/foreach}
 		|{/if}{else}
 		h3 Nemáte žádné inzeráty

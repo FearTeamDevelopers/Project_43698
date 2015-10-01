@@ -23,7 +23,7 @@ class IndexController extends Controller
         $latestActions = \App\Model\ActionModel::fetchWithLimit(10);
         $latestReports = \App\Model\ReportModel::fetchWithLimit(10);
         $latestComments = \App\Model\CommentModel::fetchWithLimit(10);
-        $latestUsers = \App\Model\UserModel::fetchLates();
+        $latestUsers = \App\Model\UserModel::fetchLates(5);
 
         $view->set('latestnews', $latestNews)
                 ->set('latestreports', $latestReports)

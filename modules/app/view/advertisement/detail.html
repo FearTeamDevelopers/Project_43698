@@ -1,71 +1,81 @@
 
 <section class="wrapper bazar detail singlePage">
-  <header class="row">
-    <h2>{echo $ad->getTitle()}</h2>
-  </header>
-  <div class="row container">
-    <div class="buttonWrapper">
-      <ul>
-        <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
-        <li><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" class="fi-pencil">Upravit</a></li>
-        <li><a href="/bazar/odstranit/{echo $ad->getUniqueKey()}" class="fi-trash">Smazat</a></li>{/if}
-      </ul>
-    </div>
-    <article class="large-12">
-      <div class="row">
-        {script $images=$ad->getImages()}
-        {if !empty($images)}
-        <div class="large-7 medium-7 small-12 column">
-          <div class="images large-12">
-            {foreach $image in $images}
-            {if $image_i == 0}
-            <div class="mainImage large-12"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgMain()}"/></a></div>{if count($images)>1}<a href="#" class="fi-arrow-down dropdown">zobrazit více fotek</a>{/if}
-            {/if}{else}
-            <div class="thumbImage large-5 small-12 medium-6 column left"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgThumb()}"/></a></div>{/else}
-            {/foreach}
-          </div>
-        </div>{/if}
-        {if !empty($images)}
-        <div class="large-5 medium-5 small-12 column">
-          <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span>{if $ad->getPrice() == "0"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
-            {else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}
-          </div>
-        </div>{/if}
-        {else}
-        <div class="large-12 column">
-          <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span>{if $ad->getPrice() == "0"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
-            {else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}
-          </div>
-        </div>{/else}
-      </div>
-      <div class="row">
-        <div class="large-12 column">
-          <div class="info description">
-            <div>{echo $ad->content} <br/></div>
-            <div class="large-4 medium-6 small-12 centerBlock mv10"><a href="#sendEmail" class="sendEmail">
-                <div class="more blue"><span>Odpovědět na Inzerát</span></div></a></div>
-          </div>
+    <header class="row">
+        <h2>{echo $ad->getTitle()}</h2>
+    </header>
+    <div class="row container">
+
+        <div class="buttonWrapper">
+            <ul>
+                <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>
+                {if isset($authUser) && $authUser->getId() == $ad->getUserId()}
+                    {if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+                    <li><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" class="fi-pencil">Upravit</a></li>
+                    <li><a href="/bazar/odstranit/{echo $ad->getUniqueKey()}" class="fi-trash">Smazat</a></li>
+                    {/if}
+                {/if}
+            </ul>
         </div>
-      </div>
-    </article>
-    <div class="row">
-      <div class="large-6 medium-9 small-12 centerBlock">
-        <form id="sendEmail" method="post" action="#" class="mv30">
-          <label>Jméno:
-            {echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
-          </label>
-          <label>Email:
-            {echo \App\Helper\FormPrinter::input("email", "email", array($admessage,"msEmail"), array("required"=>true))}
-          </label>
-          <label>Text:
-            <textarea name="message" rows="6" required="required">{echo \App\Helper\FormPrinter::iset($admessage,"message")}</textarea>
-          </label>
-          <label>Chcete poslat kopii na svůj email?
-            <input type="checkbox" name="getemailcopy"/>
-          </label><a href="#" class="submitEmail">
-            <div class="more"><span>Odeslat</span></div></a>
-        </form>
-      </div>
+        <article class="large-12">
+            <div class="row">
+                {script $images=$ad->getImages()}
+                {if !empty($images)}
+                <div class="large-7 medium-7 small-12 column">
+                    <div class="images large-12">
+                        {foreach $image in $images}
+                        {if $image_i == 0}
+                        <div class="mainImage large-12"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgMain()}"/></a></div>{if count($images)>1}<a href="#" class="fi-arrow-down dropdown">zobrazit více fotek</a>{/if}
+                        {/if}{else}
+                        <div class="thumbImage large-5 small-12 medium-6 column left"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgThumb()}"/></a></div>{/else}
+                        {/foreach}
+                    </div>
+                </div>{/if}
+                {if !empty($images)}
+                <div class="large-5 medium-5 small-12 column">
+                    <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span>{if $ad->getPrice() == "0"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
+                        {else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}
+                    </div>
+                </div>{/if}
+                {else}
+                <div class="large-12 column">
+                    <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span>{if $ad->getPrice() == "0"}</small><span class="price">{echo " na dohodě"}<br/></span>{/if}
+                        {else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}
+                    </div>
+                </div>{/else}
+            </div>
+            <div class="row">
+                <div class="large-12 column">
+                    <div class="info description">
+                        <div>{echo $ad->content} <br/></div>
+                        {if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+                        <div class="large-4 medium-6 small-12 centerBlock mv10">
+                            <a href="#sendEmail" class="sendEmail">
+                                <div class="more blue"><span>Odpovědět na Inzerát</span></div>
+                            </a>
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </article>
+        <div class="row">
+            <div class="large-6 medium-9 small-12 centerBlock">
+                <form id="sendEmail" method="post" action="#" class="mv30">
+                    <label>Jméno:
+                        {echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
+                    </label>
+                    <label>Email:
+                        {echo \App\Helper\FormPrinter::input("email", "email", array($admessage,"msEmail"), array("required"=>true))}
+                    </label>
+                    <label>Text:
+                        <textarea name="message" rows="6" required="required">{echo \App\Helper\FormPrinter::iset($admessage,"message")}</textarea>
+                    </label>
+                    <label>Chcete poslat kopii na svůj email?
+                        <input type="checkbox" name="getemailcopy"/>
+                    </label><a href="#" class="submitEmail">
+                        <div class="more"><span>Odeslat</span></div></a>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </section>

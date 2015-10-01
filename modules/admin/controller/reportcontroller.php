@@ -223,20 +223,21 @@ class ReportController extends Controller
      */
     private function _sendEmailNotification(\App\Model\ReportModel $report)
     {
-        if ($report->getApproved() && $this->getConfig()->report_new_notification) {
+        if ($report->getApproved() && $this->getConfig()->new_report_notification) {
             $users = \App\Model\UserModel::all(array('getNewReportNotification = ?' => true), array('email'));
 
             if (!empty($users)) {
                 $data = array('{TITLE}' => '<a href="http://'.$this->getServerHost().'/report/r/'.$report->getUrlKey().'">'.$report->getTitle().'</a>',
                     '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody()),
                         );
-                $email = \Admin\Model\EmailModel::loadAndPrepare('nova-reportaz', $data);
+                $email = \Admin\Model\EmailModel::loadAndPrepare('new-report', $data);
 
                 foreach ($users as $user) {
                     $email->setRecipient($user->getEmail());
                 }
 
                 $email->send(true);
+                Event::fire('admin.log', array('success', 'Send new report notification to '.count($users).' users'));
             }
         }
     }

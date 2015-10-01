@@ -86,6 +86,9 @@ class UserController extends Controller
                 } catch (\THCFrame\Security\Exception\UserNotExists $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', array('fail', sprintf('User %s does not exists', $email)));
+                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
+                    Event::fire('app.log', array('fail', sprintf('User %s does not exists', $email)));
                 } catch (\THCFrame\Security\Exception\UserPassExpired $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_PASS_EXPIRED'));
                     Event::fire('app.log', array('fail', sprintf('Password has expired for user %s', $email)));
@@ -159,7 +162,7 @@ class UserController extends Controller
                 $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
             }
 
-            if (strlen(RequestMethods::post('password')) < 5 || PasswordManager::strength(RequestMethods::post('password')) <= 0.5) {
+            if (strlen(RequestMethods::post('password')) < 5 || PasswordManager::strength(RequestMethods::post('password')) <= 0.3) {
                 $errors['password'] = array($this->lang('PASS_WEAK'));
             }
 
@@ -167,11 +170,16 @@ class UserController extends Controller
             $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
             $cleanHash = StringMethods::getHash(RequestMethods::post('password'));
             $verifyEmail = $this->getConfig()->registration_verif_email;
+            $adminAccountActivation = $this->getConfig()->registration_admin_activate;
 
-            if ($verifyEmail) {
+            if ($adminAccountActivation) {
                 $active = false;
             } else {
-                $active = true;
+                if ($verifyEmail) {
+                    $active = false;
+                } else {
+                    $active = true;
+                }
             }
 
             $actToken = Rand::randStr(50);
@@ -206,19 +214,34 @@ class UserController extends Controller
             if (empty($errors) && $user->validate()) {
                 $uid = $user->save();
 
-                if ($verifyEmail) {
+                //odeslani notifikace administratorum, ze byl zaregistrovan novy uzivatel
+                if($adminAccountActivation){
+                    $admins = \App\Model\UserModel::fetchAdminsEmail();
+                    
+                    $data = array('{USERNAME}' => $user->getWholeName(), '{USEREMAIL}' => $user->getEmail());
+                    $email = \Admin\Model\EmailModel::loadAndPrepare('new-registration-notification', $data);
+                    $email->setRecipient($admins);
+                    
+                    if ($email->send(false, 'registrace@hastrman.cz')) {
+                        Event::fire('app.log', array('success', 'Notification email about new registration to admin'));
+                        $view->successMessage($this->lang('REGISTRATION_SUCCESS_ADMIN_ACTIVATION'));
+                    } else {
+                        $user->delete();
+                        Event::fire('app.log', array('fail', 'Notification email about new registration to admin'));
+                        $view->errorMessage($this->lang('REGISTRATION_FAIL'));
+                    }
+                }elseif ($verifyEmail) { //odeslani overovaciho emailu
                     $data = array('{TOKEN}' => $actToken);
-                    $email = \Admin\Model\EmailModel::loadAndPrepare('aktivace-uctu', $data);
+                    $email = \Admin\Model\EmailModel::loadAndPrepare('email-verification', $data);
                     $email->setRecipient($user->getEmail());
 
                     if ($email->send(false, 'registrace@hastrman.cz')) {
                         Event::fire('app.log', array('success', 'User Id with email activation: '.$uid));
                         $view->successMessage($this->lang('REGISTRATION_EMAIL_SUCCESS'));
                     } else {
-                        Event::fire('app.log', array('fail', 'Email not send for User Id: '.$uid));
                         $user->delete();
+                        Event::fire('app.log', array('fail', 'Email not send for User Id: '.$uid));
                         $view->errorMessage($this->lang('REGISTRATION_EMAIL_FAIL'));
-                        self::redirect('/');
                     }
                 } else {
                     Event::fire('app.log', array('success', 'User Id: '.$uid));
@@ -263,7 +286,7 @@ class UserController extends Controller
                 ->set('metatile', 'Hastrman - Můj profil')
                 ->set('canonical', $canonical);
         $view->set('user', $user)
-                ->set('actions', $myActions);
+                ->set('myactions', $myActions);
 
         if (RequestMethods::post('editProfile')) {
             if ($this->_checkCSRFToken() !== true) {
@@ -289,7 +312,7 @@ class UserController extends Controller
                 $newPass = RequestMethods::post('password');
 
                 try {
-                    $user = $user->changePassword($oldPassword, $newPass);
+                    $user = $user->changePassword($oldPassword, $newPass, 0.3);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {

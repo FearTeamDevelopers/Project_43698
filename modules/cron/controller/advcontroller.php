@@ -44,7 +44,7 @@ class AdvController extends Controller
             $adsString .= '</tbody></table>';
             
             $data = array('{ADS}' => $adsString);
-            $email = \Admin\Model\EmailModel::loadAndPrepare('vyprseni-platnosti-inzeratu', $data);
+            $email = \Admin\Model\EmailModel::loadAndPrepare('ad-expiration-notification', $data);
             $email->setRecipient($email);
 
             if ($email->send(false, 'bazar@hastrman.cz')) {

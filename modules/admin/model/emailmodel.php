@@ -137,6 +137,15 @@ class EmailModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
+    
+    public function getSubjectWithPrefix()
+    {
+        if(ENV != 'live'){
+            return '[TEST] '.$this->_subject;
+        }
+        
+        return $this->_subject;
+    }
 
     public static function fetchAll()
     {
@@ -185,10 +194,6 @@ class EmailModel extends Model
      */
     public static function loadAndPrepare($urlKey, $data = array())
     {
-        if (empty($data)) {
-            return;
-        }
-
         $email = self::first(array('urlKey = ?' => $urlKey));
 
         if (empty($email)) {
@@ -197,9 +202,12 @@ class EmailModel extends Model
 
         $emailText = str_replace('{MAINURL}', 'http://'.RequestMethods::server('HTTP_HOST'), $email->getBody());
 
-        foreach ($data as $key => $value) {
-            $emailText = str_replace($key, $value, $emailText);
+        if (!empty($data)) {
+            foreach ($data as $key => $value) {
+                $emailText = str_replace($key, $value, $emailText);
+            }
         }
+        
         $email->_body = $emailText;
 
         return $email;
@@ -214,8 +222,10 @@ class EmailModel extends Model
     {
         $emailText = str_replace('{MAINURL}', 'http://'.RequestMethods::server('HTTP_HOST'), $this->getBody());
 
-        foreach ($data as $key => $value) {
-            $emailText = str_replace($key, $value, $emailText);
+        if (!empty($data)) {
+            foreach ($data as $key => $value) {
+                $emailText = str_replace($key, $value, $emailText);
+            }
         }
 
         $this->_body = $emailText;
@@ -238,7 +248,7 @@ class EmailModel extends Model
             $mailer = \Swift_Mailer::newInstance($transport);
 
             $message = \Swift_Message::newInstance(null)
-                    ->setSubject($this->getSubject())
+                    ->setSubject($this->getSubjectWithPrefix())
                     ->setBody($this->getBody(), 'text/html');
 
             if (null === $sendFrom) {

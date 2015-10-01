@@ -58,24 +58,24 @@
                     </thead>
                     <tbody>
                         {if !empty($latestusers)}
-                        {foreach $user in $latestusers}
+                        {foreach $newuser in $latestusers}
                         <tr>
                             <td>
                                 {if $isAdmin}
-                                    <a href="/admin/user/edit/{echo $user->getId()}">
-                                        {echo $user->getFirstname()." ".$user->getLastname()}
+                                    <a href="/admin/user/edit/{echo $newuser->getId()}">
+                                        {echo $newuser->getFirstname()." ".$newuser->getLastname()}
                                     </a>
                                 {/if}{else}
-                                    {echo $user->getFirstname()." ".$user->getLastname()}
+                                    {echo $newuser->getFirstname()." ".$newuser->getLastname()}
                                 {/else}
                             </td>
-                            <td>{echo $user->getEmail()}</td>
-                            <td>{echo $user->getCreated()}</td>
+                            <td>{echo $newuser->getEmail()}</td>
+                            <td>{echo $newuser->getCreated()}</td>
                             <td>
-                                {if $user->active}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}
+                                {if $newuser->active}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}
                                 {else}<span class="infoLabel infoLabelGray">Neaktivní</span>{/else}
-                                {if $user->blocked}<span class="infoLabel infoLabelOrange">Blokovaný</span>{/if}
-                                {if $user->deleted}<span class="infoLabel infoLabelRed">Smazaný</span>{/else}
+                                {if $newuser->blocked}<span class="infoLabel infoLabelOrange">Blokovaný</span>{/if}
+                                {if $newuser->deleted}<span class="infoLabel infoLabelRed">Smazaný</span>{/if}
                             </td>
                         </tr>
                         {/foreach}

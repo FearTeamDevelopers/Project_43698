@@ -54,7 +54,7 @@
       <div class="imgWrapper">{if !empty($ad->getImgMain())}<a data-lightbox="{echo $ad->getId()}" data-title="{echo $ad->getPhotoName()}" href="{echo $ad->getImgMain()}"><img src="{echo $ad->getImgThumb()}"/></a>{/if}</div>
       <div class="nazev">
         <div class="nazevWrapper"><a href="/bazar/r/{echo $ad->getUniqueKey()}">
-            <h4>{echo $ad->getTitle()}</h4></a></div>
+            <h4>{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}PRODÁNO - {/if}{echo $ad->getTitle()}</h4></a></div>
       </div>
       <div class="infoWrapper">
         <div class="info">{if $ad->getAdType() =='tender'}
@@ -67,7 +67,14 @@
           <small><span>platnost do:</span></small><span>{echo " ".\App\Helper\DateFormater::t2d($ad->getExpirationDate())}</span><br/>
           <a href="/bazar/r/{echo $ad->getUniqueKey()}" class="bla">zobrazit podrobnosti</a>
         </div>
-      </div><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->getUniqueKey()}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->getUniqueKey()}" title="Smazat" class="buttonTab delete ajaxReload fi-trash"></a>
+      </div>
+      {if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+      <a href="/bazar/prodano/{echo $ad->getUniqueKey()}" title="Prodáno" class="buttonTab sell ajaxReload fi-dollar"></a>
+      <a href="/bazar/upravit/{echo $ad->getUniqueKey()}" title="Upravit" class="buttonTab edit fi-pencil"></a>
+      <a href="/bazar/prodlouzit/{echo $ad->getUniqueKey()}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a>
+      <a href="/bazar/smazat/{echo $ad->getUniqueKey()}" title="Smazat" class="buttonTab delete ajaxReload fi-trash"></a>
+      {/if}
+      
     </article>{/foreach}
     {/if}{else}
     <h3>Nemáte žádné inzeráty</h3>{/else}

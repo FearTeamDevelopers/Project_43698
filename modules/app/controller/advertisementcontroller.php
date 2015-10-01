@@ -242,7 +242,7 @@ class AdvertisementController extends Controller
                         '{AUTHOREMAIL}' => $message->getMsEmail(),
                         '{MESSAGE}' => StringMethods::prepareEmailText($message->getMessage()),
                     );
-                    $email = \Admin\Model\EmailModel::loadAndPrepare('dotaz-k-inzeratu', $data);
+                    $email = \Admin\Model\EmailModel::loadAndPrepare('add-query', $data);
 
                     if ($message->getSendEmailCopy() == 1) {
                         $email->setRecipients(array($message->getMsEmail(), $ad->getEmail()));
@@ -463,6 +463,12 @@ class AdvertisementController extends Controller
 
         if (null === $ad) {
             $view->warningMessage($this->lang('NOT_FOUND'));
+            $this->_willRenderActionView = false;
+            self::redirect('/bazar');
+        }
+        
+        if($ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD){
+            $view->warningMessage($this->lang('AD_ALREADY_SOLD'));
             $this->_willRenderActionView = false;
             self::redirect('/bazar');
         }
@@ -739,7 +745,7 @@ class AdvertisementController extends Controller
     {
         $this->_disableView();
 
-        $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
+        $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
 
         if (null === $ad) {
             echo $this->lang('NOT_FOUND');
@@ -828,6 +834,35 @@ class AdvertisementController extends Controller
                         'Errors: ' . json_encode($ad->getErrors()),));
                     echo $this->lang('COMMON_FAIL');
                 }
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @before _secured, _member
+     *
+     * @param string $uniqueKey ad key
+     */
+    public function setStateToSold($uniqueKey)
+    {
+        $this->_disableView();
+
+        $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
+
+        if (null === $ad) {
+            echo $this->lang('NOT_FOUND');
+        } else {
+            $ad->state = \App\Model\AdvertisementModel::STATE_SOLD;
+
+            if ($ad->validate()) {
+                $ad->save();
+                Event::fire('app.log', array('success', 'Set state to sold for Ad id: '.$ad->getId()));
+                echo 'success';
+            } else {
+                Event::fire('app.log', array('fail', 'Set state to sold for Ad id: '.$ad->getId(),
+                    'Errors: '.json_encode($ad->getErrors()), ));
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }

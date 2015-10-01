@@ -1,5 +1,10 @@
-Do indexu a detailu akce pridat tlacitko zucastnim se     - pro cleny
-    - pokud se ucastni tak zobrazit nejakou vetsi check ikonu a tlacitko zrusit nebo jen nejakej krizek
-
 Do detailu akce, reportaze pridat vypis komentaru a formular pro pridavani komentaru
-    + moznost odpovidat na prispevky
+    ? + moznost odpovidat na prispevky
+
+Do bazaru pridat overlay pro inzerati, ktery maji nastaveny priznak sold
+    pruhlednej obdelnik se svetlym textem Prodáno
+
+Na homepage přidat výpis akcí stejný způsob jako je to v hastrman.cz/akce, tak to samý zobrazení místo reportáží, ty dát až nakonec místo současných akcí
+
+
+

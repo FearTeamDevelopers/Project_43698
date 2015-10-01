@@ -15,7 +15,9 @@ section.wrapper.akce.pb.singlePage
                 small {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
          .body
             div {echo html_entity_decode($action->getShortBody())}
-            a(href!='/akce/r/{echo $action->getUrlKey()}') čti více
+            |{if $deviceType === 'computer'}
+            a.readMore(href!='/akce/r/{echo $action->getUrlKey()}') čti více
+            |{/if}
       |{/foreach}
    |{/if}{else}
    section.row.container

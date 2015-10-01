@@ -49,10 +49,18 @@ class Controller extends BaseController
     /**
      * Store server host name.
      *
-     * @var type
+     * @var string
      * @read
      */
     protected $_serverHost;
+    
+    /**
+     * Store device type from Mobile Detect class
+     * 
+     * @var string
+     * @read
+     */
+    protected $_deviceType;
 
     /**
      * @param type $options
@@ -66,6 +74,7 @@ class Controller extends BaseController
         $this->_cache = Registry::get('cache');
         $this->_config = Registry::get('configuration');
         $this->_lang = Lang::getInstance();
+        $this->_deviceType = Registry::get('session')->get('devicetype');
 
         // schedule disconnect from database 
         Event::add('framework.controller.destruct.after', function ($name) {
@@ -293,6 +302,7 @@ class Controller extends BaseController
 
         if ($view) {
             $view->set('authUser', $this->_security->getUser())
+                    ->set('deviceType', $this->getDeviceType())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
@@ -302,6 +312,7 @@ class Controller extends BaseController
 
         if ($layoutView) {
             $layoutView->set('authUser', $this->_security->getUser())
+                    ->set('deviceType', $this->getDeviceType())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())

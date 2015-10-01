@@ -292,6 +292,7 @@ class IndexController extends Controller
             $redirects = RedirectModel::all(array('module = ?' => 'app'));
             $news = \App\Model\NewsModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
             $actions = \App\Model\ActionModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
+            $reports = \App\Model\ReportModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
 
             $redirectArr = array();
             if (null !== $redirects) {

@@ -9,6 +9,9 @@ use THCFrame\Model\Model;
  */
 class AdvertisementModel extends Model
 {
+    
+    const STATE_SOLD = 2;
+    
     /**
      * @readwrite
      */
@@ -181,6 +184,15 @@ class AdvertisementModel extends Model
     /**
      * @column
      * @readwrite
+     * @type tinyint
+     * 
+     * @validate max(3)
+     */
+    protected $_state;
+    
+    /**
+     * @column
+     * @readwrite
      * @type text
      * @length 22
      * 
@@ -237,7 +249,7 @@ class AdvertisementModel extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('adv.id', 'adv.title', 'adv.adType', 'adv.expirationDate',
-                                'adv.active', 'adv.created', 'adv.hasAvailabilityRequest',
+                                'adv.active', 'adv.created', 'adv.hasAvailabilityRequest', 'adv.userId', 'adv.state',
                                 '(SELECT COUNT(adm.id) FROM `tb_admessage` adm where adm.adId = adv.id)' => 'messageCount', ))
                 ->join('tb_user', 'adv.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
@@ -282,7 +294,7 @@ class AdvertisementModel extends Model
     public static function fetchAdsActive($adsPerPage = 10, $page = 1)
     {
         $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                    'adv.title', 'adv.price', 'adv.created', ))
+                    'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
                 ->join('tb_user', 'adv.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -311,7 +323,7 @@ class AdvertisementModel extends Model
     {
         if ($type == 'tender' || $type == 'demand') {
             $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                                'adv.title', 'adv.price', 'adv.created', ))
+                                'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
                     ->join('tb_user', 'adv.userId = us.id', 'us',
                             array('us.firstname', 'us.lastname'))
                     ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -358,7 +370,7 @@ class AdvertisementModel extends Model
     {
         if ($type == 'tender' || $type == 'demand') {
             $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                                'adv.title', 'adv.price', 'adv.created', ))
+                                'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
                     ->join('tb_user', 'adv.userId = us.id', 'us',
                             array('us.firstname', 'us.lastname'))
                     ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -417,7 +429,7 @@ class AdvertisementModel extends Model
     public static function fetchActiveBySection($section, $adsPerPage = 10, $page = 1)
     {
         $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                    'adv.title', 'adv.price', 'adv.created', ))
+                    'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
                 ->join('tb_user', 'adv.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -494,8 +506,8 @@ class AdvertisementModel extends Model
      */
     public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                                'adv.title', 'adv.price', 'adv.created', 'adv.expirationDate' ))
+        $query = self::getQuery(array('adv.id', 'adv.userId', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
+                                'adv.title', 'adv.price', 'adv.created', 'adv.expirationDate', 'adv.state' ))
                 ->join('tb_user', 'adv.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname'))
                 ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads',
@@ -549,7 +561,7 @@ class AdvertisementModel extends Model
      */
     public static function expireInDays($min = 1, $max = 7)
     {
-        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.title',
+        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.title', 'adv.userId', 'adv.state',
                                         'adv.created', 'adv.expirationDate', 'datediff(expirationDate, curdate())' => 'expireIn' ))
                 ->join('tb_user', 'adv.userId = us.id', 'us',
                         array('us.firstname', 'us.lastname', 'us.email'))
@@ -557,7 +569,8 @@ class AdvertisementModel extends Model
                         array('ads.title' => 'sectionTitle'))
                 ->where('adv.active = ?', true)
                 ->where('adv.hasAvailabilityRequest = ?', false)
-                ->where('datediff(expirationDate, curdate()) between '.(int)$min.' and '.(int)$max)
+                ->where('adv.state <> ?', 2)
+                ->where('datediff(expirationDate, curdate()) = ?', (int)$max)
                 ->order('adv.created', 'desc');
 
         $ads = self::initialize($query);

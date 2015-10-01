@@ -137,11 +137,11 @@
                 <select name="role" class="width80">
                     {foreach $role in $roles}
                         {script $sel=""}
-                        {if $role == $user->getRole()}
+                        {if $role_i == $user->getRole()}
                             {script $sel="selected"}
                         {/if}
 
-                        <option value="{echo $role}" {echo $sel}>{echo $role}</option>
+                        <option value="{echo $role_i}" {echo $sel}>{echo $role}</option>
                     {/foreach}
                 </select>
                 {if isset($errors["role"])}

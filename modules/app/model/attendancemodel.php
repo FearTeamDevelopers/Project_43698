@@ -104,9 +104,18 @@ class AttendanceModel extends Model
     }
 
     /**
-     * @param type $userId
-     *
-     * @return type
+     * 
+     * @return array
+     */
+    public static function getAttendanceReturnArray()
+    {
+        return array(self::ACCEPT => array(), self::REJECT => array(), self::MAYBE => array());
+    }
+    
+    /**
+     * 
+     * @param integer $userId
+     * @return array
      */
     public static function fetchActionsByUserId($userId, $future = false)
     {
@@ -124,9 +133,8 @@ class AttendanceModel extends Model
     }
 
     /**
-     * @param type $actionId
-     *
-     * @return type
+     * @param integer $actionId
+     * @return array
      */
     public static function fetchUsersByActionId($actionId)
     {
@@ -138,7 +146,48 @@ class AttendanceModel extends Model
 
         return self::initialize($query);
     }
+    
+    /**
+     * 
+     * @param integer $actionId
+     * @return array
+     */
+    public static function fetchUsersByActionIdSimpleArr($actionId)
+    {
+        $query = self::getQuery(array('at.id', 'at.type', 'at.comment'))
+                ->join('tb_user', 'at.userId = us.id', 'us',
+                        array('us.id' => 'usId', 'us.firstname', 'us.lastname', 'us.email'))
+                ->where('at.actionId = ?', (int) $actionId)
+                ->order('us.lastname', 'ASC');
 
+        $result = self::initialize($query);
+
+        $returnArr = array(self::ACCEPT => array(), self::REJECT => array(), self::MAYBE => array());
+        if(!empty($result)){
+            foreach ($result as $att){
+                if($att->type == self::ACCEPT){
+                    $returnArr[self::ACCEPT][] = $att->firstname.' '.$att->lastname;
+                }elseif($att->type == self::REJECT){
+                    $returnArr[self::REJECT][] = $att->firstname.' '.$att->lastname;
+                }elseif($att->type == self::MAYBE){
+                    $returnArr[self::MAYBE][] = $att->firstname.' '.$att->lastname;
+                }
+            }
+        }
+        return $returnArr;
+    }
+
+    /**
+     * 
+     * @param integer $userId
+     * @param integer $actionId
+     * @return array
+     */
+    public static function fetchTypeByUserAndAction($userId, $actionId)
+    {
+        return self::first(array('userId = ?' => (int)$userId, 'actionId = ?' => (int)$actionId), array('type'));
+    }
+    
     /**
      * @return type
      */
@@ -163,17 +212,15 @@ class AttendanceModel extends Model
 
         $attend = self::initialize($query);
 
-        $ra = array();
+        $returnArr = array();
 
         if ($attend !== null) {
             foreach ($attend as $value) {
-                $ra[$value->firstname.' '.$value->lastname] = round(($value->cnt / $totalCount) * 100, 2);
+                $returnArr[$value->firstname.' '.$value->lastname] = round(($value->cnt / $totalCount) * 100, 2);
             }
-
-            return $ra;
-        } else {
-            return null;
         }
+        
+        return $returnArr;
     }
 
     /**

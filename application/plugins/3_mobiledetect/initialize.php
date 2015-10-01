@@ -1,6 +1,6 @@
 <?php
 
-if (!isset($_SESSION['app_devicetype'])) {
+if (!isset($_SESSION['thc_devicetype'])) {
     require_once 'MobileDetect.php';
 
     $detect = new MobileDetect();
@@ -13,10 +13,9 @@ if (!isset($_SESSION['app_devicetype'])) {
         $deviceType = 'computer';
     }
 
-    $_SESSION['app_devicetype'] = $deviceType;
+    $_SESSION['thc_devicetype'] = $deviceType;
 } else {
-    $deviceType = $_SESSION['app_devicetype'];
+    $deviceType = $_SESSION['thc_devicetype'];
 }
-
 
 THCFrame\Events\Events::fire('plugin.mobiledetect.devicetype', array($deviceType));

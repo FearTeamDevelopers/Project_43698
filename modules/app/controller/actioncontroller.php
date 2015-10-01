@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Registry\Registry;
+use THCFrame\Events\Events as Event;
 
 /**
  * 
@@ -104,14 +105,25 @@ class ActionController extends Controller
             self::redirect('/nenalezeno');
         }
 
-        $attendance = \App\Model\AttendanceModel::fetchUsersByActionId($action->getId());
-        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
-
         $this->_checkMetaData($layoutView, $action);
-        $view->set('action', $action)
+        
+        if($this->getUser() !== null){
+            $authUserAttendance = \App\Model\AttendanceModel::fetchTypeByUserAndAction($this->getUser()->getId(), $action->getId());
+            $attendance = \App\Model\AttendanceModel::fetchUsersByActionIdSimpleArr($action->getId());
+            $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
+            
+            $view->set('action', $action)
                 ->set('newcomment', null)
                 ->set('comments', $comments)
+                ->set('authuseratt', $authUserAttendance)
                 ->set('attendance', $attendance);
+        }else{
+            $view->set('action', $action)
+                ->set('newcomment', null)
+                ->set('comments', null)
+                ->set('authuseratt', null)
+                ->set('attendance', null);
+        }
 
         if (RequestMethods::post('submitAddComment')) {
             if ($this->_checkCSRFToken() !== true &&
@@ -264,9 +276,10 @@ class ActionController extends Controller
     {
         $this->_disableView();
 
-        if ($type != \App\Model\AttendanceModel::ACCEPT ||
-                $type != \App\Model\AttendanceModel::REJECT ||
+        if ($type != \App\Model\AttendanceModel::ACCEPT &&
+                $type != \App\Model\AttendanceModel::REJECT &&
                 $type != \App\Model\AttendanceModel::MAYBE) {
+            Event::fire('app.log', array('fail', 'Errors: Invalid attendance type - '.$type));
             echo $this->lang('COMMON_FAIL');
             exit;
         }
@@ -276,9 +289,11 @@ class ActionController extends Controller
         if (null === $action) {
             echo $this->lang('NOT_FOUND');
         } else {
+            \App\Model\AttendanceModel::deleteAll(array('userId = ?' => $this->getUser()->getId(), 'actionId' => $action->getId()));
+            
             $attendance = new \App\Model\AttendanceModel(array(
                 'userId' => $this->getUser()->getId(),
-                'resourceId' => $action->getId(),
+                'actionId' => $action->getId(),
                 'type' => (int) $type,
                 'comment' => RequestMethods::post('attcomment'),
             ));
@@ -288,7 +303,7 @@ class ActionController extends Controller
                 $this->getCache()->invalidate();
 
                 Event::fire('app.log', array('success', 'Attendance - '.$type.' - action '.$action->getId().' by user: '.$this->getUser()->getId()));
-                echo 'success';
+                echo 'active';
             } else {
                 Event::fire('app.log', array('fail', 'Errors: '.json_encode($attendance->getErrors())));
                 echo $this->lang('COMMON_FAIL');

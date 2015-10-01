@@ -53,9 +53,10 @@ return array(
     'ACCOUNT_ACTIVATED' => 'Účet byl aktivován',
 
     'REGISTRATION_SUCCESS' => 'Registrace byla úspěšná',
+    'REGISTRATION_SUCCESS_ADMIN_ACTIVATION' => 'Registrace byla úspěšná. O aktivaci účtu budete informováni emailem',
     'REGISTRATION_EMAIL_SUCCESS' => 'Registrace byla úspěšná. Na uvedený email byl zaslán odkaz k aktivaci účtu',
     'REGISTRATION_EMAIL_FAIL' => 'Nepodařilo se odeslat aktivační email, opakujte registraci později',
-    'REGISTRATION_FAIL' => 'Opakujte registraci později',
+    'REGISTRATION_FAIL' => 'Registrace se nezdařila. Opakujte registraci později',
 
     'ARTICLE_UNIQUE_ID' => 'Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.',
     'ARTICLE_TITLE_IS_USED' => 'Tento název již existuje',
@@ -92,6 +93,7 @@ return array(
     'TITLE_USER_PROFILE' => 'Můj Profil',
     
     'ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS' => 'Žádost o prodloužení platnosti inzerátu byla úspěšně odeslána',
+    'AD_ALREADY_SOLD' => 'Inzerát označený jako prodaný již nelze editovat',
     'AD_PHOTO_NOT_FOUND' => 'Daný inzerát takovou fotku nemá',
     
     //UPLOAD ERRORS

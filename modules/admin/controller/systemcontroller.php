@@ -88,7 +88,7 @@ class SystemController extends Controller
     public function settings()
     {
         $view = $this->getActionView();
-        $config = ConfigModel::all();
+        $config = ConfigModel::all(array(), array('*'), array('title' => 'ASC'));
         $view->set('config', $config);
 
         if (RequestMethods::post('submitEditSet')) {

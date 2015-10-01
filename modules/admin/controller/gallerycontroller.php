@@ -70,6 +70,8 @@ class GalleryController extends Controller
     public function add()
     {
         $view = $this->getActionView();
+        
+        $view->set('gallery', null);
 
         if (RequestMethods::post('submitAddGallery')) {
             if ($this->_checkCSRFToken() !== true &&

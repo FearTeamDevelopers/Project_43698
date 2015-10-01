@@ -90,7 +90,7 @@ class File extends Logger\Driver
     public function log($message, $type = 'error', $flag = FILE_APPEND, $prependTime = true, $file = null)
     {
         if ($prependTime) {
-            $time = '[' . date('Y-m-d H:i:s', time()) . '] ';
+            $time = '[' . date('Y-m-d H:i:s') . '] ';
         }else{
             $time = '';
         }
@@ -101,7 +101,7 @@ class File extends Logger\Driver
             $user = $sec->getUser();
 
             if ($user !== null) {
-                $userName = '(' . $user->getWholeName() . ') - ';
+                $userName = '(' . $user->getWholeName() . ' - ' . $user->getId() . ') - ';
             }
         }
 

@@ -83,7 +83,7 @@ class ActionController extends Controller
             'userId' => $this->getUser()->getId(),
             'userAlias' => $this->getUser()->getWholeName(),
             'urlKey' => $urlKeyCh,
-            'approved' => $this->getConfig()->action_new_notification,
+            'approved' => $this->getConfig()->action_autopublish,
             'archive' => 0,
             'shortBody' => $shortText,
             'body' => RequestMethods::post('text'),
@@ -164,20 +164,21 @@ class ActionController extends Controller
      */
     private function _sendEmailNotification(\App\Model\ActionModel $action)
     {
-        if ($action->getApproved() && $this->getConfig()->action_new_notification) {
+        if ($action->getApproved() && $this->getConfig()->new_action_notification) {
             $users = \App\Model\UserModel::all(array('getNewActionNotification = ?' => true), array('email'));
 
             if (!empty($users)) {
                 $data = array('{TITLE}' => '<a href="http://'.$this->getServerHost().'/akce/r/'.$action->getUrlKey().'">'.$action->getTitle().'</a>',
                     '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody()),
                         );
-                $email = \Admin\Model\EmailModel::loadAndPrepare('nova-akce', $data);
+                $email = \Admin\Model\EmailModel::loadAndPrepare('new-action', $data);
 
                 foreach ($users as $user) {
                     $email->setRecipient($user->getEmail());
                 }
 
                 $email->send(true);
+                Event::fire('admin.log', array('success', 'Send new action notification to '.count($users).' users'));
             }
         }
     }
@@ -879,20 +880,26 @@ class ActionController extends Controller
 
         $attUsers = \App\Model\AttendanceModel::fetchUsersByActionId($actionId);
         $returnStr = '';
+        $returnArr = \App\Model\AttendanceModel::getAttendanceReturnArray();
 
         if (!empty($attUsers)) {
             foreach ($attUsers as $key => $user) {
-                $returnStr .= $user->getFirstname().' '.$user->getLastname();
-
                 if ($user->getType() == \App\Model\AttendanceModel::ACCEPT) {
-                    $returnStr .= ' - Zúčastní se'.PHP_EOL;
+                    $returnArr[\App\Model\AttendanceModel::ACCEPT][] = $user->getFirstname().' '.$user->getLastname();
                 } elseif ($user->getType() == \App\Model\AttendanceModel::REJECT) {
-                    $returnStr .= ' - Nezúčastní se'.PHP_EOL;
-                } else {
-                    $returnStr .= ' - Neví'.PHP_EOL;
+                    $returnArr[\App\Model\AttendanceModel::REJECT][] = $user->getFirstname().' '.$user->getLastname();
+                } elseif ($user->getType() == \App\Model\AttendanceModel::MAYBE) {
+                    $returnArr[\App\Model\AttendanceModel::MAYBE][] = $user->getFirstname().' '.$user->getLastname();
                 }
             }
 
+            $returnStr = 'Zúčastní se ('.count($returnArr[\App\Model\AttendanceModel::ACCEPT]).'):<br/>';
+            $returnStr .= implode('<br/>', $returnArr[\App\Model\AttendanceModel::ACCEPT]);
+            $returnStr .= '<hr/>Nezúčastní se ('.count($returnArr[\App\Model\AttendanceModel::REJECT]).'):<br/>';
+            $returnStr .= implode('<br/>', $returnArr[\App\Model\AttendanceModel::REJECT]);
+            $returnStr .= '<hr/>Neví ('.count($returnArr[\App\Model\AttendanceModel::MAYBE]).'):<br/>';
+            $returnStr .= implode('<br/>', $returnArr[\App\Model\AttendanceModel::MAYBE]);
+            
             echo $returnStr;
             exit;
         } else {

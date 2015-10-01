@@ -153,6 +153,9 @@ class NewsHistoryModel extends Model
         }
 
         foreach ($properties as $key => $value) {
+            if(!preg_match('#.*@column.*#s', $value->getDocComment())){
+                continue;
+            }
             if ($value->class == $className) {
                 $propertyName = $value->getName();
                 $getProperty = 'get'.ucfirst(str_replace('_', '', $value->getName()));

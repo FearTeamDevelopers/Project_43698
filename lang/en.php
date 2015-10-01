@@ -53,9 +53,10 @@ return array(
     'ACCOUNT_ACTIVATED' => 'The account has been activated',
 
     'REGISTRATION_SUCCESS' => 'Registration has been successfull',
+    'REGISTRATION_SUCCESS_ADMIN_ACTIVATION' => 'Registration has been successfull. You will be notified about account activation via email',
     'REGISTRATION_EMAIL_SUCCESS' => 'Registration has been successfull. Confirm your e-mail address and activate your account',
     'REGISTRATION_EMAIL_FAIL' => 'An unknown error occured during sending e-mail with activation link, please repeat registration later',
-    'REGISTRATION_FAIL' => 'Try repeat registration later',
+    'REGISTRATION_FAIL' => 'Registration failed. Try repeat registration later',
 
     'ARTICLE_UNIQUE_ID' => 'Article unique id cannot be created. Please create new title.',
     'ARTICLE_TITLE_IS_USED' => 'This title is already used',
@@ -92,6 +93,7 @@ return array(
     'TITLE_USER_PROFILE' => 'My Profile',
     
     'ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS' => 'Advertisement availability request has been successfully sent',
+    'AD_ALREADY_SOLD' => 'Ad which has status sold cannot be changed',
     'AD_PHOTO_NOT_FOUND' => 'No such a photo is connected to the advertisement',
     
     //UPLOAD ERRORS

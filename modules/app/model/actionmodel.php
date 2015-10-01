@@ -58,7 +58,7 @@ class ActionModel extends Model
     /**
      * @column
      * @readwrite
-     * @type boolean
+     * @type tinyint
      * @index
      * 
      * @validate max(3)
@@ -290,7 +290,7 @@ class ActionModel extends Model
      * Called from app module.
      * 
      * @param type $limit
-     *
+     * @param type $page
      * @return type
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
@@ -315,7 +315,7 @@ class ActionModel extends Model
      * Called from app module.
      * 
      * @param type $limit
-     *
+     * @param type $page
      * @return type
      */
     public static function fetchOldWithLimit($limit = 10, $page = 1)
@@ -333,7 +333,7 @@ class ActionModel extends Model
      * Called from app module.
      * 
      * @param type $limit
-     *
+     * @param type $page
      * @return type
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
@@ -351,7 +351,6 @@ class ActionModel extends Model
      * Called from app module.
      * 
      * @param type $urlKey
-     *
      * @return type
      */
     public static function fetchByUrlKey($urlKey)

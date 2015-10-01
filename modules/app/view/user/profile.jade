@@ -124,8 +124,23 @@ section.wrapper.profil.singlePage
                         |{echo join("<br/>", $errors["password2"])}
                      |{/if}
                      |{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
-
-
                tr
                   td(colspan=2)
                      input(type="submit", name="editProfile", value="Upravit").more
+   .row
+      article.small-12.large-8.medium-8.centerBlock
+         table
+            tr
+                td(colspan='2')
+                    strong Akce, kterých se účastním:
+            tr
+                td Akce
+                td Datum konání
+            |{if !empty($myactions)}
+            |{foreach $action in $myactions}
+            tr
+                td
+                    |<a href="/akce/r/{echo $action->getUrlKey()}" target="_blank">{echo $action->getTitle()}</a>
+                td {echo \App\Helper\DateFormater::t2d($action->getStartDate())} - {echo \App\Helper\DateFormater::t2d($action->getEndDate())}
+            |{/foreach}
+            |{/if}

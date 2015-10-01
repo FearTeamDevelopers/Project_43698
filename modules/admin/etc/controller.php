@@ -37,6 +37,14 @@ class Controller extends BaseController
      * @read
      */
     protected $_config;
+    
+    /**
+     * Store server host name.
+     *
+     * @var string
+     * @read
+     */
+    protected $_serverHost;
 
     /**
      * Store language extension.
@@ -78,6 +86,7 @@ class Controller extends BaseController
         parent::__construct($options);
 
         $this->_security = Registry::get('security');
+        $this->_serverHost = RequestMethods::server('HTTP_HOST');
         $this->_cache = Registry::get('cache');
         $this->_config = Registry::get('configuration');
         $this->_lang = Lang::getInstance();

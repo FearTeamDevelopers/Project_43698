@@ -72,7 +72,7 @@ class EmailController extends Controller
         if (RequestMethods::post('submitSendEmail')) {
             if ($this->_checkCSRFToken() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
-                self::redirect('/admin/email/');
+                self::redirect('/admin/email/send/');
             }
 
             $errors = array();
@@ -97,10 +97,10 @@ class EmailController extends Controller
                 if ($email->send()) {
                     Event::fire('admin.log', array('success', 'Email sent to: '.$recipients));
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
-                    self::redirect('/admin/email/');
+                    self::redirect('/admin/email/send/');
                 } else {
                     $view->errorMessage($this->lang('EMAIL_SEND_FAIL'));
-                    self::redirect('/admin/email/');
+                    self::redirect('/admin/email/send/');
                 }
             } elseif (empty($errors) && $email->type == 2) {
                 $roles = RequestMethods::post('grouprecipients');
@@ -116,10 +116,10 @@ class EmailController extends Controller
                 if ($email->send()) {
                     Event::fire('admin.log', array('success', 'Email sent to: '.implode(',', $recipientsArr)));
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
-                    self::redirect('/admin/email/');
+                    self::redirect('/admin/email/send/');
                 } else {
                     $view->errorMessage($this->lang('EMAIL_SEND_FAIL'));
-                    self::redirect('/admin/email/');
+                    self::redirect('/admin/email/send/');
                 }
             } elseif (empty($errors) && $email->type == 3) {
                 $actionId = RequestMethods::post('actionid');
@@ -135,10 +135,10 @@ class EmailController extends Controller
                     $recipientStr = $email->getRecipientsToString(',');
                     Event::fire('admin.log', array('success', 'Email sent to: '.$recipientStr));
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
-                    self::redirect('/admin/email/');
+                    self::redirect('/admin/email/send/');
                 } else {
                     $view->errorMessage($this->lang('EMAIL_SEND_FAIL'));
-                    self::redirect('/admin/email/');
+                    self::redirect('/admin/email/send/');
                 }
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '));
@@ -247,6 +247,12 @@ class EmailController extends Controller
             $this->_willRenderActionView = false;
             self::redirect('/admin/email/');
         }
+        
+        if($emailTemplate->getType() == 2 && !$this->isSuperAdmin()){
+            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
+            $this->_willRenderActionView = false;
+            self::redirect('/admin/email/');
+        }
 
         $view->set('template', $emailTemplate);
 
@@ -299,6 +305,10 @@ class EmailController extends Controller
         if (null === $emailTemplate) {
             echo $this->lang('NOT_FOUND');
         } else {
+            if($emailTemplate->getType() == 2 && !$this->isSuperAdmin()){
+                echo $this->lang('LOW_PERMISSIONS');
+                exit;
+            }
             if ($emailTemplate->delete()) {
                 Event::fire('admin.log', array('success', 'Email template id: '.$id));
                 echo 'success';

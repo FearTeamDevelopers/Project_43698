@@ -95,7 +95,7 @@
             <span class="field">
                 <select name="role" class="width80">
                     {foreach $role in $roles}
-                        <option value="{echo $role}">{echo $role}</option>
+                        <option value="{echo $role_i}">{echo $role}</option>
                     {/foreach}
                 </select>
                 {if isset($errors["role"])}

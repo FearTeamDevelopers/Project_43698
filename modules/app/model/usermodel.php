@@ -10,6 +10,17 @@ use THCFrame\Security\Model\BasicUser;
 class UserModel extends BasicUser
 {
     /**
+     * Pole uživatelských rolí
+     * @var array
+     */
+    private static $_avRoles = array(
+        'role_superadmin' => 'Super Admin',
+        'role_admin' => 'Admin',
+        'role_participant' => 'Člen s přístupem do administrace',
+        'role_member' => 'Člen',
+        );
+    
+    /**
      * @column
      * @readwrite
      * @type text
@@ -91,6 +102,15 @@ class UserModel extends BasicUser
     }
 
     /**
+     * 
+     * @return type
+     */
+    public static function getAllRoles()
+    {
+        return self::$_avRoles;
+    }
+    
+    /**
      * @return type
      */
     public function getWholeName()
@@ -121,17 +141,35 @@ class UserModel extends BasicUser
     }
 
     /**
+     * 
      * @param type $limit
-     *
      * @return type
      */
     public static function fetchLates($limit = 10)
     {
         return self::all(
-                array('role <> ?' => 'role_superadmin', 'active = ?' => true, 'blocked = ?' => false),
-                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'),
+                array('role <> ?' => 'role_superadmin'),
+                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked', 'deleted'),
                 array('created' => 'desc'),
                 (int) $limit
         );
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public static function fetchAdminsEmail()
+    {
+        $admins = self::all(array('role = ?' => 'role_admin', 'active = ?' => true, 'deleted = ?' => false, 'blocked = ?' => false), array('email'));
+        
+        $returnArr = array();
+        if(!empty($admins)){
+            foreach ($admins as $admin){
+                $returnArr[] = $admin->getEmail();
+            }
+        }
+        
+        return $returnArr;
     }
 }

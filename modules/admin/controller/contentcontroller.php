@@ -167,8 +167,8 @@ class ContentController extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $content = \App\Model\PageContentModel::all(array(), array('urlKey', 'title'));
+        $contents = \App\Model\PageContentModel::all(array(), array('urlKey', 'title'));
 
-        $view->set('contents', $content);
+        $view->set('contents', $contents);
     }
 }

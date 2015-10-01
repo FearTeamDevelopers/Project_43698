@@ -7,10 +7,12 @@ section.wrapper.bazar.detail.singlePage
             li
                a(href="/bazar").fi-arrow-left Bazar
             |{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
+            |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
             li
                a(href!="/bazar/upravit/{echo $ad->getUniqueKey()}").fi-pencil Upravit
             li
                a(href!="/bazar/odstranit/{echo $ad->getUniqueKey()}").fi-trash Smazat
+            |{/if}
             |{/if}
       article.large-12
          .row
@@ -72,10 +74,12 @@ section.wrapper.bazar.detail.singlePage
             .large-12.column
                .info.description
                   div {echo $ad->content} <br/>
+                  |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
                   .large-4.medium-6.small-12.centerBlock.mv10
                      a.sendEmail(href="#sendEmail")
                         .more.blue
                            span Odpovědět na Inzerát
+                  |{/if}
       .row
          .large-6.medium-9.small-12.centerBlock
             form#sendEmail.mv30(method="post", action="#")

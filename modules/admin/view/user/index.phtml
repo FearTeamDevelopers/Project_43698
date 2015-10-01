@@ -42,6 +42,7 @@
                             <a href="/admin/user/edit/{echo $user->id}" class="btn btn3 btn_pencil" title="Upravit"></a> 
                             <a href="/admin/user/delete/{echo $user->id}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>
                             <a href="/admin/user/forcepasswordreset/{echo $user->id}" class="btn btn3 btn_key" title="Vygenerovat nové heslo"></a>
+                            {if !$user->active}<a href="/admin/user/accountactivation/{echo $user->id}" class="btn btn3 btn_refresh" title="Aktivovat účet"></a>{/if}
                         </td>
                     </tr>
                 {/foreach}
