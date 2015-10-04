@@ -84,7 +84,7 @@ class EmailController extends Controller
 
             $email->populate();
 
-            if (empty(RequestMethods::post('singlerecipients')) && empty(RequestMethods::post('grouprecipients'))) {
+            if (empty(RequestMethods::post('singlerecipients')) && empty(RequestMethods::post('grouprecipients')) && $email->type != 3) {
                 $errors['recipientlist'] = array($this->lang('EMAIL_NO_RECIPIENTS'));
             }
 
@@ -124,7 +124,7 @@ class EmailController extends Controller
             } elseif (empty($errors) && $email->type == 3) {
                 $actionId = RequestMethods::post('actionid');
                 $recipients = \App\Model\AttendanceModel::fetchUsersByActionId($actionId);
-
+                
                 if (!empty($recipients)) {
                     foreach ($recipients as $recipient) {
                         $email->setRecipient($recipient->email);

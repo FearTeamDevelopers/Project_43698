@@ -16,7 +16,7 @@ class FeedbackController extends Controller
     {
         $view = $this->getActionView();
 
-        $feedbacks = \App\Model\FeedbackModel::all(array(), array('*'), array('created' => 'desc'), 150);
+        $feedbacks = \App\Model\FeedbackModel::all(array(), array('*'), array('created' => 'desc'), 100);
 
         $view->set('feedbacks', $feedbacks);
     }

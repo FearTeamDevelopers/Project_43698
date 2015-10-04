@@ -216,9 +216,9 @@
                             {if $isAdmin}
                                 <span class="radius2">
                                     {if $comment->getType() == \App\Model\CommentModel::RESOURCE_ACTION}
-                                        <a href="/admin/action/showcomments/{echo $comment->getResourceId()}">Přejít na komentáře</a>
+                                        <a href="/admin/action/edit/{echo $comment->getResourceId()}#comments">Přejít na komentáře</a>
                                     {/if}{elseif $comment->getType() == \App\Model\CommentModel::RESOURCE_NEWS}
-                                        <a href="/admin/news/showcomments/{echo $comment->getResourceId()}">Přejít na komentáře</a>
+                                        <a href="/admin/report/edit/{echo $comment->getResourceId()}#comments">Přejít na komentáře</a>
                                     {/elseif}
                                 </span>
                             {/if}

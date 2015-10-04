@@ -12,6 +12,7 @@ use THCFrame\Registry\Registry;
  */
 class EmailModel extends Model
 {
+
     /**
      * @column
      * @readwrite
@@ -137,13 +138,13 @@ class EmailModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-    
+
     public function getSubjectWithPrefix()
     {
-        if(ENV != 'live'){
-            return '[TEST] '.$this->_subject;
+        if (ENV != 'live') {
+            return '[TEST] ' . $this->_subject;
         }
-        
+
         return $this->_subject;
     }
 
@@ -175,15 +176,13 @@ class EmailModel extends Model
     public static function fetchCommonActiveByIdAndLang($id, $fieldName)
     {
         return \Admin\Model\EmailModel::first(
-                        array('id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1),
-                        array($fieldName, 'subject'));
+                        array('id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1), array($fieldName, 'subject'));
     }
 
     public static function fetchActiveByIdAndLang($id, $fieldName)
     {
         return \Admin\Model\EmailModel::first(
-                        array('id = ?' => (int) $id, 'active = ?' => true),
-                        array($fieldName, 'subject'));
+                        array('id = ?' => (int) $id, 'active = ?' => true), array($fieldName, 'subject'));
     }
 
     /**
@@ -200,14 +199,14 @@ class EmailModel extends Model
             return;
         }
 
-        $emailText = str_replace('{MAINURL}', 'http://'.RequestMethods::server('HTTP_HOST'), $email->getBody());
+        $emailText = str_replace('{MAINURL}', 'http://' . RequestMethods::server('HTTP_HOST'), $email->getBody());
 
         if (!empty($data)) {
             foreach ($data as $key => $value) {
                 $emailText = str_replace($key, $value, $emailText);
             }
         }
-        
+
         $email->_body = $emailText;
 
         return $email;
@@ -220,7 +219,7 @@ class EmailModel extends Model
      */
     public function populate($data = array())
     {
-        $emailText = str_replace('{MAINURL}', 'http://'.RequestMethods::server('HTTP_HOST'), $this->getBody());
+        $emailText = str_replace('{MAINURL}', 'http://' . RequestMethods::server('HTTP_HOST'), $this->getBody());
 
         if (!empty($data)) {
             foreach ($data as $key => $value) {
@@ -243,7 +242,7 @@ class EmailModel extends Model
     public function send($oneByOne = false, $sendFrom = null)
     {
         try {
-            require_once APP_PATH.'/vendors/swiftmailer/swift_required.php';
+            require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
             $transport = \Swift_MailTransport::newInstance();
             $mailer = \Swift_Mailer::newInstance($transport);
 
@@ -262,28 +261,33 @@ class EmailModel extends Model
             }
 
             if ($oneByOne === true) {
-                if (!empty($this->_recipients)) {
-                    $error = false;
-                    foreach ($this->_recipients as $recipient) {
-                        $message->setTo($recipient);
-
-                        if ($mailer->send($message)) {
-                            Event::fire('admin.log', array('success', sprintf('Email send to %s', $recipient)));
-                        } else {
-                            $error = true;
-                            Event::fire('admin.log', array('fail', 'No email sent'));
-                        }
-                    }
-
-                    return $error;
+                if (empty($this->_recipients)) {
+                    $adminEmail = Registry::get('configuration')->system->adminemail;
+                    $defaultEmail = Registry::get('configuration')->system->defaultemail;
+                    $this->_recipients = array($adminEmail, $defaultEmail);
                 }
+
+                $error = false;
+                foreach ($this->_recipients as $recipient) {
+                    $message->setTo($recipient);
+
+                    if ($mailer->send($message)) {
+                        Event::fire('admin.log', array('success', sprintf('Email send to %s', $recipient)));
+                    } else {
+                        $error = true;
+                        Event::fire('admin.log', array('fail', 'No email sent'));
+                    }
+                }
+
+                return $error;
             } else {
                 if (empty($this->_recipients)) {
-                    $defaultRecipient = Registry::get('configuration')->system->adminemail;
-                    $message->setTo($defaultRecipient);
-                } else {
-                    $message->setTo($this->_recipients);
+                    $adminEmail = Registry::get('configuration')->system->adminemail;
+                    $defaultEmail = Registry::get('configuration')->system->defaultemail;
+                    $this->_recipients = array($adminEmail, $defaultEmail);
                 }
+
+                $message->setTo($this->_recipients);
 
                 if ($mailer->send($message)) {
                     return true;
@@ -294,7 +298,7 @@ class EmailModel extends Model
                 }
             }
         } catch (\Exception $ex) {
-            Event::fire('admin.log', array('fail', 'Error while sending email: '.$ex->getMessage()));
+            Event::fire('admin.log', array('fail', 'Error while sending email: ' . $ex->getMessage()));
 
             return false;
         }
@@ -333,4 +337,5 @@ class EmailModel extends Model
             return '';
         }
     }
+
 }

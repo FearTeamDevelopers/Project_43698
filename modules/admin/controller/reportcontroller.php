@@ -353,7 +353,10 @@ class ReportController extends Controller
                     'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_REPORT, ),
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($report->getId(), \App\Model\CommentModel::RESOURCE_REPORT);
+        
         $view->set('report', $report)
+                ->set('comments', $comments)
                 ->set('concepts', $reportConcepts);
 
         if (RequestMethods::post('submitEditReport')) {
@@ -910,8 +913,8 @@ class ReportController extends Controller
 
                 $tempStr = '"';
                 if ($this->isAdmin() || $report->userId == $this->getUser()->getId()) {
-                    $tempStr .= "<a href='/admin/report/showcomments/".$report->id."' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
-                    $tempStr .= "<a href='/admin/report/edit/".$report->id."' class='btn btn3 btn_pencil' title='Upravit'></a>";
+                    $tempStr .= "<a href='/admin/report/edit/".$report->id."#comments' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
+                    $tempStr .= "<a href='/admin/report/edit/".$report->id."#basic' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/report/delete/".$report->id."' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
@@ -972,30 +975,4 @@ class ReportController extends Controller
         }
     }
 
-    /**
-     * Show comments for specific action.
-     * 
-     * @before _secured, _admin
-     *
-     * @param int $id
-     */
-    public function showComments($id)
-    {
-        $view = $this->getActionView();
-        $this->getLayoutView()
-                ->setTitle($this->lang('TITLE_REPORT_COMMENTS'));
-
-        $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id), array('id'));
-
-        if (null === $report) {
-            $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/report/');
-        }
-
-        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($report->getId(), \App\Model\CommentModel::RESOURCE_REPORT);
-
-        $view->set('comments', $comments)
-                ->set('report', $report);
-    }
 }

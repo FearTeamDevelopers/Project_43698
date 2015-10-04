@@ -295,7 +295,12 @@ class ActionController extends Controller
                 array('id', 'created', 'modified'),
                 array('created' => 'DESC'), 10);
 
+        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
+        $attUsers = \App\Model\AttendanceModel::fetchUsersByActionId($action->getId());
+        
         $view->set('action', $action)
+                ->set('comments', $comments)
+                ->set('attendance', $attUsers)
                 ->set('concepts', $actionConcepts);
 
         if (RequestMethods::post('submitEditAction')) {
@@ -779,9 +784,9 @@ class ActionController extends Controller
 
                 $tempStr = '"';
                 if ($this->isAdmin() || $action->userId == $this->getUser()->getId()) {
-                    $tempStr .= "<a href='/admin/action/showcomments/".$action->id."' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
-                    $tempStr .= "<a href='/admin/action/getuserlist/".$action->id."' class='btn btn3 btn_users dialog' value='Účastníci' title='Zobrazit účastníky'></a>";
-                    $tempStr .= "<a href='/admin/action/edit/".$action->id."' class='btn btn3 btn_pencil' title='Upravit'></a>";
+                    $tempStr .= "<a href='/admin/action/edit/".$action->id."#comments' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
+                    $tempStr .= "<a href='/admin/action/edit/".$action->id."#attendance' class='btn btn3 btn_users' title='Zobrazit účastníky'></a>";
+                    $tempStr .= "<a href='/admin/action/edit/".$action->id."#basic' class='btn btn3 btn_pencil' title='Upravit'></a>";
                     $tempStr .= "<a href='/admin/action/delete/".$action->id."' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
@@ -842,69 +847,4 @@ class ActionController extends Controller
         }
     }
 
-    /**
-     * Show comments for specific action.
-     * 
-     * @before _secured, _admin
-     *
-     * @param int $id
-     */
-    public function showComments($id)
-    {
-        $view = $this->getActionView();
-        $this->getLayoutView()
-                ->setTitle($this->lang('TITLE_ACTION_COMMENTS'));
-
-        $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id), array('id'));
-
-        if (null === $action) {
-            $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/action/');
-        }
-
-        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
-
-        $view->set('comments', $comments)
-                ->set('action', $action);
-    }
-
-    /**
-     * @before _secured, _participant
-     *
-     * @param type $actionId
-     */
-    public function getUserList($actionId)
-    {
-        $this->_disableView();
-
-        $attUsers = \App\Model\AttendanceModel::fetchUsersByActionId($actionId);
-        $returnStr = '';
-        $returnArr = \App\Model\AttendanceModel::getAttendanceReturnArray();
-
-        if (!empty($attUsers)) {
-            foreach ($attUsers as $key => $user) {
-                if ($user->getType() == \App\Model\AttendanceModel::ACCEPT) {
-                    $returnArr[\App\Model\AttendanceModel::ACCEPT][] = $user->getFirstname().' '.$user->getLastname();
-                } elseif ($user->getType() == \App\Model\AttendanceModel::REJECT) {
-                    $returnArr[\App\Model\AttendanceModel::REJECT][] = $user->getFirstname().' '.$user->getLastname();
-                } elseif ($user->getType() == \App\Model\AttendanceModel::MAYBE) {
-                    $returnArr[\App\Model\AttendanceModel::MAYBE][] = $user->getFirstname().' '.$user->getLastname();
-                }
-            }
-
-            $returnStr = 'Zúčastní se ('.count($returnArr[\App\Model\AttendanceModel::ACCEPT]).'):<br/>';
-            $returnStr .= implode('<br/>', $returnArr[\App\Model\AttendanceModel::ACCEPT]);
-            $returnStr .= '<hr/>Nezúčastní se ('.count($returnArr[\App\Model\AttendanceModel::REJECT]).'):<br/>';
-            $returnStr .= implode('<br/>', $returnArr[\App\Model\AttendanceModel::REJECT]);
-            $returnStr .= '<hr/>Neví ('.count($returnArr[\App\Model\AttendanceModel::MAYBE]).'):<br/>';
-            $returnStr .= implode('<br/>', $returnArr[\App\Model\AttendanceModel::MAYBE]);
-            
-            echo $returnStr;
-            exit;
-        } else {
-            echo 'Žádní účastníci';
-            exit;
-        }
-    }
 }

@@ -15,6 +15,7 @@ use THCFrame\Core\StringMethods;
  */
 class UserController extends Controller
 {
+
     private function _checkEmailActToken($token)
     {
         $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
@@ -33,7 +34,7 @@ class UserController extends Controller
     {
         $view = $this->getActionView();
 
-        $canonical = 'http://'.$this->getServerHost().'/prihlasit';
+        $canonical = 'http://' . $this->getServerHost() . '/prihlasit';
 
         $this->getLayoutView()
                 ->set('metatitle', 'Hastrman - Přihlásit se')
@@ -57,7 +58,7 @@ class UserController extends Controller
                 $view->set('account_error', $this->lang('LOGIN_PASS_ERROR'));
                 $error = true;
             }
-            
+
             if (!$error) {
                 try {
                     $this->getSecurity()->authenticate($email, $password);
@@ -93,7 +94,7 @@ class UserController extends Controller
                     $view->set('account_error', $this->lang('ACCOUNT_PASS_EXPIRED'));
                     Event::fire('app.log', array('fail', sprintf('Password has expired for user %s', $email)));
                 } catch (\Exception $e) {
-                    Event::fire('app.log', array('fail', 'Exception: '.$e->getMessage()));
+                    Event::fire('app.log', array('fail', 'Exception: ' . $e->getMessage()));
 
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
@@ -111,8 +112,8 @@ class UserController extends Controller
     public function logout()
     {
         $view = $this->getActionView();
-        
-        if($this->getUser() !== null && $this->getUser()->getForcePassChange() == true){
+
+        if ($this->getUser() !== null && $this->getUser()->getForcePassChange() == true) {
             $view->errorMessage($this->lang('LOGOUT_PASS_EXP_CHECK'));
             $this->getUser()
                     ->setForcePassChange(false)
@@ -120,9 +121,9 @@ class UserController extends Controller
             self::redirect('/muj-profil');
             exit;
         }
-        
+
         $this->_disableView();
-        
+
         $this->getSecurity()->logout();
         self::redirect('/');
     }
@@ -135,7 +136,7 @@ class UserController extends Controller
         $view = $this->getActionView();
         $user = null;
 
-        $canonical = 'http://'.$this->getServerHost().'/registrace';
+        $canonical = 'http://' . $this->getServerHost() . '/registrace';
 
         $view->set('user', $user);
 
@@ -191,7 +192,7 @@ class UserController extends Controller
                 }
 
                 if ($i == 75) {
-                    $errors['email'] = array($this->lang('UNKNOW_ERROR').$this->lang('REGISTRATION_FAIL'));
+                    $errors['email'] = array($this->lang('UNKNOW_ERROR') . $this->lang('REGISTRATION_FAIL'));
                     break;
                 }
             }
@@ -215,13 +216,13 @@ class UserController extends Controller
                 $uid = $user->save();
 
                 //odeslani notifikace administratorum, ze byl zaregistrovan novy uzivatel
-                if($adminAccountActivation){
+                if ($adminAccountActivation) {
                     $admins = \App\Model\UserModel::fetchAdminsEmail();
-                    
+
                     $data = array('{USERNAME}' => $user->getWholeName(), '{USEREMAIL}' => $user->getEmail());
                     $email = \Admin\Model\EmailModel::loadAndPrepare('new-registration-notification', $data);
                     $email->setRecipient($admins);
-                    
+
                     if ($email->send(false, 'registrace@hastrman.cz')) {
                         Event::fire('app.log', array('success', 'Notification email about new registration to admin'));
                         $view->successMessage($this->lang('REGISTRATION_SUCCESS_ADMIN_ACTIVATION'));
@@ -230,28 +231,28 @@ class UserController extends Controller
                         Event::fire('app.log', array('fail', 'Notification email about new registration to admin'));
                         $view->errorMessage($this->lang('REGISTRATION_FAIL'));
                     }
-                }elseif ($verifyEmail) { //odeslani overovaciho emailu
+                } elseif ($verifyEmail) { //odeslani overovaciho emailu
                     $data = array('{TOKEN}' => $actToken);
                     $email = \Admin\Model\EmailModel::loadAndPrepare('email-verification', $data);
                     $email->setRecipient($user->getEmail());
 
                     if ($email->send(false, 'registrace@hastrman.cz')) {
-                        Event::fire('app.log', array('success', 'User Id with email activation: '.$uid));
+                        Event::fire('app.log', array('success', 'User Id with email activation: ' . $uid));
                         $view->successMessage($this->lang('REGISTRATION_EMAIL_SUCCESS'));
                     } else {
                         $user->delete();
-                        Event::fire('app.log', array('fail', 'Email not send for User Id: '.$uid));
+                        Event::fire('app.log', array('fail', 'Email not send for User Id: ' . $uid));
                         $view->errorMessage($this->lang('REGISTRATION_EMAIL_FAIL'));
                     }
                 } else {
-                    Event::fire('app.log', array('success', 'User Id: '.$uid));
+                    Event::fire('app.log', array('success', 'User Id: ' . $uid));
                     $view->successMessage($this->lang('REGISTRATION_SUCCESS'));
                 }
 
                 self::redirect('/');
             } else {
-                Event::fire('app.log', array('fail', 'User id: '.$id,
-                    'Errors: '.json_encode($errors + $user->getErrors()), ));
+                Event::fire('app.log', array('fail', 'User id: ' . $id,
+                    'Errors: ' . json_encode($errors + $user->getErrors()),));
                 $view->set('errors', $errors + $user->getErrors())
                         ->set('user', $user);
             }
@@ -268,7 +269,7 @@ class UserController extends Controller
         $view = $this->getActionView();
         $errors = array();
 
-        $canonical = 'http://'.$this->getServerHost().'/profil';
+        $canonical = 'http://' . $this->getServerHost() . '/profil';
 
         $user = \App\Model\UserModel::first(array('id = ?' => $this->getUser()->getId()));
         $myActions = \App\Model\AttendanceModel::fetchActionsByUserId($this->getUser()->getId(), true);
@@ -276,8 +277,8 @@ class UserController extends Controller
         if (!empty($myActions)) {
             foreach ($myActions as &$action) {
                 $action->latestComments = \App\Model\CommentModel::fetchByTypeAndCreated(
-                        \App\Model\CommentModel::RESOURCE_ACTION, $action->getId(), Registry::get('session')->get('userLastLogin')
-                        );
+                                \App\Model\CommentModel::RESOURCE_ACTION, $action->getId(), Registry::get('session')->get('userLastLogin')
+                );
                 unset($action);
             }
         }
@@ -317,7 +318,7 @@ class UserController extends Controller
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
                     $errors['password'] = array($this->lang('PASS_WEAK'));
-                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex){
+                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex) {
                     $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
                 }
             }
@@ -336,8 +337,8 @@ class UserController extends Controller
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/muj-profil');
             } else {
-                Event::fire('app.log', array('fail', 'User id: '.$user->getId(),
-                    'Errors: '.json_encode($errors + $user->getErrors()), ));
+                Event::fire('app.log', array('fail', 'User id: ' . $user->getId(),
+                    'Errors: ' . json_encode($errors + $user->getErrors()),));
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -360,14 +361,66 @@ class UserController extends Controller
         }
 
         if ($user->activateAccount()) {
-            Event::fire('app.log', array('success', 'User Id: '.$user->getId()));
+            Event::fire('app.log', array('success', 'User Id: ' . $user->getId()));
             $view->successMessage($this->lang('ACCOUNT_ACTIVATED'));
             self::redirect('/');
         } else {
-            Event::fire('app.log', array('fail', 'User Id: '.$user->getId(),
-                'Errors: '.json_encode($user->getErrors()), ));
+            Event::fire('app.log', array('fail', 'User Id: ' . $user->getId(),
+                'Errors: ' . json_encode($user->getErrors()),));
             $view->warningMessage($this->lang('COMMON_FAIL'));
             self::redirect('/');
         }
     }
+
+    /**
+     * Form for visitors feedback.
+     */
+    public function feedback()
+    {
+        $view = $this->getActionView();
+        $layoutView = $this->getLayoutView();
+
+        $canonical = 'http://' . $this->getServerHost() . '/feedback';
+
+        $view->set('feedback', null);
+        $layoutView->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Feedback');
+
+        if (RequestMethods::post('submitFeedback')) {
+            if ($this->_checkCSRFToken() !== true &&
+                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                self::redirect('/feedback');
+            }
+
+            $userAlias = $this->getUser() !== null ? $this->getUser()->getWholeName() : '';
+            $feedback = new \App\Model\FeedbackModel(array(
+                'userAlias' => $userAlias,
+                'message' => RequestMethods::post('message'),
+            ));
+
+            if ($feedback->validate()) {
+                $id = $feedback->save();
+
+                $data = array('{TITLE}' => 'Hastrman feedback', '{TEXT}' => 'User: ' . $feedback->getUserAlias() . '<br/>Message: ' . $feedback->getMessage());
+                $email = \Admin\Model\EmailModel::loadAndPrepare('default-email', $data);
+                $email->setSubject('Hastrman - Feedback');
+
+                if ($email->send()) {
+                    Event::fire('app.log', array('success', 'Feedback id: ' . $id));
+                    $view->successMessage('Děkujeme za Vaše nápady a návrhy');
+                    self::redirect('/');
+                } else {
+                    Event::fire('app.log', array('fail', 'Send feedback email: ' . $id));
+                    $view->successMessage('Děkujeme za Vaše nápady a návrhy');
+                    self::redirect('/');
+                }
+            } else {
+                Event::fire('app.log', array('fail', 'Errors: ' . json_encode($feedback->getErrors())));
+                $view->set('feedback', $feedback)
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('errors', $feedback->getErrors());
+            }
+        }
+    }
+
 }

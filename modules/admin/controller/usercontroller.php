@@ -64,32 +64,9 @@ class UserController extends Controller
                     }
 
                     self::redirect('/admin/');
-                } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
-                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    Event::fire('admin.log', array('fail', sprintf('Account locked for %s', $email)));
-                } catch (\THCFrame\Security\Exception\UserInactive $ex) {
-                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    Event::fire('admin.log', array('fail', sprintf('Account inactive for %s', $email)));
-                } catch (\THCFrame\Security\Exception\UserExpired $ex) {
-                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    Event::fire('admin.log', array('fail', sprintf('Account expired for %s', $email)));
-                } catch (\THCFrame\Security\Exception\UserNotExists $ex) {
-                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    Event::fire('admin.log', array('fail', sprintf('User %s does not exists', $email)));
-                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
-                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    Event::fire('admin.log', array('fail', sprintf('User %s does not exists', $email)));
-                } catch (\THCFrame\Security\Exception\UserPassExpired $ex) {
-                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    Event::fire('admin.log', array('fail', sprintf('Password has expired for user %s', $email)));
                 } catch (\Exception $e) {
-                    Event::fire('admin.log', array('fail', 'Exception: '.$e->getMessage()));
-
-                    if (ENV == 'dev') {
-                        $view->set('account_error', $e->getMessage());
-                    } else {
-                        $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    }
+                    Event::fire('admin.log', array('fail', 'Exception: ' . get_class($e). ' Message: '.$e->getMessage()));
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                 }
             }
         }
