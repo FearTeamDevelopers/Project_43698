@@ -87,7 +87,7 @@ class File extends Logger\Driver
      * @param boolean $prependTime
      * @param string $file
      */
-    public function log($message, $type = 'error', $flag = FILE_APPEND, $prependTime = true, $file = null)
+    public function log($message, $type = 'error', $prependTime = true, $file = null)
     {
         if ($prependTime) {
             $time = '[' . date('Y-m-d H:i:s') . '] ';
@@ -111,28 +111,32 @@ class File extends Logger\Driver
             if (mb_strlen($file) > 50) {
                 $file = trim(substr($file, 0, 50)) . '.log';
             }
+            
+            if(substr($file, 0, -4) != '.log'){
+                $file = $file.'.log';
+            }
 
             $path = $this->path . DIRECTORY_SEPARATOR . $file;
             if (!file_exists($path)) {
-                file_put_contents($path, $message, $flag);
+                file_put_contents($path, $message, FILE_APPEND);
             } elseif (file_exists($path) && filesize($path) < self::MAX_FILE_SIZE) {
-                file_put_contents($path, $message, $flag);
+                file_put_contents($path, $message, FILE_APPEND);
             } elseif (file_exists($path) && filesize($path) > self::MAX_FILE_SIZE) {
                 file_put_contents($path, $message);
             }
         } elseif ($type == 'error') {
             if (!file_exists($this->errorlog)) {
-                file_put_contents($this->errorlog, $message, $flag);
+                file_put_contents($this->errorlog, $message, FILE_APPEND);
             } elseif (file_exists($this->errorlog) && filesize($this->errorlog) < self::MAX_FILE_SIZE) {
-                file_put_contents($this->errorlog, $message, $flag);
+                file_put_contents($this->errorlog, $message, FILE_APPEND);
             } elseif (file_exists($this->errorlog) && filesize($this->errorlog) > self::MAX_FILE_SIZE) {
                 file_put_contents($this->errorlog, $message);
             }
         } else {
             if (!file_exists($this->syslog)) {
-                file_put_contents($this->syslog, $message, $flag);
+                file_put_contents($this->syslog, $message, FILE_APPEND);
             } elseif (file_exists($this->syslog) && filesize($this->syslog) < self::MAX_FILE_SIZE) {
-                file_put_contents($this->syslog, $message, $flag);
+                file_put_contents($this->syslog, $message, FILE_APPEND);
             } elseif (file_exists($this->syslog) && filesize($this->syslog) > self::MAX_FILE_SIZE) {
                 file_put_contents($this->syslog, $message);
             }

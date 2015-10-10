@@ -354,9 +354,15 @@ class UserController extends Controller
         $view = $this->getActionView();
 
         $user = \App\Model\UserModel::first(array('active = ?' => false, 'emailActivationToken = ?' => $key));
+        $adminAccountActivation = $this->getConfig()->registration_admin_activate;
 
         if (null === $user) {
             $view->warningMessage($this->lang('NOT_FOUND'));
+            self::redirect('/');
+        }
+        
+        if($adminAccountActivation){
+            $view->infoMessage($this->lang('REGISTRATION_WAITING_ADMIN_ACTIVATION'));
             self::redirect('/');
         }
 

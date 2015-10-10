@@ -386,4 +386,17 @@ class IndexController extends Controller
             $this->_sendEmail($body, 'WARNING: System chcek', null, 'cron@hastrman.cz');
         }
     }
+    
+    /**
+     * 
+     */
+    public function filehashscan()
+    {
+        $this->_disableView();
+        $scanner = new \THCFrame\Security\FileHashScanner\Scanner();
+        
+        
+        $scanner->scan();
+        Event::fire('cron.log', array('success', 'File hash checked'));
+    }
 }

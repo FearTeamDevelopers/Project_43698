@@ -34,7 +34,6 @@ class SystemController extends Controller
         $height = RequestMethods::post('scheight');
         $res = $width . ' x ' . $height;
 
-        Core::getLogger()->log($res, FILE_APPEND, true, 'scres.log');
+        Core::getLogger()->log($res, 'system', true, 'scres.log');
     }
-
 }

@@ -54,6 +54,7 @@ return array(
 
     'REGISTRATION_SUCCESS' => 'Registration has been successfull',
     'REGISTRATION_SUCCESS_ADMIN_ACTIVATION' => 'Registration has been successfull. You will be notified about account activation via email',
+    'REGISTRATION_WAITING_ADMIN_ACTIVATION' => 'Your registration is now waiting for activation by web page administrator',
     'REGISTRATION_EMAIL_SUCCESS' => 'Registration has been successfull. Confirm your e-mail address and activate your account',
     'REGISTRATION_EMAIL_FAIL' => 'An unknown error occured during sending e-mail with activation link, please repeat registration later',
     'REGISTRATION_FAIL' => 'Registration failed. Try repeat registration later',

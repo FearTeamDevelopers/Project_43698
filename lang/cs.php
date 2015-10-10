@@ -54,6 +54,7 @@ return array(
 
     'REGISTRATION_SUCCESS' => 'Registrace byla úspěšná',
     'REGISTRATION_SUCCESS_ADMIN_ACTIVATION' => 'Registrace byla úspěšná. O aktivaci účtu budete informováni emailem',
+    'REGISTRATION_WAITING_ADMIN_ACTIVATION' => 'Vaše registrace nyní čeká na schválení správcem stránek',
     'REGISTRATION_EMAIL_SUCCESS' => 'Registrace byla úspěšná. Na uvedený email byl zaslán odkaz k aktivaci účtu',
     'REGISTRATION_EMAIL_FAIL' => 'Nepodařilo se odeslat aktivační email, opakujte registraci později',
     'REGISTRATION_FAIL' => 'Registrace se nezdařila. Opakujte registraci později',

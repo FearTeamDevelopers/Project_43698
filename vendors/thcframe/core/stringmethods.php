@@ -423,6 +423,32 @@ class StringMethods
     }
     
     /**
+     * Version of stripos with needles as an array or string
+     * 
+     * @param type $haystack
+     * @param type $needles
+     * @return type
+     */
+    public static function striposArray($haystack, $needles)
+    {
+        if (is_array($needles)) {
+            foreach ($needles as $str) {
+                if (is_array($str)) {
+                    $pos = self::striposArray($haystack, $str);
+                } else {
+                    $pos = stripos($haystack, $str);
+                }
+                if ($pos !== false) {
+                    return $pos;
+                }
+            }
+            return false;
+        } else {
+            return stripos($haystack, $needles);
+        }
+    }
+
+    /**
      * truncateHtml can truncate a string up to a number of characters while preserving whole words and HTML tags
      *
      * @param string $text String to truncate

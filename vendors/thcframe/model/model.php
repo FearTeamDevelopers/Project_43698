@@ -871,7 +871,6 @@ class Model extends Base
      * @param type $where
      * @param type $fields
      * @param type $order
-     * @param type $direction
      * @return type
      */
     public static function first($where = array(), $fields = array('*'), $order = array())
@@ -886,7 +885,6 @@ class Model extends Base
      * @param type $where
      * @param type $fields
      * @param type $order
-     * @param type $direction
      * @return \THCFrame\class|null
      */
     protected function _first($where = array(), $fields = array('*'), $order = array())
