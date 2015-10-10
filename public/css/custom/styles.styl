@@ -1,16 +1,23 @@
-html {
+html
 	font-family: 'Ubuntu', sans-serif !important;
 	font-size: 16px;
-}
-h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
+
+h1, h2, h3, h4, h5, h6, a, span, p, ul, li
 	font-family: 'Ubuntu', sans-serif !important;
-}
-.singlePage{
+
+.singlePage
 	min-height calc(100% - 379px)
-}
+
 .centerBlock
 	display block
 	margin 0 auto
+.clearfix
+	&:before
+	&:after
+		content ''
+		display table
+	&:after
+		clear both
 
 // DEFAULT - nastaveni
 @import "/stylus/default/colors"
@@ -39,6 +46,8 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li {
 @import "/stylus/components/notification"
 
 @import "mobile"
+
+
 
 body
 	.feedback

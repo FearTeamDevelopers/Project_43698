@@ -35,71 +35,73 @@
     <title>{echo $metatitle}</title>
   </head>
   <body>
-    <section class="wrapper topPanel blue">
-      <header class="row">
-        <div class="small-12 medium-6 large-6 columns"><a href="/">
-            <h1>Hastrman</h1></a></div>
-        <div class="large-6 small-12 medium-6 centerBlock searchWrapper">
-          <form method="get" action="/hledat" class="fulltextsearch">
-            <input type="text" name="str" title="Pole nemůže být prázdné" placeholder="Prohledat hastrmana..." required class="small-10 left"><a id="hledatHastrman" href="#" title="Hledat" class="fi-magnifying-glass left"></a>
-          </form>
-        </div>
-        <div class="small-12 medium-12 large-12 columns navWrapper"><a href="#" class="showMenu">Menu</a>
-          <nav>
-            <ul>
-              <li><a href="#" class="dropdown">O nás</a>
-                <ul>
-                  <li><a href="/o-nas">Potápěčské centrum</a></li>
-                  <li><a href="/klub-hastrman">Klub sportovních potápěčů</a></li>
-                  <li><a href="/apnea-tym">Apnea tým</a></li>
-                </ul>
-              </li>
-              <li><a href="/novinky">Novinky</a></li>
-              <li><a href="/akce">Akce</a></li>
-              <li><a href="/reportaze">Reportáže</a></li>
-              <li><a href="/kurzy" class="dropdown">Kurzy</a>
-                <ul class="kurzy">
-                  <li><a href="/kurzy/cmas">CMAS</a></li>
-                  <li><a href="/kurzy/tdi">TDI</a></li>
-                  <li><a href="/kurzy/sdi">SDI</a></li>
-                  <li><a href="/kurzy/udi">UDI</a></li>
-                  <li><a href="/apnea-diving-international">Apnea</a></li>
-                </ul>
-              </li>
-              <li><a href="#" class="dropdown">Služby</a>
-                <ul>
-                  <li><a href="/sluzby/plneni-lahvi">Plnění lahví</a></li>
-                  <li><a href="/sluzby/pujcovna-potapecske-vystroje">Půjčovna potápěčské výstroje</a></li>
-                  <li><a href="/sluzby/prodej-nove-vystroje">Prodej nové výstroje</a></li>
-                  <li><a href="/sluzby/prace-pod-vodou">Práce pod vodou</a></li>
-                  <li><a href="/sluzby/servis-potapecske-techniky">Servis potápěčské techniky</a></li>
-                </ul>
-              </li>
-              <li><a href="/galerie" class="galerie">Galerie</a></li>
-              <li><a href="/bazar">Bazar</a></li>
-              <li><a href="#" class="dropdown">Odkazy</a>
-                <ul>
-                  <li><a href="/odkazy">Zajímavé stránky</a></li>
-                  <li><a href="/bazen">Bazén</a></li>
-                </ul>
-              </li>
-              <li><a href="#" class="dropdown">Ostatní</a>
-                <ul>
-                  <li><a href="/technika">Technika</a></li>
-                  <li><a href="/pojisteni">Pojišťění</a></li>
-                </ul>
-              </li>{if !isset($authUser)}
-              <li><a href="/prihlasit" title="Přihlásit se" class="fi-torso galerie"></a></li>{/if}{else}
-              <li><a href="#" class="dropdown fi-power"></a>
-                <ul>
-                  <li><a href="/muj-profil">Můj profil</a></li>
-                  <li><a href="/odhlasit">Odhlásit se</a></li>
-                </ul>
-              </li>{/else}
-            </ul>
-          </nav>
-        </div>
-      </header>
+    <section class="wrapper topPanel">
+      <div class="bg-container">
+        <header class="row">
+          <div class="small-12 medium-6 large-6 columns"><a href="/">
+              <h1>Hastrman</h1></a></div>
+          <div class="large-6 small-12 medium-6 centerBlock searchWrapper">
+            <form method="get" action="/hledat" class="fulltextsearch">
+              <input type="text" name="str" title="Pole nemůže být prázdné" placeholder="Prohledat hastrmana..." required class="small-10 left"><a id="hledatHastrman" href="#" title="Hledat" class="fi-magnifying-glass left"></a>
+            </form>
+          </div>
+          <div class="small-12 medium-12 large-12 columns navWrapper"><a href="#" class="showMenu">Menu</a>
+            <nav>
+              <ul>
+                <li><a href="#" class="dropdown">O nás</a>
+                  <ul>
+                    <li><a href="/o-nas">Potápěčské centrum</a></li>
+                    <li><a href="/klub-hastrman">Klub sportovních potápěčů</a></li>
+                    <li><a href="/apnea-tym">Apnea tým</a></li>
+                  </ul>
+                </li>
+                <li><a href="/novinky">Novinky</a></li>
+                <li><a href="/akce">Akce</a></li>
+                <li><a href="/reportaze">Reportáže</a></li>
+                <li><a href="/kurzy" class="dropdown">Kurzy</a>
+                  <ul class="kurzy">
+                    <li><a href="/kurzy/cmas">CMAS</a></li>
+                    <li><a href="/kurzy/tdi">TDI</a></li>
+                    <li><a href="/kurzy/sdi">SDI</a></li>
+                    <li><a href="/kurzy/udi">UDI</a></li>
+                    <li><a href="/apnea-diving-international">Apnea</a></li>
+                  </ul>
+                </li>
+                <li><a href="#" class="dropdown">Služby</a>
+                  <ul>
+                    <li><a href="/sluzby/plneni-lahvi">Plnění lahví</a></li>
+                    <li><a href="/sluzby/pujcovna-potapecske-vystroje">Půjčovna potápěčské výstroje</a></li>
+                    <li><a href="/sluzby/prodej-nove-vystroje">Prodej nové výstroje</a></li>
+                    <li><a href="/sluzby/prace-pod-vodou">Práce pod vodou</a></li>
+                    <li><a href="/sluzby/servis-potapecske-techniky">Servis potápěčské techniky</a></li>
+                  </ul>
+                </li>
+                <li><a href="/galerie" class="galerie">Galerie</a></li>
+                <li><a href="/bazar">Bazar</a></li>
+                <li><a href="#" class="dropdown">Odkazy</a>
+                  <ul>
+                    <li><a href="/odkazy">Zajímavé stránky</a></li>
+                    <li><a href="/bazen">Bazén</a></li>
+                  </ul>
+                </li>
+                <li><a href="#" class="dropdown">Ostatní</a>
+                  <ul>
+                    <li><a href="/technika">Technika</a></li>
+                    <li><a href="/pojisteni">Pojišťění</a></li>
+                  </ul>
+                </li>{if !isset($authUser)}
+                <li><a href="/prihlasit" title="Přihlásit se" class="fi-torso galerie"></a></li>{/if}{else}
+                <li><a href="#" class="dropdown fi-power"></a>
+                  <ul>
+                    <li><a href="/muj-profil">Můj profil</a></li>
+                    <li><a href="/odhlasit">Odhlásit se</a></li>
+                  </ul>
+                </li>{/else}
+              </ul>
+            </nav>
+          </div>
+        </header>
+      </div>
     </section>
     <div class="notificationWrapper">{if !empty($infoMessage)}
       <div class="notification msginfo large-5 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
@@ -140,12 +142,11 @@
         </div>
       </footer>
     </div>
-    <div id="loader"><img src="/public/images/loaders/loader6.gif" alt="Loading..." />Nahrávám...</div>
     <div id="dialog" title="Chcete pokračovat?">
       <p></p>
     </div>{if $showfeedback}<a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>
-    <!--JS scripts
-    -->
+    <div id="loader"><img src="/public/images/loaders/loader6.gif">Nahrávám...</div>
+    <!-- JS scripts-->
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/modernizr.js"></script>
@@ -156,8 +157,7 @@
     <script type="text/javascript" src="/public/js/plugins/jssor.slider.mini.js"></script>
     <script type="text/javascript" src="/public/js/custom/build/jssor.slider.init.js"></script>{/if}
     <script type="text/javascript" src="/public/js/custom/build/generalApp.js"></script>{if $env == "live"}
-    <!--Piwik
-    -->
+    <!-- Piwik-->
     <script type="text/javascript">
       var _paq = _paq || [];
       _paq.push(["trackPageView"]);
@@ -173,9 +173,7 @@
     <noscript>
       <p><img src="//piwik.hastrman.cz/piwik.php?idsite=1" style="border:0;" alt=""></p>
     </noscript>
-    <!--End Piwik Code
-    -->{/if}
-    <!--End JS scripts
-    -->
+    <!-- End Piwik Code-->{/if}
+    <!-- End JS scripts-->
   </body>
 </html>

@@ -1,20 +1,20 @@
-.pridatInzerat{
-	a.ajaxDeleteImage{
-		img{
+.pridatInzerat
+	a.ajaxDeleteImage
+		img
 			width 30%
 			margin-right 1.5%
-		}
-		&:hover{
-			img{
-				border 2px solid #ff0000
-			}
-		}
-	}
 
-}
+		&:hover
+			img
+				border 2px solid #ff0000
+
+
+
+
+
 .bazar
-	.container{
-		article{
+	.container
+		article
 			position relative
 			display block
 			margin 0 auto
@@ -22,10 +22,10 @@
 			margin-top 1.875rem
 			margin-bottom 1.875rem
 			min-width 500px
-			&:last-child{
+			&:last-child
 				margin-bottom 60px
-			}
-			.buttonTab{
+
+			.buttonTab
 				position absolute
 				overflow hidden
 				top 16px
@@ -37,28 +37,28 @@
 				color #ffffff
 				z-index 2
 				font-size 15pt
-				&:hover{
+				&:hover
 					color defaultGreen
 					top 17px
-				}
-				&.delete{
+
+				&.delete
 					right 20px
 					color #CC1100
-					&:hover{
+					&:hover
 						color red
-					}
-				}
-				&.edit{
+
+
+				&.edit
 					right 60px
-				}
-				&.reload{
+
+				&.reload
 					right 100px
-				}
-                                &.sell{
+
+                                &.sell
 					right 140px
-				}
-			}
-			.imgWrapper{
+
+
+			.imgWrapper
 				width 60%
 				height 300px
 				line-height 300px
@@ -67,30 +67,30 @@
 				padding 0
 				text-align center
 				background defaultBLue
-				img{
+				img
 					width auto
 					max-width 100%
 					max-height 98%
-				}
-			}
-			.nazev{
-				a{
-					&:hover{
+
+
+			.nazev
+				a
+					&:hover
 						text-decoration underline
-					}
-				}
+
+
 				position absolute
 				top 0
 				width 100%
 				height 40px
 				padding-right 1.875rem
 				z-index 1
-				.nazevWrapper{
+				.nazevWrapper
 					background rgba(0,0,0,0.6)
 					width 100%
 					height 40px
-				}
-				h4{
+
+				h4
 					width 74%
 					color #ffffff
 					white-space nowrap
@@ -101,17 +101,17 @@
 					line-height 40px
 					margin 0
 
-				}
-					}
 
-			}
-			.infoWrapper{
+
+
+
+			.infoWrapper
 				width:40%;
 				overflow:hidden;
 				height:300px;
-			}
 
-			.info{
+
+			.info
 
 				background defaultBLue ;
 				padding-top 60px;
@@ -123,33 +123,33 @@
 				float left
 				position relative
 				line-height 2em
-				span, p{
+				span, p
 					color white
-					&.price{
+					&.price
 						color defaultGreen
 						font-weight bold
 						font-size 1.6  em
-					}
-				}
-				small{
+
+
+				small
 					font-size 80%
-				}
-				center{
+
+				center
 					margin-bottom 1em
-				}
-				.nabidka{
+
+				.nabidka
 					text-transform uppercase
 					font-weight bold
 					color greenyellow
 					margin-bottom 1em
-				}
-				.poptavka{
+
+				.poptavka
 					text-transform uppercase
 					font-weight bold
 					color orangered
 					margin-bottom 1em
-				}
-				a.bla{
+
+				a.bla
 					position absolute
 					bottom 10px
 					left 0
@@ -157,71 +157,71 @@
 					color #ffffff
 					text-align center
 					width 100%
-					&:hover{
+					&:hover
 						color default green
 						text-decoration underline
-					}
-				}
-			}
-		}
-	}
-	&.detail{
-		form{
-			display:none
-		}
 
-		article{
+
+
+
+
+	&.detail
+		form
+			display:none
+
+
+		article
 			height:auto;
 			min-height:300px;
 			min-width:auto;
 			position:relative;
 			background defaultBLue
-			.images{
-				a.fi-arrow-down{
+			.images
+				a.fi-arrow-down
 					margin-left 30px
 					z-index 5
 					color #ffffff
 					text-decoration underline
-					&:hover{
+					&:hover
 						color defaultGreen
-					}
-					&:before{
+
+					&:before
 						padding-right:1em
 						color defaultGreen
 						text-decoration none
-					}
-				}
-				.mainImage{
+
+
+				.mainImage
 					padding-bottom 10px;
 					position relative
 					overflow hidden
 					width 100%
 					background-color rgba(0,0,0,0.6)
 
-					img{
+					img
 						width 100%
 						display block
-					}
 
-				}
 
-				.thumbImage{
+
+
+				.thumbImage
 					display:none;
 					height:100px;
 					background:rgba(0,0,0,0.6)
 					text-align:center
-					img{
+					img
 						height  100%;
 						width auto
-					}
-				}
-			}
-			&.arrow_box {
+
+
+
+			&.arrow_box
 				position: relative;
 				background: defaultBLue;
 				border: 4px solid defaultBLue;
 				margin-bottom 0
-				&:after, &:before {
+				&:after, &:before
 					top: 100%;
 					left: 50%;
 					border: solid transparent;
@@ -230,29 +230,29 @@
 					width: 0;
 					position: absolute;
 					pointer-events: none;
-				}
-				&:after {
+
+				&:after
 					border-color: rgba(136, 183, 213, 0);
 					border-top-color: defaultBLue;
 					border-width: 30px;
 					margin-left: -30px;
-				}
-				&:before {
+
+				&:before
 					border-color: rgba(194, 225, 245, 0);
 					border-top-color: defaultBLue;
 					border-width: 36px;
 					margin-left: -36px;
-				}
-			}
-			.info{
+
+
+			.info
 				padding:30px 20px
 				border 0
 				min-width:170px
-				&.description{
+				&.description
 					padding:30px 25px 10px;
 					color white
 					font-size 1rem
-				}
-			}
-		}
-	}
+
+
+
+

@@ -4,13 +4,13 @@ section.wrapper.bazar
 		h2 Výsledky filtru
 	.row.container
 		.buttonWrapper
-                        ul
-                                li
-                                        a(href='/bazar/pridat').fi-plus Nový inzerát
-                                |{if isset($authUser)}
-                                li
-                                        a(href='/bazar/moje-inzeraty').fi-page-copy Moje inzeráty
-                                |{/if}
+						ul
+								li
+										a(href='/bazar/pridat').fi-plus Nový inzerát
+								|{if isset($authUser)}
+								li
+										a(href='/bazar/moje-inzeraty').fi-page-copy Moje inzeráty
+								|{/if}
 		|{if !empty($ads)}
 		|{foreach $ad in $ads}
 		article.large-6.small-12.medium-6.column.left

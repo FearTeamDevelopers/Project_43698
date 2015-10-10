@@ -1,20 +1,24 @@
-.topPanel{
-	background defaultBLue !important;
-	header{
+.topPanel
+	padding:0;
+	position relative
+	background-color rgba(defaultBLue, .5);
+	.bg-container
+		padding-bottom:10px;
+	header
 		margin-top 0
 		padding 0
 		padding-top:1em;
 		position relative
 		z-index 2
-		a{
-			h1{
+		a
+			h1
 				font-weight 700
 				color white
 				width 260px
 				margin 0 auto
 				margin-bottom .5rem
 				text-transform uppercase
-				&:after{
+				&:after
 					content ' '
 					background url('../../images/Logo_Hastrmnek.png') no-repeat
 					background-size 230px 215px
@@ -23,21 +27,21 @@
 					position absolute
 					top 291px
 					left -245px
-				}
-			}
-			&:hover{
-				h1{
+
+
+			&:hover
+				h1
 					color defaultGreen
 
-				}
-			}
-		}
+
+
+
 		@import "header-menu"
 
-	}
+
 	@import "header-submenu"
 	@import "header-search"
-}
+
 
 
 

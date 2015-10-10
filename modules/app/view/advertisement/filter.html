@@ -42,13 +42,12 @@
     <h2>Výsledky filtru</h2>
   </header>
   <div class="row container">
-      <div class="buttonWrapper">
-          <ul>
-              <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>
-              {if isset($authUser)}<li><a href="/bazar/moje-inzeraty" class="fi-page-copy">Moje inzeráty</a></li>{/if}
-          </ul>
-      </div>
-    {if !empty($ads)}
+    <div class="buttonWrapper">
+      <ul>
+        <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>{if isset($authUser)}
+        <li><a href="/bazar/moje-inzeraty" class="fi-page-copy">Moje inzeráty</a></li>{/if}
+      </ul>
+    </div>{if !empty($ads)}
     {foreach $ad in $ads}
     <article class="large-6 small-12 medium-6 column left">
       <div class="imgWrapper">

@@ -1,46 +1,46 @@
-html{
+html
 	min-height 100%
 	background:transparent url('../../images/IMG_9650.jpg') no-repeat center center fixed;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	-o-background-size: cover;
 	background-size: cover;
-}
-body{
+
+body
 	background none
 	min-height 100%
 	height 100%
 	position relative
-}
-.panel{
+
+.panel
 	margin 0
 	background defaultBLue
 	border none
-}
-.clear-all{
+
+.clear-all
 	clear both
-	&:before, &:after{
+	&:before, &:after
 		content: " "; /* 1 */
 		display: table; /* 2 */
-	}
-	&:after{
+
+	&:after
 		clear: both;
-	}
-}
-.wrapper {
+
+
+.wrapper
 	width 100%
 	position relative
 	background rgba(255, 255, 255, 0.7)
 	padding 0 0 15px
-	&.blue {
+	&.blue
 		background headerColor
 		color white
-		h1, h2, h3, h4 {
+		h1, h2, h3, h4
 			color white !important
-		}
-	}
-	header.row{
-		h2{
+
+
+	header.row
+		h2
 			text-align center
 			text-transform uppercase
 			margin 0 auto
@@ -50,124 +50,124 @@ body{
 			width 50%
 			min-width:400px;
 			border-bottom 3px solid defaultGreen
-		}
-	}
-	.moreWrap{
+
+
+	.moreWrap
 		margin-top .5rem
-		&:first-of-type{
+		&:first-of-type
 			margin-top 2.5rem
-		}
-	}
-	section.row.container{
+
+
+	section.row.container
 		box-shadow 0 0 3px rgba(black, .5)
-		article{
+		article
 			background-color rgba(white, .8)
 			position relative
 			padding 15px 20px
-			span{
+			span
 				font-style italic
 				margin 0
-			}
-			header{
-				a{
-					&:hover{
+
+			header
+				a
+					&:hover
 						text-decoration underline
-					}
-				}
-				h3{
+
+
+				h3
 					font-size 1.2em
 					font-weight bold
 					margin 0
 					padding 0
-				}
-			}
-			.body{
+
+
+			.body
 				margin-top 1em
-				p{
+				p
 					height auto
 					line-height 25px
 					overflow hidden
-				}
-				a.readMore{
+
+				a.readMore
 					position absolute
 					top 25px
 					right 25px
 					color black
 					font-weight bold
-					&:hover{
+					&:hover
 						text-decoration underline
-					}
-				}
-			}
-			&:nth-child(odd){
+
+
+
+			&:nth-child(odd)
 				background boxColor
 				// border 1px solid defaultBLue
-				h3, p, span{
+				h3, p, span
 					color white
-				}
-				a{
+
+				a
 					color defaultGreen
-				}
-			}
-		}
-	}
-}
 
-section.wrapper {
 
-	.loadContent {
-		header {
+
+
+
+
+section.wrapper
+
+	.loadContent
+		header
 			border-bottom: 2px dotted headerColor
-			h1 {
+			h1
 				text-align left !important
-			}
-		}
-	}
-}
+
+
+
+
 
 .content
 	width 100%
 	height calc(100% - 112px)
 	clear both
-	&:before, &:after{
+	&:before, &:after
 		content: " "; /* 1 */
 		display: table; /* 2 */
-	}
-	&:after{
+
+	&:after
 		clear: both;
-	}
 
 
 
-.buttonWrapper{
-	li{
+
+.buttonWrapper
+	li
 		list-style none
 		display inline
 		margin-right 30px
-		a{
+		a
 			color #ffffff
 			background defaultBLue
 			padding 8px 12px
 			border-radius 5px
 			border 1px solid defaultGreen
-			&:hover{
+			&:hover
 				color defaultGreen
-			}
-		}
-		a::before{
+
+
+		a::before
 			  padding-right 5px
 			  margin-right 5px
 			  border-right 1px dotted white
-		  }
-	}
-}
+
+
+
 
 //Buttony pro file upload
-.field{
-	a{
+.field
+	a
 		color #ffffff
 
-		&:before{
+		&:before
 			margin-bottom 15px
 			size = 25;
 			halfsize = size/2;
@@ -179,15 +179,15 @@ section.wrapper {
 			text-align center
 			background defaultBLue
 
-		}
-		&:hover{
+
+		&:hover
 			color defaultGreen
-		}
-	}
-}
+
+
+
 
 //button styl
-.more{
+.more
 	position relative
 	text-align center
 	width 100%
@@ -196,23 +196,23 @@ section.wrapper {
 	background defaultGreen
 	color white
 	border none
-	span{
+	span
 		height 40px
 		line-height 40px
 		font-size 16px
 		width 100%
 		color white
-	}
-	&.blue:hover{
+
+	&.blue:hover
 		background white
-		span{
+		span
 			color black !important
-		}
-	}
-	&:hover{
+
+
+	&:hover
 		background headerColor
-		span{
+		span
 			color white
-		}
-	}
-}
+
+
+

@@ -1,73 +1,67 @@
-#carousel{
-	padding-top 20px;
-	background transparent
-	a{
-		margin 8px
-		padding 15px
-		float left
-		height 270px
+.actions-wrapper
+	&>a
 		color black
-		border:2px solid black
-		overflow hidden
-		text-overflow ellipsis
+		display block
+		float left
+		&:nth-child(odd)
+			padding 0 10px 20px 0px
+		&:not(:nth-child(odd))
+			padding 0 0 20px 10px
+		@media (max-width:640px)
+			&:nth-child(odd)
+			&:not(:nth-child(odd))
+				padding 0 20px 20px
+
+	.article-item
+		height 300px
 		background-color white
-		-webkit-transition: all 0.3s ease-out;
-		-moz-transition: all 0.3s ease-out;
-		-o-transition: all 0.3s ease-out;
-		transition: all 0.3s ease-out;
-		-webkit-backface-visibility: hidden;
-		-moz-backface-visibility: hidden;
-		-ms-backface-visibility: hidden;
-		backface-visibility: hidden;
-
-		-webkit-perspective: 1000;
-		-moz-perspective: 1000;
-		-ms-perspective: 1000;
-		perspective: 1000;
-		-webkit-transform: translate3d(0, 0, 0);
-		-moz-transform: translate3d(0, 0, 0);
-		-ms-transform: translate3d(0, 0, 0);
-		transform: translate3d(0, 0, 0);
-		&:hover{
-			border-bottom 15px solid defaultBLue
-			border-color defaultBLue
-			-webkit-transition: all 0.3s ease-out;
-			-moz-transition: all 0.3s ease-out;
-			-o-transition: all 0.3s ease-out;
-			transition: all 0.3s ease-out;
-			-webkit-backface-visibility: hidden;
-			-moz-backface-visibility: hidden;
-			-ms-backface-visibility: hidden;
-			backface-visibility: hidden;
-
-			-webkit-perspective: 1000;
-			-moz-perspective: 1000;
-			-ms-perspective: 1000;
-			perspective: 1000;
-			-webkit-transform: translate3d(0, 0, 0);
-			-moz-transform: translate3d(0, 0, 0);
-			-ms-transform: translate3d(0, 0, 0);
-			transform: translate3d(0, 0, 0);
-		}
-		p{
-			height:auto
-			overflow hidden
-			line-height 22px;
-		}
-		header{
+		box-shadow 0 0 5px rgba(black, .4)
+		overflow hidden
+		&> div
+			padding 0 20px 20px
+		header
+			height 70px
+			.date
+			.name
+				float left
+				display inline-block
+				text-align:center
+			.name
+				width calc(100% - 60px)
+				h4
+					line-height 70px
+					height 70px
+					text-overflow ellipsis
+					overflow hidden
+					white-space nowrap
+			.date
+				width 60px
+				height 70px
+				box-shadow 0 0 1px rgba(black, 0.2)
+				.den
+					height 48px
+					line-height 48px
+					background-color white
+					font-size 36px
+					font-weight bold
+				.mesic
+					background-color #a61d1d
+					height 22px
+					line-height 22px
+					font-weight bold
 			margin-bottom 1em
-			h4{
+			h4
 				margin-bottom 0
 				color black
 				font-weight 700
-			}
-			.datum{
+
+			.datum
 				font-style italic
 				font-size 0.7em
 				line-height 0.7em
 				margin 0
-			}
-		}
-	}
-	
-}
+
+
+
+
+

@@ -1,19 +1,19 @@
-.notificationWrapper{
+.notificationWrapper
 	width 100%
 	position fixed
 	z-index 11111
 	top 100px
 	background transparent
-	.notification{
+	.notification
 		position relative
 		padding 5px
 		border 1px solid defaultBLue
 		height 60px
-		p{
+		p
 			padding-left 60px
 			padding-right 30px
 			margin 0
-			&:before{
+			&:before
 				font-size 30pt
 				height 58px
 				line-height 58px
@@ -22,49 +22,49 @@
 				padding-right 10px
 				left 10px
 				top 0
-			}
-		}
-		a{
-			&:before{
+
+
+		a
+			&:before
 				position absolute
 				right 4px
 				top 2px
 				font-size 18pt
-			}
-		}
-		&.msgalert{
-			background orange
-			p:before{
-				border-color black
-			}
-			p,a{
-				color black
-			}
-		}
-		&.msginfo{
-			background deepskyblue
-			p:before{
-				border-color black
-			}
-			p,a{
-				color black
-			}
 
-		}
-		&.msgsuccess{
-			background defaultGreen
-			p,a{
-				color white
-			}
-		}
-		&.msgerror{
-			background #ff0000
-			p:before{
+
+		&.msgalert
+			background orange
+			p:before
 				border-color black
-			}
-			p,a{
+
+			p,a
 				color black
-			}
-		}
-	}
-}
+
+
+		&.msginfo
+			background deepskyblue
+			p:before
+				border-color black
+
+			p,a
+				color black
+
+
+
+		&.msgsuccess
+			background defaultGreen
+			p,a
+				color white
+
+
+		&.msgerror
+			background #ff0000
+			p:before
+				border-color black
+
+			p,a
+				color black
+
+
+
+

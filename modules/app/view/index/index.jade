@@ -1,6 +1,28 @@
 .homepage
-	|{if !empty($reports)}
+	|{if !empty($actions)}
 	section.wrapper
+		.row.container
+			header
+				h3.fi-compass Akce
+				.actions-wrapper.clearfix
+					|{foreach $action in $actions}
+					a.large-6.medium-6.small-12.clearfix(href!='/akce/r/{echo $action->getUrlKey()}')
+						.article-item
+							header
+								.date
+									.den {echo \App\Helper\DateFormater::g2dn($action->getStartDate())}
+									.mesic {echo \App\Helper\DateFormater::g2mn($action->getStartDate())}
+								.name
+									h4 {echo $action->getTitle()}
+							div {echo html_entity_decode($action->getShortBody())}
+					|{/foreach}
+			.moreWrap
+				a(href='/akce')
+					.more
+						span Další akce
+	|{/if}
+	|{if !empty($reports)}
+	section.wrapper.blue
 		.row.container
 			header
 				h3.fi-list Reportáže
@@ -30,7 +52,7 @@
 					span Zobrazit více
 	|{/if}
 	| {if !empty($news)}
-	section.wrapper.blue
+	section.wrapper
 		.row.container
 			header
 				h3.fi-results Novinky
@@ -48,26 +70,6 @@
 					.more.blue
 						span Zobrazit více
 	| {/if}
-	|{if !empty($actions)}
-	section.wrapper
-		.row.container
-			header
-				h3.fi-compass Akce
-			.container-box#wrapper
-				#carousel
-					|{foreach $action in $actions}
-					a.large-4.medium-6.small-12(href!='/akce/r/{echo $action->getUrlKey()}')
-						article
-							header
-								h4 {echo $action->getTitle()}
-								span.datum Kdy: {echo \App\Helper\DateFormater::t2d($action->getStartDate())}
-							div {echo html_entity_decode($action->getShortBody())}
-					|{/foreach}
-			.moreWrap
-				a(href='/akce')
-					.more
-						span Další akce
-	|{/if}
 	|{if !empty($partners)}
 	section.wrapper.blue
 		.row.container

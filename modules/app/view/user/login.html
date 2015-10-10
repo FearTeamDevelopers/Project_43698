@@ -9,9 +9,11 @@
         <form method="POST" action="#">{if isset($account_error)}
           <label class="error fi-alert">{echo $account_error}</label>{/if}
           {echo \App\Helper\FormPrinter::input("email", "email", array(), array("required"=>true, "placeholder" => "Váš@email.cz"))}
-          {if isset($email_error)}<label class="error fi-alert">{echo $email_error}</label>{/if}
+          {if isset($email_error)}
+          <label class="error fi-alert">{echo $email_error}</label>{/if}
           {echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "placeholder" => "Vaše heslo"))}
-          {if isset($password_error)}<label class="error fi-alert">{echo $password_error}</label>{/if}
+          {if isset($password_error)}
+          <label class="error fi-alert">{echo $password_error}</label>{/if}
           <input type="submit" name="submitLogin" value="Přihlásit"/><br/><br/><span>Zaregistrujte se a vytvořte si účet<a href="/registrace">&nbsp;zde</a></span>
           <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
         </form>

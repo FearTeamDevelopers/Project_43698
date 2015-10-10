@@ -1,45 +1,45 @@
-.navWrapper{
+.navWrapper
 	padding 0
 	margin 0
 	height 70px
-	.showMenu{
+	.showMenu
 		display none
-	}
-	nav{
+
+	nav
 		width auto
 		bottom 10px
 		margin 0 auto
 		margin-top:1.5em;
-		ul{
+		ul
 			position relative
 			margin 0 auto
 			text-align center
 			list-style-type: none;
-			li{
+			li
 				display block
 				border 0
 				padding 0 12px
 				position relative
 				display inline
 				border-right 1px solid white
-				&.active{
-					a {
+				&.active
+					a
 						color defaultGreen
-					}
-					ul{
+
+					ul
 						display block
-						li{
-							a{
+						li
+							a
 								color white
-							}
-						}
-					}
-				}
-				&:last-child{
+
+
+
+
+				&:last-child
 					border 0px
 					padding-right 0
-				}
-				ul{
+
+				ul
 					display none
 					position absolute
 					z-index 10
@@ -51,7 +51,7 @@
 					height auto
 					border-bottom-left-radius 5px
 					border-bottom-right-radius 5px
-					li{
+					li
 						float left
 						border 0
 						display block
@@ -60,36 +60,36 @@
 						width 100%
 						margin 0
 						padding 0
-						&:first-child{
+						&:first-child
 							padding-top 10px
-						}
-						a{
+
+						a
 							white-space nowrap
 							font-size 1em
-						}
-					}
-				}
 
-			}
 
-			a{
+
+
+
+
+			a
 				color white
 				font-size 1.2rem
 				z-index 1000
-				&:hover{
+				&:hover
 					color defaultGreen
-				}
-			}
 
-		}
-	}
-}
-@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
-	.navWrapper{
+
+
+
+
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px)
+	.navWrapper
 		height auto
 		position absolute
 		top 138px
-		.showMenu{
+		.showMenu
 			display block
 			width 100%
 			color white
@@ -97,25 +97,25 @@
 			font-size 1.2em
 			padding 0.5em
 			background defaultBLue
-		}
-		nav{
+
+		nav
 			display none
 			margin 0;
-			&:before{
+			&:before
 				content ''
 				display table
-			}
-			&:after{
+
+			&:after
 				content ''
 				display table
 				clear both
-			}
-			ul{
+
+			ul
 				width 100%
 				margin 0
 
 				z-index 10000
-				li{
+				li
 					line-height 1.5
 					width 100%
 					text-align center
@@ -124,7 +124,7 @@
 					background defaultBLue
 					height auto
 
-					ul{
+					ul
 						position relative
 						margin 0
 						padding 0
@@ -132,19 +132,19 @@
 						background defaultGreen
 						top 0
 						left 0
-						li{
+						li
 							background defaultGreen
-							&:first-child{
+							&:first-child
 								padding 0
-							}
+
 							width 100%
-							a{
+							a
 								color defaultBLue
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
+
+
+
+
+
+
+
+

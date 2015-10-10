@@ -1,35 +1,30 @@
 section.wrapper.akce.pb.singlePage
-   header.row
-      h2 akce
-   |{if !empty($actions)}
-   section.row.container
-      |{foreach $action in $actions}
-      article
-         .date
-            .den {echo \App\Helper\DateFormater::g2dn($action->getStartDate())}
-            .mesic {echo \App\Helper\DateFormater::g2mn($action->getStartDate())}
-         header
-            a(href!='/akce/r/{echo $action->getUrlKey()}')
-               h3 {echo $action->getTitle()}
-            span
-                small {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
-         .body
-            div {echo html_entity_decode($action->getShortBody())}
-            |{if $deviceType === 'computer'}
-            a.readMore(href!='/akce/r/{echo $action->getUrlKey()}') čti více
-            |{/if}
-      |{/foreach}
-   |{/if}{else}
-   section.row.container
-      div Žádné akce nejsou naplánované
-   |{/else}
-   .moreWrap.large-2.medium-3.small-6.centerBlock
-      a(href='/probehleakce')
-         .more
-            span Již proběhlé akce
-   .moreWrap.large-2.medium-3.small-6.centerBlock
-      a(href='/archivakci')
-         .more
-            span Archiv akcí
-   br
-   include ../components/pager
+	header.row
+		h2 akce
+	|{if !empty($actions)}
+	section.row.actions-wrapper
+		|{foreach $action in $actions}
+		a.large-6.medium-6.small-12.clearfix(href!='/akce/r/{echo $action->getUrlKey()}')
+			.article-item
+				header
+					.date
+						.den {echo \App\Helper\DateFormater::g2dn($action->getStartDate())}
+						.mesic {echo \App\Helper\DateFormater::g2mn($action->getStartDate())}
+					.name
+						h4 {echo $action->getTitle()}
+				div {echo html_entity_decode($action->getShortBody())}
+		|{/foreach}
+	|{/if}{else}
+	section.row.container
+		div Žádné akce nejsou naplánované
+	|{/else}
+	.moreWrap.large-2.medium-3.small-6.centerBlock
+		a(href='/probehleakce')
+			.more
+				span Již proběhlé akce
+	.moreWrap.large-2.medium-3.small-6.centerBlock
+		a(href='/archivakci')
+			.more
+				span Archiv akcí
+	br
+	include ../components/pager

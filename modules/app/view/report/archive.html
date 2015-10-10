@@ -11,8 +11,7 @@
         <h3>{echo $report->getTitle()}</h3><span> <small>{echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}</small></span>
       </header>
       <div class="body">
-        <div>{echo html_entity_decode($report->getShortBody())}</div>
-        {if $deviceType === 'computer'}<a href="/reportaze/r/{echo $report->getUrlKey()}">čti více</a>{/if}
+        <div>{echo html_entity_decode($report->getShortBody())}</div>{if $deviceType === 'computer'}<a href="/reportaze/r/{echo $report->getUrlKey()}" class="readMore">čti více</a>{/if}
       </div>
     </article>{/foreach}
     {/if}

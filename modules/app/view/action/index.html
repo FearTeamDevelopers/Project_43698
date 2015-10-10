@@ -1,31 +1,31 @@
+
 <section class="wrapper akce pb singlePage">
-    <header class="row">
-        <h2>akce</h2>
-    </header>{if !empty($actions)}
-    <section class="row container">{foreach $action in $actions}
-        <article>
-            <div class="date">
-                <div class="den">{echo \App\Helper\DateFormater::g2dn($action->getStartDate())}</div>
-                <div class="mesic">{echo \App\Helper\DateFormater::g2mn($action->getStartDate())}</div>
-            </div>
-            <header><a href="/akce/r/{echo $action->getUrlKey()}">
-                    <h3>{echo $action->getTitle()}</h3></a><span><small>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</small></span></header>
-            <div class="body">
-                <div>{echo html_entity_decode($action->getShortBody())}</div>
-                {if $deviceType === 'computer'}<a href="/akce/r/{echo $action->getUrlKey()}" class="readMore">čti více</a>{/if}
-            </div>
-        </article>{/foreach}
-    </section>{/if}{else}
-    <section class="row container">
-        <div>Žádné akce nejsou naplánované</div>
-    </section>{/else}
-    <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/probehleakce">
-            <div class="more"><span>Již proběhlé akce</span></div></a></div>
-    <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/archivakci">
-            <div class="more"><span>Archiv akcí</span></div></a></div><br/>{if  $pagecount > 1}
-    <section class="pager row">
-        {if $currentpage !=1}
-        {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
-        {/if}
-    </section>{/if}
+  <header class="row">
+    <h2>akce</h2>
+  </header>{if !empty($actions)}
+  <section class="row actions-wrapper">{foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" class="large-6 medium-6 small-12 clearfix">
+      <div class="article-item">
+        <header>
+          <div class="date">
+            <div class="den">{echo \App\Helper\DateFormater::g2dn($action->getStartDate())}</div>
+            <div class="mesic">{echo \App\Helper\DateFormater::g2mn($action->getStartDate())}</div>
+          </div>
+          <div class="name">
+            <h4>{echo $action->getTitle()}</h4>
+          </div>
+        </header>
+        <div>{echo html_entity_decode($action->getShortBody())}</div>
+      </div></a>{/foreach}</section>{/if}{else}
+  <section class="row container">
+    <div>Žádné akce nejsou naplánované</div>
+  </section>{/else}
+  <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/probehleakce">
+      <div class="more"><span>Již proběhlé akce</span></div></a></div>
+  <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/archivakci">
+      <div class="more"><span>Archiv akcí</span></div></a></div><br/>{if  $pagecount > 1}
+  <section class="pager row">
+    {if $currentpage !=1}
+    {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
+    {/if}
+  </section>{/if}
 </section>

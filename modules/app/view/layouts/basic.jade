@@ -40,18 +40,18 @@ html
         | {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
         title {echo $metatitle}
     body
-        section.wrapper.topPanel.blue
-
-            header.row
-                .small-12.medium-6.large-6.columns
-                    a(href='/')
-                        h1 Hastrman
-                .large-6.small-12.medium-6.centerBlock.searchWrapper
-                    form.fulltextsearch(method='get', action='/hledat')
-                        input(type='text',name='str', title='Pole nemůže být prázdné', placeholder='Prohledat hastrmana...' required).small-10.left
-                        a#hledatHastrman(href='#', title='Hledat').fi-magnifying-glass.left
-                .small-12.medium-12.large-12.columns.navWrapper
-                    include menu.jade
+        section.wrapper.topPanel
+            .bg-container
+                header.row
+                    .small-12.medium-6.large-6.columns
+                        a(href='/')
+                            h1 Hastrman
+                    .large-6.small-12.medium-6.centerBlock.searchWrapper
+                        form.fulltextsearch(method='get', action='/hledat')
+                            input(type='text',name='str', title='Pole nemůže být prázdné', placeholder='Prohledat hastrmana...' required).small-10.left
+                            a#hledatHastrman(href='#', title='Hledat').fi-magnifying-glass.left
+                    .small-12.medium-12.large-12.columns.navWrapper
+                        include menu.jade
         include ../components/notification
         .content
             | {yield action}
@@ -71,9 +71,8 @@ html
         a(href="/feedback").fi-comment.feedback Pošlete nám feedback
         #loader
             img(src="/public/images/loaders/loader6.gif")
-            Nahrávám...
-        //
-          JS scripts
+            | Nahrávám...
+        // JS scripts
         script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
         script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')
         script(type='text/javascript', src='/public/js/plugins/modernizr.js')
@@ -89,8 +88,7 @@ html
         |{/if}
         script(type='text/javascript', src='/public/js/custom/build/generalApp.js')
         |{if $env == "live"}
-        //
-            Piwik
+        // Piwik
         script(type="text/javascript").
           var _paq = _paq || [];
           _paq.push(["trackPageView"]);
@@ -104,8 +102,6 @@ html
           })();
         noscript
             p: img( src="//piwik.hastrman.cz/piwik.php?idsite=1" style="border:0;" alt="")
-        //
-            End Piwik Code
+        // End Piwik Code
         |{/if}
-        //
-          End JS scripts
+        // End JS scripts

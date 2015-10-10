@@ -1,6 +1,29 @@
 
-<div class="homepage">{if !empty($reports)}
+<div class="homepage">{if !empty($actions)}
   <section class="wrapper">
+    <div class="row container">
+      <header>
+        <h3 class="fi-compass">Akce</h3>
+        <div class="actions-wrapper clearfix">{foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" class="large-6 medium-6 small-12 clearfix">
+            <div class="article-item">
+              <header>
+                <div class="date">
+                  <div class="den">{echo \App\Helper\DateFormater::g2dn($action->getStartDate())}</div>
+                  <div class="mesic">{echo \App\Helper\DateFormater::g2mn($action->getStartDate())}</div>
+                </div>
+                <div class="name">
+                  <h4>{echo $action->getTitle()}</h4>
+                </div>
+              </header>
+              <div>{echo html_entity_decode($action->getShortBody())}</div>
+            </div></a>{/foreach}</div>
+      </header>
+      <div class="moreWrap"><a href="/akce">
+          <div class="more"><span>Další akce</span></div></a></div>
+    </div>
+  </section>{/if}
+  {if !empty($reports)}
+  <section class="wrapper blue">
     <div class="row container">
       <header>
         <h3 class="fi-list">Reportáže</h3>
@@ -22,7 +45,7 @@
         <div class="more"><span>Zobrazit více</span></div></a></div>
   </section>{/if}
   {if !empty($news)}
-  <section class="wrapper blue">
+  <section class="wrapper">
     <div class="row container">
       <header>
         <h3 class="fi-results">Novinky</h3>
@@ -38,25 +61,6 @@
       </div>
       <div class="moreWrap"><a href="/novinky">
           <div class="more blue"><span>Zobrazit více</span></div></a></div>
-    </div>
-  </section>{/if}
-  {if !empty($actions)}
-  <section class="wrapper">
-    <div class="row container">
-      <header>
-        <h3 class="fi-compass">Akce</h3>
-      </header>
-      <div id="wrapper" class="container-box">
-        <div id="carousel">{foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" class="large-4 medium-6 small-12">
-            <article>
-              <header>
-                <h4>{echo $action->getTitle()}</h4><span class="datum">Kdy: {echo \App\Helper\DateFormater::t2d($action->getStartDate())}</span>
-              </header>
-              <div>{echo html_entity_decode($action->getShortBody())}</div>
-            </article></a>{/foreach}</div>
-      </div>
-      <div class="moreWrap"><a href="/akce">
-          <div class="more"><span>Další akce</span></div></a></div>
     </div>
   </section>{/if}
   {if !empty($partners)}
