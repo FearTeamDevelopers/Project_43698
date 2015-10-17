@@ -5,7 +5,7 @@ namespace THCFrame\Security\Authentication;
 use THCFrame\Security\Authentication\Authentication;
 use THCFrame\Security\Authentication\AuthenticationInterface;
 use THCFrame\Security\Exception;
-use THCFrame\Security\Model\BasicUser;
+use THCFrame\Security\Model\BasicUserModel;
 use THCFrame\Security\PasswordManager;
 use THCFrame\Core\Core;
 use THCFrame\Request\RequestMethods;
@@ -143,7 +143,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
         $passVerify = PasswordManager::validatePassword($pass, $user->getPassword(), $user->getSalt());
 
         if ($passVerify === true) {
-            if ($user instanceof BasicUser) {
+            if ($user instanceof BasicUserModel) {
                 if (!$user->isActive()) {
                     throw new Exception\UserInactive();
                 } elseif ($user->isAccountExpired()) {
@@ -179,7 +179,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      * @param string $user    User object
      * @return boolean      Returns True if brute-force is detected. False otherwise
      */
-    protected function isBruteForce(BasicUser $user)
+    protected function isBruteForce(BasicUserModel $user)
     {
         $currentTime = time();
 

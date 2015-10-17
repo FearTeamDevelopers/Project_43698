@@ -2,120 +2,16 @@
 
 namespace Admin\Model;
 
-use THCFrame\Model\Model;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
+use Admin\Model\Basic\BasicEmailModel;
 
 /**
  * Email template ORM class.
  */
-class EmailModel extends Model
+class EmailModel extends BasicEmailModel
 {
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_active;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate alphanumeric, max(150)
-     * @label nazev
-     */
-    protected $_title;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 200
-     * @unique
-     * 
-     * @validate required, alphanumeric, max(200)
-     * @label url key
-     */
-    protected $_urlKey;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 200
-     * 
-     * @validate alphanumeric, max(200)
-     * @label subject
-     */
-    protected $_subject;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate html
-     * @label text
-     */
-    protected $_body;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate html
-     * @label text
-     */
-    protected $_bodyEn;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * 
-     * @validate numeric, max(2)
-     * @label type
-     */
-    protected $_type;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_modified;
 
     /**
      * @readwrite

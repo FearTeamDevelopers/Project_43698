@@ -2,8 +2,10 @@
 <section class="wrapper akce pb singlePage">
   <header class="row">
     <h2>akce</h2>
-  </header>{if !empty($actions)}
-  <section class="row actions-wrapper">{foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" class="large-6 medium-6 small-12 clearfix">
+  </header>
+  <section class="row actions-wrapper">
+    {if !empty($actions)}
+    {foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" class="large-6 medium-6 small-12 clearfix">
       <div class="article-item">
         <header>
           <div class="date">
@@ -15,13 +17,15 @@
           </div>
         </header>
         <div>{echo html_entity_decode($action->getShortBody())}</div>
-      </div></a>{/foreach}</section>{/if}{else}
-  <section class="row container">
-    <div>Žádné akce nejsou naplánované</div>
-  </section>{/else}
-  <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/probehleakce">
+      </div></a>{/foreach}
+    {/if}{else}
+    <div class="large-12 medium-12 small-12 columns">
+      <h2>Žádné akce nejsou naplánované</h2>
+    </div>{/else}
+  </section>
+  <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/probehle-akce">
       <div class="more"><span>Již proběhlé akce</span></div></a></div>
-  <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/archivakci">
+  <div class="moreWrap large-2 medium-3 small-6 centerBlock"><a href="/archiv-akci">
       <div class="more"><span>Archiv akcí</span></div></a></div><br/>{if  $pagecount > 1}
   <section class="pager row">
     {if $currentpage !=1}

@@ -1,8 +1,8 @@
 section.wrapper.akce.pb.singlePage
 	header.row
 		h2 akce
-	|{if !empty($actions)}
 	section.row.actions-wrapper
+		|{if !empty($actions)}
 		|{foreach $action in $actions}
 		a.large-6.medium-6.small-12.clearfix(href!='/akce/r/{echo $action->getUrlKey()}')
 			.article-item
@@ -14,16 +14,16 @@ section.wrapper.akce.pb.singlePage
 						h4 {echo $action->getTitle()}
 				div {echo html_entity_decode($action->getShortBody())}
 		|{/foreach}
-	|{/if}{else}
-	section.row.container
-		div Žádné akce nejsou naplánované
-	|{/else}
+		|{/if}{else}
+		.large-12.medium-12.small-12.columns
+			h2 Žádné akce nejsou naplánované
+		|{/else}
 	.moreWrap.large-2.medium-3.small-6.centerBlock
-		a(href='/probehleakce')
+		a(href='/probehle-akce')
 			.more
 				span Již proběhlé akce
 	.moreWrap.large-2.medium-3.small-6.centerBlock
-		a(href='/archivakci')
+		a(href='/archiv-akci')
 			.more
 				span Archiv akcí
 	br

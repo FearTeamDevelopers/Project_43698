@@ -111,7 +111,7 @@ class ActionController extends Controller
             $authUserAttendance = \App\Model\AttendanceModel::fetchTypeByUserAndAction($this->getUser()->getId(), $action->getId());
             $attendance = \App\Model\AttendanceModel::fetchUsersByActionIdSimpleArr($action->getId());
             $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
-            
+
             $view->set('action', $action)
                 ->set('newcomment', null)
                 ->set('comments', $comments)
@@ -173,9 +173,9 @@ class ActionController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/archivakci';
+            $canonical = 'http://'.$this->getServerHost().'/archiv-akci';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/archivakci/p/'.$page;
+            $canonical = 'http://'.$this->getServerHost().'/archiv-akci/p/'.$page;
         }
 
         $actions = \App\Model\ActionModel::fetchArchivatedWithLimit($articlesPerPage, $page);
@@ -188,10 +188,10 @@ class ActionController extends Controller
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($actionsPageCount, $page, '/archivakci/p/');
+        $this->_pagerMetaLinks($actionsPageCount, $page, '/archiv-akci/p/');
 
         $view->set('actions', $actions)
-                ->set('pagerpathprefix', '/archivakci')
+                ->set('pagerpathprefix', '/archiv-akci')
                 ->set('currentpage', $page)
                 ->set('pagecount', $actionsPageCount);
 
@@ -216,9 +216,9 @@ class ActionController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/probehleakce';
+            $canonical = 'http://'.$this->getServerHost().'/probehle-akce';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/probehleakce/p/'.$page;
+            $canonical = 'http://'.$this->getServerHost().'/probehle-akce/p/'.$page;
         }
 
         $actions = \App\Model\ActionModel::fetchOldWithLimit($articlesPerPage, $page);
@@ -232,10 +232,10 @@ class ActionController extends Controller
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($actionsPageCount, $page, '/probehleakce/p/');
+        $this->_pagerMetaLinks($actionsPageCount, $page, '/probehle-akce/p/');
 
         $view->set('actions', $actions)
-                ->set('pagerpathprefix', '/probehleakce')
+                ->set('pagerpathprefix', '/probehle-akce')
                 ->set('currentpage', $page)
                 ->set('pagecount', $actionsPageCount);
 
@@ -275,6 +275,7 @@ class ActionController extends Controller
     public function attendance($actionId, $type)
     {
         $this->_disableView();
+        $view = $this->getActionView();
 
         if ($type != \App\Model\AttendanceModel::ACCEPT &&
                 $type != \App\Model\AttendanceModel::REJECT &&
@@ -302,6 +303,7 @@ class ActionController extends Controller
                 $attendance->save();
                 $this->getCache()->invalidate();
 
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
                 Event::fire('app.log', array('success', 'Attendance - '.$type.' - action '.$action->getId().' by user: '.$this->getUser()->getId()));
                 echo 'active';
             } else {

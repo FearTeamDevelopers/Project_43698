@@ -18,7 +18,7 @@ class CSRF
      * @var string 
      */
     protected static $_tokenname = 'csrf';
-    
+
     /**
      * Session object
      * 
@@ -27,20 +27,9 @@ class CSRF
     private $_session;
 
     /**
-     * Generates a new token value and saves it in session
-     */
-    private function setToken()
-    {
-        if ($this->getToken() === false) {
-            $token = Rand::randStr(32);
-            $this->writeTokenToSession($token);
-        }
-    }
-
-    /**
      * Writes token to session
      */
-    private function writeTokenToSession($token)
+    private function _writeTokenToSession($token)
     {
         $this->_session->set(self::$_tokenname, $token);
     }
@@ -48,13 +37,13 @@ class CSRF
     /**
      * Refresh token stored in session
      */
-    private function refreshToken()
+    private function _refreshToken()
     {
         $this->_session->erase(self::$_tokenname);
 
         $this->setToken();
     }
-    
+
     /**
      * 
      * @param string $tokenname
@@ -62,7 +51,7 @@ class CSRF
     public function __construct($tokenname = 'csrf')
     {
         self::$_tokenname = $tokenname;
-        
+
         $this->_session = Registry::get('session');
         $this->setToken();
     }
@@ -96,7 +85,7 @@ class CSRF
     {
         $checkPost = RequestMethods::issetpost(self::$_tokenname) && $this->isValidToken(RequestMethods::post(self::$_tokenname));
         $checkGet = RequestMethods::issetget(self::$_tokenname) && $this->isValidToken(RequestMethods::get(self::$_tokenname));
-        $this->refreshToken();
+        $this->_refreshToken();
 
         if ($checkGet || $checkPost) {
             return true;
@@ -118,7 +107,18 @@ class CSRF
             return false;
         }
     }
-    
+
+    /**
+     * Generates a new token value and saves it in session
+     */
+    public function setToken()
+    {
+        if ($this->getToken() === false) {
+            $token = Rand::randStr(32);
+            $this->_writeTokenToSession($token);
+        }
+    }
+
     /**
      * Return tokenname
      * 
@@ -128,6 +128,5 @@ class CSRF
     {
         return self::$_tokenname;
     }
-    
 
 }

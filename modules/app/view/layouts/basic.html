@@ -2,7 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8">{if $env == "dev"}
-    <meta http-equiv="Cache-control" content="no-store">{/if}
+    <meta http-equiv="Cache-control" content="no-store">{/if}{else}
+    <meta http-equiv="Cache-control" content="public">{/else}
     <meta name="viewport" content="width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0">
     <meta name="description" content="{echo $metadescription}">
     <meta name="author" content="Tomas Hodan, Tomas Slama">
@@ -124,7 +125,8 @@
         <p class="fi-info">{echo $longFlashMessage}</p></p>
       </div>{/if}
     </div>
-    <div class="content">{yield action}
+    <div class="content">
+      <div id="loader"><img src="/public/images/loaders/loader6.gif">Nahrávám...</div>{yield action}
       <footer id="kontakty" class="wrapper blue">
         <div class="row container">
           <header>
@@ -144,8 +146,7 @@
     </div>
     <div id="dialog" title="Chcete pokračovat?">
       <p></p>
-    </div>{if $showfeedback}<a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>
-    <div id="loader"><img src="/public/images/loaders/loader6.gif">Nahrávám...</div>
+    </div>{if $showfeedback}<a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>{/if}
     <!-- JS scripts-->
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>

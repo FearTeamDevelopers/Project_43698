@@ -9,7 +9,7 @@ use THCFrame\Security\Exception;
 use THCFrame\Security\SecurityInterface;
 use THCFrame\Security\CSRF;
 use THCFrame\Security\PasswordManager;
-use THCFrame\Security\Model\BasicUser;
+use THCFrame\Security\Model\BasicUserModel;
 
 /**
  * Security context class. Wrapper for authentication and authorization methods
@@ -52,7 +52,7 @@ class Security extends Base implements SecurityInterface
     /**
      * Authenticated user object
      * @readwrite
-     * @var \THCFrame\Security\Model\BasicUser or null
+     * @var \THCFrame\Security\Model\BasicUserModel or null
      */
     protected $_user = null;
 
@@ -89,7 +89,7 @@ class Security extends Base implements SecurityInterface
         $authorization = new Authorization\Authorization();
         $this->_authorization = $authorization->initialize($configuration);
 
-        if ($user instanceof BasicUser) {
+        if ($user instanceof BasicUserModel) {
             $this->_user = $user;
             Event::fire('framework.security.initialize.user', array($user));
         }
@@ -101,10 +101,10 @@ class Security extends Base implements SecurityInterface
 
     /**
      * 
-     * @param BasicUser $user
+     * @param BasicUserModel $user
      * @return type
      */
-    public function setUser(BasicUser $user)
+    public function setUser(BasicUserModel $user)
     {
         @session_regenerate_id();
         $user->password = null;
@@ -158,7 +158,7 @@ class Security extends Base implements SecurityInterface
                 ->erase('lastActive')
                 ->erase('csrf');
         
-        BasicUser::deleteAuthenticationToken();
+        BasicUserModel::deleteAuthenticationToken();
 
         $this->_user = NULL;
         @session_regenerate_id();

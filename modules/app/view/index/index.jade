@@ -51,25 +51,25 @@
 				.more
 					span Zobrazit více
 	|{/if}
-	| {if !empty($news)}
+	|{if !empty($news)}
 	section.wrapper
 		.row.container
 			header
 				h3.fi-results Novinky
 			.container-box
-				| {foreach $new in $news}
+				|{foreach $new in $news}
 				.large-6.medium-6.small-12.columns
 					article.indexNew.fi-paperclip
 						header
 							a(href!='/novinky/r/{echo $new->getUrlKey()}')
 								h4 {echo $new->getTitle()}
 						div {echo html_entity_decode($new->getShortBody())}
-				| {/foreach}
+				|{/foreach}
 			.moreWrap
 				a(href='/novinky')
 					.more.blue
 						span Zobrazit více
-	| {/if}
+	|{/if}
 	|{if !empty($partners)}
 	section.wrapper.blue
 		.row.container

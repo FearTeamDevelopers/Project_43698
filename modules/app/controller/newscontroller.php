@@ -103,9 +103,9 @@ class NewsController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/archivnovinek';
+            $canonical = 'http://'.$this->getServerHost().'/archiv-novinek';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/archivnovinek/p/'.$page;
+            $canonical = 'http://'.$this->getServerHost().'/archiv-novinek/p/'.$page;
         }
 
         $content = $this->getCache()->get('news-arch-'.$page);
@@ -125,11 +125,11 @@ class NewsController extends Controller
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($newsPageCount, $page, '/archivnovinek/p/');
+        $this->_pagerMetaLinks($newsPageCount, $page, '/archiv-novinek/p/');
 
         $view->set('news', $news)
                 ->set('currentpage', $page)
-                ->set('pagerpathprefix', '/archivnovinek')
+                ->set('pagerpathprefix', '/archiv-novinek')
                 ->set('pagecount', $newsPageCount);
 
         $layoutView->set('canonical', $canonical)

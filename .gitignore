@@ -3,7 +3,6 @@
 /application/configuration/maindb.sql
 /application/configuration/searchdb.sql
 /application/configuration/update.sql
-/application/configuration/dev.sql
 /application/configuration/oldToNewDb.sql
 /application/logs/
 /public/uploads/
@@ -16,7 +15,6 @@
 /public/js/plugins/filemanager/files/
 /prepros.cfg
 /node_modules/
-/gulpfile.js
 /hastrman.sublime-project
 /hastrman.sublime-workspace
 /googlef731e53ddaa1ca37.html

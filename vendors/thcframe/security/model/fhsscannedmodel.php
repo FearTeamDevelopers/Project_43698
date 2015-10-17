@@ -17,6 +17,7 @@ class FhsScannedModel extends Model
      * @readwrite
      * @primary
      * @type auto_increment
+     * @unsigned
      */
     protected $_id;
 
@@ -24,8 +25,10 @@ class FhsScannedModel extends Model
      * @column
      * @readwrite
      * @type integer
+     * @length 10
+     * @unsigned
      * 
-     * @validate numeric, max(9)
+     * @validate numeric, max(10)
      * @label changes
      */
     protected $_changes;
@@ -33,10 +36,12 @@ class FhsScannedModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      * @label scanned
      */
     protected $_scanned;
@@ -44,7 +49,7 @@ class FhsScannedModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 20
      * 
      * @validate alphanumeric, max(20)
@@ -55,20 +60,24 @@ class FhsScannedModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      */
     protected $_created;
 
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      */
     protected $_modified;
 

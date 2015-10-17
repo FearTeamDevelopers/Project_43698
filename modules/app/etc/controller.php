@@ -156,6 +156,7 @@ class Controller extends BaseController
     {
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
+        header('Content-Type: text/html; charset=utf-8');
     }
 
     /**

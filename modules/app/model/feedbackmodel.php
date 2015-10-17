@@ -2,67 +2,18 @@
 
 namespace App\Model;
 
-use THCFrame\Model\Model;
+use App\Model\Basic\BasicFeedbackModel;
 
 /**
  * 
  */
-class FeedbackModel extends Model
+class FeedbackModel extends BasicFeedbackModel
 {
+
     /**
      * @readwrite
      */
     protected $_alias = 'fb';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 80
-     * 
-     * @validate alphanumeric, max(80)
-     * @label alias autora
-     */
-    protected $_userAlias;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, alphanumeric
-     * @label text
-     */
-    protected $_message;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_modified;
 
     /**
      * 
@@ -77,4 +28,5 @@ class FeedbackModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
+
 }

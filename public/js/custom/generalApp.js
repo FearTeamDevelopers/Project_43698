@@ -28,8 +28,6 @@ jQuery(document).ready(function ($) {
     });
 
     jQuery(window).load(function () {
-        jQuery('#loader, .loader').hide();
-
         jQuery.post('/app/system/showprofiler/', function (msg) {
             jQuery('body').append(msg);
         });
@@ -79,7 +77,7 @@ jQuery(document).ready(function ($) {
     if (jQuery('.notificationWrapper .notification').is(':visible')) {
         setTimeout(function () {
             jQuery('.notificationWrapper .notification').hide("slow");
-        }, 5000);
+        }, 3000);
     }
 
     /* GLOBAL SCRIPTS */

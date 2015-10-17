@@ -304,10 +304,10 @@ class IndexController extends Controller
             $articlesXml = '';
             $pageContentXml = "<url><loc>http://{$host}</loc></url>".PHP_EOL
                     ."<url><loc>http://{$host}/akce</loc></url>"
-                    ."<url><loc>http://{$host}/probehleakce</loc></url>"
-                    ."<url><loc>http://{$host}/archivakci</loc></url>"
-                    ."<url><loc>http://{$host}/archivnovinek</loc></url>"
-                    ."<url><loc>http://{$host}/archivreportazi</loc></url>"
+                    ."<url><loc>http://{$host}/probehle-akce</loc></url>"
+                    ."<url><loc>http://{$host}/archiv-akci</loc></url>"
+                    ."<url><loc>http://{$host}/archiv-novinek</loc></url>"
+                    ."<url><loc>http://{$host}/archiv-reportazi</loc></url>"
                     ."<url><loc>http://{$host}/reportaze</loc></url>"
                     ."<url><loc>http://{$host}/novinky</loc></url>"
                     ."<url><loc>http://{$host}/galerie</loc></url>"
@@ -388,13 +388,14 @@ class IndexController extends Controller
     }
     
     /**
+     * Run File hash scan
      * 
+     * @before _cron
      */
     public function filehashscan()
     {
         $this->_disableView();
         $scanner = new \THCFrame\Security\FileHashScanner\Scanner();
-        
         
         $scanner->scan();
         Event::fire('cron.log', array('success', 'File hash checked'));

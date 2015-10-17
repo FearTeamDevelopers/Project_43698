@@ -2,14 +2,16 @@ doctype html
 html
     head
         meta(charset='UTF-8')
-        | {if $env == "dev"}
+        |{if $env == "dev"}
         meta(http-equiv='Cache-control', content='no-store')
-        | {/if}
+        |{/if}{else}
+        meta(http-equiv='Cache-control', content='public')
+        |{/else}
         meta(name='viewport', content='width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0')
         meta(name='description', content='{echo $metadescription}')
         meta(name='author', content='Tomas Hodan, Tomas Slama')
         meta(name='robots', content='{echo $metarobots}')
-        | {if isset($article)}
+        |{if isset($article)}
         <meta property="og:title" content="{echo $metatitle}" />
         <meta property="og:type" content="{echo $metaogtype}" />
         <meta property="og:url" content="{echo $metaogurl}" />
@@ -18,14 +20,14 @@ html
         <meta property="og:site_name" content="{echo $metaogsitename}" />
         <meta property="article:published_time" content="{echo $articlecreated}" />
         <meta property="article:modified_time" content="{echo $articlemodified}" />
-        | {/if}{else}
+        |{/if}{else}
         <meta property="og:url" content="{echo $metaogurl}" />
         <meta property="og:title" content="{echo $metatitle}" />
         <meta property="og:description" content="{echo $metadescription}" />
         <meta property="og:type" content="{echo $metaogtype}" />
         <meta property="og:site_name" content="{echo $metaogsitename}" />
         <meta property="og:image" content="{echo $metaogimage}" />
-        | {/else}
+        |{/else}
 
         link(href='/public/css/custom/reset.css', media='screen', rel='stylesheet', type='text/css')
         link(href='/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css', media='screen', rel='stylesheet', type='text/css')
@@ -35,9 +37,9 @@ html
         link(href='/public/css/custom/styles.css', media='screen', rel='stylesheet', type='text/css')
         link(href='http://fonts.googleapis.com/css?family=Ubuntu:400,700', rel='stylesheet', type='text/css')
 
-        | {if isset($canonical)}<link rel="canonical" href="{echo $canonical}">{/if}
-        | {if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
-        | {if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
+        |{if isset($canonical)}<link rel="canonical" href="{echo $canonical}">{/if}
+        |{if isset($pagedprev) && $pagedprev != 0}<link rel="prev" href="{echo $pagedprevlink}">{/if}
+        |{if isset($pagednext) && $pagednext != 0}<link rel="next" href="{echo $pagednextlink}">{/if}
         title {echo $metatitle}
     body
         section.wrapper.topPanel
@@ -54,7 +56,10 @@ html
                         include menu.jade
         include ../components/notification
         .content
-            | {yield action}
+            #loader
+                img(src="/public/images/loaders/loader6.gif")
+                | Nahrávám...
+            |{yield action}
             footer.wrapper.blue#kontakty
                 .row.container
                     header
@@ -69,9 +74,7 @@ html
             p
         |{if $showfeedback}
         a(href="/feedback").fi-comment.feedback Pošlete nám feedback
-        #loader
-            img(src="/public/images/loaders/loader6.gif")
-            | Nahrávám...
+        |{/if}
         // JS scripts
         script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
         script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')

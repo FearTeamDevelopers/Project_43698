@@ -744,6 +744,7 @@ class AdvertisementController extends Controller
     public function extendAdExpiration($uniqueKey)
     {
         $this->_disableView();
+        $view = $this->getActionView();
 
         $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
 
@@ -754,9 +755,11 @@ class AdvertisementController extends Controller
 
             if ($ad->validate()) {
                 $ad->save();
+                $view->successMessage($this->lang('ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS'));
                 Event::fire('app.log', array('success', 'Ad id: '.$ad->getId()));
                 echo 'success';
             } else {
+                $view->errorMessage($this->lang('COMMON_FAIL'));
                 Event::fire('app.log', array('fail', 'Ad id: '.$ad->getId(),
                     'Errors: '.json_encode($ad->getErrors()), ));
                 echo $this->lang('COMMON_FAIL');
@@ -812,6 +815,7 @@ class AdvertisementController extends Controller
     public function setNewMainPhoto($adId, $photoId)
     {
         $this->_disableView();
+        $view = $this->getActionView();
         
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int)$adId));
         
@@ -827,6 +831,7 @@ class AdvertisementController extends Controller
 
                 if ($ad->validate()) {
                     $ad->save();
+                    $view->successMessage($this->lang('UPDATE_SUCCESS'));
                     Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId().' new main photo: '.$photoId));
                     echo 'active';
                 } else {
@@ -847,6 +852,7 @@ class AdvertisementController extends Controller
     public function setStateToSold($uniqueKey)
     {
         $this->_disableView();
+        $view = $this->getActionView();
 
         $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
 
@@ -857,6 +863,7 @@ class AdvertisementController extends Controller
 
             if ($ad->validate()) {
                 $ad->save();
+                $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 Event::fire('app.log', array('success', 'Set state to sold for Ad id: '.$ad->getId()));
                 echo 'success';
             } else {

@@ -18,25 +18,25 @@ section.wrapper.pridatInzerat.singlePage
                         span Sekce
                     td
                         select(name="section")
-                            | {foreach $section in $adsections}
-                            | {if isset($ad) && $ad->getSectionId() == $section->getId()}
+                            |{foreach $section in $adsections}
+                            |{if isset($ad) && $ad->getSectionId() == $section->getId()}
                             option(value!="{echo $section->getId()}", selected) {echo $section->getTitle()}
-                            | {/if}{else}
+                            |{/if}{else}
                             option(value!="{echo $section->getId()}") {echo $section->getTitle()}
-                            | {/else}
-                            | {/foreach}
+                            |{/else}
+                            |{/foreach}
                 tr
                     td
                         span Typ
                     td
                         select(name="type")
-                            | {if isset($ad) && $ad->getAdType() == "demand"}
+                            |{if isset($ad) && $ad->getAdType() == "demand"}
                             option(value="tender") Nabídka
                             option(value="demand", selected) Poptávka
-                            | {/if}{else}
+                            |{/if}{else}
                             option(value="tender", selected) Nabídka
                             option(value="demand") Poptávka
-                            | {/else}
+                            |{/else}
                 tr
                     td
                         span Obsah
@@ -45,7 +45,7 @@ section.wrapper.pridatInzerat.singlePage
                         label.error {echo join("<br/>", $errors["content"])}
                         |{/if}
                         textarea(name="content", required, rows=8) {echo \App\Helper\FormPrinter::iset($ad,"content")}
-                tr
+                tr#anchor
                     td
                         span Klíčová slova
                     td
@@ -72,8 +72,8 @@ section.wrapper.pridatInzerat.singlePage
                             span K inzerátu mohou být připojeny maximálně 3 fotky
                             br
                             span.field
-                                a(href="#").multi_upload.fi-plus.mh10
-                                a(href="#").multi_upload_dec.fi-minus.mh10
+                                a(href="#anchor").multi_upload.fi-plus.mh10
+                                a(href="#anchor").multi_upload_dec.fi-minus.mh10
                             span.field.file_inputs
                                 input(type="file", name="uploadfile[]", accept="image/*")
                 tr

@@ -42,10 +42,10 @@ section.wrapper.profil.singlePage
                   td
                      span Jméno:
                   td
-                     | {if isset($errors["firstname"])}
+                     |{if isset($errors["firstname"])}
                      label.error.fi-alert
-                        | {echo join("<br/>", $errors["firstname"])}
-                     | {/if}
+                        |{echo join("<br/>", $errors["firstname"])}
+                     |{/if}
                      |{echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true))}
                tr
                   td
@@ -70,23 +70,23 @@ section.wrapper.profil.singlePage
                      span Informace na email:
                   td
                      label
-                        | {if $user->getNewActionNotification}
+                        |{if $user->getNewActionNotification}
                         input(type="checkbox",name="actionNotification",value="1", checked="checked")
                         | Informace o nových akcích
-                        | {/if}
-                        | {else}
+                        |{/if}
+                        |{else}
                         input(type="checkbox",name="actionNotification",value="1")
                         | Informace o nových akcích
-                        | {/else}
+                        |{/else}
                      label
-                        | {if $user->getNewReportNotification}
+                        |{if $user->getNewReportNotification}
                         input(type="checkbox",name="reportNotification",value="1", checked="checked")
                         | Informace o nových reportážích
-                        | {/if}
-                        | {else}
+                        |{/if}
+                        |{else}
                         input(type="checkbox",name="reportNotification",value="1")
                         | Informace o nových reportážích
-                        | {/else}
+                        |{/else}
                      label
                tr
                   td

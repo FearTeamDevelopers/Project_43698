@@ -24,13 +24,14 @@ class SearchIndexLogModel extends Model
      * @readwrite
      * @primary
      * @type auto_increment
+     * @unsigned
      */
     protected $_id;
 
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 100
      * 
      * @validate alpha, max(100)
@@ -41,7 +42,7 @@ class SearchIndexLogModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 100
      * 
      * @validate alpha, max(100)
@@ -52,7 +53,7 @@ class SearchIndexLogModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 100
      * 
      * @validate alphanumeric, max(100)
@@ -63,17 +64,20 @@ class SearchIndexLogModel extends Model
     /**
      * @column
      * @readwrite
-     * @type boolean
      * @index
+     * @type tinyint
+     * @length 1
      * 
-     * @validate max(3)
+     * @default 0
+     * @validate max(1)
      */
     protected $_isManualIndex;
 
     /**
      * @column
      * @readwrite
-     * @type integer
+     * @type smallint
+     * @unsigned
      * 
      * @validate numeric, max(8)
      * @label words count
@@ -83,20 +87,24 @@ class SearchIndexLogModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      */
     protected $_created;
 
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      */
     protected $_modified;
 

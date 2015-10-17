@@ -15,6 +15,10 @@ section.wrapper.novinky.singlePage
                 |{if $deviceType === 'computer'}
                 a.readMore(href!='/novinky/r/{echo $new->getUrlKey()}') čti více
                 |{/if}
-        | {/foreach}
+        |{/foreach}
         |{/if}
+        |{/if}{else}
+        .large-12.medium-12.small-12.columns
+            h2 Žádné novinky v archivu nejsou
+        |{/else}
     include ../components/pager

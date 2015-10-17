@@ -25,18 +25,18 @@ section.wrapper.blue.filter
          select(name='bfsection')
             |{if isset($bfsection)}
             option(value='0') Sekce
-            | {foreach $ad in $adsections}
+            |{foreach $ad in $adsections}
             |{if $ad->urlKey == $bfsection}
             option(value!='{echo $ad->getUrlKey()}', selected) {echo $ad->getTitle()}
             |{/if}{else}
             option(value!='{echo $ad->getUrlKey()}') {echo $ad->getTitle()}
             |{/else}
-            | {/foreach}
+            |{/foreach}
             |{/if}{else}
             option(value='0') Sekce
-            | {foreach $ad in $adsections}
+            |{foreach $ad in $adsections}
             option(value!='{echo $ad->getUrlKey()}') {echo $ad->getTitle()}
-            | {/foreach}
+            |{/foreach}
             |{/else}
          input(type='submit' value='Zobrazit')
          |{if isset($bftype)}

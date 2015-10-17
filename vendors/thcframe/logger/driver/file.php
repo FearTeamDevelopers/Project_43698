@@ -41,7 +41,7 @@ class File extends Logger\Driver
         }
 
         $date = date('Y-m-d', strtotime('-90 days'));
-        $this->deleteOldLogs($date);
+        $this->_deleteOldLogs($date);
     }
 
     /**
@@ -49,7 +49,7 @@ class File extends Logger\Driver
      * 
      * @param string $olderThan   date yyyy-mm-dd
      */
-    private function deleteOldLogs($olderThan)
+    private function _deleteOldLogs($olderThan)
     {
         if (!is_dir($this->path)) {
             return;
@@ -83,37 +83,39 @@ class File extends Logger\Driver
      * Save log message into file
      * 
      * @param string $message
-     * @param mixed $flag
-     * @param boolean $prependTime
-     * @param string $file
+     * @param type $type
+     * @param type $prependInfo
+     * @param type $file
      */
-    public function log($message, $type = 'error', $prependTime = true, $file = null)
+    public function log($message, $type = 'error', $prependInfo = true, $file = null)
     {
-        if ($prependTime) {
+        if ($prependInfo) {
             $time = '[' . date('Y-m-d H:i:s') . '] ';
-        }else{
-            $time = '';
-        }
-        
-        $userName = '(annonymous) - ';
-        $sec = Registry::get('security');
-        if (isset($sec)) {
-            $user = $sec->getUser();
 
-            if ($user !== null) {
-                $userName = '(' . $user->getWholeName() . ' - ' . $user->getId() . ') - ';
+            $userName = '(annonymous) - ';
+            $sec = Registry::get('security');
+            if (isset($sec)) {
+                $user = $sec->getUser();
+
+                if ($user !== null) {
+                    $userName = '(' . $user->getWholeName() . ' - ' . $user->getId() . ') - ';
+                }
             }
+        } else {
+            $time = '';
+            $userName = '';
         }
 
-        $message = $time.$userName.$message . PHP_EOL;
+        $message = $time . $userName . $message . PHP_EOL;
 
         if ($file !== null) {
-            if (mb_strlen($file) > 50) {
-                $file = trim(substr($file, 0, 50)) . '.log';
+            $file = $type . '-' . $file;
+            if (mb_strlen($file) > 45) {
+                $file = date('Y-m-d') . '_' . trim(substr($file, 0, 45)) . '-' . $type . '.log';
             }
-            
-            if(substr($file, 0, -4) != '.log'){
-                $file = $file.'.log';
+
+            if (substr($file, -4, 4) != '.log') {
+                $file = $file . '.log';
             }
 
             $path = $this->path . DIRECTORY_SEPARATOR . $file;

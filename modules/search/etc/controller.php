@@ -114,6 +114,16 @@ class Controller extends BaseController
             Registry::get('database')->disconnectAll();
         });
     }
+    
+    /**
+     * Disable view, used for ajax calls.
+     */
+    protected function _disableView()
+    {
+        $this->_willRenderActionView = false;
+        $this->_willRenderLayoutView = false;
+        header('Content-Type: text/html; charset=utf-8');
+    }
 
     /**
      * @protected

@@ -10,17 +10,20 @@ use THCFrame\Configuration\Model\ConfigModel;
 use THCFrame\Profiler\Profiler;
 use THCFrame\Router\Model\RedirectModel;
 use THCFrame\Filesystem\LineCounter;
+use THCFrame\Core\Core;
 
 /**
  * 
  */
 class SystemController extends Controller
 {
+
     /**
      * @before _secured, _admin
      */
     public function index()
     {
+        
     }
 
     /**
@@ -62,7 +65,7 @@ class SystemController extends Controller
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             $view->errorMessage($ex->getMessage());
             Event::fire('admin.log', array('fail', 'Database backup',
-                'Error: '.$ex->getMessage(), ));
+                'Error: ' . $ex->getMessage(),));
         }
 
         self::redirect('/admin/system/');
@@ -102,10 +105,10 @@ class SystemController extends Controller
                 $conf->value = RequestMethods::post($conf->getXkey());
 
                 if ($conf->validate()) {
-                    Event::fire('admin.log', array('success', $conf->getXkey().': '.$oldVal.' - '.$conf->getValue()));
+                    Event::fire('admin.log', array('success', $conf->getXkey() . ': ' . $oldVal . ' - ' . $conf->getValue()));
                     $conf->save();
                 } else {
-                    Event::fire('admin.log', array('fail', $conf->getXkey().': '.json_encode($conf->getErrors())));
+                    Event::fire('admin.log', array('fail', $conf->getXkey() . ': ' . json_encode($conf->getErrors())));
                     $error = $conf->getErrors();
                     $errors[$conf->xkey] = array_shift($error);
                 }
@@ -146,7 +149,7 @@ class SystemController extends Controller
             xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">'.PHP_EOL;
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">' . PHP_EOL;
 
         $xmlEnd = '</urlset>';
 
@@ -166,54 +169,54 @@ class SystemController extends Controller
         }
 
         $articlesXml = '';
-        $pageContentXml = "<url><loc>http://{$host}</loc></url>".PHP_EOL
-                ."<url><loc>http://{$host}/akce</loc></url>"
-                ."<url><loc>http://{$host}/probehleakce</loc></url>"
-                ."<url><loc>http://{$host}/archivakci</loc></url>"
-                ."<url><loc>http://{$host}/archivnovinek</loc></url>"
-                ."<url><loc>http://{$host}/archivreportazi</loc></url>"
-                ."<url><loc>http://{$host}/reportaze</loc></url>"
-                ."<url><loc>http://{$host}/novinky</loc></url>"
-                ."<url><loc>http://{$host}/galerie</loc></url>"
-                ."<url><loc>http://{$host}/bazar</loc></url>".PHP_EOL;
+        $pageContentXml = "<url><loc>http://{$host}</loc></url>" . PHP_EOL
+                . "<url><loc>http://{$host}/akce</loc></url>"
+                . "<url><loc>http://{$host}/probehle-akce</loc></url>"
+                . "<url><loc>http://{$host}/archiv-akci</loc></url>"
+                . "<url><loc>http://{$host}/archiv-novinek</loc></url>"
+                . "<url><loc>http://{$host}/archiv-reportazi</loc></url>"
+                . "<url><loc>http://{$host}/reportaze</loc></url>"
+                . "<url><loc>http://{$host}/novinky</loc></url>"
+                . "<url><loc>http://{$host}/galerie</loc></url>"
+                . "<url><loc>http://{$host}/bazar</loc></url>" . PHP_EOL;
 
         $linkCounter = 10;
 
         if (null !== $pageContent) {
             foreach ($pageContent as $content) {
-                $pageUrl = '/page/'.$content->getUrlKey();
+                $pageUrl = '/page/' . $content->getUrlKey();
                 if (array_key_exists($pageUrl, $redirectArr)) {
                     $pageUrl = $redirectArr[$pageUrl];
                 }
-                $pageContentXml .= "<url><loc>http://{$host}{$pageUrl}</loc></url>".PHP_EOL;
+                $pageContentXml .= "<url><loc>http://{$host}{$pageUrl}</loc></url>" . PHP_EOL;
                 $linkCounter+=1;
             }
         }
 
         if (null !== $news) {
             foreach ($news as $_news) {
-                $articlesXml .= "<url><loc>http://{$host}/novinky/r/{$_news->getUrlKey()}</loc></url>".PHP_EOL;
+                $articlesXml .= "<url><loc>http://{$host}/novinky/r/{$_news->getUrlKey()}</loc></url>" . PHP_EOL;
                 $linkCounter+=1;
             }
         }
 
         if (null !== $actions) {
             foreach ($actions as $action) {
-                $articlesXml .= "<url><loc>http://{$host}/akce/r/{$action->getUrlKey()}</loc></url>".PHP_EOL;
+                $articlesXml .= "<url><loc>http://{$host}/akce/r/{$action->getUrlKey()}</loc></url>" . PHP_EOL;
                 $linkCounter+=1;
             }
         }
 
         if (null !== $reports) {
             foreach ($reports as $report) {
-                $articlesXml .= "<url><loc>http://{$host}/reportaze/r/{$report->getUrlKey()}</loc></url>".PHP_EOL;
+                $articlesXml .= "<url><loc>http://{$host}/reportaze/r/{$report->getUrlKey()}</loc></url>" . PHP_EOL;
                 $linkCounter+=1;
             }
         }
 
-        file_put_contents('./sitemap.xml', $xml.$pageContentXml.$articlesXml.$xmlEnd);
+        file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml . $xmlEnd);
 
-        Event::fire('admin.log', array('success', 'Links count: '.$linkCounter));
+        Event::fire('admin.log', array('success', 'Links count: ' . $linkCounter));
         $view->successMessage('Soubor sitemap.xml byl aktualizován');
         self::redirect('/admin/system/');
     }
@@ -236,4 +239,109 @@ class SystemController extends Controller
         $view->set('totallines', $totalLines)
                 ->set('filecounter', $fileCounter);
     }
+
+    /**
+     * @before _secured, _superadmin
+     */
+    public function generator($dbIdent = 'main')
+    {
+        $this->_disableView();
+        $view = $this->getActionView();
+
+        try{
+            $generator = new \THCFrame\Model\Generator(array('dbIdent' => $dbIdent));
+            $generator->createModels();
+            
+            Event::fire('admin.log', array('success', 'Generate model classes'));
+            $view->successMessage('New models were generated');
+            self::redirect('/admin/system/');
+        } catch (\Exception $ex) {
+            Event::fire('admin.log', array('fail', 'An error occured while creating model classes: ' . $ex->getMessage()));
+            $view->errorMessage('An error occured while creating model classes: ' . $ex->getMessage());
+            self::redirect('/admin/system/');
+        }
+    }
+
+    /**
+     * @before _secured, _superadmin
+     */
+    public function sync($type = 1)
+    {
+        set_time_limit(0);
+        
+        $this->_disableView();
+        $view = $this->getActionView();
+
+        $models = array(
+            '\App\Model\Basic\BasicActionModel',
+            '\App\Model\Basic\BasicAdimageModel',
+            '\App\Model\Basic\BasicAdmessageModel',
+            '\App\Model\Basic\BasicAdsectionModel',
+            '\App\Model\Basic\BasicAdvertisementhistoryModel',
+            '\App\Model\Basic\BasicAdvertisementModel',
+            '\App\Model\Basic\BasicAttendanceModel',
+            '\App\Model\Basic\BasicCommentModel',
+            '\App\Model\Basic\BasicFeedbackModel',
+            '\App\Model\Basic\BasicGalleryModel',
+            '\App\Model\Basic\BasicNewsModel',
+            '\App\Model\Basic\BasicPagecontentModel',
+            '\App\Model\Basic\BasicPartnerModel',
+            '\App\Model\Basic\BasicPhotoModel',
+            '\App\Model\Basic\BasicReportModel',
+            '\Admin\Model\Basic\BasicActionhistoryModel',
+            '\Admin\Model\Basic\BasicAdminlogModel',
+            '\Admin\Model\Basic\BasicConceptModel',
+            '\Admin\Model\Basic\BasicEmailModel',
+            '\Admin\Model\Basic\BasicImessageModel',
+            '\Admin\Model\Basic\BasicNewshistoryModel',
+            '\Admin\Model\Basic\BasicPagecontentHistoryModel',
+            '\Admin\Model\Basic\BasicReporthistoryModel',
+//            '\THCFrame\Configuration\Model\ConfigModel',
+//            '\THCFrame\Router\Model\RedirectModel',
+//            '\THCFrame\Security\Model\AuthtokenModel',
+//            '\THCFrame\Security\Model\FhsBaselineModel',
+//            '\THCFrame\Security\Model\FhsHistoryModel',
+//            '\THCFrame\Security\Model\FhsScannedModel',
+        );
+
+        $db = \THCFrame\Registry\Registry::get('database')->get();
+        $error = false;
+        
+        $dump = new Mysqldump();
+        $dump->create();
+
+        foreach ($models as $model) {
+            $m = new $model();
+
+            if ($type == 1) {
+                if (!$db->sync($m, false, 'alter', false)) {
+                    $errMsg = 'An error occured while executing db sync for model: '.$model.'. Check error log';
+                    $error = true;
+                    
+                    Event::fire('admin.log', array('fail', $errMsg));
+                    Core::getLogger()->log($errMsg, 'sync', true, 'DbModelSync.log');
+                }
+            } elseif ($type == 2) {
+                if (!$db->sync($m, true, 'alter', false)) {
+                    $errMsg = 'An error occured while executing db sync for model: '.$model.'. Check error log';
+                    $error = true;
+                    
+                    Event::fire('admin.log', array('fail', $errMsg));
+                    Core::getLogger()->log($errMsg, 'sync', true, 'DbModelSync.log');
+                }
+            }
+
+            unset($m);
+        }
+
+        if ($error === true) {
+            $view->errorMessage('An error occured while executing db sync. Check error log');
+            self::redirect('/admin/system/');
+        } else {
+            Event::fire('admin.log', array('success', 'Model -> DB sync'));
+            $view->successMessage('Model -> DB sync done');
+            self::redirect('/admin/system/');
+        }
+    }
+
 }

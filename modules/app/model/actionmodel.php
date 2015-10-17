@@ -2,13 +2,14 @@
 
 namespace App\Model;
 
-use THCFrame\Model\Model;
+use App\Model\Basic\BasicActionModel;
 
 /**
  * 
  */
-class ActionModel extends Model
+class ActionModel extends BasicActionModel
 {
+
     const STATE_WAITING = 0;
     const STATE_APPROVED = 1;
     const STATE_REJECTED = 2;
@@ -26,217 +27,6 @@ class ActionModel extends Model
      * @readwrite
      */
     protected $_alias = 'ac';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label id autora
-     */
-    protected $_userId;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_active;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_approved;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_archive;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 200
-     * @unique
-     * 
-     * @validate required, alphanumeric, max(200)
-     * @label url key
-     */
-    protected $_urlKey;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 80
-     * 
-     * @validate alphanumeric, max(80)
-     * @label alias autora
-     */
-    protected $_userAlias;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate required, alphanumeric, max(150)
-     * @label nazev
-     */
-    protected $_title;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label teaser
-     */
-    protected $_shortBody;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label text
-     */
-    protected $_body;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * 
-     * @validate numeric, max(2)
-     * @label pořadí
-     */
-    protected $_rank;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 12
-     * 
-     * @validate date, max(12)
-     * @label datum začátek
-     */
-    protected $_startDate;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 12
-     * 
-     * @validate date, max(12)
-     * @label datum konec
-     */
-    protected $_endDate;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 10
-     * 
-     * @validate time, max(10)
-     * @label čas začátek
-     */
-    protected $_startTime;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 10
-     * 
-     * @validate time, max(10)
-     * @label čas konec
-     */
-    protected $_endTime;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate alphanumeric, max(350)
-     * @label keywords
-     */
-    protected $_keywords;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate alphanumeric, max(150)
-     * @label meta-název
-     */
-    protected $_metaTitle;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate alphanumeric
-     * @label meta-popis
-     */
-    protected $_metaDescription;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_modified;
 
     /**
      * 
@@ -264,8 +54,7 @@ class ActionModel extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
     }
@@ -278,8 +67,7 @@ class ActionModel extends Model
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
                 ->order('ac.created', 'desc')
                 ->limit((int) $limit);
 
@@ -296,15 +84,10 @@ class ActionModel extends Model
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
         if ($limit === 0) {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())),
-                    array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
-                    array('rank' => 'desc', 'startDate' => 'asc')
+            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'asc')
             );
         } else {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())),
-                    array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
-                    array('rank' => 'desc', 'startDate' => 'asc'),
-                    $limit, $page
+            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'asc'), $limit, $page
             );
         }
 
@@ -320,10 +103,7 @@ class ActionModel extends Model
      */
     public static function fetchOldWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())),
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
-                array('rank' => 'desc', 'startDate' => 'desc'),
-                $limit, $page
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())), array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
         );
 
         return $actions;
@@ -338,10 +118,7 @@ class ActionModel extends Model
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true),
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'),
-                array('rank' => 'desc', 'startDate' => 'desc'),
-                $limit, $page
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
         );
 
         return $actions;
@@ -367,4 +144,5 @@ class ActionModel extends Model
     {
         return self::$_statesConv;
     }
+
 }

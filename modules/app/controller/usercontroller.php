@@ -360,8 +360,8 @@ class UserController extends Controller
             $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/');
         }
-        
-        if($adminAccountActivation){
+
+        if ($adminAccountActivation) {
             $view->infoMessage($this->lang('REGISTRATION_WAITING_ADMIN_ACTIVATION'));
             self::redirect('/');
         }
@@ -427,6 +427,15 @@ class UserController extends Controller
                         ->set('errors', $feedback->getErrors());
             }
         }
+    }
+
+    public function eprivacy()
+    {
+        $canonical = 'http://' . $this->getServerHost() . '/ochrana-soukromi';
+
+        $this->getLayoutView()
+                ->set('canonical', $canonical)
+                ->set('metatitle', 'Hastrman - Ochrana soukromí');
     }
 
 }

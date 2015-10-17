@@ -2,91 +2,21 @@
 
 namespace Admin\Model;
 
-use THCFrame\Model\Model;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
+use Admin\Model\Basic\BasicReporthistoryModel;
 
 /**
  * 
  */
-class ReportHistoryModel extends Model
+class ReportHistoryModel extends BasicReporthistoryModel
 {
+
     /**
      * @readwrite
      */
     protected $_alias = 'rph';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label id zdroje
-     */
-    protected $_originId;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label id editora
-     */
-    protected $_editedBy;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 30
-     * 
-     * @validate alphanumeric, max(30)
-     * @label keywords
-     */
-    protected $_remoteAddr;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate url, max(150)
-     * @label referrer
-     */
-    protected $_referer;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate alphanumeric
-     * @label changes
-     */
-    protected $_changedData;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
 
     /**
      * 
@@ -107,8 +37,7 @@ class ReportHistoryModel extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('rph.*'))
-                ->join('tb_user', 'rph.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                ->join('tb_user', 'rph.editedBy = us.id', 'us', array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
     }
@@ -121,8 +50,7 @@ class ReportHistoryModel extends Model
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('rph.*'))
-                ->join('tb_user', 'rph.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                ->join('tb_user', 'rph.editedBy = us.id', 'us', array('us.firstname', 'us.lastname'))
                 ->order('rph.created', 'desc')
                 ->limit((int) $limit);
 
@@ -153,12 +81,12 @@ class ReportHistoryModel extends Model
         }
 
         foreach ($properties as $key => $value) {
-            if(!preg_match('#.*@column.*#s', $value->getDocComment())){
+            if (!preg_match('#.*@column.*#s', $value->getDocComment())) {
                 continue;
             }
             if ($value->class == $className) {
                 $propertyName = $value->getName();
-                $getProperty = 'get'.ucfirst(str_replace('_', '', $value->getName()));
+                $getProperty = 'get' . ucfirst(str_replace('_', '', $value->getName()));
 
                 if (trim((string) $original->$getProperty()) !== trim((string) $edited->$getProperty())) {
                     $changes[$propertyName] = $original->$getProperty();
@@ -176,9 +104,9 @@ class ReportHistoryModel extends Model
 
         if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'Report '.$original->getId().' changes saved'));
+            Event::fire('admin.log', array('success', 'Report ' . $original->getId() . ' changes saved'));
         } else {
-            Event::fire('admin.log', array('fail', 'Report history errors: '.json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', array('fail', 'Report history errors: ' . json_encode($historyRecord->getErrors())));
         }
     }
 
@@ -188,12 +116,12 @@ class ReportHistoryModel extends Model
     public function getUnlinkPath($type = true)
     {
         if ($type) {
-            if (file_exists(APP_PATH.$this->_imgMain)) {
-                return APP_PATH.$this->_imgMain;
-            } elseif (file_exists('.'.$this->_imgMain)) {
-                return '.'.$this->_imgMain;
-            } elseif (file_exists('./'.$this->_imgMain)) {
-                return './'.$this->_imgMain;
+            if (file_exists(APP_PATH . $this->_imgMain)) {
+                return APP_PATH . $this->_imgMain;
+            } elseif (file_exists('.' . $this->_imgMain)) {
+                return '.' . $this->_imgMain;
+            } elseif (file_exists('./' . $this->_imgMain)) {
+                return './' . $this->_imgMain;
             }
         } else {
             return $this->_imgMain;
@@ -206,15 +134,16 @@ class ReportHistoryModel extends Model
     public function getUnlinkThumbPath($type = true)
     {
         if ($type) {
-            if (file_exists(APP_PATH.$this->_imgThumb)) {
-                return APP_PATH.$this->_imgThumb;
-            } elseif (file_exists('.'.$this->_imgThumb)) {
-                return '.'.$this->_imgThumb;
-            } elseif (file_exists('./'.$this->_imgThumb)) {
-                return './'.$this->_imgThumb;
+            if (file_exists(APP_PATH . $this->_imgThumb)) {
+                return APP_PATH . $this->_imgThumb;
+            } elseif (file_exists('.' . $this->_imgThumb)) {
+                return '.' . $this->_imgThumb;
+            } elseif (file_exists('./' . $this->_imgThumb)) {
+                return './' . $this->_imgThumb;
             }
         } else {
             return $this->_imgThumb;
         }
     }
+
 }

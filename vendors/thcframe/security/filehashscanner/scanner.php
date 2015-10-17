@@ -118,7 +118,7 @@ class Scanner extends Base
             $skip = explode(',', $this->_configuration->security->filescan->skipDir);
             $ext = explode(',', $this->_configuration->security->filescan->ext);
             $exclExt = explode(',', $this->_configuration->security->filescan->excludeExt);
-
+            
             if (!$iter->isDot() && StringMethods::striposArray($iter->getSubPath(), $skip) === false) {
                 // Select file extensions OR $ext empty AND not excluded ext
                 if ((!empty($ext)) || (empty($ext) && !in_array(pathinfo($iter->key(), PATHINFO_EXTENSION), $exclExt, true))) {

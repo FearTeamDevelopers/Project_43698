@@ -107,9 +107,9 @@ class ReportController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/archivreportazi';
+            $canonical = 'http://'.$this->getServerHost().'/archiv-reportazi';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/archivreportazi/p/'.$page;
+            $canonical = 'http://'.$this->getServerHost().'/archiv-reportazi/p/'.$page;
         }
 
         $content = $this->getCache()->get('report-arch-'.$page);
@@ -129,11 +129,11 @@ class ReportController extends Controller
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($reportsPageCount, $page, '/archivreportazi/p/');
+        $this->_pagerMetaLinks($reportsPageCount, $page, '/archiv-reportazi/p/');
 
         $view->set('reports', $reports)
                 ->set('currentpage', $page)
-                ->set('pagerpathprefix', '/archivreportazi')
+                ->set('pagerpathprefix', '/archiv-reportazi')
                 ->set('pagecount', $reportsPageCount);
 
         $layoutView->set('canonical', $canonical)

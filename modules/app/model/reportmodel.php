@@ -2,13 +2,14 @@
 
 namespace App\Model;
 
-use THCFrame\Model\Model;
+use App\Model\Basic\BasicReportModel;
 
 /**
  * 
  */
-class ReportModel extends Model
+class ReportModel extends BasicReportModel
 {
+
     const STATE_WAITING = 0;
     const STATE_APPROVED = 1;
     const STATE_REJECTED = 2;
@@ -26,217 +27,6 @@ class ReportModel extends Model
      * @readwrite
      */
     protected $_alias = 'rp';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label autor
-     */
-    protected $_userId;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_active;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_approved;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_archive;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 200
-     * @unique
-     * 
-     * @validate required, alphanumeric, max(200)
-     * @label url key
-     */
-    protected $_urlKey;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 80
-     * 
-     * @validate alphanumeric, max(80)
-     * @label alias autora
-     */
-    protected $_userAlias;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate required, alphanumeric, max(150)
-     * @label nazev
-     */
-    protected $_title;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label teaser
-     */
-    protected $_shortBody;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label text
-     */
-    protected $_body;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * 
-     * @validate numeric, max(2)
-     * @label pořadí
-     */
-    protected $_rank;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 60
-     * 
-     * @validate alphanumeric, max(60)
-     * @label název fotky
-     */
-    protected $_photoName;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate max(350)
-     * @label photo path
-     */
-    protected $_imgMain;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate max(350)
-     * @label thumb path
-     */
-    protected $_imgThumb;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate alphanumeric, max(350)
-     * @label keywords
-     */
-    protected $_keywords;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate alphanumeric, max(150)
-     * @label meta-název
-     */
-    protected $_metaTitle;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate alphanumeric
-     * @label meta-popis
-     */
-    protected $_metaDescription;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 350
-     * 
-     * @validate alphanumeric, max(350)
-     * @label meta-image
-     */
-    protected $_metaImage;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_modified;
 
     /**
      * @readwrite
@@ -269,8 +59,7 @@ class ReportModel extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
     }
@@ -283,8 +72,7 @@ class ReportModel extends Model
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
                 ->order('rp.created', 'desc')
                 ->limit((int) $limit);
 
@@ -300,11 +88,8 @@ class ReportModel extends Model
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false),
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
-                        'imgMain', 'imgThumb', 'photoName', ),
-                array('rank' => 'desc', 'created' => 'desc'),
-                $limit, $page
+        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
+                    'imgMain', 'imgThumb', 'photoName',), array('rank' => 'desc', 'created' => 'desc'), $limit, $page
         );
 
         return $reports;
@@ -319,11 +104,8 @@ class ReportModel extends Model
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true),
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
-                    'imgMain', 'imgThumb', 'photoName', ),
-                array('rank' => 'desc', 'created' => 'desc'),
-                $limit, $page
+        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
+                    'imgMain', 'imgThumb', 'photoName',), array('rank' => 'desc', 'created' => 'desc'), $limit, $page
         );
 
         return $reports;
@@ -347,12 +129,12 @@ class ReportModel extends Model
     public function getUnlinkPath($type = true)
     {
         if ($type) {
-            if (file_exists(APP_PATH.$this->_imgMain)) {
-                return APP_PATH.$this->_imgMain;
-            } elseif (file_exists('.'.$this->_imgMain)) {
-                return '.'.$this->_imgMain;
-            } elseif (file_exists('./'.$this->_imgMain)) {
-                return './'.$this->_imgMain;
+            if (file_exists(APP_PATH . $this->_imgMain)) {
+                return APP_PATH . $this->_imgMain;
+            } elseif (file_exists('.' . $this->_imgMain)) {
+                return '.' . $this->_imgMain;
+            } elseif (file_exists('./' . $this->_imgMain)) {
+                return './' . $this->_imgMain;
             }
         } else {
             return $this->_imgMain;
@@ -365,12 +147,12 @@ class ReportModel extends Model
     public function getUnlinkThumbPath($type = true)
     {
         if ($type) {
-            if (file_exists(APP_PATH.$this->_imgThumb)) {
-                return APP_PATH.$this->_imgThumb;
-            } elseif (file_exists('.'.$this->_imgThumb)) {
-                return '.'.$this->_imgThumb;
-            } elseif (file_exists('./'.$this->_imgThumb)) {
-                return './'.$this->_imgThumb;
+            if (file_exists(APP_PATH . $this->_imgThumb)) {
+                return APP_PATH . $this->_imgThumb;
+            } elseif (file_exists('.' . $this->_imgThumb)) {
+                return '.' . $this->_imgThumb;
+            } elseif (file_exists('./' . $this->_imgThumb)) {
+                return './' . $this->_imgThumb;
             }
         } else {
             return $this->_imgThumb;
@@ -386,4 +168,5 @@ class ReportModel extends Model
     {
         return self::$_statesConv;
     }
+
 }

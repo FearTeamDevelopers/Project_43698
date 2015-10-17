@@ -11,7 +11,7 @@ section.wrapper.gallery.singlePage
                   img(src!='{echo $gallery->getImgThumb()}')
                .info
                   h3 {echo $gallery->getTitle()}
-      | {/foreach}
+      |{/foreach}
       |{/if}{else}
       .large-12.medium-12.small-12.columns
          h2 Žádné galerie nejsou k dispozici

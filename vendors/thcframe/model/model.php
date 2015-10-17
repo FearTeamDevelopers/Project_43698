@@ -46,11 +46,26 @@ class Model extends Base
      */
     protected $_types = array(
         'auto_increment',
+        'binary',
+        'char',
+        'varchar',
         'text',
-        'integer',
+        'mediumtext',
+        'longtext',
+        'blob',
+        'mediumblob',
+        'longblob',
         'tinyint',
+        'smallint',
+        'mediumint',
+        'int',
+        'integer',
+        'float',
+        'double',
         'decimal',
         'boolean',
+        'date',
+        'time',
         'datetime',
     );
 
@@ -692,7 +707,7 @@ class Model extends Base
 
             if (preg_match('#model#i', get_class($this))) {
                 $parts = array_reverse(explode('\\', get_class($this)));
-                $this->_table = strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0]));
+                $this->_table = str_replace(array('Basic', 'basic'), '', strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0])));
             } else {
                 throw new Exception\Implementation('Model has not valid name used for THCFrame\Model\Model');
             }
@@ -780,6 +795,9 @@ class Model extends Base
                     $primary = !empty($propertyMeta['@primary']);
                     $type = $first($propertyMeta, '@type');
                     $length = $first($propertyMeta, '@length');
+                    $default = !empty($propertyMeta['@default']) ? $first($propertyMeta, '@default') : false;
+                    $null = !empty($propertyMeta['@null']);
+                    $unsigned = !empty($propertyMeta['@unsigned']);
                     $index = !empty($propertyMeta['@index']);
                     $unique = !empty($propertyMeta['@unique']);
                     $readwrite = !empty($propertyMeta['@readwrite']);
@@ -788,6 +806,7 @@ class Model extends Base
 
                     $validate = !empty($propertyMeta['@validate']) ? $propertyMeta['@validate'] : false;
                     $label = $first($propertyMeta, '@label');
+                    $foreign = $first($propertyMeta, '@foreign');
 
                     if (!in_array($type, $types)) {
                         throw new Exception\Type(sprintf('%s is not a valid type', $type));
@@ -796,20 +815,25 @@ class Model extends Base
                     if ($primary) {
                         $primaries++;
                     }
-
+                    
                     $columns[$name] = array(
                         'raw' => $property,
                         'name' => $name,
                         'primary' => $primary,
+                        'foreign' => $foreign,
                         'type' => $type,
                         'length' => $length,
+                        'default' => $default,
                         'index' => $index,
                         'unique' => $unique,
+                        'null' => $null,
+                        'unsigned' => $unsigned,
                         'read' => $read,
                         'write' => $write,
                         'validate' => $validate,
                         'label' => $label
                     );
+                    
                 }
             }
 

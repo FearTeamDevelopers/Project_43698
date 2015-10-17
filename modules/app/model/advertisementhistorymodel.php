@@ -2,91 +2,21 @@
 
 namespace App\Model;
 
-use THCFrame\Model\Model;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
+use App\Model\Basic\BasicAdvertisementhistoryModel;
 
 /**
  * 
  */
-class AdvertisementHistoryModel extends Model
+class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
 {
+
     /**
      * @readwrite
      */
     protected $_alias = 'adh';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label id zdroje
-     */
-    protected $_originId;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label id editora
-     */
-    protected $_editedBy;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 30
-     * 
-     * @validate alphanumeric, max(30)
-     * @label keywords
-     */
-    protected $_remoteAddr;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate url, max(150)
-     * @label referrer
-     */
-    protected $_referer;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate alphanumeric
-     * @label changes
-     */
-    protected $_changedData;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
 
     /**
      * 
@@ -107,8 +37,7 @@ class AdvertisementHistoryModel extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
     }
@@ -121,8 +50,7 @@ class AdvertisementHistoryModel extends Model
     public static function fetchWithLimit($limit = 10)
     {
         $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
                 ->order('ac.created', 'desc')
                 ->limit((int) $limit);
 
@@ -153,12 +81,12 @@ class AdvertisementHistoryModel extends Model
         }
 
         foreach ($properties as $key => $value) {
-            if(!preg_match('#.*@column.*#s', $value->getDocComment())){
+            if (!preg_match('#.*@column.*#s', $value->getDocComment())) {
                 continue;
             }
             if ($value->class == $className) {
                 $propertyName = $value->getName();
-                $getProperty = 'get'.ucfirst(str_replace('_', '', $value->getName()));
+                $getProperty = 'get' . ucfirst(str_replace('_', '', $value->getName()));
 
                 if (trim((string) $original->$getProperty()) !== trim((string) $edited->$getProperty())) {
                     $changes[$propertyName] = $original->$getProperty();
@@ -176,9 +104,10 @@ class AdvertisementHistoryModel extends Model
 
         if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'Advertisement '.$original->getId().' changes saved'));
+            Event::fire('admin.log', array('success', 'Advertisement ' . $original->getId() . ' changes saved'));
         } else {
-            Event::fire('admin.log', array('fail', 'Advertisement history errors: '.json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', array('fail', 'Advertisement history errors: ' . json_encode($historyRecord->getErrors())));
         }
     }
+
 }

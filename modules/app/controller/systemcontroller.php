@@ -36,4 +36,5 @@ class SystemController extends Controller
 
         Core::getLogger()->log($res, 'system', true, 'scres.log');
     }
+
 }

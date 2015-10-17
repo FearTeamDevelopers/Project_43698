@@ -1,42 +1,42 @@
 {
-  "name": "Hastrman",
-  "version": "1.0.0",
-  "description": "hastrman",
-  "main": "gulpfile.js",
-  "directories": {
-    "test": "tests"
-  },
-  "dependencies": {
-    "browser-sync": "^2.2.1",
-    "gulp": "^3.8.11",
-    "gulp-notify": "^2.2.0",
-    "gulp-stylus": "^2.0.1",
-    "gulp-imagemin": "^2.2.1",
-    "gulp-plumber": "^0.6.6",
-    "gulp-autoprefixer": "^2.1.0",
-    "gulp-jade": "^1.0.0",
-    "gulp-uglify": "^1.1.0"
-  },
-  "devDependencies": {
-    "browser-sync": "^2.9.11",
-    "gulp-autoprefixer": "^2.3.1",
-    "gulp-imagemin": "^2.3.0",
-    "gulp-jade": "^1.1.0",
-    "gulp-plumber": "^0.6.6",
-    "gulp-stylus": "^2.1.0",
-    "gulp-uglify": "^1.4.1"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/FearTeamDevelopers/Project_43698.git"
-  },
-  "author": "slamic & tomy",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/FearTeamDevelopers/Project_43698/issues"
-  },
-  "homepage": "https://github.com/FearTeamDevelopers/Project_43698"
+    "name": "Hastrman",
+    "version": "1.0.0",
+    "description": "hastrman",
+    "main": "gulpfile.js",
+    "directories": {
+        "test": "tests"
+    },
+    "dependencies": {
+        "browser-sync": "^2.2.1",
+        "gulp": "^3.8.11",
+        "gulp-notify": "^2.2.0",
+        "gulp-stylus": "^2.0.1",
+        "gulp-imagemin": "^2.2.1",
+        "gulp-plumber": "^0.6.6",
+        "gulp-autoprefixer": "^2.1.0",
+        "gulp-jade": "^1.0.0",
+        "gulp-uglify": "^1.1.0"
+    },
+    "devDependencies": {
+        "browser-sync": "^2.9.11",
+        "gulp-autoprefixer": "^2.3.1",
+        "gulp-imagemin": "^2.3.0",
+        "gulp-jade": "^1.1.0",
+        "gulp-plumber": "^0.6.6",
+        "gulp-stylus": "^2.1.0",
+        "gulp-uglify": "^1.4.1"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/FearTeamDevelopers/Project_43698.git"
+    },
+    "author": "slamic & tomy",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/FearTeamDevelopers/Project_43698/issues"
+    },
+    "homepage": "https://github.com/FearTeamDevelopers/Project_43698"
 }

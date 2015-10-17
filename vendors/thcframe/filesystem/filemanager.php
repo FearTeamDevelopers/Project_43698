@@ -103,7 +103,7 @@ class FileManager extends Base
             $this->_pathToImages = trim($configuration->files->pathToImages, '/');
             $this->_pathToThumbs = trim($configuration->files->pathToThumbs, '/');
 
-            $this->checkDirectories();
+            $this->_checkDirectories();
         } else {
             throw new \Exception('Error in configuration file');
         }
@@ -113,7 +113,7 @@ class FileManager extends Base
      * Check for default directory structure. 
      * Creates it if needed
      */
-    private function checkDirectories()
+    private function _checkDirectories()
     {
         if (!is_dir(APP_PATH . '/' . $this->_pathToDocs)) {
             mkdir(APP_PATH . '/' . $this->_pathToDocs, self::DIR_CHMOD, true);
@@ -133,7 +133,7 @@ class FileManager extends Base
      * @param mixed $files
      * @return \ArrayObject
      */
-    private function toIterator($files)
+    private function _toIterator($files)
     {
         if (!$files instanceof \Traversable) {
             $files = new \ArrayObject(is_array($files) ? $files : array($files));
@@ -147,7 +147,7 @@ class FileManager extends Base
      * 
      * @param string $file
      */
-    private function backup($file)
+    private function _backup($file)
     {
         $ext = $this->getExtension($file);
         $filename = $this->getFileName($file);
@@ -208,7 +208,7 @@ class FileManager extends Base
      */
     public function remove($files)
     {
-        $files = iterator_to_array($this->toIterator($files));
+        $files = iterator_to_array($this->_toIterator($files));
         $files = array_reverse($files);
         
         foreach ($files as $file) {
@@ -274,7 +274,7 @@ class FileManager extends Base
             $mode = self::DIR_CHMOD;
         }
         
-        foreach ($this->toIterator($dirs) as $dir) {
+        foreach ($this->_toIterator($dirs) as $dir) {
             if (is_dir($dir)) {
                 continue;
             }
@@ -298,7 +298,7 @@ class FileManager extends Base
      */
     public function chmod($files, $mode, $umask = 0000, $recursive = false)
     {
-        foreach ($this->toIterator($files) as $file) {
+        foreach ($this->_toIterator($files) as $file) {
             if ($recursive && is_dir($file) && !is_link($file)) {
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
@@ -522,7 +522,7 @@ class FileManager extends Base
                             $fileLocName = $pathToDocs . $namePrefix . $fileNameExt;
 
                             if (file_exists($fileLocName)) {
-                                $this->backup($fileLocName);
+                                $this->_backup($fileLocName);
                             }
 
                             $copy = move_uploaded_file($_FILES[$postField]['tmp_name'][$i], $fileLocName);
@@ -594,7 +594,7 @@ class FileManager extends Base
                         $fileLocName = $pathToDocs . $namePrefix . $fileNameExt;
 
                         if (file_exists($fileLocName)) {
-                            $this->backup($fileLocName);
+                            $this->_backup($fileLocName);
                         }
 
                         $copy = move_uploaded_file($_FILES[$postField]['tmp_name'], $fileLocName);
@@ -698,11 +698,11 @@ class FileManager extends Base
                             $thumbLocName = $pathToThumbs . $namePrefix . $thumbName;
 
                             if (file_exists($imageLocName)) {
-                                $this->backup($imageLocName);
+                                $this->_backup($imageLocName);
                             }
 
                             if (file_exists($thumbLocName)) {
-                                $this->backup($thumbLocName);
+                                $this->_backup($thumbLocName);
                             }
 
                             $copy = move_uploaded_file($_FILES[$postField]['tmp_name'][$i], $imageLocName);
@@ -803,11 +803,11 @@ class FileManager extends Base
                         $thumbLocName = $pathToThumbs . $namePrefix . $thumbName;
 
                         if (file_exists($imageLocName)) {
-                            $this->backup($imageLocName);
+                            $this->_backup($imageLocName);
                         }
 
                         if (file_exists($thumbLocName)) {
-                            $this->backup($thumbLocName);
+                            $this->_backup($thumbLocName);
                         }
 
                         $copy = move_uploaded_file($_FILES[$postField]['tmp_name'], $imageLocName);
@@ -891,11 +891,11 @@ class FileManager extends Base
             $thumbLocName = $pathToThumbs . $namePrefix . $thumbName;
 
             if (file_exists($imageLocName)) {
-                $this->backup($imageLocName);
+                $this->_backup($imageLocName);
             }
 
             if (file_exists($thumbLocName)) {
-                $this->backup($thumbLocName);
+                $this->_backup($thumbLocName);
             }
 
             if ($img->getWidth() > $this->getMaxImageWidth() || $img->getHeight() > $this->getMaxImageHeight()) {

@@ -31,18 +31,6 @@ class ModuleConfig extends Module
      */
     protected $_routes = array(
         array(
-            'pattern' => '/hledat',
-            'module' => 'app',
-            'controller' => 'index',
-            'action' => 'search',
-        ),
-        array(
-            'pattern' => '/admin',
-            'module' => 'admin',
-            'controller' => 'index',
-            'action' => 'index',
-        ),
-        array(
             'pattern' => '/bazar/hledat',
             'module' => 'app',
             'controller' => 'advertisement',
@@ -181,14 +169,14 @@ class ModuleConfig extends Module
             'args' => ':urlkey',
         ),
         array(
-            'pattern' => '/archivakci/p/:page',
+            'pattern' => '/archiv-akci/p/:page',
             'module' => 'app',
             'controller' => 'action',
             'action' => 'archive',
             'args' => ':page',
         ),
         array(
-            'pattern' => '/probehleakce/p/:page',
+            'pattern' => '/probehle-akce/p/:page',
             'module' => 'app',
             'controller' => 'action',
             'action' => 'oldactions',
@@ -209,7 +197,7 @@ class ModuleConfig extends Module
             'args' => ':urlkey',
         ),
         array(
-            'pattern' => '/archivreportazi/p/:page',
+            'pattern' => '/archiv-reportazi/p/:page',
             'module' => 'app',
             'controller' => 'report',
             'action' => 'archive',
@@ -230,7 +218,7 @@ class ModuleConfig extends Module
             'args' => ':urlkey',
         ),
         array(
-            'pattern' => '/archivnovinek/p/:page',
+            'pattern' => '/archiv-novinek/p/:page',
             'module' => 'app',
             'controller' => 'news',
             'action' => 'archive',

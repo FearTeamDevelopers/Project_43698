@@ -9,6 +9,7 @@
         <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
         {if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
         <li><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" class="fi-pencil">Upravit</a></li>
+        <li><a href="/bazar/prodano/{echo $ad->getUniqueKey()}" class="fi-dollar">Prodáno</a></li>
         <li><a href="/bazar/odstranit/{echo $ad->getUniqueKey()}" class="fi-trash">Smazat</a></li>{/if}
         {/if}
       </ul>

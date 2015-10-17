@@ -2,13 +2,14 @@
 
 namespace App\Model;
 
-use THCFrame\Model\Model;
+use App\Model\Basic\BasicNewsModel;
 
 /**
  * 
  */
-class NewsModel extends Model
+class NewsModel extends BasicNewsModel
 {
+
     const STATE_WAITING = 0;
     const STATE_APPROVED = 1;
     const STATE_REJECTED = 2;
@@ -26,173 +27,6 @@ class NewsModel extends Model
      * @readwrite
      */
     protected $_alias = 'nw';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label autor
-     */
-    protected $_userId;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_active;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_approved;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     */
-    protected $_archive;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 200
-     * @unique
-     * 
-     * @validate required, alphanumeric, max(200)
-     * @label url key
-     */
-    protected $_urlKey;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 80
-     * 
-     * @validate alphanumeric, max(80)
-     * @label alias autora
-     */
-    protected $_userAlias;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate required, alphanumeric, max(150)
-     * @label nazev
-     */
-    protected $_title;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label teaser
-     */
-    protected $_shortBody;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate required, html
-     * @label text
-     */
-    protected $_body;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     * 
-     * @validate numeric, max(2)
-     * @label pořadí
-     */
-    protected $_rank;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 250
-     * 
-     * @validate alphanumeric, max(250)
-     * @label keywords
-     */
-    protected $_keywords;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate alphanumeric, max(150)
-     * @label meta-název
-     */
-    protected $_metaTitle;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate alphanumeric
-     * @label meta-popis
-     */
-    protected $_metaDescription;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_modified;
 
     /**
      * @readwrite
@@ -225,8 +59,7 @@ class NewsModel extends Model
     public static function fetchAll()
     {
         $query = self::getQuery(array('nw.*'))
-                ->join('tb_user', 'nw.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                ->join('tb_user', 'nw.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
         return self::initialize($query);
     }
@@ -239,8 +72,7 @@ class NewsModel extends Model
     public static function fetchWithLimit($limit = 10, $page = 1)
     {
         $query = self::getQuery(array('nw.*'))
-                ->join('tb_user', 'nw.userId = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                ->join('tb_user', 'nw.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
                 ->order('nw.created', 'desc')
                 ->limit((int) $limit, $page);
 
@@ -256,10 +88,7 @@ class NewsModel extends Model
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false),
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created'),
-                array('rank' => 'desc', 'created' => 'desc'),
-                $limit, $page
+        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), array('rank' => 'desc', 'created' => 'desc'), $limit, $page
         );
 
         return $news;
@@ -274,10 +103,7 @@ class NewsModel extends Model
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true),
-                array('urlKey', 'userAlias', 'title', 'shortBody', 'created'),
-                array('rank' => 'desc', 'created' => 'desc'),
-                $limit, $page
+        $news = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), array('urlKey', 'userAlias', 'title', 'shortBody', 'created'), array('rank' => 'desc', 'created' => 'desc'), $limit, $page
         );
 
         return $news;
@@ -304,4 +130,5 @@ class NewsModel extends Model
     {
         return self::$_statesConv;
     }
+
 }

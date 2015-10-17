@@ -17,16 +17,19 @@ class FhsHistoryModel extends Model
      * @readwrite
      * @primary
      * @type auto_increment
+     * @unsigned
      */
     protected $_id;
 
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      * @label timestamp
      */
     protected $_timestamp;
@@ -34,7 +37,7 @@ class FhsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 15
      * 
      * @validate alphanumeric, max(15)
@@ -45,7 +48,7 @@ class FhsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 250
      * 
      * @validate path, max(250)
@@ -56,7 +59,7 @@ class FhsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 200
      * 
      * @validate alphanumeric, max(200)
@@ -67,7 +70,7 @@ class FhsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 200
      * 
      * @validate alphanumeric, max(200)
@@ -78,10 +81,12 @@ class FhsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      * @label last modification
      */
     protected $_lastMod;
@@ -89,7 +94,7 @@ class FhsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 20
      * 
      * @validate alphanumeric, max(20)
@@ -100,20 +105,24 @@ class FhsHistoryModel extends Model
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      */
     protected $_created;
 
     /**
      * @column
      * @readwrite
-     * @type text
-     * @length 22
+     * @type char
+     * @length 19
+     * @null
      * 
-     * @validate datetime, max(22)
+     * @default null
+     * @validate datetime, max(19)
      */
     protected $_modified;
 

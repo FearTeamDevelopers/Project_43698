@@ -2,12 +2,12 @@
 
 namespace App\Model;
 
-use THCFrame\Security\Model\BasicUser;
+use THCFrame\Security\Model\BasicUserModel;
 
 /**
  * 
  */
-class UserModel extends BasicUser
+class UserModel extends BasicUserModel
 {
     /**
      * Pole uživatelských rolí
@@ -23,7 +23,7 @@ class UserModel extends BasicUser
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 40
      *
      * @validate required, alphanumeric, min(3), max(40)
@@ -34,7 +34,7 @@ class UserModel extends BasicUser
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 40
      *
      * @validate required, alphanumeric, min(3), max(40)
@@ -45,7 +45,7 @@ class UserModel extends BasicUser
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 15
      * 
      * @validate numeric, max(15)
@@ -56,7 +56,7 @@ class UserModel extends BasicUser
     /**
      * @column
      * @readwrite
-     * @type text
+     * @type varchar
      * @length 50
      *
      * @validate alphanumeric, max(50)
@@ -67,18 +67,24 @@ class UserModel extends BasicUser
     /**
      * @column
      * @readwrite
-     * @type boolean
+     * @index
+     * @type tinyint
+     * @length 1
      * 
-     * @validate max(3)
+     * @default 1
+     * @validate max(1)
      */
     protected $_getNewActionNotification;
 
     /**
      * @column
      * @readwrite
-     * @type boolean
+     * @index
+     * @type tinyint
+     * @length 1
      * 
-     * @validate max(3)
+     * @default 1
+     * @validate max(1)
      */
     protected $_getNewReportNotification;
 

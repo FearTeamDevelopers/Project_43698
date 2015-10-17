@@ -2,91 +2,20 @@
 
 namespace Admin\Model;
 
-use THCFrame\Model\Model;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
+use Admin\Model\Basic\BasicActionhistoryModel;
 
 /**
  * 
  */
-class ActionHistoryModel extends Model
+class ActionHistoryModel extends BasicActionhistoryModel
 {
     /**
      * @readwrite
      */
     protected $_alias = 'ach';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label id zdroje
-     */
-    protected $_originId;
-
-    /**
-     * @column
-     * @readwrite
-     * @type integer
-     * 
-     * @validate numeric, max(8)
-     * @label id editora
-     */
-    protected $_editedBy;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 30
-     * 
-     * @validate alphanumeric, max(30)
-     * @label keywords
-     */
-    protected $_remoteAddr;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     * 
-     * @validate url, max(150)
-     * @label referrer
-     */
-    protected $_referer;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 256
-     * 
-     * @validate alphanumeric
-     * @label changes
-     */
-    protected $_changedData;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 22
-     * 
-     * @validate datetime, max(22)
-     */
-    protected $_created;
 
     /**
      * 
