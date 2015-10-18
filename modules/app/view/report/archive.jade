@@ -6,7 +6,8 @@ section.wrapper.reports.singlePage
         |{foreach $report in $reports}
         article
             header
-                h3 {echo $report->getTitle()}
+                a(href!='/reportaze/r/{echo $report->getUrlKey()}')
+                    h3 {echo $report->getTitle()}
                 span 
                     small {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}
             .body
