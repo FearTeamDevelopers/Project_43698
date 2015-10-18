@@ -166,7 +166,7 @@ class IndexController extends Controller
     public function index()
     {
         $view = $this->getActionView();
-        $searchIndexLog = \Search\Model\SearchIndexLogModel::all(array(), array('*'), array('created' => 'desc'), 50);
+        $searchIndexLog = \Search\Model\SearchIndexLogModel::all(array(), array('*'), array('created' => 'desc'), 150);
 
         $view->set('tables', $this->_textSource)
                 ->set('indexLog', $searchIndexLog);

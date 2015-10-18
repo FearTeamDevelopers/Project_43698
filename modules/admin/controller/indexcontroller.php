@@ -23,13 +23,23 @@ class IndexController extends Controller
         $latestActions = \App\Model\ActionModel::fetchWithLimit(10);
         $latestReports = \App\Model\ReportModel::fetchWithLimit(10);
         $latestComments = \App\Model\CommentModel::fetchWithLimit(10);
-        $latestUsers = \App\Model\UserModel::fetchLates(5);
+
+        if($this->isSuperAdmin()){
+            $latestUsers = \App\Model\UserModel::fetchLates(5);
+            $latestErrors = \Admin\Model\AdminLogModel::fetchErrorsFromLastWeek();
+        }elseif($this->isAdmin()){
+            $latestUsers = \App\Model\UserModel::fetchLates(5);
+            $latestErrors = array();
+        }else{
+            $latestUsers = $latestErrors = array();
+        }
 
         $view->set('latestnews', $latestNews)
                 ->set('latestreports', $latestReports)
                 ->set('latestusers', $latestUsers)
                 ->set('latestcomments', $latestComments)
                 ->set('latestactions', $latestActions)
+                ->set('latesterrors', $latestErrors)
                 ->set('imessages', $imessages);
     }
 }

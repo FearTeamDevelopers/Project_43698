@@ -180,7 +180,8 @@ class ActionController extends Controller
                     '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody()),
                         );
                 $email = \Admin\Model\EmailModel::loadAndPrepare('new-action', $data);
-
+                $email->subject = $email->getSubject().' - '.$action->getTitle();
+                
                 foreach ($users as $user) {
                     $email->setRecipient($user->getEmail());
                 }

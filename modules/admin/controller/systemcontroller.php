@@ -74,13 +74,34 @@ class SystemController extends Controller
     /**
      * Get admin log.
      * 
-     * @before _secured, _superadmin
+     * @before _secured, _admin
      */
-    public function showAdminLog()
+    public function showLog()
     {
         $view = $this->getActionView();
         $log = \Admin\Model\AdminLogModel::all(array(), array('*'), array('created' => 'DESC'), 250);
         $view->set('adminlog', $log);
+    }
+    
+    /**
+     * 
+     * @param type $id
+     * @before _secured, _admin
+     */
+    public function showLogDetail($id)
+    {
+        $this->_disableView();
+        
+        $log = \Admin\Model\AdminLogModel::first(array('id = ?' =>(int)$id));
+        
+        if(!empty($log)){
+            $str = 'Akce: <br/><strong>'.$log->getModule().'/'.$log->getController().'/'.$log->getAction().'</strong><br/><br/>';
+            $str .= 'Referer: <br/><strong>'.$log->getHttpreferer().'</strong><br/><br/>';
+            $str .=  'Parametry: <br/><strong>'.$log->getParams().'</strong>';
+            echo $str;
+        }else{
+            echo $this->lang('NOT_FOUND');
+        }
     }
 
     /**

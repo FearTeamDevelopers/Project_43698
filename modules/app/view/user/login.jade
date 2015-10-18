@@ -1,29 +1,29 @@
 section.wrapper.login.singlePage
-   .row
-      .small-12.columns
-         .container
-            header
-               h2.fi-torso Přihlášení
-            form(method="POST" action="#")
-               |{if isset($account_error)}
-               label.error.fi-alert
-                  |{echo $account_error}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("email", "email", array(), array("required"=>true, "placeholder" => "Váš@email.cz"))}
-               |{if isset($email_error)}
-               label.error.fi-alert
-                  |{echo $email_error}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "placeholder" => "Vaše heslo"))}
-               |{if isset($password_error)}
-               label.error.fi-alert
-                  |{echo $password_error}
-               |{/if}
-               input(type="submit" name="submitLogin" value="Přihlásit")
-               |<br/><br/>
-               span Zaregistrujte se a vytvořte si účet
+    .row
+        .small-12.columns
+            .container
+                header
+                    h2.fi-torso Přihlášení
+                form(method="POST" action="#")
+                    input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+                    |{if isset($account_error)}
+                    label.error.fi-alert
+                        |{echo $account_error}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("email", "email", array(), array("required"=>true, "placeholder" => "Váš@email.cz"))}
+                    |{if isset($email_error)}
+                    label.error.fi-alert
+                        |{echo $email_error}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "placeholder" => "Vaše heslo"))}
+                    |{if isset($password_error)}
+                    label.error.fi-alert
+                        |{echo $password_error}
+                    |{/if}
+                    input(type="submit" name="submitLogin" value="Přihlásit")
+                |<br/><br/>
+                span Zaregistrujte se a vytvořte si účet
                     a(href="/registrace") &nbsp;zde
-               input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
-
-
-
+                |<br/><br/>
+                span V případě potíží s přihlášením si prosím zkontrolujte, že máte povolené ukládání souborů cookie.
+                    a(href="/ochrana-soukromi") Více o souborech cookie.

@@ -135,7 +135,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                     'totalLoginAttempts', 'lastLoginAttempt', 'firstLoginAttempt'));
 
         if ($user === null) {
-            throw new Exception\UserNotExists();
+            throw new Exception\UserNotExists('User '.$name.' does not exists');
         }
 
         Registry::get('session')->set('userLastLogin', $user->getLastLogin());
@@ -145,13 +145,13 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
         if ($passVerify === true) {
             if ($user instanceof BasicUserModel) {
                 if (!$user->isActive()) {
-                    throw new Exception\UserInactive();
+                    throw new Exception\UserInactive('User '.$name.' is not active');
                 } elseif ($user->isAccountExpired()) {
-                    throw new Exception\UserExpired();
+                    throw new Exception\UserExpired('User '.$name.' account is expired');
                 } elseif ($user->isPasswordExpired()) {
-                    throw new Exception\UserPassExpired();
+                    throw new Exception\UserPassExpired('User '.$name.' password is expired');
                 } elseif ($user->isBlocked()) {
-                    throw new Exception\UserBlocked();
+                    throw new Exception\UserBlocked('User '.$name.' account is blocked');
                 } else {
                     $this->_successfullLogin($user);
                     return $this->_loadCompleteUser($user->getId());
@@ -161,14 +161,14 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
             }
         } else {
             if ($user->isBlocked()) {
-                throw new Exception\UserBlocked();
+                throw new Exception\UserBlocked('User '.$name.' account is blocked');
             } elseif ($this->isBruteForce($user)) { //Brute force attack detection
                 $identifier = $this->_name;
                 Core::getLogger()->log(sprintf('Brute Force Attack Detected for account %s', $user->$identifier));
 
-                throw new Exception\BruteForceAttack('WARNING: Brute Force Attack Detected.');
+                throw new Exception\BruteForceAttack('User '.$name.' WARNING: Brute Force Attack Detected.');
             } else {
-                throw new Exception\WrongPassword();
+                throw new Exception\WrongPassword('User '.$name.' password is not correct');
             }
         }
     }

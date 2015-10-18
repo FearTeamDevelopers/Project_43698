@@ -231,6 +231,7 @@ class ReportController extends Controller
                     '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody()),
                         );
                 $email = \Admin\Model\EmailModel::loadAndPrepare('new-report', $data);
+                $email->subject = $email->getSubject().' - '.$report->getTitle();
 
                 foreach ($users as $user) {
                     $email->setRecipient($user->getEmail());

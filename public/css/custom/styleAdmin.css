@@ -28,7 +28,7 @@ h1,h2,h3 { font-family: Arial, Helvetica, sans-serif; letter-spacing: 0.5px; fon
 .radius3 { -moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; }
 .radius25 { -moz-border-radius: 25px; -webkit-border-radius: 25px; border-radius: 25px; }
 .radius50 { -moz-border-radius: 50px; -webkit-border-radius: 50px; border-radius: 50px; }
-.bebas { font-family: Arial, Helvetica, sans-serif; }
+.font-arial { font-family: Arial, Helvetica, sans-serif; }
 .width1 { width: 1px; }
 
 button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, sans-serif; margin: 0; }
@@ -448,6 +448,10 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .widgetbox { 
     background: #fff; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; margin-bottom: 10px; 
     -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee; 
+}
+.fix-height { 
+    height: 250px;
+    overflow-y: scroll;
 }
 .widgetbox .title { 
     background: #222; -moz-border-radius: 2px 2px 0 0; -webkit-border-radius: 2px 2px 0 0;
