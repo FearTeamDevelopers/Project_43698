@@ -50,7 +50,7 @@ section.wrapper.pridatInzerat.singlePage
                         label.error {echo join("<br/>", $errors["content"])}
                         |{/if}
                         textarea(name="content", required, rows=8) {echo \App\Helper\FormPrinter::iset($ad,"content")}
-                tr#anchor
+                tr
                     td
                         span Klíčová slova
                     td
@@ -77,8 +77,8 @@ section.wrapper.pridatInzerat.singlePage
                             span K inzerátu mohou být připojeny maximálně 3 fotky
                             br
                             span.field
-                                a(href="#anchor").multi_upload.fi-plus.mh10
-                                a(href="#anchor").multi_upload_dec.fi-minus.mh10
+                                a(href="").multi_upload.fi-plus.mh10
+                                a(href="").multi_upload_dec.fi-minus.mh10
                             span.field.file_inputs
                                 input(type="file", name="uploadfile[]", accept="image/*")
                 tr

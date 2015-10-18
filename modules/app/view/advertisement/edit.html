@@ -48,7 +48,7 @@
             <textarea name="content" required="required" rows="8">{echo \App\Helper\FormPrinter::iset($ad,"content")}</textarea>
           </td>
         </tr>
-        <tr id="anchor">
+        <tr>
           <td><span>Klíčová slova</span></td>
           <td>{if isset($errors["keywords"])}
             <label class="error">{echo join("<br/>", $errors["keywords"])}</label>{/if}
@@ -66,7 +66,7 @@
           <td><span>Fotky</span></td>
           <td>{if isset($errors["uploadfile"])}
             <label class="error">{echo join("<br/>", $errors["uploadfile"])}</label>{/if}
-            <p><span>K inzerátu mohou být připojeny maximálně 3 fotky</span><br/><span class="field"><a href="#anchor" class="multi_upload fi-plus mh10"></a><a href="#anchor" class="multi_upload_dec fi-minus mh10"></a></span><span class="field file_inputs">
+            <p><span>K inzerátu mohou být připojeny maximálně 3 fotky</span><br/><span class="field"><a href="" class="multi_upload fi-plus mh10"></a><a href="" class="multi_upload_dec fi-minus mh10"></a></span><span class="field file_inputs">
                 <input type="file" name="uploadfile[]" accept="image/*"/></span></p>
           </td>
         </tr>

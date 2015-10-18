@@ -106,7 +106,8 @@ jQuery(document).ready(function ($) {
     });
 
     /* ---------------------- UPLOAD FORMS --------------------------------*/
-    jQuery('.uploadForm .multi_upload').click(function () {
+    jQuery('.uploadForm .multi_upload').click(function (event) {
+        event.preventDefault();
         if (jQuery('.uploadForm .file_inputs input[type=file]').length < 3) {
             jQuery('.uploadForm .file_inputs input[type=file]')
                     .last()
@@ -115,6 +116,7 @@ jQuery(document).ready(function ($) {
     });
 
     jQuery('.uploadForm .multi_upload_dec').click(function () {
+        event.preventDefault();
         if (jQuery('.uploadForm .file_inputs input[type=file]').length > 1) {
             jQuery('.uploadForm .file_inputs input[type=file]').last().remove();
             jQuery('.uploadForm .file_inputs br').last().remove();
