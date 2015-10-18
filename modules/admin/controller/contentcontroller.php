@@ -12,6 +12,7 @@ use THCFrame\Core\StringMethods;
  */
 class ContentController extends Controller
 {
+
     /**
      * Check whether unique content identifier already exist or not.
      * 
@@ -68,6 +69,7 @@ class ContentController extends Controller
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
+            $metaDesc = substr(strip_tags(RequestMethods::post('text')), 0, 600);
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $content = new \App\Model\PageContentModel(array(
@@ -77,21 +79,21 @@ class ContentController extends Controller
                 'bodyEn' => RequestMethods::post('texten'),
                 'keywords' => $keywords,
                 'metaTitle' => RequestMethods::post('metatitle'),
-                'metaDescription' => RequestMethods::post('metadescription'),
+                'metaDescription' => RequestMethods::post('metadescription', $metaDesc),
             ));
 
             if (empty($errors) && $content->validate()) {
                 $id = $content->save();
 
                 $this->getCache()->invalidate();
-                Event::fire('admin.log', array('success', 'Content id: '.$id));
+                Event::fire('admin.log', array('success', 'Content id: ' . $id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/content/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($errors + $content->getErrors())));
+                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $content->getErrors())));
                 $view->set('errors', $errors + $content->getErrors())
-                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
-                    ->set('content', $content);
+                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('content', $content);
             }
         }
     }
@@ -130,6 +132,7 @@ class ContentController extends Controller
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
             }
 
+            $metaDesc = substr(strip_tags(RequestMethods::post('text')), 0, 600);
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
             $content->title = RequestMethods::post('page');
@@ -138,21 +141,21 @@ class ContentController extends Controller
             $content->bodyEn = RequestMethods::post('texten');
             $content->keywords = $keywords;
             $content->metaTitle = RequestMethods::post('metatitle');
-            $content->metaDescription = RequestMethods::post('metadescription');
+            $content->metaDescription = RequestMethods::post('metadescription', $metaDesc);
             $content->active = RequestMethods::post('active');
 
             if (empty($errors) && $content->validate()) {
                 $content->save();
                 \Admin\Model\PageContentHistoryModel::logChanges($originalContent, $content);
                 $this->getCache()->invalidate();
-                Event::fire('admin.log', array('success', 'Content id: '.$id));
+                Event::fire('admin.log', array('success', 'Content id: ' . $id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/content/');
             } else {
-                Event::fire('admin.log', array('fail', 'Content id: '.$id,
-                    'Errors: '.json_encode($errors + $content->getErrors()), ));
+                Event::fire('admin.log', array('fail', 'Content id: ' . $id,
+                    'Errors: ' . json_encode($errors + $content->getErrors()),));
                 $view->set('errors', $content->getErrors())
-                    ->set('content', $content);
+                        ->set('content', $content);
             }
         }
     }
@@ -171,4 +174,5 @@ class ContentController extends Controller
 
         $view->set('contents', $contents);
     }
+
 }

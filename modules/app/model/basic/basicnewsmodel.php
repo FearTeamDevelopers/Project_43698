@@ -138,17 +138,17 @@ class BasicNewsModel extends Model
      * @type varchar
      * @length 150
      * @validate alphanumeric,max(150)
-     * @label meta
+     * @label metatitle
      */
     protected $_metaTitle;
 
     /**
      * @column
      * @readwrite
-     * @type varchar
-     * @length 256
+     * @type text
      * @validate alphanumeric
-     * @label meta
+     * @label metadescription
+     * @null
      */
     protected $_metaDescription;
 

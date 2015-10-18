@@ -119,7 +119,7 @@ class ReportController extends Controller
             'rank' => RequestMethods::post('rank', 1),
             'keywords' => $keywords,
             'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-            'metaDescription' => RequestMethods::post('metadescription'),
+            'metaDescription' => strip_tags(RequestMethods::post('metadescription',$shortText)),
             'metaImage' => $imgMain,
             'photoName' => $urlKey,
             'imgMain' => $imgMain,
@@ -195,7 +195,7 @@ class ReportController extends Controller
         $object->archive = RequestMethods::post('archive');
         $object->keywords = $keywords;
         $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-        $object->metaDescription = RequestMethods::post('metadescription');
+        $object->metaDescription = strip_tags(RequestMethods::post('metadescription',$shortText));
         $object->metaImage = $imgMain;
         $object->photoName = $urlKey;
         $object->imgMain = $imgMain;

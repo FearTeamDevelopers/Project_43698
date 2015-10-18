@@ -42,9 +42,6 @@ class DevController extends Controller
         $LARGE_TEXT = str_replace('h1', 'h2', $content->getBody());
         unset($content);
 
-        $META_DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse efficitur viverra libero, at dapibus sapien placerat a. '
-                .'In efficitur tortor in nulla auctor tristique. Pellentesque non nisi mollis, tincidunt purus rutrum, ornare sem.';
-
         if ((int) $type == 1) {
             for ($i = 0; $i < $ROW_COUNT; $i+=1) {
                 $news = new \App\Model\NewsModel(array(
@@ -59,7 +56,7 @@ class DevController extends Controller
                     'rank' => 1,
                     'keywords' => 'news',
                     'metaTitle' => 'News-'.$i.'-'.time(),
-                    'metaDescription' => $META_DESC,
+                    'metaDescription' => $SHORT_TEXT,
                 ));
 
                 $news->save();
@@ -90,7 +87,7 @@ class DevController extends Controller
                     'endTime' => '',
                     'keywords' => 'action',
                     'metaTitle' => 'Action-'.$i.'-'.time(),
-                    'metaDescription' => $META_DESC,
+                    'metaDescription' => $SHORT_TEXT,
                 ));
 
                 $action->save();
@@ -113,7 +110,7 @@ class DevController extends Controller
                     'rank' => 1,
                     'keywords' => 'report',
                     'metaTitle' => 'Report-'.$i.'-'.time(),
-                    'metaDescription' => $META_DESC,
+                    'metaDescription' => $SHORT_TEXT,
                     'metaImage' => '',
                     'photoName' => '',
                     'imgMain' => '',

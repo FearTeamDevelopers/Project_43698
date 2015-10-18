@@ -98,7 +98,7 @@ class ActionController extends Controller
             'endTime' => RequestMethods::post('timeend'),
             'keywords' => $keywords,
             'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-            'metaDescription' => RequestMethods::post('metadescription'),
+            'metaDescription' => strip_tags(RequestMethods::post('metadescription', $shortText)),
         ));
 
         return $action;
@@ -148,7 +148,7 @@ class ActionController extends Controller
         $object->archive = RequestMethods::post('archive');
         $object->keywords = $keywords;
         $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-        $object->metaDescription = RequestMethods::post('metadescription');
+        $object->metaDescription = strip_tags(RequestMethods::post('metadescription',$shortText));
 
         return $object;
     }

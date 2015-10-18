@@ -168,7 +168,7 @@ class BasicReportModel extends Model
      * @type varchar
      * @length 150
      * @validate alphanumeric,max(150)
-     * @label meta
+     * @label metatitle
      */
     protected $_metaTitle;
 
@@ -177,7 +177,7 @@ class BasicReportModel extends Model
      * @readwrite
      * @type text
      * @validate alphanumeric
-     * @label meta
+     * @label metadescription
      * @null
      */
     protected $_metaDescription;
@@ -188,7 +188,7 @@ class BasicReportModel extends Model
      * @type varchar
      * @length 350
      * @validate alphanumeric,max(350)
-     * @label meta
+     * @label metaimage
      */
     protected $_metaImage;
 

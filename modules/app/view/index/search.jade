@@ -1,24 +1,20 @@
 section.wrapper.pageSearch.singlePage
-   |{if empty($urls)}
-   header.row
-      h2 Výsledky hledání
-   section.row.container
-      .large-12.medium-12.small-12.column
-            h3 Pro hledaný výraz nebyl nenalezen žádný odkaz
-   |{/if}
-   |{else}
-   header.row
-      h2 Výsledky hledání
-   section.row.container
-      .large-12.medium-12.small-12.column
-         |{foreach $url in $urls}
-         article
+    header.row
+        h2 Výsledky hledání
+    section.row.container
+    |{if empty($urls)}
+        h3 Pro hledaný výraz nebyl nenalezen žádný odkaz
+    |{/if}
+    |{else}
+        |{foreach $url in $urls}
+        article
             a(href!="{echo $url['path']}")
-               h3 {echo $url_i}
+                h3 {echo $url_i}
             small
-               span {echo \App\Helper\DateFormater::t2dt($url['created'])}
-               br
+                span {echo \App\Helper\DateFormater::t2dt($url['created'])}
+            br
             div {echo $url['meta']}
-         |{/foreach}
-   |{/else}
-
+        |{/foreach}
+    br
+    include ../components/pager
+    |{/else}
