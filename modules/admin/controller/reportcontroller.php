@@ -982,7 +982,7 @@ class ReportController extends Controller
             echo json_encode($conceptArr);
             exit;
         } else {
-            echo 'notfound';
+            echo $this->lang('NOT_FOUND');
             exit;
         }
     }
