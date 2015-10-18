@@ -25,7 +25,8 @@ try {
 
     $request = array(
         'GET' => $_GET,
-        'POST' => $_POST
+        'POST' => $_POST,
+        'COOKIE' => $_COOKIE
     );
 
     $init = Init::init(APP_PATH . '/vendors/ids/config/config.ini');
