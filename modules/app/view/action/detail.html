@@ -12,7 +12,8 @@
           <li><a href="NaN" class="fi-x ajaxReload">Nezúčastním se</a></li>{/if}
         </ul>
       </div>{/if}<span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span>
-      <hr/><span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->getStartDate())}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->getEndDate())}</strong></span><br/>{if !empty($action->startTime)}<span>Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/></span>{/if}
+      <hr/>{if !empty($action->getStartDate())}<span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->getStartDate())}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->getEndDate())}</strong></span><br/>{/if}
+      {if !empty($action->getStartTime())}<span>Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/></span>{/if}
     </header>{echo html_entity_decode($action->getBody())}
   </div>{if $isMember && !empty($attendance)}
   <div class="row container">
