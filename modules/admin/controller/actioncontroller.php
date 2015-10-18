@@ -59,14 +59,14 @@ class ActionController extends Controller
     {
         $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-        for ($i = 1; $i <= 50; $i+=1) {
+        for ($i = 1; $i <= 100; $i+=1) {
             if ($this->_checkUrlKey($urlKeyCh)) {
                 break;
             } else {
                 $urlKeyCh = $urlKey.'-'.$i;
             }
 
-            if ($i == 50) {
+            if ($i == 100) {
                 $this->_errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
                 break;
             }
@@ -113,10 +113,21 @@ class ActionController extends Controller
      */
     private function _editObject(\App\Model\ActionModel $object)
     {
-        $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
         if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-            $this->_errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            for ($i = 1; $i <= 100; $i+=1) {
+                if ($this->_checkUrlKey($urlKeyCh)) {
+                    break;
+                } else {
+                    $urlKeyCh = $urlKey . '-' . $i;
+                }
+
+                if ($i == 100) {
+                    $this->_errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+                    break;
+                }
+            }
         }
 
         if (null === $object->userId) {
@@ -135,7 +146,7 @@ class ActionController extends Controller
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
         $object->title = RequestMethods::post('title');
-        $object->urlKey = $urlKey;
+        $object->urlKey = $urlKeyCh;
         $object->body = RequestMethods::post('text');
         $object->shortBody = $shortText;
         $object->rank = RequestMethods::post('rank', 1);

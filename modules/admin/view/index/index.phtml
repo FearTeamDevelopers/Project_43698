@@ -146,7 +146,13 @@
                         {if !empty($latestnews)}
                         {foreach $news in $latestnews}
                         <tr>
-                            <td><a href="/admin/news/edit/{echo $news->getId()}">{echo $news->getTitle()}</a></td>
+                            <td>
+                                {if $authUser->getId() == $news->getUserId() || $isAdmin}
+                                    <a href="/admin/news/edit/{echo $news->getId()}">{echo $news->getTitle()}</a>
+                                {/if}{else}
+                                    {echo $news->getTitle()}
+                                {/else}
+                            </td>
                             <td>{echo $news->getUserAlias()}</td>
                             <td>{echo $news->getCreated()}</td>
                             <td>
@@ -184,7 +190,13 @@
                         {if !empty($latestreports)}
                         {foreach $report in $latestreports}
                         <tr>
-                            <td><a href="/admin/report/edit/{echo $report->getId()}">{echo $report->getTitle()}</a></td>
+                            <td>
+                                {if $authUser->getId() == $report->getUserId() || $isAdmin}
+                                    <a href="/admin/report/edit/{echo $report->getId()}">{echo $report->getTitle()}</a>
+                                {/if}{else}
+                                    {echo $news->getTitle()}
+                                {/else}
+                            </td>
                             <td>{echo $report->getUserAlias()}</td>
                             <td>{echo $report->getCreated()}</td>
                             <td>
@@ -224,7 +236,13 @@
                         {if !empty($latestactions)}
                         {foreach $action in $latestactions}
                         <tr>
-                            <td><a href="/admin/action/edit/{echo $action->getId()}">{echo $action->getTitle()}</a></td>
+                            <td>
+                                {if $authUser->getId() == $action->getUserId() || $isAdmin}
+                                    <a href="/admin/action/edit/{echo $action->getId()}">{echo $action->getTitle()}</a>
+                                {/if}{else}
+                                    {echo $news->getTitle()}
+                                {/else}
+                            </td>
                             <td>{echo $action->getUserAlias()}</td>
                             <td>{echo $action->getCreated()}</td>
                             <td>

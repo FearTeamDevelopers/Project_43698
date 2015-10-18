@@ -194,14 +194,14 @@ class EmailController extends Controller
             $errors = array();
             $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
-            for ($i = 1; $i <= 50; $i+=1) {
+            for ($i = 1; $i <= 100; $i+=1) {
                 if ($this->_checkUrlKey($urlKeyCh)) {
                     break;
                 } else {
                     $urlKeyCh = $urlKey.'-'.$i;
                 }
 
-                if ($i == 50) {
+                if ($i == 100) {
                     $errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
                     break;
                 }
@@ -262,15 +262,26 @@ class EmailController extends Controller
             }
 
             $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
 
             if ($emailTemplate->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+                for ($i = 1; $i <= 100; $i+=1) {
+                    if ($this->_checkUrlKey($urlKeyCh)) {
+                        break;
+                    } else {
+                        $urlKeyCh = $urlKey . '-' . $i;
+                    }
+
+                    if ($i == 100) {
+                        $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+                        break;
+                    }
+                }
             }
 
             $emailTemplate->title = RequestMethods::post('title');
             $emailTemplate->subject = RequestMethods::post('subject');
-            $emailTemplate->urlKey = $urlKey;
+            $emailTemplate->urlKey = $urlKeyCh;
             $emailTemplate->body = stripslashes(RequestMethods::post('text'));
             $emailTemplate->bodyEn = stripslashes(RequestMethods::post('texten'));
             $emailTemplate->type = $this->isSuperAdmin() ? RequestMethods::post('type') : 1;
