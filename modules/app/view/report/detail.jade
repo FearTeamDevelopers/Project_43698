@@ -1,22 +1,20 @@
 section.wrapper.report
-   .row
-    header.row
-       .reportInfo.large-12.column
-          h2 {echo $report->getTitle()}
-          small
-             span Autor:
-          span {echo " ".$report->getUserAlias()}
-          br
-          span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
-       .imgWrapper.large-12.column
-          img.centerBlock(src!='{echo $report->getImgMain()}')
-    .page.row
-      |{if $report->getImgMain() != ""}
-      .container
-          |{echo html_entity_decode($report->getBody())}
-      |{/if}
-      |{else}
-      .container.top_padded
-          |{echo html_entity_decode($report->getBody())}
-      |{/else}
-
+    .row
+        header.row
+            .reportInfo.large-12.column
+                h2 {echo $report->getTitle()}
+                small
+                    span Autor:
+                span {echo " ".$report->getUserAlias()}
+                br
+                span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
+            .imgWrapper.large-12.column
+                img.centerBlock(src!='{echo $report->getImgMain()}')
+        .page.row
+            |{if $report->getImgMain() != ""}
+            .container
+                |{echo html_entity_decode($report->getBody())}
+            |{/if}{else}
+            .container.top-padded
+                |{echo html_entity_decode($report->getBody())}
+            |{/else}

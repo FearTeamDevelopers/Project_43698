@@ -8,9 +8,8 @@
       <div class="imgWrapper large-12 column"><img src="{echo $report->getImgMain()}" class="centerBlock"/></div>
     </header>
     <div class="page row">{if $report->getImgMain() != ""}
-      <div class="container">{echo html_entity_decode($report->getBody())}</div>{/if}
-      {else}
-      <div class="container top_padded">{echo html_entity_decode($report->getBody())}</div>{/else}
+      <div class="container">{echo html_entity_decode($report->getBody())}</div>{/if}{else}
+      <div class="container top-padded">{echo html_entity_decode($report->getBody())}</div>{/else}
     </div>
   </div>
 </section>
