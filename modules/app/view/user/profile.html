@@ -64,19 +64,16 @@
             <td>
               <label>{if $user->getNewActionNotification}
                 <input type="checkbox" name="actionNotification" value="1" checked="checked"/>Informace o nových akcích
-                {/if}
-                {else}
+                {/if}{else}
                 <input type="checkbox" name="actionNotification" value="1"/>Informace o nových akcích
                 {/else}
               </label>
               <label>{if $user->getNewReportNotification}
                 <input type="checkbox" name="reportNotification" value="1" checked="checked"/>Informace o nových reportážích
-                {/if}
-                {else}
+                {/if}{else}
                 <input type="checkbox" name="reportNotification" value="1"/>Informace o nových reportážích
                 {/else}
               </label>
-              <label></label>
             </td>
           </tr>
           <tr>
