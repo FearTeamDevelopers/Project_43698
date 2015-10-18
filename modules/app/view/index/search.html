@@ -1,19 +1,19 @@
 
-<section class="wrapper pageSearch singlePage">{if empty($urls)}
+<section class="wrapper pageSearch singlePage">
   <header class="row">
     <h2>Výsledky hledání</h2>
   </header>
-  <section class="row container">
-    <h3>Pro hledaný výraz nebyl nenalezen žádný odkaz</h3>
-  </section>{/if}
-  {else}
-  <header class="row">
-    <h2>Výsledky hledání</h2>
-  </header>
-  <section class="row container">{foreach $url in $urls}
+  <section class="row container">{if empty($urls)}
+    <h3>Pro hledaný výraz nebyl nenalezen žádný odkaz</h3>{/if}{else}
+    {foreach $url in $urls}
     <article><a href="{echo $url['path']}">
         <h3>{echo $url_i}</h3></a><small><span>{echo \App\Helper\DateFormater::t2dt($url['created'])}</span></small><br/>
       <div>{echo $url['meta']}</div>
-    </article>{/foreach}
-  </section>{/else}
+    </article>{/foreach}<br/>{if  $pagecount > 1}
+    <section class="pager row">
+      {if $currentpage !=1}
+      {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}
+      {/if}
+    </section>{/if}{/else}
+  </section>
 </section>

@@ -2,10 +2,9 @@ section.wrapper.pageSearch.singlePage
     header.row
         h2 Výsledky hledání
     section.row.container
-    |{if empty($urls)}
+        |{if empty($urls)}
         h3 Pro hledaný výraz nebyl nenalezen žádný odkaz
-    |{/if}
-    |{else}
+        |{/if}{else}
         |{foreach $url in $urls}
         article
             a(href!="{echo $url['path']}")
@@ -15,6 +14,6 @@ section.wrapper.pageSearch.singlePage
             br
             div {echo $url['meta']}
         |{/foreach}
-    br
-    include ../components/pager
-    |{/else}
+        br
+        include ../components/pager
+        |{/else}
