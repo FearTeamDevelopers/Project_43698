@@ -61,6 +61,7 @@ return array(
 
     'ARTICLE_UNIQUE_ID' => 'Article unique id cannot be created. Please create new title.',
     'ARTICLE_TITLE_IS_USED' => 'This title is already used',
+    'ARTICLE_STARTDATE_ERROR' => 'Start date can not be greater than the end date',
 
     'NO_ROW_SELECTED' => 'No row selected',
 

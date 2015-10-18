@@ -267,7 +267,7 @@ class SystemController extends Controller
      */
     public function sync($type = 1)
     {
-        set_time_limit(0);
+        //set_time_limit(0);
         
         $this->_disableView();
         $view = $this->getActionView();
@@ -296,12 +296,12 @@ class SystemController extends Controller
             '\Admin\Model\Basic\BasicNewshistoryModel',
             '\Admin\Model\Basic\BasicPagecontentHistoryModel',
             '\Admin\Model\Basic\BasicReporthistoryModel',
-//            '\THCFrame\Configuration\Model\ConfigModel',
-//            '\THCFrame\Router\Model\RedirectModel',
-//            '\THCFrame\Security\Model\AuthtokenModel',
-//            '\THCFrame\Security\Model\FhsBaselineModel',
-//            '\THCFrame\Security\Model\FhsHistoryModel',
-//            '\THCFrame\Security\Model\FhsScannedModel',
+            '\THCFrame\Configuration\Model\ConfigModel',
+            '\THCFrame\Router\Model\RedirectModel',
+            '\THCFrame\Security\Model\AuthtokenModel',
+            '\THCFrame\Security\Model\FhsBaselineModel',
+            '\THCFrame\Security\Model\FhsHistoryModel',
+            '\THCFrame\Security\Model\FhsScannedModel',
         );
 
         $db = \THCFrame\Registry\Registry::get('database')->get();

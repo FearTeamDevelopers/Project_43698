@@ -115,7 +115,12 @@ class AttendanceModel extends BasicAttendanceModel
     public static function fetchTypeByUserAndAction($userId, $actionId)
     {
         $result = self::first(array('userId = ?' => (int) $userId, 'actionId = ?' => (int) $actionId), array('type'));
-        return $result->getType();
+        
+        if(!empty($result)){
+            return $result->getType();
+        }
+        
+        return 0;
     }
 
     /**

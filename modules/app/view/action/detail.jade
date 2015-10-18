@@ -2,7 +2,7 @@ section.wrapper.singlePage
     .row.container
         header
             h1 {echo $action->getTitle()}
-            |{if $isMember}
+            |{if $isMember && $action->getStartDate() > date("Y-m-d")}
             .buttonWrapper
                 ul
                     |{if $authuseratt != \App\Model\AttendanceModel::ACCEPT}

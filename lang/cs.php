@@ -61,6 +61,7 @@ return array(
 
     'ARTICLE_UNIQUE_ID' => 'Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.',
     'ARTICLE_TITLE_IS_USED' => 'Tento název již existuje',
+    'ARTICLE_STARTDATE_ERROR' => 'Datum začátku akce nemůže být větší než datum konce',
 
     'NO_ROW_SELECTED' => 'Nějaký řádek musí být vybrán',
 

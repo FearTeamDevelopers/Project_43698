@@ -2,7 +2,7 @@
 <section class="wrapper singlePage">
   <div class="row container">
     <header>
-      <h1>{echo $action->getTitle()}</h1>{if $isMember}
+      <h1>{echo $action->getTitle()}</h1>{if $isMember && $action->getStartDate() > date("Y-m-d")}
       <div class="buttonWrapper">
         <ul>{if $authuseratt != \App\Model\AttendanceModel::ACCEPT}
           <li><a href="NaN" class="fi-check ajaxReload">Zúčastním se</a></li>{/if}

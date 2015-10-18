@@ -2,6 +2,8 @@
 
 namespace THCFrame\Request;
 
+use THCFrame\Registry\Registry;
+
 /**
  * Request methods wrapper class
  */
@@ -139,9 +141,8 @@ class RequestMethods
      */
     public static function getBrowser()
     {
-        $ua = get_browser();
-
-        return json_encode($ua);
+        $browser = Registry::get('browser');
+        return $browser->getBrowser().' '.$browser->getVersion().' '.$browser->getPlatform().' '.$browser->getUserAgent();
     }
 
     /**

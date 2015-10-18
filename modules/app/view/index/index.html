@@ -1,9 +1,9 @@
 
-<div class="homepage">{if !empty($actions)}
+<div class="homepage">
   <section class="wrapper">
     <div class="row container">
       <header>
-        <h3 class="fi-compass">Akce</h3>
+        <h3 class="fi-compass">Akce</h3>{if !empty($actions)}
         <div class="actions-wrapper clearfix">{foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" class="large-6 medium-6 small-12 clearfix">
             <div class="article-item">
               <header>
@@ -16,13 +16,13 @@
                 </div>
               </header>
               <div>{echo html_entity_decode($action->getShortBody())}</div>
-            </div></a>{/foreach}</div>
+            </div></a>{/foreach}</div>{/if}{else}
+        <h4>Nejsou naplánované žádné akce</h4>{/else}
       </header>
       <div class="moreWrap"><a href="/akce">
           <div class="more"><span>Další akce</span></div></a></div>
     </div>
-  </section>{/if}
-  {if !empty($reports)}
+  </section>{if !empty($reports)}
   <section class="wrapper blue">
     <div class="row container">
       <header>

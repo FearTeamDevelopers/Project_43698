@@ -4,6 +4,7 @@ if (!isset($_SESSION['thc_devicetype'])) {
     require_once 'MobileDetect.php';
 
     $detect = new MobileDetect();
+    \THCFrame\Registry\Registry::set('mobiledetect', $detect);
 
     if ($detect->isMobile() && !$detect->isTablet()) {
         $deviceType = 'phone';

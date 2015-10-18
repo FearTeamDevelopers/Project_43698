@@ -1,9 +1,9 @@
 .homepage
-	|{if !empty($actions)}
 	section.wrapper
 		.row.container
 			header
 				h3.fi-compass Akce
+				|{if !empty($actions)}
 				.actions-wrapper.clearfix
 					|{foreach $action in $actions}
 					a.large-6.medium-6.small-12.clearfix(href!='/akce/r/{echo $action->getUrlKey()}')
@@ -16,11 +16,13 @@
 									h4 {echo $action->getTitle()}
 							div {echo html_entity_decode($action->getShortBody())}
 					|{/foreach}
+				|{/if}{else}
+				h4 Nejsou naplánované žádné akce
+				|{/else}
 			.moreWrap
 				a(href='/akce')
 					.more
 						span Další akce
-	|{/if}
 	|{if !empty($reports)}
 	section.wrapper.blue
 		.row.container
@@ -38,7 +40,6 @@
 							div {echo html_entity_decode($report->getShortBody())}
 					|{/if}{else}
 					article.report.large-3.medium-4.small-6
-
 						img(src!='{echo $report->imgThumb}')
 						.info
 							h3 {echo $report->getTitle()}

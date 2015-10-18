@@ -31,16 +31,10 @@ class ModuleConfig extends Module
      */
     protected $_routes = array(
         array(
-            'pattern' => '/bazar/hledat',
-            'module' => 'app',
-            'controller' => 'advertisement',
-            'action' => 'search',
-        ),
-        array(
-            'pattern' => '/bazar/filtr',
-            'module' => 'app',
-            'controller' => 'advertisement',
-            'action' => 'filter',
+            'pattern' => '/admin',
+            'module' => 'admin',
+            'controller' => 'index',
+            'action' => 'index',
         ),
         array(
             'pattern' => '/page/:urlkey',
