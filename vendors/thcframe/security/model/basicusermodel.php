@@ -11,12 +11,16 @@ use THCFrame\Core\Rand;
 use THCFrame\Date\Date;
 use THCFrame\Registry\Registry;
 use THCFrame\Core\StringMethods;
+use THCFrame\Events\Events as Event;
 
 /**
  * Basic user class
  */
 class BasicUserModel extends Model
 {
+
+    const ADMIN_PASS_STRENGHT = 0.5;
+    const MEMBER_PASS_STRENGHT = 0.3;
 
     /**
      * Maximum time after which the user must re-login
@@ -269,7 +273,7 @@ class BasicUserModel extends Model
      * @label prev password1
      */
     protected $_passwordHistory1;
-    
+
     /**
      * @column
      * @readwrite
@@ -280,7 +284,7 @@ class BasicUserModel extends Model
      * @label prev password2
      */
     protected $_passwordHistory2;
-    
+
     /**
      * @column
      * @readwrite
@@ -313,13 +317,13 @@ class BasicUserModel extends Model
      */
     private function _checkPasswordHistory($newPasswordHash)
     {
-        if($newPasswordHash == $this->_passwordHistory1 || $newPasswordHash == $this->_passwordHistory2){
+        if ($newPasswordHash == $this->_passwordHistory1 || $newPasswordHash == $this->_passwordHistory2) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * 
      */
@@ -339,7 +343,7 @@ class BasicUserModel extends Model
 
         $this->setModified(date('Y-m-d H:i:s'));
     }
-    
+
     /**
      * 
      */
@@ -361,7 +365,7 @@ class BasicUserModel extends Model
         } else {
             $this->_role = $value;
         }
-        
+
         return $this;
     }
 
@@ -375,7 +379,7 @@ class BasicUserModel extends Model
         } else {
             $this->_lastLogin = $time;
         }
-        
+
         return $this;
     }
 
@@ -393,10 +397,10 @@ class BasicUserModel extends Model
             $passExp = Date::getInstance()->dateAdd(date('Y-m-d'), 'Y-m-d H:i:s', 0, 0, $passExpiration);
             $this->_passExpire = $passExp;
         }
-        
+
         return $this;
     }
-    
+
     /**
      * 
      * @return \THCFrame\Security\Model\BasicUserModel
@@ -411,7 +415,7 @@ class BasicUserModel extends Model
             $accExpirationDate = Date::getInstance()->dateAdd(date('Y-m-d'), 'Y-m-d H:i:s', 0, 0, $accExpiration);
             $this->_accountExpire = $accExpirationDate;
         }
-        
+
         return $this;
     }
 
@@ -486,14 +490,14 @@ class BasicUserModel extends Model
     public function isPasswordExpired()
     {
         $passExp = Registry::get('configuration')->security->passwordExpiration;
-        if ((int)$passExp === 0) {
+        if ((int) $passExp === 0) {
             return false;
         }
 
         $currentTime = time();
         $passExpire = Date::getInstance()->getTimestamp($this->passExpire);
 
-        if (($passExpire - $currentTime) < (24*3600)) {
+        if (($passExpire - $currentTime) < (24 * 3600)) {
             $this->setForcePassChange(true);
             $this->update();
             return false;
@@ -511,7 +515,7 @@ class BasicUserModel extends Model
     public function getDaysToPassExpiration()
     {
         $passExp = Registry::get('configuration')->security->passwordExpiration;
-        if ((int)$passExp === 0) {
+        if ((int) $passExp === 0) {
             return false;
         }
 
@@ -527,7 +531,7 @@ class BasicUserModel extends Model
     public function isAccountExpired()
     {
         $accExp = Registry::get('configuration')->security->accountExpiration;
-        if ((int)$accExp === 0) {
+        if ((int) $accExp === 0) {
             return false;
         }
 
@@ -540,7 +544,7 @@ class BasicUserModel extends Model
             return false;
         }
     }
-    
+
     /**
      * 
      * @param type $oldPassword
@@ -549,17 +553,25 @@ class BasicUserModel extends Model
      * @return \THCFrame\Security\Model\BasicUserModel
      * @throws Exception\WrongPassword
      * @throws Exception\WeakPassword
-     */        
-    public function changePassword($oldPassword, $newPassword, $passStrength = 0.5)
+     */
+    public function changePassword($oldPassword, $newPassword, $passStrength = null)
     {
         if (!PasswordManager::validatePassword($oldPassword, $this->getPassword(), $this->getSalt())) {
             throw new Exception\WrongPassword('Wrong Password provided');
         }
 
+        if (null === $passStrength) {
+            if ($this->getRole() == 'role_member') {
+                $passStrength = self::MEMBER_PASS_STRENGHT;
+            } else {
+                $passStrength = self::ADMIN_PASS_STRENGHT;
+            }
+        }
+        
         if (PasswordManager::strength($newPassword) <= $passStrength) {
             throw new Exception\WeakPassword('Password is too weak');
         }
-        
+
         $cleanHash = StringMethods::getHash($newPassword);
         $this->_passwordHistory2 = $this->_passwordHistory1;
         $this->_passwordHistory1 = $cleanHash;
@@ -571,9 +583,9 @@ class BasicUserModel extends Model
         $this->setPassExipre();
 
         $checkPassHistory = Registry::get('configuration')->security->checkPasswordHistory;
-        if ((int)$checkPassHistory === 0) {
+        if ((int) $checkPassHistory === 0) {
             return $this;
-        }else{
+        } else {
             if (!$this->_checkPasswordHistory($cleanHash)) {
                 throw new Exception\PasswordInHistory('Password must be different than previous two');
             } else {
@@ -583,48 +595,29 @@ class BasicUserModel extends Model
     }
 
     /**
-     * Function to reset the password for the current user
-     * 
-     * @param type $oldPassword
-     * @param type $newPassword
-     * @return boolean
-     * @throws Exception\WrongPassword
-     */
-    public function resetPassword($oldPassword, $newPassword)
-    {
-        if (!PasswordManager::validatePassword($oldPassword, $this->getPassword(), $this->getSalt())) {
-            throw new Exception\WrongPassword('Wrong Password provided');
-        }
-
-        $this->salt = PasswordManager::createSalt();
-        $this->password = PasswordManager::hashPassword($newPassword, $this->getSalt());
-        $this->lastPassChange = Date::getInstance()->getFormatedCurDatetime('system');
-        $this->setPassExipre();
-
-        if ($this->validate()) {
-            $this->save();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Force password reset for user
      * 
      * @param type $newPassword
      * @return boolean
      */
-    public function forceResetPassword($newPassword = null, $passStrength = 0.5)
+    public function forceResetPassword($newPassword = null, $passStrength = null)
     {
         if (null === $newPassword) {
             $newPassword = PasswordManager::generate($passStrength);
         }
-        
+
+        if (null === $passStrength) {
+            if ($this->getRole() == 'role_member') {
+                $passStrength = self::MEMBER_PASS_STRENGHT;
+            } else {
+                $passStrength = self::ADMIN_PASS_STRENGHT;
+            }
+        }
+
         if (PasswordManager::strength($newPassword) <= $passStrength) {
             throw new Exception\WeakPassword('Password is too weak');
         }
-        
+
         $cleanHash = StringMethods::getHash($newPassword);
         $this->_passwordHistory2 = $this->_passwordHistory1;
         $this->_passwordHistory1 = $cleanHash;
@@ -635,26 +628,7 @@ class BasicUserModel extends Model
         $this->lastForcePassChange = Date::getInstance()->getFormatedCurDatetime('system');
         $this->setPassExipre();
 
-        $checkPassHistory = Registry::get('configuration')->security->checkPasswordHistory;
-        if ((int) $checkPassHistory === 0) {
-            if ($this->validate()) {
-                $this->save();
-                return $newPassword;
-            } else {
-                return false;
-            }
-        } else {
-            if (!$this->_checkPasswordHistory($cleanHash)) {
-                throw new Exception\PasswordInHistory('Password must be different than previous two');
-            } else {
-                if ($this->validate()) {
-                    $this->save();
-                    return $newPassword;
-                } else {
-                    return false;
-                }
-            }
-        }
+        return $this;
     }
 
     /**

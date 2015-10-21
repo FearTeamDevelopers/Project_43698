@@ -140,7 +140,13 @@ class UserController extends Controller
                 $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
             }
 
-            if (PasswordManager::strength(RequestMethods::post('password')) <= 0.5) {
+            if (RequestMethods::post('role', 'role_member') == 'role_member') {
+                $passStrenght = \App\Model\UserModel::MEMBER_PASS_STRENGHT;
+            } else {
+                $passStrenght = \App\Model\UserModel::ADMIN_PASS_STRENGHT;
+            }
+
+            if (PasswordManager::strength(RequestMethods::post('password')) <= $passStrenght) {
                 $errors['password'] = array($this->lang('PASS_WEAK'));
             }
 
@@ -239,7 +245,7 @@ class UserController extends Controller
                 $newPass = RequestMethods::post('password');
 
                 try {
-                    $user = $user->changePassword($oldPassword, $newPass, 0.5);
+                    $user = $user->changePassword($oldPassword, $newPass);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
@@ -318,19 +324,6 @@ class UserController extends Controller
             }
 
             $oldPassword = RequestMethods::post('oldpass');
-            if (!empty($oldPassword)) {
-                $newPass = RequestMethods::post('password');
-
-                try {
-                    $user = $user->changePassword($oldPassword, $newPass, 0.5);
-                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
-                    $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
-                } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
-                    $errors['password'] = array($this->lang('PASS_WEAK'));
-                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex) {
-                    $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
-                }
-            }
 
             $user->firstname = RequestMethods::post('firstname');
             $user->lastname = RequestMethods::post('lastname');
@@ -341,6 +334,28 @@ class UserController extends Controller
             $user->role = RequestMethods::post('role', $user->getRole());
             $user->active = RequestMethods::post('active');
             $user->blocked = RequestMethods::post('blocked');
+            
+            if ($this->isSuperAdmin() && !empty(RequestMethods::post('password'))) {
+                $newPass = RequestMethods::post('password');
+
+                try {
+                    $user = $user->forceResetPassword($newPass);
+                } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
+                    $errors['password'] = array($this->lang('PASS_WEAK'));
+                }
+            } elseif (!empty($oldPassword)) {
+                $newPass = RequestMethods::post('password');
+
+                try {
+                    $user = $user->changePassword($oldPassword, $newPass);
+                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
+                    $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
+                } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
+                    $errors['password'] = array($this->lang('PASS_WEAK'));
+                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex) {
+                    $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
+                }
+            }
 
             if (empty($errors) && $user->validate()) {
                 $user->update();
@@ -420,10 +435,12 @@ class UserController extends Controller
         }
 
         try {
-            $newPass = $user->forceResetPassword();
+            $user = $user->forceResetPassword();
 
-            if ($newPass !== false) {
-                $data = array('{NEWPASS}' => $newPass);
+            if ($user->validate()) {
+                $user->save();
+                
+                $data = array('{NEWPASS}' => $user->getPassword());
                 $email = \Admin\Model\EmailModel::loadAndPrepare('password-reset', $data);
                 $email->setRecipient($user->getEmail())
                         ->send();
@@ -432,7 +449,7 @@ class UserController extends Controller
                 Event::fire('admin.log', array('success', 'Force password change for user: ' . $user->getId()));
                 self::redirect('/admin/user/');
             } else {
-                $view->warningMessage($this->lang('COMMON_FAIL'));
+                $view->errorMessage($this->lang('COMMON_FAIL'));
                 Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
                     'Errors: ' . json_encode($user->getErrors()),));
                 self::redirect('/admin/user/');
@@ -440,7 +457,7 @@ class UserController extends Controller
         } catch (\Exception $ex) {
             $view->errorMessage($this->lang('UNKNOW_ERROR'));
             Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
-                'Errors: ' . $ex->getMessage(),));
+                'Exception: ' . $ex->getMessage(),));
             self::redirect('/admin/user/');
         }
     }

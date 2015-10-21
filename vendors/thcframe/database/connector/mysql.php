@@ -609,11 +609,13 @@ class Mysql extends Database\Connector
             $this->execute('SET foreign_key_checks = 1;');
         } catch (\Exception $ex) {
             Core::getLogger()->log($ex->getMessage(), 'sync', true, 'DbModelSync.log');
+            Core::getLogger()->log('---------- Sync was finished with errors ----------', 'sync', true, 'DbModelSync.log');
             $this->rollbackTransaction();
             return false;
         }
 
         $this->commitTransaction();
+        Core::getLogger()->log('---------- Sync was finished without errors ----------', 'sync', true, 'DbModelSync.log');
 
         return true;
     }

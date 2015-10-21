@@ -5,9 +5,11 @@ section.wrapper.akce.singlePage
         |{if !empty($actions)}
         |{foreach $action in $actions}
         article
+            |{if $action->getStartDate()}
             .date
                 .den {echo \App\Helper\DateFormater::g2dn($action->getStartDate())}
                 .mesic {echo \App\Helper\DateFormater::g2mn($action->getStartDate())}
+            |{/if}
             header
                 a(href!='/akce/r/{echo $action->getUrlKey()}')
                     h3 {echo $action->getTitle()}

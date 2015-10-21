@@ -73,7 +73,7 @@ class ActionController extends Controller
         }
 
         if(RequestMethods::post('datestart') > RequestMethods::post('dateend')){
-            $this->_errors['datestart'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
+            $this->_errors['startDate'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
         }
                 
         $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
@@ -140,7 +140,7 @@ class ActionController extends Controller
         );
 
         if(RequestMethods::post('datestart') > RequestMethods::post('dateend')){
-            $this->_errors['datestart'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
+            $this->_errors['startDate'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
         }
         
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));

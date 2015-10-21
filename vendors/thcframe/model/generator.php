@@ -4,7 +4,6 @@ namespace THCFrame\Model;
 
 use THCFrame\Core\Base;
 use THCFrame\Registry\Registry;
-use THCFrame\Model\Exception;
 use THCFrame\Model\Modelwriter;
 use THCFrame\Core\Core;
 
@@ -261,6 +260,7 @@ ANNOTATION;
 
         if (!empty($tables)) {
             foreach ($tables as $table => $module) {
+                Core::getLogger()->log('-------- Creating model class for '.$table.' --------', 'system');
                 $columns = $this->_getTableColumns($table);
 
                 if (!empty($columns)) {
@@ -281,6 +281,8 @@ ANNOTATION;
                     $modelWriter->writeModel();
                     unset($modelWriter, $columns);
                 }
+                
+                Core::getLogger()->log('-------- Model class was successfully created for table '.$table.' --------', 'system');
             }
         }
     }

@@ -84,10 +84,14 @@ class ActionModel extends BasicActionModel
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
         if ($limit === 0) {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'asc')
+            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), 
+                    array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
+                    array('rank' => 'desc', 'startDate' => 'asc')
             );
         } else {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'asc'), $limit, $page
+            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), 
+                    array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
+                    array('rank' => 'desc', 'startDate' => 'asc'), $limit, $page
             );
         }
 
@@ -103,7 +107,9 @@ class ActionModel extends BasicActionModel
      */
     public static function fetchOldWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())), array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())), 
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
+                array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
         );
 
         return $actions;
@@ -118,7 +124,9 @@ class ActionModel extends BasicActionModel
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
+        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), 
+                array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), 
+                array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
         );
 
         return $actions;

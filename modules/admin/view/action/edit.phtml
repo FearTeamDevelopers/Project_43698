@@ -25,7 +25,7 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <td class="head0">Vytvořen</td>
+                        <td class="head0">Vytvořeno</td>
                         <td class="head1">Poslední změna</td>
                         <td class="head0">&nbsp;</td>
                     </tr>
@@ -103,9 +103,9 @@
                     </span>
                 </p>
                 <p>
-                    <label>Datum - začátek</label>
+                    <label>Datum - začátek*</label>
                     <span class="field">
-                        Datum: {echo \Admin\Helper\FormPrinter::input('text', 'datestart', array($action,'startDate'), array('class'=>'width20 datepicker2'))}
+                        Datum: {echo \Admin\Helper\FormPrinter::input('text', 'datestart', array($action,'startDate'), array('class'=>'width20 datepicker2','required'=>true))}
                         Čas: {echo \Admin\Helper\FormPrinter::input('time', 'timestart', array($action,'startTime'), array('class'=>'width20'))}
 
                         {if isset($errors["startDate"])}
@@ -117,9 +117,9 @@
                     </span>
                 </p>
                 <p>
-                    <label>Datum - konec</label>
+                    <label>Datum - konec*</label>
                     <span class="field">
-                        Datum: {echo \Admin\Helper\FormPrinter::input('text', 'dateend', array($action,'endDate'), array('class'=>'width20 datepicker3'))}
+                        Datum: {echo \Admin\Helper\FormPrinter::input('text', 'dateend', array($action,'endDate'), array('class'=>'width20 datepicker3','required'=>true))}
                         Čas: {echo \Admin\Helper\FormPrinter::input('time', 'timeend', array($action,'endTime'), array('class'=>'width20'))}
 
                         {if isset($errors["endDate"])}

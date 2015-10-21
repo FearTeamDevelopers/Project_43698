@@ -163,7 +163,7 @@ class UserController extends Controller
                 $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
             }
 
-            if (strlen(RequestMethods::post('password')) < 5 || PasswordManager::strength(RequestMethods::post('password')) <= 0.3) {
+            if (strlen(RequestMethods::post('password')) < 5 || PasswordManager::strength(RequestMethods::post('password')) <= \App\Model\UserModel::MEMBER_PASS_STRENGHT) {
                 $errors['password'] = array($this->lang('PASS_WEAK'));
             }
 
@@ -313,7 +313,7 @@ class UserController extends Controller
                 $newPass = RequestMethods::post('password');
 
                 try {
-                    $user = $user->changePassword($oldPassword, $newPass, 0.3);
+                    $user = $user->changePassword($oldPassword, $newPass);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {

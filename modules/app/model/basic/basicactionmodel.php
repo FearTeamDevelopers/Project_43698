@@ -127,7 +127,7 @@ class BasicActionModel extends Model
      * @readwrite
      * @type char
      * @length 10
-     * @validate date,max(10)
+     * @validate required,date,max(10)
      * @label datum začátek
      * @null
      */
@@ -138,7 +138,7 @@ class BasicActionModel extends Model
      * @readwrite
      * @type char
      * @length 10
-     * @validate date,max(10)
+     * @validate required,date,max(10)
      * @label datum konec
      * @null
      */

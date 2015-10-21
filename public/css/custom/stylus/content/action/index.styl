@@ -13,56 +13,58 @@
 				&:not(:nth-child(odd))
 					padding 0 20px 20px
 		.article-item
-			height 300px
+			height 250px
 			background-color white
 			box-shadow 0 0 5px rgba(black, .4)
 			overflow hidden
 			&> div
 				padding 0 20px 20px
 			header
-				height 70px
+				height 90px
 				.date
 				.name
 					float left
 					display inline-block
 					text-align:center
 				.name
-					width calc(100% - 60px)
+					width calc(100% - 75px)
 					h4
 						line-height 70px
 						height 70px
 						text-overflow ellipsis
 						overflow hidden
 						white-space nowrap
+						margin-bottom 0
+						color black
+						font-weight 700
 				.date
-					width 60px
-					height 70px
+					width 75px
+					height 90px
 					box-shadow 0 0 1px rgba(black, 0.2)
 					.den
-						height 48px
-						line-height 48px
+						height 55px
+						line-height 55px
 						background-color white
-						font-size 36px
+						font-size 37px
 						font-weight bold
 					.mesic
 						background-color #a61d1d
-						height 22px
-						line-height 22px
+						height 30px
+						line-height 30px
+						font-size 17px
 						font-weight bold
 				margin-bottom 1em
+
+
 	.container
 		overflow auto
 		&:before
 			content ""
 			display table
-
-
 		&:after
 			content ""
 			display table
 			clear both
-
-
 		article
 			position relative
 			padding-left 110px !important
@@ -70,10 +72,6 @@
 				a
 					&:hover
 						text-decoration underline
-
-
-
-
 			.date
 				background rgba(0,0,0,0.8)
 				position absolute
@@ -89,20 +87,14 @@
 					text-align center
 					font-size 24px
 					color white
-
 				.mesic
 					font-size 18px
 					line-height 40px
 					color white
 
 
-
-
 	.moreWrap
 		margin-top .5rem
 		&:first-of-type
 			margin-top 2.5rem
-
-
-
 
