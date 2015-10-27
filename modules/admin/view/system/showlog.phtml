@@ -41,7 +41,7 @@
                 <td>{echo $logitem->action}</td>
                 <td>{echo $logitem->result}</td>
                 <td>{echo substr($logitem->httpreferer,0,50)}</td>
-                <td>{echo substr($logitem->params,0,50)}</td>
+                <td class="medium">{echo $logitem->params}</td>
                 <td><a href="/admin/system/showlogdetail/{echo $logitem->getId()}" class="btn btn3 btn_search dialog" value="Detail chyby" title="Detail"></a></td>
             </tr>
             {/foreach}

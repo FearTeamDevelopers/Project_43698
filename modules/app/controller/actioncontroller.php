@@ -59,14 +59,14 @@ class ActionController extends Controller
             $canonical = 'http://'.$this->getServerHost().'/akce/p/'.$page;
         }
 
-        $content = $this->getCache()->get('akce-'.$page);
+        $content = $this->getCache()->get('actions-'.$page);
 
         if (null !== $content) {
             $actions = $content;
         } else {
             $actions = \App\Model\ActionModel::fetchActiveWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('akce-'.$page, $actions);
+            $this->getCache()->set('actions-'.$page, $actions);
         }
 
         $actionCount = \App\Model\ActionModel::count(
@@ -178,7 +178,15 @@ class ActionController extends Controller
             $canonical = 'http://'.$this->getServerHost().'/archiv-akci/p/'.$page;
         }
 
-        $actions = \App\Model\ActionModel::fetchArchivatedWithLimit($articlesPerPage, $page);
+        $content = $this->getCache()->get('actions-arch-'.$page);
+
+        if (null !== $content) {
+            $actions = $content;
+        } else {
+            $actions = \App\Model\ActionModel::fetchArchivatedWithLimit($articlesPerPage, $page);
+
+            $this->getCache()->set('actions-arch-'.$page, $actions);
+        }
 
         $actionCount = \App\Model\ActionModel::count(
                         array('active = ?' => true,
@@ -301,7 +309,6 @@ class ActionController extends Controller
 
             if ($attendance->validate()) {
                 $attendance->save();
-                $this->getCache()->invalidate();
 
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 Event::fire('app.log', array('success', 'Attendance - '.$type.' - action '.$action->getId().' by user: '.$this->getUser()->getId()));

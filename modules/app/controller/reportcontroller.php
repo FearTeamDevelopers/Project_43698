@@ -62,14 +62,14 @@ class ReportController extends Controller
             $canonical = 'http://'.$this->getServerHost().'/reportaze/p/'.$page;
         }
 
-        $content = $this->getCache()->get('report-'.$page);
+        $content = $this->getCache()->get('reports-'.$page);
 
         if (null !== $content) {
             $reports = $content;
         } else {
             $reports = \App\Model\ReportModel::fetchActiveWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('report-'.$page, $reports);
+            $this->getCache()->set('reports-'.$page, $reports);
         }
 
         $reportCount = \App\Model\ReportModel::count(

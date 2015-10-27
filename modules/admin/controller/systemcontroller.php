@@ -82,7 +82,7 @@ class SystemController extends Controller
         $log = \Admin\Model\AdminLogModel::all(array(), array('*'), array('created' => 'DESC'), 250);
         $view->set('adminlog', $log);
     }
-    
+
     /**
      * 
      * @param type $id
@@ -91,15 +91,19 @@ class SystemController extends Controller
     public function showLogDetail($id)
     {
         $this->_disableView();
-        
-        $log = \Admin\Model\AdminLogModel::first(array('id = ?' =>(int)$id));
-        
-        if(!empty($log)){
-            $str = 'Akce: <br/><strong>'.$log->getModule().'/'.$log->getController().'/'.$log->getAction().'</strong><br/><br/>';
-            $str .= 'Referer: <br/><strong>'.$log->getHttpreferer().'</strong><br/><br/>';
-            $str .=  'Parametry: <br/><strong>'.$log->getParams().'</strong>';
+
+        $log = \Admin\Model\AdminLogModel::first(array('id = ?' => (int) $id));
+
+        if (!empty($log)) {
+            $params = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+                return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UTF-16BE');
+            }, $log->getParams());
+
+            $str = 'Akce: <br/><strong>' . $log->getModule() . '/' . $log->getController() . '/' . $log->getAction() . '</strong><br/><br/>';
+            $str .= 'Referer: <br/><strong>' . $log->getHttpreferer() . '</strong><br/><br/>';
+            $str .= 'Parametry: <br/><strong>' . $params . '</strong>';
             echo $str;
-        }else{
+        } else {
             echo $this->lang('NOT_FOUND');
         }
     }
@@ -269,10 +273,10 @@ class SystemController extends Controller
         $this->_disableView();
         $view = $this->getActionView();
 
-        try{
+        try {
             $generator = new \THCFrame\Model\Generator(array('dbIdent' => $dbIdent));
             $generator->createModels();
-            
+
             Event::fire('admin.log', array('success', 'Generate model classes'));
             $view->successMessage('New models were generated');
             self::redirect('/admin/system/');
@@ -289,17 +293,17 @@ class SystemController extends Controller
     public function sync($type = 1)
     {
         //set_time_limit(0);
-        
+
         $this->_disableView();
         $view = $this->getActionView();
 
         $models = array(
-            '\App\Model\Basic\BasicActionModel',
+//            '\App\Model\Basic\BasicActionModel',
 //            '\App\Model\Basic\BasicAdimageModel',
 //            '\App\Model\Basic\BasicAdmessageModel',
 //            '\App\Model\Basic\BasicAdsectionModel',
+            '\App\Model\Basic\BasicAdvertisementModel',
 //            '\App\Model\Basic\BasicAdvertisementhistoryModel',
-//            '\App\Model\Basic\BasicAdvertisementModel',
 //            '\App\Model\Basic\BasicAttendanceModel',
 //            '\App\Model\Basic\BasicCommentModel',
 //            '\App\Model\Basic\BasicFeedbackModel',
@@ -327,7 +331,7 @@ class SystemController extends Controller
 
         $db = \THCFrame\Registry\Registry::get('database')->get();
         $error = false;
-        
+
         $dump = new Mysqldump();
         $dump->create();
 
@@ -336,17 +340,17 @@ class SystemController extends Controller
 
             if ($type == 1) {
                 if (!$db->sync($m, false, 'alter', false)) {
-                    $errMsg = 'An error occured while executing db sync for model: '.$model.'. Check error log';
+                    $errMsg = 'An error occured while executing db sync for model: ' . $model . '. Check error log';
                     $error = true;
-                    
+
                     Event::fire('admin.log', array('fail', $errMsg));
                     Core::getLogger()->log($errMsg, 'sync', true, 'DbModelSync.log');
                 }
             } elseif ($type == 2) {
                 if (!$db->sync($m, true, 'alter', false)) {
-                    $errMsg = 'An error occured while executing db sync for model: '.$model.'. Check error log';
+                    $errMsg = 'An error occured while executing db sync for model: ' . $model . '. Check error log';
                     $error = true;
-                    
+
                     Event::fire('admin.log', array('fail', $errMsg));
                     Core::getLogger()->log($errMsg, 'sync', true, 'DbModelSync.log');
                 }

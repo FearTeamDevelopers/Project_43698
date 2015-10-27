@@ -29,25 +29,25 @@ class ModuleConfig extends Module
             'pattern' => '/c/generatesitemap',
             'module' => 'cron',
             'controller' => 'index',
-            'action' => 'crongeneratesitemap',
+            'action' => 'generatesitemap',
         ),
         array(
             'pattern' => '/c/dbbackup',
             'module' => 'cron',
-            'controller' => 'index',
-            'action' => 'crondailydatabasebackup',
+            'controller' => 'backup',
+            'action' => 'dailydatabasebackup',
         ),
         array(
             'pattern' => '/c/monthdbbackup',
             'module' => 'cron',
-            'controller' => 'index',
-            'action' => 'cronmonthlydatabasebackup',
+            'controller' => 'backup',
+            'action' => 'monthlydatabasebackup',
         ),
         array(
             'pattern' => '/c/clonedb',
             'module' => 'cron',
-            'controller' => 'index',
-            'action' => 'crondatabaseprodtotest',
+            'controller' => 'backup',
+            'action' => 'databaseprodtotest',
         ),
         array(
             'pattern' => '/c/systemcheck',
@@ -56,10 +56,34 @@ class ModuleConfig extends Module
             'action' => 'systemcheck',
         ),
         array(
+            'pattern' => '/c/filehashscan',
+            'module' => 'cron',
+            'controller' => 'index',
+            'action' => 'filehashscan',
+        ),
+        array(
             'pattern' => '/c/adexpirationcheck',
             'module' => 'cron',
-            'controller' => 'adv',
+            'controller' => 'advertisement',
             'action' => 'checkadexpirations',
+        ),
+        array(
+            'pattern' => '/c/archivateactions',
+            'module' => 'cron',
+            'controller' => 'archive',
+            'action' => 'archivateactions',
+        ),
+        array(
+            'pattern' => '/c/archivatenews',
+            'module' => 'cron',
+            'controller' => 'archive',
+            'action' => 'archivatenews',
+        ),
+        array(
+            'pattern' => '/c/archivatereports',
+            'module' => 'cron',
+            'controller' => 'archive',
+            'action' => 'archivatereports',
         ),
     );
 }

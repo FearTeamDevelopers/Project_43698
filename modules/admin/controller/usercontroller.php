@@ -388,6 +388,7 @@ class UserController extends Controller
             echo $this->lang('NOT_FOUND');
         } else {
             $user->deleted = true;
+            $user->active = false;
 
             if ($user->validate()) {
                 $user->save();

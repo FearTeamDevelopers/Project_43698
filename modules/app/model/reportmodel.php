@@ -54,6 +54,26 @@ class ReportModel extends BasicReportModel
     }
 
     /**
+     * Delete report and image
+     * 
+     * @return type
+     */
+    public function delete()
+    {
+        $imgMain = $this->getUnlinkPath();
+        $imgThumb = $this->getUnlinkThumbPath();
+
+        $state = parent::delete();
+
+        if ($state != -1) {
+            @unlink($imgMain);
+            @unlink($imgThumb);
+        }
+
+        return $state;
+    }
+    
+    /**
      * @return array
      */
     public static function fetchAll()

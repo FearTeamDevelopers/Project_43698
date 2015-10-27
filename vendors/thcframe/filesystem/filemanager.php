@@ -514,7 +514,7 @@ class FileManager extends Base
                     }
 
                     if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                        $this->_uploadErrors[] = sprintf('Your file %s size exceeds the maximum size limit', $filename);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
                         continue;
                     } else {
                         if (in_array($extension, $this->_fileExtensions)) {
@@ -528,7 +528,7 @@ class FileManager extends Base
                             $copy = move_uploaded_file($_FILES[$postField]['tmp_name'][$i], $fileLocName);
 
                             if (!$copy) {
-                                $this->_uploadErrors[] = sprintf('Error while uploading image %s. Try again.', $filename);
+                                $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
                                 continue;
                             } else {
                                 $file = new File($fileLocName);
@@ -538,12 +538,13 @@ class FileManager extends Base
                                 continue;
                             }
                         } else {
-                            $this->_uploadErrors[] = sprintf('File has unsupported extension. Files: %s', join(', ', $this->_fileExtensions));
+                            $extStr = implode(',', $this->_fileExtensions);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
                             continue;
                         }
                     }
                 } else {
-                    $this->_uploadErrors[] = sprintf("Source %s cannot be empty", $i);
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EMPTY_SOURCE', array($i));
                     continue;
                 }
             }
@@ -587,7 +588,7 @@ class FileManager extends Base
                 $filename = $this->getNormalizedFileName($_FILES[$postField]['name']);
 
                 if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                    $this->_uploadErrors[] = sprintf('Your file %s size exceeds the maximum size limit', $filename);
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
                 } else {
                     if (in_array($extension, $this->_fileExtensions)) {
                         $fileNameExt = $filename . '.' . $extension;
@@ -600,7 +601,7 @@ class FileManager extends Base
                         $copy = move_uploaded_file($_FILES[$postField]['tmp_name'], $fileLocName);
 
                         if (!$copy) {
-                            $this->_uploadErrors[] = sprintf('Error while uploading image %s. Try again.', $filename);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
                         } else {
                             $file = new File($fileLocName);
 
@@ -608,7 +609,8 @@ class FileManager extends Base
                             unset($file);
                         }
                     } else {
-                        $this->_uploadErrors[] = sprintf('File has unsupported extension. Files: %s', join(', ', $this->_fileExtensions));
+                        $extStr = implode(',', $this->_fileExtensions);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
                     }
                 }
             }
@@ -688,7 +690,7 @@ class FileManager extends Base
                     }
 
                     if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                        $this->_uploadErrors[] = sprintf('Your file %s size exceeds the maximum size limit', $filename);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
                         continue;
                     } else {
                         if (in_array($extension, $this->_imageExtensions)) {
@@ -708,7 +710,7 @@ class FileManager extends Base
                             $copy = move_uploaded_file($_FILES[$postField]['tmp_name'][$i], $imageLocName);
 
                             if (!$copy) {
-                                $this->_uploadErrors[] = sprintf('Error while uploading image %s. Try again.', $filename);
+                                $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
                                 continue;
                             } else {
                                 $img = new Image($imageLocName);
@@ -745,12 +747,13 @@ class FileManager extends Base
                                 }
                             }
                         } else {
-                            $this->_uploadErrors[] = sprintf('File has unsupported extension. Images: %s', join(', ', $this->_imageExtensions));
+                            $extStr = implode(', ', $this->_imageExtensions);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
                             continue;
                         }
                     }
                 } else {
-                    $this->_uploadErrors[] = sprintf("Source %s cannot be empty", $i);
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EMPTY_SOURCE', array($i));
                     continue;
                 }
             }
@@ -794,7 +797,7 @@ class FileManager extends Base
                 $filename = $this->getNormalizedFileName($_FILES[$postField]['name']);
 
                 if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                    $this->_uploadErrors[] = sprintf('Your file %s size exceeds the maximum size limit', $filename);
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
                 } else {
                     if (in_array($extension, $this->_imageExtensions)) {
                         $imageName = $filename . '.' . $extension;
@@ -813,7 +816,7 @@ class FileManager extends Base
                         $copy = move_uploaded_file($_FILES[$postField]['tmp_name'], $imageLocName);
 
                         if (!$copy) {
-                            $this->_uploadErrors[] = sprintf('Error while uploading image %s. Try again.', $filename);
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
                         } else {
                             $img = new Image($imageLocName);
                             $img->setSize($size);
@@ -847,7 +850,8 @@ class FileManager extends Base
                             }
                         }
                     } else {
-                        $this->_uploadErrors[] = sprintf('File has unsupported extension. Images: %s', join(', ', $this->_imageExtensions));
+                        $extStr = implode(', ', $this->_imageExtensions);
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
                     }
                 }
             }
@@ -925,7 +929,8 @@ class FileManager extends Base
                 $this->_uploadedFiles[] = $img;
             }
         } else {
-            $this->_uploadErrors[] = sprintf('File has unsupported extension. Images: %s', join(', ', $this->_imageExtensions));
+            $extStr = implode(', ', $this->_imageExtensions);
+            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
         }
 
         return $this;

@@ -55,7 +55,7 @@
           <td><span>Cena</span></td>
           <td>{if isset($errors["price"])}
             <label class="error">{echo join("<br/>", $errors["price"])}</label>{/if}
-            {echo \App\Helper\FormPrinter::input("text", "price", array($ad,"price"), array("placeholder" => "při nevyplnění bude hodnota: \"Dohodou\""))}
+            {echo \App\Helper\FormPrinter::input("text", "price", array($ad,"price"), array("placeholder" => "při nevyplnění bude hodnota: Dohodou", "pattern" => "\d*", "title" => "Vyplňte pouze čísla"))}
           </td>
         </tr>
         <tr>

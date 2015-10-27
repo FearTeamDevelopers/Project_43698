@@ -31,6 +31,24 @@ class PartnerModel extends BasicPartnerModel
     }
 
     /**
+     * Delete record and logo image
+     * 
+     * @return type
+     */
+    public function delete()
+    {
+        $imgMain = $this->getUnlinkLogoPath();
+
+        $state = parent::delete();
+
+        if ($state != -1) {
+            @unlink($imgMain);
+        }
+
+        return $state;
+    }
+    
+    /**
      * @return type
      */
     public function getUnlinkLogoPath($type = true)

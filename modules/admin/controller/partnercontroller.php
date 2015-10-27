@@ -68,6 +68,7 @@ class PartnerController extends Controller
 
                         if ($partner->validate()) {
                             $id = $partner->save();
+                            $this->getCache()->erase('index-partners');
 
                             Event::fire('admin.log', array('success', 'Partner id: '.$id));
                             $view->successMessage($this->lang('CREATE_SUCCESS'));
@@ -155,7 +156,8 @@ class PartnerController extends Controller
 
             if (empty($errors) && $partner->validate()) {
                 $partner->save();
-
+                $this->getCache()->erase('index-partners');
+                
                 Event::fire('admin.log', array('success', 'Partner id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/partner/');
@@ -185,10 +187,8 @@ class PartnerController extends Controller
         if (null === $partner) {
             echo $this->lang('NOT_FOUND');
         } else {
-            $path = $partner->getUnlinkLogoPath();
-
             if ($partner->delete()) {
-                @unlink($path);
+                $this->getCache()->erase('index-partners');
                 Event::fire('admin.log', array('success', 'Partner id: '.$id));
                 echo 'success';
             } else {
@@ -218,6 +218,7 @@ class PartnerController extends Controller
             if ($partner->validate()) {
                 @unlink($path);
                 $partner->save();
+                $this->getCache()->erase('index-partners');
 
                 Event::fire('admin.log', array('success', 'Partner id: '.$id));
                 echo 'success';
@@ -267,6 +268,7 @@ class PartnerController extends Controller
                     }
 
                     if (empty($errors)) {
+                        $this->getCache()->erase('index-partners');
                         Event::fire('admin.log', array('delete success', 'Partner ids: '.implode(',', $ids)));
                         $view->successMessage($this->lang('DELETE_SUCCESS'));
                     } else {
@@ -298,6 +300,7 @@ class PartnerController extends Controller
                     }
 
                     if (empty($errors)) {
+                        $this->getCache()->erase('index-partners');
                         Event::fire('admin.log', array('activate success', 'Partner ids: '.implode(',', $ids)));
                         $view->successMessage($this->lang('ACTIVATE_SUCCESS'));
                     } else {
@@ -329,6 +332,7 @@ class PartnerController extends Controller
                     }
 
                     if (empty($errors)) {
+                        $this->getCache()->erase('index-partners');
                         Event::fire('admin.log', array('deactivate success', 'Partner ids: '.implode(',', $ids)));
                         $view->successMessage($this->lang('DEACTIVATE_SUCCESS'));
                     } else {

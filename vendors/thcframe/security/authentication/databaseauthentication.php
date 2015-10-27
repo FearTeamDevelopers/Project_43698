@@ -130,9 +130,10 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
     public function authenticate($name, $pass)
     {
         $user = \App\Model\UserModel::first(
-                        array("{$this->_name} = ?" => $name), array('id', "{$this->_name}", "{$this->_pass}",
-                    'salt', 'active', 'blocked', 'lastLogin', 'role', 'passExpire', 'accountExpire',
-                    'totalLoginAttempts', 'lastLoginAttempt', 'firstLoginAttempt'));
+                        array("{$this->_name} = ?" => $name, 'active = ?' => true, 'deleted = ?' => false), 
+                        array('id', "{$this->_name}", "{$this->_pass}", 'salt', 'active', 'blocked', 
+                                'deleted', 'lastLogin', 'role', 'passExpire', 'accountExpire', 
+                                'totalLoginAttempts', 'lastLoginAttempt', 'firstLoginAttempt'));
 
         if ($user === null) {
             throw new Exception\UserNotExists('User '.$name.' does not exists');

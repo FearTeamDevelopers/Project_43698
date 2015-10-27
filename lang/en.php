@@ -62,6 +62,7 @@ return array(
     'ARTICLE_UNIQUE_ID' => 'Article unique id cannot be created. Please create new title.',
     'ARTICLE_TITLE_IS_USED' => 'This title is already used',
     'ARTICLE_STARTDATE_ERROR' => 'Start date can not be greater than the end date',
+    'ARTICLE_TIME_ERROR' => 'Both of start time and end time must be filled',
 
     'NO_ROW_SELECTED' => 'No row selected',
 
@@ -107,4 +108,9 @@ return array(
     'UPLOAD_ERR_CANT_WRITE' => 'Failed to write file %s to disk',
     'UPLOAD_ERR_EXTENSION' => 'File upload stopped by extension',
     'UPLOAD_ERR_DEFAULT' => 'Unknown upload error occured while uploading file %s',
+    'UPLOAD_ERR_EXT' => 'File has unsupported extension. Extensions: %s',
+    'UPLOAD_ERR_EMPTY_SOURCE' => 'Source %s cannot be empty',
+    
+    'SEND_FEEDBACK_SUCCESS' => 'Thank you for your help',
+    'SEND_FEEDBACK_FAIL' => 'An error occured while sending message',
 );

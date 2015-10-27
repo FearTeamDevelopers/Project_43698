@@ -29,14 +29,14 @@ class GalleryController extends Controller
             $canonical = 'http://'.$this->getServerHost().'/galerie/p/'.$page;
         }
 
-        $content = $this->getCache()->get('galerie-'.$page);
+        $content = $this->getCache()->get('gallery-'.$page);
 
         if (null !== $content) {
             $galleries = $content;
             unset($content);
         } else {
             $galleries = \App\Model\GalleryModel::fetchPublicActiveGalleries(30, $page);
-            $this->getCache()->set('galerie-'.$page, $galleries);
+            $this->getCache()->set('gallery-'.$page, $galleries);
         }
 
         $galleryCount = \App\Model\GalleryModel::count(

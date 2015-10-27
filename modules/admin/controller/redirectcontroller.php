@@ -51,6 +51,7 @@ class RedirectController extends Controller
 
             if ($redirect->validate()) {
                 $id = $redirect->save();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Redirect id: '.$id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
@@ -98,6 +99,7 @@ class RedirectController extends Controller
 
             if ($redirect->validate()) {
                 $redirect->save();
+                $this->getCache()->invalidate();
 
                 Event::fire('admin.log', array('success', 'Redirect id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
@@ -129,6 +131,7 @@ class RedirectController extends Controller
             echo $this->lang('NOT_FOUND');
         } else {
             if ($redirect->delete()) {
+                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Redirect id: '.$id));
                 echo 'success';
             } else {

@@ -57,7 +57,7 @@
       <div class="infoWrapper">
         <div class="info">{if $ad->getAdType() =='tender'}
           <center><span class="nabidka">Nabídka</span></center>{/if}{else}
-          <center><span class="poptavka">Poptávka</span></center>{/else}<small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}</span><br/><small><span>cena:</span></small>{if $ad->getPrice() == "1"}<span class="price">{echo " na dohodě"}</span><br/>
+          <center><span class="poptavka">Poptávka</span></center>{/else}<small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}</span><br/><small><span>cena:</span></small>{if "" == $ad->getPrice()}<span class="price">{echo " Dohodou"}</span><br/>
           {/if}{else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}</span><br/>
           {/else}<small><span>platnost do:</span></small><span>{echo " ".\App\Helper\DateFormater::t2d($ad->getExpirationDate())}</span><br/><a href="/bazar/r/{echo $ad->getUniqueKey()}" class="bla">zobrazit podrobnosti</a>{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}<a href="/bazar/prodano/{echo $ad->getUniqueKey()}" title="Prodáno" class="buttonTab sell ajaxReload fi-dollar"></a><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" title="Upravit" class="buttonTab edit fi-pencil"></a><a href="/bazar/prodlouzit/{echo $ad->getUniqueKey()}" title="Požádat o prodloužení" class="buttonTab reload ajaxReload fi-refresh"></a><a href="/bazar/smazat/{echo $ad->getUniqueKey()}" title="Smazat" class="buttonTab delete ajaxReload fi-trash"></a>{/if}
         </div>

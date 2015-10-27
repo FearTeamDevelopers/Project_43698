@@ -99,8 +99,8 @@ class GalleryController extends Controller
 
             if (empty($errors) && $gallery->validate()) {
                 $id = $gallery->save();
-
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('gallery');
+                
                 Event::fire('admin.log', array('success', 'Gallery id: '.$id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/'.$id);
@@ -189,8 +189,8 @@ class GalleryController extends Controller
 
             if (empty($errors) && $gallery->validate()) {
                 $gallery->save();
-
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('gallery');
+                
                 Event::fire('admin.log', array('success', 'Gallery id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/'.$id);
@@ -268,7 +268,7 @@ class GalleryController extends Controller
             }
 
             if ($gallery->delete()) {
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('gallery');
                 Event::fire('admin.log', array('success', 'Gallery id: '.$id));
                 $view->successMessage($this->lang('DELETE_SUCCESS'));
                 self::redirect('/admin/gallery/');
@@ -388,6 +388,7 @@ class GalleryController extends Controller
             $errors['uploadfile'] = $uploadErrors;
 
             if (empty($errors['uploadfile'])) {
+                $this->getCache()->erase('gallery');
                 header('HTTP/1.0 200 OK');
                 echo $this->lang('UPLOAD_SUCCESS');
                 exit;
@@ -430,6 +431,7 @@ class GalleryController extends Controller
             }
 
             if ($photo->delete()) {
+                $this->getCache()->erase('gallery');
                 Event::fire('admin.log', array('success', 'Photo id: '.$id));
                 echo 'success';
             } else {
@@ -472,6 +474,8 @@ class GalleryController extends Controller
 
                 if ($photo->validate()) {
                     $photo->save();
+                    $this->getCache()->erase('gallery');
+                    
                     Event::fire('admin.log', array('success', 'Photo id: '.$id));
                     echo 'active';
                 } else {
@@ -482,6 +486,8 @@ class GalleryController extends Controller
 
                 if ($photo->validate()) {
                     $photo->save();
+                    $this->getCache()->erase('gallery');
+                    
                     Event::fire('admin.log', array('success', 'Photo id: '.$id));
                     echo 'inactive';
                 } else {

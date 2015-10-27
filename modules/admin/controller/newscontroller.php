@@ -129,13 +129,18 @@ class NewsController extends Controller
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
+        if(!$this->isAdmin()){
+            $object->approved = $this->getConfig()->news_autopublish;
+        }else{
+            $object->approved = RequestMethods::post('approve');
+        }
+        
         $object->title = RequestMethods::post('title');
         $object->urlKey = $urlKeyCh;
         $object->body = RequestMethods::post('text');
         $object->shortBody = $shortText;
         $object->rank = RequestMethods::post('rank', 1);
         $object->active = RequestMethods::post('active');
-        $object->approved = RequestMethods::post('approve');
         $object->archive = RequestMethods::post('archive');
         $object->keywords = $keywords;
         $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
@@ -196,7 +201,7 @@ class NewsController extends Controller
 
             if (empty($this->_errors) && $news->validate()) {
                 $id = $news->save();
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('news');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'News id: '.$id));
@@ -283,7 +288,7 @@ class NewsController extends Controller
             if (empty($this->_errors) && $news->validate()) {
                 $news->save();
                 \Admin\Model\NewsHistoryModel::logChanges($originalNews, $news);
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('news');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'News id: '.$id));
@@ -336,7 +341,7 @@ class NewsController extends Controller
         } else {
             if ($this->_checkAccess($news)) {
                 if ($news->delete()) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('news');
                     Event::fire('admin.log', array('success', 'News id: '.$id));
                     echo 'success';
                 } else {
@@ -374,7 +379,7 @@ class NewsController extends Controller
 
             if ($news->validate()) {
                 $news->save();
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('news');
 
                 Event::fire('admin.log', array('success', 'News id: '.$id));
                 echo 'success';
@@ -471,7 +476,7 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('news');
                     Event::fire('admin.log', array('delete success', 'News ids: '.implode(',', $ids)));
                     echo $this->lang('DELETE_SUCCESS');
                 } else {
@@ -505,7 +510,7 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('news');
                     Event::fire('admin.log', array('activate success', 'News ids: '.implode(',', $ids)));
                     echo $this->lang('ACTIVATE_SUCCESS');
                 } else {
@@ -539,7 +544,7 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('news');
                     Event::fire('admin.log', array('deactivate success', 'News ids: '.implode(',', $ids)));
                     echo $this->lang('DEACTIVATE_SUCCESS');
                 } else {
@@ -574,7 +579,7 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('news');
                     Event::fire('admin.log', array('approve success', 'Action ids: '.implode(',', $ids)));
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
@@ -609,7 +614,7 @@ class NewsController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('news');
                     Event::fire('admin.log', array('reject success', 'Action ids: '.implode(',', $ids)));
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {

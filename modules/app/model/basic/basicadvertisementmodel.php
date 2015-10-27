@@ -50,7 +50,7 @@ class BasicAdvertisementModel extends Model
      * @validate numeric,max(10)
      * @label photo
      * @unsigned
-     * @default 0
+     * @null
      */
     protected $_mainPhotoId;
 
@@ -119,11 +119,11 @@ class BasicAdvertisementModel extends Model
     /**
      * @column
      * @readwrite
-     * @type decimal
-     * @length 10
-     * @validate required,numeric
+     * @type varchar
+     * @length 20
+     * @validate numeric,max(8)
      * @label cena
-     * @default 0.0
+     * @null
      */
     protected $_price;
 

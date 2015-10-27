@@ -127,7 +127,7 @@ class Query extends Base
             $buffer = join(', ', $buffer);
             return "({$buffer})";
         }
-
+        
         if (is_null($value)) {
             return 'NULL';
         }

@@ -47,7 +47,6 @@ class UserModel extends BasicUserModel
      * @readwrite
      * @type varchar
      * @length 15
-     * 
      * @validate numeric, max(15)
      * @label telefon
      */
@@ -58,7 +57,7 @@ class UserModel extends BasicUserModel
      * @readwrite
      * @type varchar
      * @length 50
-     *
+     * @unique
      * @validate alphanumeric, max(50)
      * @label activation token
      */
@@ -70,8 +69,7 @@ class UserModel extends BasicUserModel
      * @index
      * @type tinyint
      * @length 1
-     * 
-     * @default 1
+     * @default 0
      * @validate max(1)
      */
     protected $_getNewActionNotification;
@@ -82,8 +80,7 @@ class UserModel extends BasicUserModel
      * @index
      * @type tinyint
      * @length 1
-     * 
-     * @default 1
+     * @default 0
      * @validate max(1)
      */
     protected $_getNewReportNotification;
@@ -98,11 +95,14 @@ class UserModel extends BasicUserModel
 
         if (empty($this->$raw)) {
             $this->setCreated(date('Y-m-d H:i:s'));
-            $this->setBlocked(false);
+            $this->setBlocked(0);
+            $this->setDeleted(0);
             $this->setLastLogin(0);
             $this->setTotalLoginAttempts(0);
             $this->setLastLoginAttempt(0);
             $this->setFirstLoginAttempt(0);
+            $this->setGetNewActionNotification(0);
+            $this->setGetNewReportNotification(0);
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
@@ -141,7 +141,7 @@ class UserModel extends BasicUserModel
     {
         return self::all(
                 array('role <> ?' => 'role_superadmin'),
-                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked'),
+                array('id', 'firstname', 'lastname', 'email', 'role', 'active', 'created', 'blocked', 'deleted'),
                 array('id' => 'asc')
         );
     }

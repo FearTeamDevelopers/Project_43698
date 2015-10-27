@@ -73,36 +73,39 @@ class ReportController extends Controller
             }
         }
 
-        $fileManager = new FileManager(array(
-            'thumbWidth' => $this->getConfig()->thumb_width,
-            'thumbHeight' => $this->getConfig()->thumb_height,
-            'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
-            'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-            'maxImageHeight' => $this->getConfig()->photo_maxheight,
-        ));
+        $imgMain = $imgThumb = '';
+        
+        if(!empty(RequestMethods::post('croppedimage'))){
+            $fileManager = new FileManager(array(
+                'thumbWidth' => $this->getConfig()->thumb_width,
+                'thumbHeight' => $this->getConfig()->thumb_height,
+                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
+                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
+                'maxImageHeight' => $this->getConfig()->photo_maxheight,
+            ));
 
-        $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time().'_')->getUploadErrors();
-        $files = $fileManager->getUploadedFiles();
+            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKeyCh, 'report', time().'_')->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
 
-        if (!empty($fileErrors)) {
-            $this->_errors['croppedimage'] = $fileErrors;
-        }
+            if (!empty($fileErrors)) {
+                $this->_errors['croppedimage'] = $fileErrors;
+            }
 
-        if (!empty($files)) {
-            foreach ($files as $i => $file) {
-                if ($file instanceof \THCFrame\Filesystem\Image) {
-                    $imgMain = trim($file->getFilename(), '.');
-                    $imgThumb = trim($file->getThumbname(), '.');
-                    break;
+            if (!empty($files)) {
+                foreach ($files as $i => $file) {
+                    if ($file instanceof \THCFrame\Filesystem\Image) {
+                        $imgMain = trim($file->getFilename(), '.');
+                        $imgThumb = trim($file->getThumbname(), '.');
+                        break;
+                    }
                 }
             }
-        } else {
-            $imgMain = '';
-            $imgThumb = '';
+        }else{
+            $this->_errors['croppedimage'] = 'Foto je povinné';
         }
 
         $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
-                array('/reportaz/r/'.$urlKey, '[Celý článek]'),
+                array('/reportaz/r/'.$urlKeyCh, '[Celý článek]'),
                 RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -164,8 +167,8 @@ class ReportController extends Controller
         ));
 
         $imgMain = $imgThumb = '';
-        if ($object->imgMain == '') {
-            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKey, 'report', time().'_')->getUploadErrors();
+        if ($object->imgMain == '' && !empty(RequestMethods::post('croppedimage'))) {
+            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKeyCh, 'report', time().'_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
@@ -180,6 +183,8 @@ class ReportController extends Controller
                         break;
                     }
                 }
+            }else{
+                $this->_errors['croppedimage'] = 'Foto je povinné';
             }
         } else {
             $imgMain = $object->imgMain;
@@ -191,18 +196,24 @@ class ReportController extends Controller
             $object->userAlias = $this->getUser()->getWholeName();
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/'.$urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-        );
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
+                array('/reportaz/r/'.$urlKeyCh, '[Celý článek]'), 
+                RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
+        if(!$this->isAdmin()){
+            $object->approved = $this->getConfig()->report_autopublish;
+        }else{
+            $object->approved = RequestMethods::post('approve');
+        }
+        
         $object->title = RequestMethods::post('title');
         $object->urlKey = $urlKeyCh;
         $object->body = RequestMethods::post('text');
         $object->shortBody = $shortText;
         $object->rank = RequestMethods::post('rank', 1);
         $object->active = RequestMethods::post('active');
-        $object->approved = RequestMethods::post('approve');
         $object->archive = RequestMethods::post('archive');
         $object->keywords = $keywords;
         $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
@@ -293,7 +304,7 @@ class ReportController extends Controller
             if (empty($this->_errors) && $report->validate()) {
                 $id = $report->save();
                 $this->_sendEmailNotification($report);
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('report');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Report id: '.$id));
@@ -382,7 +393,7 @@ class ReportController extends Controller
             if (empty($this->_errors) && $report->validate()) {
                 $report->save();
                 \Admin\Model\ReportHistoryModel::logChanges($originalReport, $report);
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('report');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Report id: '.$id));
@@ -434,13 +445,8 @@ class ReportController extends Controller
             echo $this->lang('NOT_FOUND');
         } else {
             if ($this->_checkAccess($report)) {
-                $imgPath = $report->getUnlinkPath();
-                $thumbPath = $report->getUnlinkThumbPath();
-
                 if ($report->delete()) {
-                    @unlink($imgPath);
-                    @unlink($thumbPath);
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('report');
                     Event::fire('admin.log', array('success', 'Report id: '.$id));
                     echo 'success';
                 } else {
@@ -549,7 +555,7 @@ class ReportController extends Controller
             if ($report->validate()) {
                 $report->save();
                 $this->_sendEmailNotification($report);
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('report');
 
                 Event::fire('admin.log', array('success', 'Report id: '.$id));
                 echo 'success';
@@ -647,7 +653,7 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('report');
                     Event::fire('admin.log', array('delete success', 'Report ids: '.implode(',', $ids)));
                     echo $this->lang('DELETE_SUCCESS');
                 } else {
@@ -682,7 +688,7 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('report');
                     Event::fire('admin.log', array('activate success', 'Report ids: '.implode(',', $ids)));
                     echo $this->lang('ACTIVATE_SUCCESS');
                 } else {
@@ -717,7 +723,7 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('report');
                     Event::fire('admin.log', array('deactivate success', 'Report ids: '.implode(',', $ids)));
                     echo $this->lang('DEACTIVATE_SUCCESS');
                 } else {
@@ -754,7 +760,7 @@ class ReportController extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('approve success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('report');
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('approve fail', 'Errors:'.json_encode($errors)));
@@ -789,7 +795,7 @@ class ReportController extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('reject success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('report');
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('reject fail', 'Errors:'.json_encode($errors)));

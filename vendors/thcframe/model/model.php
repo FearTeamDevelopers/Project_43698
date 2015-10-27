@@ -192,8 +192,8 @@ class Model extends Base
         if ($value == '') {
             return true;
         } else {
-            $pattern = preg_quote('%^*()+=-,./:', '#');
-            return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž0-9{$pattern}]+)#");
+            $pattern = preg_quote('-,.\s', '#');
+            return StringMethods::match($value, "#([0-9{$pattern}]+)#");
         }
     }
 
@@ -252,7 +252,7 @@ class Model extends Base
      */
     protected function _validateMax($value, $number)
     {
-        return strlen($value) <= (int) $number;
+        return mb_strlen($value) <= (int) $number;
     }
 
     /**
@@ -263,7 +263,7 @@ class Model extends Base
      */
     protected function _validateMin($value, $number)
     {
-        return strlen($value) >= (int) $number;
+        return mb_strlen($value) >= (int) $number;
     }
 
     /**

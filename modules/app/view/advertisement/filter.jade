@@ -40,10 +40,9 @@ section.wrapper.bazar
 					span {echo " ".$ad->getSectionTitle()}<br/>
 					small
 						span cena:
-					|{if $ad->getPrice() == "0"}
-					span.price {echo " na dohodě"}<br/>
-					|{/if}
-					|{else}
+					|{if "" == $ad->getPrice()}
+					span.price {echo " Dohodou"}<br/>
+					|{/if}{else}
 					span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}<br/>
 					|{/else}
 					a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti

@@ -19,6 +19,7 @@
         </ul>
     </div>
 
+    {if $isAdmin}
     <div class="grid_4">
         <div class="widgetbox">
             <div class="title"><h2 class="chart"><span>Online návštěvníci</span></h2></div>
@@ -27,8 +28,6 @@
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
     </div><!--grid_4-->
-
-    {if $isAdmin}
     <div class="grid_5">
         <div class="widgetbox fix-height">
             <div class="title"><h2 class="general"><span>Chyby za poslední týden</span></h2></div>
@@ -67,6 +66,7 @@
     {/if}
     <div class="clear"></div>
 
+    {if $isAdmin}
     <div class="grid_10">
         <div class="widgetbox">
             <div class="title"><h2 class="chart"><span>Návštěvnost</span></h2></div>
@@ -75,7 +75,6 @@
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
     </div><!--grid_10-->
-    {if $isAdmin}
     <div class="grid_6">
         <div class="widgetbox">
             <div class="title"><h2 class="general"><span>Nový uživatelé</span></h2></div>

@@ -72,14 +72,11 @@ body
 				a
 					&:hover
 						text-decoration underline
-
-
 				h3
 					font-size 1.2em
 					font-weight bold
 					margin 0
 					padding 0
-
 
 			.body
 				margin-top 1em
@@ -87,7 +84,10 @@ body
 					height auto
 					line-height 25px
 					overflow hidden
-
+				&>div
+					overflow hidden
+					line-height 25px
+					max-height 50px
 				a.readMore
 					position absolute
 					top 25px
@@ -97,30 +97,23 @@ body
 					&:hover
 						text-decoration underline
 
-
-
 			&:nth-child(odd)
 				background boxColor
 				// border 1px solid defaultBLue
 				h3, p, span
 					color white
-
 				a
 					color defaultGreen
 
 
 
 
-
-
 section.wrapper
-
 	.loadContent
 		header
 			border-bottom: 2px dotted headerColor
 			h1
 				text-align left !important
-
 
 
 
@@ -208,11 +201,7 @@ section.wrapper
 		span
 			color black !important
 
-
 	&:hover
 		background headerColor
 		span
 			color white
-
-
-

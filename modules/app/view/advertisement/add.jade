@@ -60,7 +60,7 @@ section.wrapper.pridatInzerat.singlePage
                         |{if isset($errors["price"])}
                         label.error {echo join("<br/>", $errors["price"])}
                         |{/if}
-                        |{echo \App\Helper\FormPrinter::input("text", "price", array($ad,"price"), array("placeholder" => "při nevyplnění bude hodnota: \"Dohodou\""))}
+                        |{echo \App\Helper\FormPrinter::input("text", "price", array($ad,"price"), array("placeholder" => "při nevyplnění bude hodnota: Dohodou", "pattern" => "\d*", "title" => "Vyplňte pouze čísla"))}
                 tr
                     td
                         span Fotky

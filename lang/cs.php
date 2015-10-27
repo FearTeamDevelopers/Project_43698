@@ -62,6 +62,7 @@ return array(
     'ARTICLE_UNIQUE_ID' => 'Nepodařilo se vytvořit jedinečný identifikátor článku. Vytvořte jiný název.',
     'ARTICLE_TITLE_IS_USED' => 'Tento název již existuje',
     'ARTICLE_STARTDATE_ERROR' => 'Datum začátku akce nemůže být větší než datum konce',
+    'ARTICLE_TIME_ERROR' => 'Oba časy musí být vyplněny',
 
     'NO_ROW_SELECTED' => 'Nějaký řádek musí být vybrán',
 
@@ -107,4 +108,9 @@ return array(
     'UPLOAD_ERR_CANT_WRITE' => 'Chyba při zápisu souboru %s na disk',
     'UPLOAD_ERR_EXTENSION' => 'File upload stopped by extension',
     'UPLOAD_ERR_DEFAULT' => 'Nastala neočekávaná chyba při nahrávání souboru %s',
+    'UPLOAD_ERR_EXT' => 'Tento typ souboru není podporován. Můžete nahrát pouze: %s',
+    'UPLOAD_ERR_EMPTY_SOURCE' => 'Zdroj %s nemůže být prázdný',
+    
+    'SEND_FEEDBACK_SUCCESS' => 'Děkujeme za Vaše nápady a návrhy',
+    'SEND_FEEDBACK_FAIL' => 'Nepodařilo se odeslat zprávu s Vašimy nápady',
 );

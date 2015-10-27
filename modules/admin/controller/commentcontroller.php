@@ -29,7 +29,6 @@ class CommentController extends Controller
             echo $this->lang('NOT_FOUND');
         } else {
             if ($comment->delete()) {
-                $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Comment id: '.$id));
                 echo 'success';
             } else {

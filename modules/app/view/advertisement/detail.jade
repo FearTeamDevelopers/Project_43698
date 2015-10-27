@@ -1,95 +1,106 @@
 section.wrapper.bazar.detail.singlePage
-   header.row
-      h2 {echo $ad->getTitle()}
-   .row.container
-      .buttonWrapper
-         ul
-            li
-               a(href="/bazar").fi-arrow-left Bazar
-            |{if isset($authUser) && $authUser->getId() == $ad->getUserId()}
-            |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
-            li
-               a(href!="/bazar/upravit/{echo $ad->getUniqueKey()}").fi-pencil Upravit
-            li
-               a(href!="/bazar/prodano/{echo $ad->getUniqueKey()}").fi-dollar Prodáno
-            li
-               a(href!="/bazar/odstranit/{echo $ad->getUniqueKey()}").fi-trash Smazat
-            |{/if}
-            |{/if}
-      article.large-12
-         .row
-            |{script $images=$ad->getImages()}
-            |{if !empty($images)}
-            .large-7.medium-7.small-12.column
-               .images.large-12
-                  |{foreach $image in $images}
-                  |{if $image_i == 0}
-                  .mainImage.large-12
-                     a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
-                        img(src!="{echo $image->getImgMain()}")
-                  |{if count($images)>1}
-                  a(href="#").fi-arrow-down.dropdown zobrazit více fotek
-                  |{/if}
-                  |{/if}{else}
-                  .thumbImage.large-5.small-12.medium-6.column.left
-                     a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
-                        img(src!="{echo $image->getImgThumb()}")
-                  |{/else}
-                  |{/foreach}
-            |{/if}
-            |{if !empty($images)}
-            .large-5.medium-5.small-12.column
-               .info
-                  span {echo $ad->getUserAlias()} <br/>
-                  small
-                     span sekce:
-                  span {echo " ".$ad->getSectionTitle()}<br/>
-                  small
-                     span cena:
-                     |{if $ad->getPrice() == "0"}
-                  span.price {echo " na dohodě"}<br/>
-                  |{/if}
-                  |{else}
-                  span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
-                  |{/else}
-            |{/if}
-            |{else}
-            .large-12.column
-               .info
-                  span {echo $ad->getUserAlias()} <br/>
-                  small
-                     span sekce:
-                  span {echo " ".$ad->getSectionTitle()}<br/>
-                  small
-                     span cena:
-                     |{if $ad->getPrice() == "0"}
-                  span.price {echo " na dohodě"}<br/>
-                  |{/if}
-                  |{else}
-                  span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
-                  |{/else}
-            |{/else}
-         .row
-            .large-12.column
-               .info.description
-                  div {echo $ad->content} <br/>
-                  |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
-                  .large-4.medium-6.small-12.centerBlock.mv10
-                     a.sendEmail(href="#sendEmail")
-                        .more.blue
-                           span Odpovědět na Inzerát
-                  |{/if}
-      .row
-         .large-6.medium-9.small-12.centerBlock
-            form#sendEmail.mv30(method="post", action="#")
-               label Jméno:
-                  |{echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
-               label Email:
-                  |{echo \App\Helper\FormPrinter::input("email", "email", array($admessage,"msEmail"), array("required"=>true))}
-               label Text:
-                  textarea(name="message" rows=6 required) {echo \App\Helper\FormPrinter::iset($admessage,"message")}
-               label Chcete poslat kopii na svůj email?
-                  input(type="checkbox" name="getemailcopy")
-               a.submitEmail(href="#")
-                  .more
-                     span Odeslat
+    header.row
+        h2 {if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}PRODÁNO - {/if}{echo $ad->getTitle()}
+    .row.container
+        .buttonWrapper
+            ul
+                li
+                    a(href="/bazar").fi-arrow-left Bazar
+                |{if isset($authUser) && $authUser->getId() == $ad->getUserId() && $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+                li
+                    a(href!="/bazar/upravit/{echo $ad->getUniqueKey()}").fi-pencil Upravit
+                li
+                    a.ajaxReload(href!="/bazar/prodano/{echo $ad->getUniqueKey()}").fi-dollar Prodáno
+                li
+                    a(href!="/bazar/odstranit/{echo $ad->getUniqueKey()}").fi-trash Smazat
+                |{/if}
+        article.large-12
+            .row
+                |{script $images=$ad->getImages()}
+                |{if !empty($images)}
+                .large-7.medium-7.small-12.column
+                    .images.large-12
+                        |{foreach $image in $images}
+                        |{if $image_i == 0}
+                        .mainImage.large-12
+                            a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
+                                img(src!="{echo $image->getImgMain()}")
+                        |{if count($images)>1}
+                        a(href="#").fi-arrow-down.dropdown zobrazit více fotek
+                        |{/if}
+                        |{/if}{else}
+                        .thumbImage.large-5.small-12.medium-6.column.left
+                            a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
+                                img(src!="{echo $image->getImgThumb()}")
+                        |{/else}
+                        |{/foreach}
+                |{/if}
+                |{if !empty($images)}
+                .large-5.medium-5.small-12.column
+                    .info
+                        span {echo $ad->getUserAlias()} <br/>
+                        small
+                            span sekce:
+                        span {echo " ".$ad->getSectionTitle()}<br/>
+                        small
+                            span cena:
+                        |{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}
+                        span.price {echo " PRODÁNO"}
+                        br
+                        |{/if}{elseif "" == $ad->getPrice()}
+                        span.price {echo " Dohodou"}
+                        br
+                        |{/elseif}{else}
+                        span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
+                        |{/else}
+                |{/if}{else}
+                .large-12.column
+                    .info
+                        span {echo $ad->getUserAlias()} <br/>
+                        small
+                            span sekce:
+                        span {echo " ".$ad->getSectionTitle()}<br/>
+                        small
+                            span cena:
+                        |{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}
+                        span.price {echo " PRODÁNO"}
+                        br
+                        |{/if}{elseif "" == $ad->getPrice()}
+                        span.price {echo " Dohodou"}
+                        br
+                        |{/elseif}{else}
+                        span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
+                        |{/else}
+                |{/else}
+            .row
+                .large-12.column
+                    .info.description
+                        div {echo $ad->content} <br/>
+                        |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+                        .large-4.medium-6.small-12.centerBlock.mv10
+                            a.sendEmail(href="#sendEmail")
+                                .more.blue
+                                    span Odpovědět na Inzerát
+                        |{/if}
+        .row
+            .large-6.medium-9.small-12.centerBlock
+                form#sendEmail.mv30(method="post", action="#")
+                    input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+                    label Vaše jméno:
+                        |{echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
+                        |{if isset($errors["msAuthor"])}
+                        label.error {echo join("<br/>", $errors["msAuthor"])}
+                        |{/if}
+                    label Email, na který může majitel inzerátu odpovědět:
+                        |{echo \App\Helper\FormPrinter::input("email", "email", array($admessage,"msEmail"), array("required"=>true))}
+                        |{if isset($errors["msEmail"])}
+                        label.error {echo join("<br/>", $errors["msEmail"])}
+                        |{/if}
+                    label Váš dotaz:
+                        textarea(name="message" rows=6 required) {echo \App\Helper\FormPrinter::iset($admessage,"message")}
+                        |{if isset($errors["message"])}
+                        label.error {echo join("<br/>", $errors["message"])}
+                        |{/if}
+                    label Chcete poslat kopii dotazu na váš email?
+                        input(type="checkbox" name="getemailcopy" value="1")
+                    input.submitEmail(type="submit" name="submitAdReply" value="Odeslat")

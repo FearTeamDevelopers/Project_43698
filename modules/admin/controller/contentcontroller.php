@@ -84,8 +84,8 @@ class ContentController extends Controller
 
             if (empty($errors) && $content->validate()) {
                 $id = $content->save();
-
                 $this->getCache()->invalidate();
+                
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/content/');
@@ -148,6 +148,7 @@ class ContentController extends Controller
                 $content->save();
                 \Admin\Model\PageContentHistoryModel::logChanges($originalContent, $content);
                 $this->getCache()->invalidate();
+                
                 Event::fire('admin.log', array('success', 'Content id: ' . $id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/content/');

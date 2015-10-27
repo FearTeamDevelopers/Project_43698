@@ -156,36 +156,32 @@ class EmailModel extends BasicEmailModel
                 $message->setFrom($sendFrom);
             }
 
+            if (empty($this->_recipients)) {
+                $adminEmail = Registry::get('configuration')->system->adminemail;
+                $defaultEmail = Registry::get('configuration')->system->defaultemail;
+                $this->_recipients = array($adminEmail, $defaultEmail);
+            }
+            
             if ($oneByOne === true) {
-                if (empty($this->_recipients)) {
-                    $adminEmail = Registry::get('configuration')->system->adminemail;
-                    $defaultEmail = Registry::get('configuration')->system->defaultemail;
-                    $this->_recipients = array($adminEmail, $defaultEmail);
-                }
-
-                $error = false;
+                $statusSend = false;
                 foreach ($this->_recipients as $recipient) {
+                    $message->setTo(array());
                     $message->setTo($recipient);
 
                     if ($mailer->send($message)) {
                         Event::fire('admin.log', array('success', sprintf('Email send to %s', $recipient)));
+                        $statusSend = true;
                     } else {
-                        $error = true;
                         Event::fire('admin.log', array('fail', 'No email sent'));
                     }
                 }
 
-                return $error;
+                return $statusSend;
             } else {
-                if (empty($this->_recipients)) {
-                    $adminEmail = Registry::get('configuration')->system->adminemail;
-                    $defaultEmail = Registry::get('configuration')->system->defaultemail;
-                    $this->_recipients = array($adminEmail, $defaultEmail);
-                }
-
                 $message->setTo($this->_recipients);
 
                 if ($mailer->send($message)) {
+                    Event::fire('admin.log', array('success', sprintf('Email send to %s', json_encode($this->_recipients))));
                     return true;
                 } else {
                     Event::fire('admin.log', array('fail', 'No email sent'));

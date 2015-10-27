@@ -89,7 +89,7 @@ class UserController extends Controller
                     Event::fire('app.log', array('fail', sprintf('User %s does not exists', $email)));
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
-                    Event::fire('app.log', array('fail', sprintf('User %s does not exists', $email)));
+                    Event::fire('app.log', array('fail', sprintf('Wrong password provided for user %s', $email)));
                 } catch (\THCFrame\Security\Exception\UserPassExpired $ex) {
                     $view->set('account_error', $this->lang('ACCOUNT_PASS_EXPIRED'));
                     Event::fire('app.log', array('fail', sprintf('Password has expired for user %s', $email)));
@@ -398,7 +398,7 @@ class UserController extends Controller
                 self::redirect('/feedback');
             }
 
-            $userAlias = $this->getUser() !== null ? $this->getUser()->getWholeName() : '';
+            $userAlias = $this->getUser() !== null ? $this->getUser()->getWholeName() : 'annonymous';
             $feedback = new \App\Model\FeedbackModel(array(
                 'userAlias' => $userAlias,
                 'message' => RequestMethods::post('message'),
@@ -413,11 +413,11 @@ class UserController extends Controller
 
                 if ($email->send()) {
                     Event::fire('app.log', array('success', 'Feedback id: ' . $id));
-                    $view->successMessage('Děkujeme za Vaše nápady a návrhy');
+                    $view->successMessage($this->lang('SEND_FEEDBACK_SUCCESS'));
                     self::redirect('/');
                 } else {
                     Event::fire('app.log', array('fail', 'Send feedback email: ' . $id));
-                    $view->successMessage('Děkujeme za Vaše nápady a návrhy');
+                    $view->errorMessage($this->lang('SEND_FEEDBACK_FAIL'));
                     self::redirect('/');
                 }
             } else {
@@ -429,6 +429,9 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * 
+     */
     public function eprivacy()
     {
         $canonical = 'http://' . $this->getServerHost() . '/ochrana-soukromi';

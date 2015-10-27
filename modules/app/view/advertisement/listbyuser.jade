@@ -36,8 +36,8 @@ section.wrapper.bazar.singlePage
 					|<br/>
 					small
 						span cena:
-					|{if $ad->getPrice() == "1"}
-					span.price {echo " na dohodě"}
+					|{if "" == $ad->getPrice()}
+					span.price {echo " Dohodou"}
 					|<br/>
 					|{/if}{else}
 					span.price {echo " ".number_format($ad->getPrice(), 0, ',', ' ')." Kč"}

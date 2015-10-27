@@ -75,6 +75,12 @@ class ActionController extends Controller
         if(RequestMethods::post('datestart') > RequestMethods::post('dateend')){
             $this->_errors['startDate'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
         }
+        
+        if(!empty(RequestMethods::post('timestart')) && empty(RequestMethods::post('timeend'))){
+            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
+        }elseif(!empty(RequestMethods::post('timeend')) && empty(RequestMethods::post('timestart'))){
+            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
+        }
                 
         $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
                 array('/akce/r/'.$urlKey, '[Celý článek]'),
@@ -143,8 +149,20 @@ class ActionController extends Controller
             $this->_errors['startDate'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
         }
         
+        if(!empty(RequestMethods::post('timestart')) && empty(RequestMethods::post('timeend'))){
+            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
+        }elseif(!empty(RequestMethods::post('timeend')) && empty(RequestMethods::post('timestart'))){
+            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
+        }
+        
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
+        if(!$this->isAdmin()){
+            $object->approved = $this->getConfig()->action_autopublish;
+        }else{
+            $object->approved = RequestMethods::post('approve');
+        }
+        
         $object->title = RequestMethods::post('title');
         $object->urlKey = $urlKeyCh;
         $object->body = RequestMethods::post('text');
@@ -155,7 +173,6 @@ class ActionController extends Controller
         $object->startTime = RequestMethods::post('timestart');
         $object->endTime = RequestMethods::post('timeend');
         $object->active = RequestMethods::post('active');
-        $object->approved = RequestMethods::post('approve');
         $object->archive = RequestMethods::post('archive');
         $object->keywords = $keywords;
         $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
@@ -242,7 +259,7 @@ class ActionController extends Controller
             if (empty($this->_errors) && $action->validate()) {
                 $id = $action->save();
                 $this->_sendEmailNotification($action);
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('actions');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Action id: '.$id));
@@ -334,7 +351,7 @@ class ActionController extends Controller
             if (empty($this->_errors) && $action->validate()) {
                 $action->save();
                 \Admin\Model\ActionHistoryModel::logChanges($originalAction, $action);
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('actions');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 Event::fire('admin.log', array('success', 'Action id: '.$id));
@@ -387,7 +404,8 @@ class ActionController extends Controller
         } else {
             if ($this->_checkAccess($action)) {
                 if ($action->delete()) {
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('actions');
+                    
                     Event::fire('admin.log', array('success', 'Action id: '.$id));
                     echo 'success';
                 } else {
@@ -427,7 +445,7 @@ class ActionController extends Controller
             if ($action->validate()) {
                 $action->save();
                 $this->_sendEmailNotification($action);
-                $this->getCache()->invalidate();
+                $this->getCache()->erase('actions');
 
                 Event::fire('admin.log', array('success', 'Action id: '.$id));
                 echo 'success';
@@ -526,7 +544,7 @@ class ActionController extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('delete success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('actions');
                     echo $this->lang('DELETE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('delete fail', 'Errors:'.json_encode($errors)));
@@ -561,7 +579,7 @@ class ActionController extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('activate success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('actions');
                     echo $this->lang('ACTIVATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('activate fail', 'Errors:'.json_encode($errors)));
@@ -596,7 +614,7 @@ class ActionController extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('deactivate success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('actions');
                     echo $this->lang('DEACTIVATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('deactivate fail', 'Errors:'.json_encode($errors)));
@@ -632,7 +650,7 @@ class ActionController extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('approve success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('actions');
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('approve fail', 'Errors:'.json_encode($errors)));
@@ -667,7 +685,7 @@ class ActionController extends Controller
 
                 if (empty($errors)) {
                     Event::fire('admin.log', array('reject success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->invalidate();
+                    $this->getCache()->erase('actions');
                     echo $this->lang('UPDATE_SUCCESS');
                 } else {
                     Event::fire('admin.log', array('reject fail', 'Errors:'.json_encode($errors)));
