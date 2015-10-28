@@ -11,11 +11,7 @@ section.wrapper.singlePage
                     |{/if}
                     |{if $authuseratt != \App\Model\AttendanceModel::MAYBE}
                     li
-                        a(href='/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::MAYBE}').fi-info.ajaxReload Ještě nevím
-                    |{/if}
-                    |{if $authuseratt != \App\Model\AttendanceModel::REJECT}
-                    li
-                        a(href='/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::REJECT}').fi-x.ajaxReload Nezúčastním se
+                        a(href='/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::MAYBE}').fi-info.ajaxReload Přemýšlím o tom
                     |{/if}
             |{/if}
             span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
@@ -36,7 +32,4 @@ section.wrapper.singlePage
         br
         strong Ještě neví: 
         |{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
-        br
-        strong Nezúčastní se: 
-        |{script $rejectStr = implode(", ", $attendance[\App\Model\AttendanceModel::REJECT])}{echo $rejectStr}
     |{/if}

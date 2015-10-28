@@ -343,7 +343,7 @@ class AdvertisementModel extends BasicAdvertisementModel
      * @param integer $max
      * @return array
      */
-    public static function expireInDays($min = 1, $max = 7)
+    public static function expireInDays($max = 7)
     {
         $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.title', 'adv.userId', 'adv.state',
                     'adv.created', 'adv.expirationDate', 'datediff(expirationDate, curdate())' => 'expireIn'))

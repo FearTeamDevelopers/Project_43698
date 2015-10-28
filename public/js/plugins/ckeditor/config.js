@@ -12,13 +12,19 @@ CKEDITOR.editorConfig = function (config) {
     config.format_tags = 'p;h2;h3;h4;h5;h6;pre;address;div';
     config.entities = false;
 
-    config.extraPlugins = 'wordcount,lightbox';
+    config.extraPlugins = 'wordcount,lightbox,youtube';
     
     config.wordcount = {
         showWordCount: false,
         showCharCount: true,
         countHTML: false
     };
+
+    config.youtube_width = '640';
+    config.youtube_height = '480';
+    config.youtube_related = false;
+    config.youtube_older = false;
+    config.youtube_privacy = true;
 
     config.extraAllowedContent = 'a[data-lightbox,data-title,data-lightbox-saved]';
 
@@ -31,7 +37,7 @@ CKEDITOR.editorConfig = function (config) {
         {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi'], items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']},
         '/',
         {name: 'links', items: ['Link', 'Unlink', 'Anchor', 'lightbox']},
-        {name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak']},
+        {name: 'insert', items: ['Image',  'Youtube', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak']},
         '/',
         {name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize']},
         {name: 'colors', items: ['TextColor', 'BGColor']},
