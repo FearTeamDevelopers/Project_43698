@@ -11,7 +11,6 @@ use THCFrame\Core\Rand;
 use THCFrame\Date\Date;
 use THCFrame\Registry\Registry;
 use THCFrame\Core\StringMethods;
-use THCFrame\Events\Events as Event;
 
 /**
  * Basic user class
@@ -308,6 +307,12 @@ class BasicUserModel extends Model
      * @validate datetime, max(19)
      */
     protected $_modified;
+
+    /**
+     * @readwrite
+     * @var type 
+     */
+    protected $_newCleanPassword;
 
     /**
      * Check if new password doesnt math to the previous
@@ -613,11 +618,13 @@ class BasicUserModel extends Model
                 $passStrength = self::ADMIN_PASS_STRENGHT;
             }
         }
-
+        
         if (PasswordManager::strength($newPassword) <= $passStrength) {
             throw new Exception\WeakPassword('Password is too weak');
         }
 
+        $this->_newCleanPassword = $newPassword;
+        
         $cleanHash = StringMethods::getHash($newPassword);
         $this->_passwordHistory2 = $this->_passwordHistory1;
         $this->_passwordHistory1 = $cleanHash;

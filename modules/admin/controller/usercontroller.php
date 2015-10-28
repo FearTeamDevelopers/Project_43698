@@ -441,7 +441,9 @@ class UserController extends Controller
             if ($user->validate()) {
                 $user->save();
                 
-                $data = array('{NEWPASS}' => $user->getPassword());
+                $data = array('{NEWPASS}' => $user->getNewCleanPassword());
+                $user->setNewCleanPassword(null);
+                
                 $email = \Admin\Model\EmailModel::loadAndPrepare('password-reset', $data);
                 $email->setRecipient($user->getEmail())
                         ->send();
