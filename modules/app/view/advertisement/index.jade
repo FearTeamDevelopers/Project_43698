@@ -47,7 +47,7 @@ section.wrapper.bazar.singlePage
                     |{/elseif}{else}
                     span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
                     |{/else}
-                    a.bla(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
+            a.showDetail(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
             |{if isset($authUser) && $authUser->getId() == $ad->getUserId() && $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
             a.buttonTab.sell.ajaxReload.fi-dollar(href!='/bazar/prodano/{echo $ad->getUniqueKey()}', title='Prodáno')
             a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')

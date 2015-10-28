@@ -32,7 +32,7 @@
       </select>
       <input type="submit" value="Zobrazit"/>{if isset($bftype)}<a href="/bazar" class="reset">×</a>{/if}
     </form>{/if}
-    <form method="GET" action="/bazar/hledat" class="search">
+    <form method="get" action="/bazar/hledat" class="search">
       <input type="text" placeholder="vyhledat v bazaru..." name="adstr" required="required"/><a id="hledat" href="#" class="fi-magnifying-glass"></a>
     </form>
   </div>

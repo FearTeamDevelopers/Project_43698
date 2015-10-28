@@ -1,7 +1,7 @@
 section.wrapper.blue.filter
    .row
       |{if $pagerpathprefix=='/bazar' | $pagerpathprefix=='/bazar/filtr'}
-      form.filtr(method ='get' action='/bazar/filtr')
+      form.filtr(method='get' action='/bazar/filtr')
          select(name='bftype')
             |{if isset($bftype)}
             |{if $bftype == 'nabidka'}
@@ -42,9 +42,7 @@ section.wrapper.blue.filter
          |{if isset($bftype)}
          a(href="/bazar").reset ×
          |{/if}
-
-
       |{/if}
-      form.search(method='GET' action='/bazar/hledat')
+      form.search(method='get' action='/bazar/hledat')
          input(type='text' placeholder='vyhledat v bazaru...' name='adstr' required)
          a#hledat(href='#').fi-magnifying-glass

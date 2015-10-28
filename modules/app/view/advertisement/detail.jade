@@ -29,7 +29,7 @@ section.wrapper.bazar.detail.singlePage
                         a(href="#").fi-arrow-down.dropdown zobrazit více fotek
                         |{/if}
                         |{/if}{else}
-                        .thumbImage.large-5.small-12.medium-6.column.left
+                        .thumbImage.large-6.small-6.medium-6.column.left
                             a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
                                 img(src!="{echo $image->getImgThumb()}")
                         |{/else}
@@ -83,7 +83,7 @@ section.wrapper.bazar.detail.singlePage
                                     span Odpovědět na Inzerát
                         |{/if}
         .row
-            .large-6.medium-9.small-12.centerBlock
+            .large-6.medium-9.small-9.centerBlock
                 form#sendEmail.mv30(method="post", action="#")
                     input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
                     label Vaše jméno:

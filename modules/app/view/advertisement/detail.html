@@ -22,7 +22,7 @@
             {if $image_i == 0}
             <div class="mainImage large-12"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgMain()}"/></a></div>{if count($images)>1}<a href="#" class="fi-arrow-down dropdown">zobrazit více fotek</a>{/if}
             {/if}{else}
-            <div class="thumbImage large-5 small-12 medium-6 column left"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgThumb()}"/></a></div>{/else}
+            <div class="thumbImage large-6 small-6 medium-6 column left"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgThumb()}"/></a></div>{/else}
             {/foreach}
           </div>
         </div>{/if}
@@ -45,7 +45,7 @@
       </div>
     </article>
     <div class="row">
-      <div class="large-6 medium-9 small-12 centerBlock">
+      <div class="large-6 medium-9 small-9 centerBlock">
         <form id="sendEmail" method="post" action="#" class="mv30">
           <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
           <label>
