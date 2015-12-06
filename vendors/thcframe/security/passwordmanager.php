@@ -22,14 +22,6 @@ class PasswordManager extends Base
     protected $_encoder = 'sha512';
 
     /**
-     * Minimum password strength that all passwords must have
-     * 
-     * @readwrite
-     * @var float
-     */
-    protected $_passwordStrength = 0.5;
-
-    /**
      * Generated string loaded from config file
      * 
      * @readwrite

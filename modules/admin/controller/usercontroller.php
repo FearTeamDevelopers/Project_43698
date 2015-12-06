@@ -263,7 +263,7 @@ class UserController extends Controller
             $user->getNewReportNotification = RequestMethods::post('reportNotification');
 
             if (empty($errors) && $user->validate()) {
-                $user->update();
+                $user->save();
                 $this->getSecurity()->setUser($user);
 
                 Event::fire('admin.log', array('success', 'User id: ' . $user->getId()));
@@ -324,6 +324,7 @@ class UserController extends Controller
             }
 
             $oldPassword = RequestMethods::post('oldpass');
+            $newPassword = RequestMethods::post('password');
 
             $user->firstname = RequestMethods::post('firstname');
             $user->lastname = RequestMethods::post('lastname');
@@ -334,20 +335,16 @@ class UserController extends Controller
             $user->role = RequestMethods::post('role', $user->getRole());
             $user->active = RequestMethods::post('active');
             $user->blocked = RequestMethods::post('blocked');
-            
-            if ($this->isSuperAdmin() && !empty(RequestMethods::post('password'))) {
-                $newPass = RequestMethods::post('password');
 
+            if ($this->isSuperAdmin() && !empty($newPassword)) {
                 try {
-                    $user = $user->forceResetPassword($newPass);
+                    $user = $user->forceResetPassword($newPassword);
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
                     $errors['password'] = array($this->lang('PASS_WEAK'));
                 }
-            } elseif (!empty($oldPassword)) {
-                $newPass = RequestMethods::post('password');
-
+            } elseif (!empty($oldPassword) && !empty($newPassword)) {
                 try {
-                    $user = $user->changePassword($oldPassword, $newPass);
+                    $user = $user->changePassword($oldPassword, $newPassword);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
@@ -355,10 +352,12 @@ class UserController extends Controller
                 } catch (\THCFrame\Security\Exception\PasswordInHistory $ex) {
                     $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
                 }
+            } elseif (empty($oldPassword) && !empty($newPassword)) {
+                $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
             }
 
             if (empty($errors) && $user->validate()) {
-                $user->update();
+                $user->save();
 
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
@@ -440,10 +439,10 @@ class UserController extends Controller
 
             if ($user->validate()) {
                 $user->save();
-                
+
                 $data = array('{NEWPASS}' => $user->getNewCleanPassword());
                 $user->setNewCleanPassword(null);
-                
+
                 $email = \Admin\Model\EmailModel::loadAndPrepare('password-reset', $data);
                 $email->setRecipient($user->getEmail())
                         ->send();
@@ -488,9 +487,7 @@ class UserController extends Controller
         $user->active = 1;
 
         try {
-            if ($user->validate()) {
-                $user->update();
-
+            if ($user->activateAccount()) {
                 $email = \Admin\Model\EmailModel::loadAndPrepare('user-account-activation-notification');
                 $email->setRecipient($user->getEmail())
                         ->send(false, 'registrace@hastrman.cz');

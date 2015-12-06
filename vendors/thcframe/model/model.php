@@ -661,7 +661,6 @@ class Model extends Base
 
         $data = array();
         foreach ($this->columns as $key => $column) {
-
             if (!$column['read']) {
                 $prop = $column['raw'];
                 $data[$key] = $this->$prop;

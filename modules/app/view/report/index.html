@@ -6,7 +6,7 @@
   <div class="row">{foreach $report in $reports}<a href="/reportaze/r/{echo $report->getUrlKey()}">
       <article class="report medium-4 left"><img src="{echo $report->getImgThumb()}"/>
         <div class="info">
-          <h2>{echo $report->getTitle()}</h2><span>{echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}</span>
+          <h2>{echo $report->getTitle()}</h2>
           <div>{echo html_entity_decode($report->getShortBody())}</div>
         </div>
       </article></a>{/foreach}</div>

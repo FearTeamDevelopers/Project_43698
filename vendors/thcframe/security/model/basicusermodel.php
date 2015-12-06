@@ -607,16 +607,15 @@ class BasicUserModel extends Model
      */
     public function forceResetPassword($newPassword = null, $passStrength = null)
     {
-        if (null === $newPassword) {
-            $newPassword = PasswordManager::generate($passStrength);
-        }
-
         if (null === $passStrength) {
             if ($this->getRole() == 'role_member') {
                 $passStrength = self::MEMBER_PASS_STRENGHT;
             } else {
                 $passStrength = self::ADMIN_PASS_STRENGHT;
             }
+        }
+        if (null === $newPassword) {
+            $newPassword = PasswordManager::generate($passStrength);
         }
         
         if (PasswordManager::strength($newPassword) <= $passStrength) {
@@ -631,7 +630,7 @@ class BasicUserModel extends Model
 
         $this->salt = PasswordManager::createSalt();
         $this->password = PasswordManager::hashPassword($newPassword, $this->getSalt());
-        $this->forcePassChange = 1;
+        $this->forcePassChange = true;
         $this->lastForcePassChange = Date::getInstance()->getFormatedCurDatetime('system');
         $this->setPassExipre();
 

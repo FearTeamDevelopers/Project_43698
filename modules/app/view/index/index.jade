@@ -36,15 +36,13 @@
 						img(src!='{echo $report->getImgMain()}')
 						.info
 							h2 {echo $report->getTitle()}
-							span {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2dt($report->getCreated())}
 							div {echo html_entity_decode($report->getShortBody())}
 					|{/if}{else}
 					article.report.large-3.medium-4.small-6
 						img(src!='{echo $report->imgThumb}')
 						.info
 							h3 {echo $report->getTitle()}
-							span {echo "Vytvořil: ".$report->getUserAlias()}<br/>
-							span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
+							div {echo html_entity_decode($report->getShortBody())}
 					|{/else}
 				|{/foreach}
 		.moreWrap

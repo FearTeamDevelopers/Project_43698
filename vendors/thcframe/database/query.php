@@ -7,6 +7,7 @@ use THCFrame\Core\ArrayMethods;
 use THCFrame\Core\StringMethods;
 use THCFrame\Database\Exception as Exception;
 use THCFrame\Core\Core;
+use THCFrame\Registry\Registry;
 
 /**
  * Query class for OO query creating
@@ -208,6 +209,11 @@ class Query extends Base
 
         $input = sprintf($template, $joinedFields, $this->from, $this->alias, $join, $where, $groupBy, $having, $order, $limit);
         $output = mb_ereg_replace('\s+', ' ', $input);
+        
+        if(Registry::get('configuration')->profiler->logSql == 1){
+            Core::getLogger()->log($output,'system', true, 'sql.log');
+        }
+
         return $output;
     }
 
@@ -232,6 +238,11 @@ class Query extends Base
 
         $input = sprintf($template, $this->from, $fields, $values);
         $output = mb_ereg_replace('\s+', ' ', $input);
+        
+        if(Registry::get('configuration')->profiler->logSql == 1){
+            Core::getLogger()->log($output,'system', true, 'sql.log');
+        }
+        
         return $output;
     }
 
@@ -272,6 +283,10 @@ class Query extends Base
         $input = sprintf($template, $this->from, $parts, $where, $limit);
         $output = mb_ereg_replace('\s+', ' ', $input);
         
+        if(Registry::get('configuration')->profiler->logSql == 1){
+            Core::getLogger()->log($output,'system', true, 'sql.log');
+        }
+        
         return $output;
     }
 
@@ -303,6 +318,11 @@ class Query extends Base
 
         $input = sprintf($template, $this->from, $where, $limit);
         $output = mb_ereg_replace('\s+', ' ', $input);
+        
+        if(Registry::get('configuration')->profiler->logSql == 1){
+            Core::getLogger()->log($output,'system', true, 'sql.log');
+        }
+        
         return $output;
     }
 

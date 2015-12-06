@@ -130,7 +130,7 @@ final class Dispatcher extends Base
             throw new Exception\Action('Method Name not specified');
         }
 
-        $status = $this->loadConfigFromDb($module.'status');
+        $status = Registry::get('configuration')->{$module.'status'};
 
         if ($status !== null && $status != 1) {
             throw new Exception\Offline('Application is offline');

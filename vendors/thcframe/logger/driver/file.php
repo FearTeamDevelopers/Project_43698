@@ -109,13 +109,13 @@ class File extends Logger\Driver
         $message = $time . $userName . $message . PHP_EOL;
 
         if ($file !== null) {
-            $file = $type . '-' . $file;
-            if (mb_strlen($file) > 45) {
-                $file = date('Y-m-d') . '_' . trim(substr($file, 0, 45)) . '-' . $type . '.log';
-            }
+            $file = date('Y-m-d') . '_' . $type . '-' . $file;
 
             if (substr($file, -4, 4) != '.log') {
                 $file = $file . '.log';
+            }
+            if (mb_strlen($file) > 45) {
+                $file = trim(substr($file, 0, 45)) . '-' . $type . '.log';
             }
 
             $path = $this->path . DIRECTORY_SEPARATOR . $file;

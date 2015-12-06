@@ -8,8 +8,6 @@ section.wrapper.reports.singlePage
             header
                 a(href!='/reportaze/r/{echo $report->getUrlKey()}')
                     h3 {echo $report->getTitle()}
-                span 
-                    small {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}
             .body
                 div {echo html_entity_decode($report->getShortBody())}
                 |{if $deviceType === 'computer'}

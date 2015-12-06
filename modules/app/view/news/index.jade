@@ -8,8 +8,6 @@ section.wrapper.novinky.singlePage
             header
                 a(href!='/novinky/r/{echo $new->getUrlKey()}')
                     h3 {echo $new->getTitle()}
-                span
-                    small {echo "Vytvořil: ".$new->getUserAlias().", ".\App\Helper\DateFormater::t2d($new->getCreated())}
             .body
                 div {echo html_entity_decode($new->getShortBody())}
                 |{if $deviceType === 'computer'}

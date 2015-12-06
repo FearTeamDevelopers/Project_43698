@@ -298,7 +298,7 @@ class ActionController extends Controller
         if (null === $action) {
             echo $this->lang('NOT_FOUND');
         } else {
-            \App\Model\AttendanceModel::deleteAll(array('userId = ?' => $this->getUser()->getId(), 'actionId' => $action->getId()));
+            \App\Model\AttendanceModel::deleteAll(array('userId = ?' => $this->getUser()->getId(), 'actionId = ?' => $action->getId()));
             
             $attendance = new \App\Model\AttendanceModel(array(
                 'userId' => $this->getUser()->getId(),

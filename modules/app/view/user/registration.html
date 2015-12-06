@@ -14,7 +14,7 @@
           {echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true, "placeholder" => "Příjmení"))}
           {if isset($errors["phoneNumber"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
-          {echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon"))}
+          {echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon - nepovinné"))}
           {if isset($errors["email"])}
           <label class="error fi-alert">{echo join("<br/>", $errors["email"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}<span>Informace na email:<br/></span>

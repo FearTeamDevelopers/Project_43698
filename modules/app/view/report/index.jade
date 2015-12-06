@@ -9,7 +9,6 @@ section.wrapper.reports.singlePage
             img(src!='{echo $report->getImgThumb()}')
             .info
                h2 {echo $report->getTitle()}
-               span {echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}
                div {echo html_entity_decode($report->getShortBody())}
       |{/foreach}
    .moreWrap.large-2.medium-3.small-6.centerBlock

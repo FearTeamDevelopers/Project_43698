@@ -202,39 +202,28 @@ class GalleryController extends Controller
     }
 
     /**
-     * Delete existing gallery and all photos (files and db).
+     * Delete existing gallery and all photos (files and db)
      * 
      * @before _secured, _participant
-     *
      * @param int $id gallery id
      */
     public function delete($id)
     {
-        $view = $this->getActionView();
+        $this->_disableView();
 
         $gallery = \App\Model\GalleryModel::first(
                         array('id = ?' => (int) $id), array('id', 'title', 'created', 'userId')
         );
 
         if (null === $gallery) {
-            $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/gallery/');
+            echo $this->lang('NOT_FOUND');
         }
 
         if (!$this->_checkAccess($gallery)) {
-            $view->warningMessage($this->lang('LOW_PERMISSIONS'));
-            $this->_willRenderActionView = false;
-            self::redirect('/admin/gallery/');
+            echo $this->lang('LOW_PERMISSIONS');
         }
 
-        $view->set('gallery', $gallery);
-
         if (RequestMethods::post('submitDeleteGallery')) {
-            if ($this->_checkCSRFToken() !== true) {
-                self::redirect('/admin/gallery/');
-            }
-
             $fm = new FileManager();
             $configuration = Registry::get('config');
 
@@ -256,8 +245,8 @@ class GalleryController extends Controller
 
                 \App\Model\PhotoModel::deleteAll(array('id IN ?' => $ids));
 
-                $path = APP_PATH.'/'.$pathToImages.'/gallery/'.$gallery->getId();
-                $pathThumbs = APP_PATH.'/'.$pathToThumbs.'/gallery/'.$gallery->getId();
+                $path = APP_PATH.'/'.$pathToImages.'/gallery/'.$gallery->getUrlKey();
+                $pathThumbs = APP_PATH.'/'.$pathToThumbs.'/gallery/'.$gallery->getUrlKey();
 
                 if ($path == $pathThumbs) {
                     $fm->remove($path);
@@ -270,12 +259,10 @@ class GalleryController extends Controller
             if ($gallery->delete()) {
                 $this->getCache()->erase('gallery');
                 Event::fire('admin.log', array('success', 'Gallery id: '.$id));
-                $view->successMessage($this->lang('DELETE_SUCCESS'));
-                self::redirect('/admin/gallery/');
+                echo $this->lang('DELETE_SUCCESS');
             } else {
                 Event::fire('admin.log', array('fail', 'Gallery id: '.$id));
-                $view->warningMessage($this->lang('COMMON_FAIL'));
-                self::redirect('/admin/gallery/');
+                echo $this->lang('COMMON_FAIL');
             }
         }
     }
@@ -314,7 +301,7 @@ class GalleryController extends Controller
                             array(
                         'id = ?' => (int) $galleryId,
                         'active = ?' => true,
-                            ), array('id', 'title', 'userId')
+                            ), array('id', 'title', 'userId', 'urlKey')
             );
 
             if (null === $gallery) {
@@ -339,7 +326,7 @@ class GalleryController extends Controller
                 'maxImageHeight' => $this->getConfig()->photo_maxheight,
             ));
 
-            $fileErrors = $fileManager->uploadImage('file', 'gallery/'.$gallery->getId(), time().'_')->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('file', 'gallery/'.$gallery->getUrlKey(), time().'_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
@@ -371,9 +358,9 @@ class GalleryController extends Controller
                         if ($photo->validate()) {
                             $aid = $photo->save();
 
-                            Event::fire('admin.log', array('success', 'Photo id: '.$aid.' in gallery '.$gallery->getId()));
+                            Event::fire('admin.log', array('success', 'Photo id: '.$aid.' in gallery '.$gallery->getUrlKey()));
                         } else {
-                            Event::fire('admin.log', array('fail', 'Photo in gallery '.$gallery->getId()));
+                            Event::fire('admin.log', array('fail', 'Photo in gallery '.$gallery->getUrlKey()));
                             \THCFrame\Core\Core::getLogger()->log('Gallery image create db record fail: '.print_r($photo->getErrors(), true));
                             $error = \THCFrame\Core\ArrayMethods::flatten($photo->getErrors());
                             

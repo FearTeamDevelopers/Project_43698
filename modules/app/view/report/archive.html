@@ -8,7 +8,7 @@
     {foreach $report in $reports}
     <article>
       <header><a href="/reportaze/r/{echo $report->getUrlKey()}">
-          <h3>{echo $report->getTitle()}</h3></a><span> <small>{echo "Vytvořil: ".$report->getUserAlias().", ".\App\Helper\DateFormater::t2d($report->getCreated())}</small></span></header>
+          <h3>{echo $report->getTitle()}</h3></a></header>
       <div class="body">
         <div>{echo html_entity_decode($report->getShortBody())}</div>{if $deviceType === 'computer'}<a href="/reportaze/r/{echo $report->getUrlKey()}" class="readMore">čti více</a>{/if}
       </div>

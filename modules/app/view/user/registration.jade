@@ -21,7 +21,7 @@ section.wrapper.login.singlePage
                label.error.fi-alert
                   |{echo join("<br/>", $errors["phoneNumber"])}
                |{/if}
-               |{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon"))}
+               |{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon - nepovinné"))}
 
                |{if isset($errors["email"])}
                label.error.fi-alert

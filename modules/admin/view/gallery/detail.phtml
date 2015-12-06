@@ -3,16 +3,14 @@
     <li><a href="/admin/gallery/add/">Nová Galerie</a></li>
     <li class="current"><a href="#">Detail Galerie</a></li>
     <li><a href="/admin/gallery/edit/{echo $gallery->id}">Editovat Galerii</a></li>
-    <li><a href="/admin/gallery/delete/{echo $gallery->id}">Smazat Galerii</a></li>
 </ul><!--maintabmenu-->
 
 {if isset($gallery)}
 <div class="content">
-    <div class="grid_8">
+    <div class="grid_4">
         <div class="contenttitle radiusbottom0">
             <h2 class="table"><span>{echo $gallery->title}</span></h2>
         </div><!--contenttitle-->
-        
         <div>
             Autor: {echo $gallery->userAlias}<br/>
             Vytvořeno: {echo $gallery->created}<br/>
@@ -20,6 +18,19 @@
             <p class="collectiondetail_description">
                 {echo $gallery->description}
             </p>
+        </div>
+    </div>
+    <div class="grid_4">
+        <div class="contenttitle radiusbottom0">
+            <h2 class="table"><span>Avatar</span></h2>
+        </div><!--contenttitle-->
+        <br/>
+        <div>
+            {if $gallery->getImgThumb() == ""}
+                Zatím není nastavený žádný avatar galerie
+            {/if}{else}
+                <img src="{echo $gallery->getImgThumb()}" height="180px"/>
+            {/else}
         </div>
     </div>
     <div class="grid_8">
@@ -54,9 +65,9 @@
                             <img src="{echo $photo->imgThumb}" alt="" height="120px" />
                         </a>
                         <span>
-                            <a href="{echo $photo->imgMain}" class="view" value="Zobrazit" target="_blank"></a>
-                            <a href="/admin/gallery/changephotostatus/{echo $photo->id}" class="activate" value="Aktivovat/Deaktivovat"></a>
-                            <a href="/admin/gallery/deletephoto/{echo $photo->id}" class="delete" value="Smazat"></a>
+                            <a href="{echo $photo->imgMain}" class="view" title="Zobrazit" target="_blank"></a>
+                            <a href="/admin/gallery/changephotostatus/{echo $photo->id}" class="activate" title="Aktivovat/Deaktivovat"></a>
+                            <a href="/admin/gallery/deletephoto/{echo $photo->id}" class="delete" title="Smazat"></a>
                         </span>
                     </li>
                 {/foreach}

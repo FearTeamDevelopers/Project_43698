@@ -145,7 +145,9 @@ class GalleryModel extends BasicGalleryModel
     public function getActPhotosForGallery()
     {
         $photos = \App\Model\PhotoModel::all(
-                        array('galleryId = ?' => $this->getId(), 'active = ?' => true), array('*'), array('rank' => 'desc', 'created' => 'desc')
+                    array('galleryId = ?' => $this->getId(), 'active = ?' => true), 
+                    array('*'), 
+                    array('rank' => 'desc', 'created' => 'desc')
         );
 
         $this->_photos = $photos;

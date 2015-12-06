@@ -101,6 +101,8 @@ class UserModel extends BasicUserModel
             $this->setTotalLoginAttempts(0);
             $this->setLastLoginAttempt(0);
             $this->setFirstLoginAttempt(0);
+            $this->setAccountExpire();
+            $this->setPassExipre();
             $this->setGetNewActionNotification(0);
             $this->setGetNewReportNotification(0);
         }

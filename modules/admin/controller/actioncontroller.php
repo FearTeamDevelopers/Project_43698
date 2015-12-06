@@ -13,6 +13,7 @@ use THCFrame\Core\StringMethods;
  */
 class ActionController extends Controller
 {
+    
     private $_errors = array();
 
     /**

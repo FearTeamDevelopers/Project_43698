@@ -387,7 +387,8 @@ class AdvertisementController extends Controller
                     'maxImageHeight' => $this->getConfig()->photo_maxheight,
                 ));
 
-                $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $this->getUser()->getId(), time() . '_', true)->getUploadErrors();
+                $userFolderName = $this->getUser()->getId().'-'.$this->_createUrlKey($this->getUser()->getWholeName());
+                $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $userFolderName, time() . '_', true)->getUploadErrors();
                 $files = $fileManager->getUploadedFiles();
 
                 if (!empty($fileErrors)) {
@@ -523,7 +524,8 @@ class AdvertisementController extends Controller
                     'maxImageHeight' => $this->getConfig()->photo_maxheight,
                 ));
 
-                $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $this->getUser()->getId(), time() . '_', true)->getUploadErrors();
+                $userFolderName = $this->getUser()->getId().'-'.$this->_createUrlKey($this->getUser()->getWholeName());
+                $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $userFolderName, time() . '_', true)->getUploadErrors();
                 $files = $fileManager->getUploadedFiles();
 
                 if (!empty($fileErrors)) {

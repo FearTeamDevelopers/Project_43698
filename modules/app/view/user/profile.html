@@ -87,21 +87,21 @@
             <td><span>Původní heslo:</span></td>
             <td>{if isset($errors["oldpass"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["oldpass"])}</label>{/if}
-              {echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
+              {echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>
           <tr>
             <td><span>Heslo:</span></td>
             <td>{if isset($errors["password"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["password"])}</label>{/if}
-              {echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
+              {echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>
           <tr>
             <td><span>Ověření hesla:</span></td>
             <td>{if isset($errors["password2"])}
               <label class="error fi-alert">{echo join("<br/>", $errors["password2"])}</label>{/if}
-              {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
+              {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>
           <tr>

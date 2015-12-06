@@ -102,7 +102,7 @@ section.wrapper.profil.singlePage
 							label.error.fi-alert
 								|{echo join("<br/>", $errors["oldpass"])}
 							|{/if}
-							|{echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
+							|{echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr
 						td
 							span Heslo:
@@ -111,7 +111,7 @@ section.wrapper.profil.singlePage
 							label.error.fi-alert
 								|{echo join("<br/>", $errors["password"])}
 							|{/if}
-							|{echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
+							|{echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr
 						td
 							span Ověření hesla:
@@ -120,7 +120,7 @@ section.wrapper.profil.singlePage
 							label.error.fi-alert
 								|{echo join("<br/>", $errors["password2"])}
 							|{/if}
-							|{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné..."))}
+							|{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr
 						td(colspan=2)
 							input(type="submit", name="editProfile", value="Upravit").more

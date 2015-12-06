@@ -309,11 +309,11 @@ class UserController extends Controller
             }
 
             $oldPassword = RequestMethods::post('oldpass');
-            if (!empty($oldPassword)) {
-                $newPass = RequestMethods::post('password');
+            $newPassword = RequestMethods::post('password');
 
+            if (!empty($oldPassword) && !empty($newPassword)) {
                 try {
-                    $user = $user->changePassword($oldPassword, $newPass);
+                    $user = $user->changePassword($oldPassword, $newPassword);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
                     $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
@@ -321,6 +321,8 @@ class UserController extends Controller
                 } catch (\THCFrame\Security\Exception\PasswordInHistory $ex) {
                     $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
                 }
+            } elseif (empty($oldPassword) && !empty($newPassword)) {
+                $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
             }
 
             $user->firstname = RequestMethods::post('firstname');
@@ -331,7 +333,7 @@ class UserController extends Controller
             $user->getNewReportNotification = RequestMethods::post('reportNotification');
 
             if (empty($errors) && $user->validate()) {
-                $user->update();
+                $user->save();
                 $this->getSecurity()->setUser($user);
 
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
