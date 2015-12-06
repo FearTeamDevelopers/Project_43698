@@ -106,7 +106,7 @@ class GalleryController extends Controller
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/' . $id);
             } else {
-                Event::fire('admin.log', array('fail'));
+                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $gallery->getErrors())));
                 $view->set('gallery', $gallery)
                         ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $gallery->getErrors());
@@ -196,7 +196,8 @@ class GalleryController extends Controller
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/' . $id);
             } else {
-                Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
+                Event::fire('admin.log', array('fail', 'Gallery id: ' . $id,
+                    'Errors: ' . json_encode($errors + $gallery->getErrors())));
                 $view->set('errors', $gallery->getErrors());
             }
         }
@@ -257,7 +258,8 @@ class GalleryController extends Controller
                     Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
                     echo 'success';
                 } else {
-                    Event::fire('admin.log', array('fail', 'Gallery id: ' . $id));
+                    Event::fire('admin.log', array('fail', 'Gallery id: ' . $id,
+                        'Errors: ' . json_encode($gallery->getErrors())));
                     echo $this->lang('COMMON_FAIL');
                 }
             } else {
@@ -359,7 +361,8 @@ class GalleryController extends Controller
 
                             Event::fire('admin.log', array('success', 'Photo id: ' . $aid . ' in gallery ' . $gallery->getUrlKey()));
                         } else {
-                            Event::fire('admin.log', array('fail', 'Photo in gallery ' . $gallery->getUrlKey()));
+                            Event::fire('admin.log', array('fail', 'Photo in gallery ' . $gallery->getUrlKey(),
+                                'Errors: ' . json_encode($photo->getErrors())));
                             \THCFrame\Core\Core::getLogger()->log('Gallery image create db record fail: ' . print_r($photo->getErrors(), true));
                             $error = \THCFrame\Core\ArrayMethods::flatten($photo->getErrors());
 
@@ -410,19 +413,20 @@ class GalleryController extends Controller
 
             if (null === $gallery) {
                 echo $this->lang('NOT_FOUND');
-            }
-
-            if (!$this->_checkAccess($gallery)) {
-                echo $this->lang('LOW_PERMISSIONS');
-            }
-
-            if ($photo->delete()) {
-                $this->getCache()->erase('gallery');
-                Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                echo 'success';
             } else {
-                Event::fire('admin.log', array('fail', 'Photo id: ' . $id));
-                echo $this->lang('COMMON_FAIL');
+                if ($this->_checkAccess($gallery)) {
+                    if ($photo->delete()) {
+                        $this->getCache()->erase('gallery');
+                        Event::fire('admin.log', array('success', 'Photo id: ' . $id));
+                        echo 'success';
+                    } else {
+                        Event::fire('admin.log', array('fail', 'Photo id: ' . $id,
+                            'Errors: ' . json_encode($photo->getErrors())));
+                        echo $this->lang('COMMON_FAIL');
+                    }
+                } else {
+                    echo $this->lang('LOW_PERMISSIONS');
+                }
             }
         }
     }
@@ -449,35 +453,37 @@ class GalleryController extends Controller
 
             if (null === $gallery) {
                 echo $this->lang('NOT_FOUND');
-            }
+            } else {
+                if ($this->_checkAccess($gallery)) {
+                    if (!$photo->active) {
+                        $photo->active = true;
 
-            if (!$this->_checkAccess($gallery)) {
-                echo $this->lang('LOW_PERMISSIONS');
-            }
+                        if ($photo->validate()) {
+                            $photo->save();
+                            $this->getCache()->erase('gallery');
 
-            if (!$photo->active) {
-                $photo->active = true;
+                            Event::fire('admin.log', array('success', 'Photo id: ' . $id));
+                            echo 'active';
+                        } else {
+                            echo implode('<br/>', $photo->getErrors());
+                        }
+                    } elseif ($photo->active) {
+                        $photo->active = false;
 
-                if ($photo->validate()) {
-                    $photo->save();
-                    $this->getCache()->erase('gallery');
+                        if ($photo->validate()) {
+                            $photo->save();
+                            $this->getCache()->erase('gallery');
 
-                    Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                    echo 'active';
+                            Event::fire('admin.log', array('success', 'Photo id: ' . $id));
+                            echo 'inactive';
+                        } else {
+                            Event::fire('admin.log', array('fail', 'Photo id: ' . $id,
+                                'Errors: ' . json_encode($photo->getErrors())));
+                            echo implode('<br/>', $photo->getErrors());
+                        }
+                    }
                 } else {
-                    echo implode('<br/>', $photo->getErrors());
-                }
-            } elseif ($photo->active) {
-                $photo->active = false;
-
-                if ($photo->validate()) {
-                    $photo->save();
-                    $this->getCache()->erase('gallery');
-
-                    Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                    echo 'inactive';
-                } else {
-                    echo implode('<br/>', $photo->getErrors());
+                    echo $this->lang('LOW_PERMISSIONS');
                 }
             }
         }
