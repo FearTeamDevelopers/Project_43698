@@ -26,6 +26,11 @@ class Response extends Base
     protected $_headers = array();
 
     /**
+     * @readwrite
+     */
+    protected $_httpVersionStatusHeader;
+    
+    /**
      * 
      * @param type $method
      * @return \THCFrame\Request\Exception\Implementation
@@ -53,20 +58,16 @@ class Response extends Base
         preg_match_all($pattern, $response, $matches);
 
         $headers = array_pop($matches[0]);
-        $headers = explode('\r\n', str_replace('\r\n\r\n', '', $headers));
+        $headers = explode(PHP_EOL, str_replace('\r\n\r\n', '', trim($headers)));
 
         $this->_body = str_replace($headers, '', $response);
 
         $version = array_shift($headers);
-        preg_match('#HTTP/(\d\.\d)\s(\d\d\d)\s(.*)#', $version, $matches);
-
-        $this->_headers['Http-Version'] = $matches[1];
-        $this->_headers['Status-Code'] = $matches[2];
-        $this->_headers['Status'] = $matches[2] . ' ' . $matches[3];
+        $this->setHttpVersionStatusHeader($version);
 
         foreach ($headers as $header) {
-            preg_match('#(.*?)\:\s(.*)#', $header, $matches);
-            $this->_headers[$matches[1]] = $matches[2];
+            preg_match('#(.*?)\:\s?(.*)#', $header, $matches);
+            $this->setHeader($matches[1], $matches[2]);
         }
     }
 
@@ -77,6 +78,79 @@ class Response extends Base
     public function __toString()
     {
         return $this->_body;
+    }
+
+    /**
+     * Set header
+     * 
+     * @param string $type
+     * @param string $content
+     * @return \THCFrame\Request\Response
+     */
+    public function setHeader($type, $content)
+    {
+        if (!isset($this->_headers[$type]) || $this->_headers[$type] != $content) {
+            $this->_headers[$type] = $content;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if headers can be send
+     * 
+     * @return boolean
+     */
+    public function canSendHeaders()
+    {
+        if (headers_sent()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Send headers
+     */
+    public function sendHeaders()
+    {
+        if ($this->canSendHeaders() && !empty($this->_headers)) {
+            header($this->getHttpVersionStatusHeader());
+            
+            foreach ($this->_headers as $type => $content) {
+                header("{$type}: {$content}");
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param string $body
+     */
+    public function setBody($body)
+    {
+        $this->_body = $body;
+    }
+
+    /**
+     * Prepend string to body
+     * 
+     * @param string $string
+     */
+    public function prependBody($string)
+    {
+        $this->_body = $string . $this->_body;
+    }
+
+    /**
+     * Append string to body
+     * 
+     * @param string $string
+     */
+    public function appendBody($string)
+    {
+        $this->_body .= $string;
     }
 
 }

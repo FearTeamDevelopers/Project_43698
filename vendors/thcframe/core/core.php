@@ -163,10 +163,12 @@ class Core
     public static function _errorHandler($number, $text, $file, $row)
     {
         switch ($number) {
-            case E_WARNING: case E_USER_WARNING :
+            case E_WARNING:
+            case E_USER_WARNING :
                 $type = 'Warning';
                 break;
-            case E_NOTICE: case E_USER_NOTICE:
+            case E_NOTICE:
+            case E_USER_NOTICE:
                 $type = 'Notice';
                 break;
             default:
@@ -255,28 +257,28 @@ class Core
 
         // Autoloader
         $prefixes = array(
-            'THCFrame' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors'. DIRECTORY_SEPARATOR .'thcframe',
-            'IDS' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors'. DIRECTORY_SEPARATOR .'ids',
-            'Swift' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors'. DIRECTORY_SEPARATOR .'swiftmailer'
-            );
+            'THCFrame' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'thcframe',
+            'IDS' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'ids',
+            'Swift' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'swiftmailer'
+        );
 
         require_once APP_PATH . '/vendors/thcframe/core/autoloader.php';
         self::$_autoloader = new Autoloader();
         self::$_autoloader->register();
         self::$_autoloader->addNamespaces($prefixes);
-        
-        //register modules
-        self::registerModules($modules);
-        
-        // Logger
-        $logger = new Logger();
-        self::$_logger = $logger->initialize();
-
-        // error and exception handlers
-        set_error_handler(__CLASS__ . '::_errorHandler');
-        set_exception_handler(__CLASS__ . '::_exceptionHandler');
 
         try {
+            // Logger
+            $logger = new Logger();
+            self::$_logger = $logger->initialize();
+
+            // error and exception handlers
+            set_error_handler(__CLASS__ . '::_errorHandler');
+            set_exception_handler(__CLASS__ . '::_exceptionHandler');
+            
+            //register modules
+            self::registerModules($modules);
+            
             // configuration
             $configuration = new \THCFrame\Configuration\Configuration(
                     array('type' => 'ini', 'options' => array('env' => ENV))
@@ -290,7 +292,7 @@ class Core
                 $database = new \THCFrame\Database\Database();
                 $connectors = $database->initialize($parsedConfig);
                 Registry::set('database', $connectors);
-                
+
                 //extend configuration for config loaded from db
                 $confingInitialized->extendForDbConfig();
             }
@@ -366,16 +368,12 @@ class Core
         if (array_key_exists(ucfirst($moduleName), self::$_modules)) {
             throw new \THCFrame\Module\Exception\Multiload(sprintf('Module %s has been alerady loaded', ucfirst($moduleName)));
         } else {
-            self::$_autoloader->addNamespace(ucfirst($moduleName), MODULES_PATH. DIRECTORY_SEPARATOR.strtolower($moduleName));
-            $moduleClass = ucfirst($moduleName)."\Etc\ModuleConfig";
+            self::$_autoloader->addNamespace(ucfirst($moduleName), MODULES_PATH . DIRECTORY_SEPARATOR . strtolower($moduleName));
+            $moduleClass = ucfirst($moduleName) . "\Etc\ModuleConfig";
 
-            try {
-                $moduleObject = new $moduleClass();
-                $moduleObjectName = ucfirst($moduleObject->getModuleName());
-                self::$_modules[$moduleObjectName] = $moduleObject;
-            } catch (Exception $e) {
-                
-            }
+            $moduleObject = new $moduleClass();
+            $moduleObjectName = ucfirst($moduleObject->getModuleName());
+            self::$_modules[$moduleObjectName] = $moduleObject;
         }
     }
 
@@ -459,12 +457,12 @@ class Core
                 foreach ($classes as $class) {
                     if ($class == $exception) {
                         $controller = Registry::get('controller');
-                        
-                        if(null !== $controller){
+
+                        if (null !== $controller) {
                             $controller->willRenderLayoutView = false;
                             $controller->willRenderActionView = false;
                         }
-                        
+
                         $defaultErrorFile = MODULES_PATH . "/app/view/errors/{$template}.phtml";
 
                         http_response_code($template);

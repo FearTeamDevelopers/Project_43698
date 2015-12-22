@@ -94,6 +94,20 @@ class RequestMethods
     }
 
     /**
+     * Check if key is in $_POST array
+     * 
+     * @param mixed $key
+     * @return boolean
+     */
+    public static function issetserver($key)
+    {
+        if (isset($_SERVER[$key])) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
      * Get value from $_COOKIE array
      * 
      * @param mixed $key

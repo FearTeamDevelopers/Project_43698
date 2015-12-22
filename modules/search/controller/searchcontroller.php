@@ -44,6 +44,7 @@ class SearchController extends Controller
 
         $cleanStr = $this->_cleanString($query);
         $articlesPerPage = $this->getConfig()->search_results_per_page;
+        $body = array();
 
         $words = explode(' ', $cleanStr);
         $searchQuery = \Search\Model\SearchIndexModel::getQuery(
@@ -64,12 +65,12 @@ class SearchController extends Controller
             array_unshift($paramArr, $whereCond);
         } else {
             unset($searchQuery);
-            echo json_encode(array());
+            $body = array();
         }
 
         if ($paramArr === null) {
             unset($searchQuery);
-            echo json_encode(array());
+            $body = array();
         } else {
             call_user_func_array(array($searchQuery, 'wheresql'), $paramArr);
 
@@ -88,11 +89,12 @@ class SearchController extends Controller
                         'created' => $model->getSourceCreated(), );
                 }
             }
+            
+            $body = array_slice($searchReturnArr, (int) $articlesPerPage * ((int) $page - 1), $articlesPerPage + 1);
         }
-
-        $slicedReturnArr = array_slice($searchReturnArr, (int) $articlesPerPage * ((int) $page - 1), $articlesPerPage + 1);
-
-        echo json_encode($slicedReturnArr);
+        
+        header('Content-Type: application/json');
+        echo json_encode($body);
     }
 
     /**
@@ -109,6 +111,7 @@ class SearchController extends Controller
 
         $cleanStr = $this->_cleanString($query);
         $articlesPerPage = $this->getConfig()->search_results_per_page;
+        $body = array();
 
         $words = explode(' ', $cleanStr);
         $searchQuery = \Search\Model\SearchIndexModel::getQuery(
@@ -129,12 +132,12 @@ class SearchController extends Controller
             array_unshift($paramArr, $whereCond);
         } else {
             unset($searchQuery);
-            echo json_encode(array());
+            $body = array();
         }
 
         if ($paramArr === null) {
             unset($searchQuery);
-            echo json_encode(array());
+            $body = array();
         } else {
             call_user_func_array(array($searchQuery, 'wheresql'), $paramArr);
 
@@ -153,10 +156,11 @@ class SearchController extends Controller
                         'created' => $model->getSourceCreated(), );
                 }
             }
+            
+            $body = array_slice($searchReturnArr, (int) $articlesPerPage * ((int) $page - 1), $articlesPerPage + 1);
         }
-
-        $slicedReturnArr = array_slice($searchReturnArr, (int) $articlesPerPage * ((int) $page - 1), $articlesPerPage + 1);
-
-        echo json_encode($slicedReturnArr);
+        
+        header('Content-Type: application/json');
+        echo json_encode($body);
     }
 }

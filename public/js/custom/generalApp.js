@@ -3,26 +3,26 @@ jQuery.noConflict();
 
 jQuery(document).ready(function ($) {
     //menu
-    $('.showMenu').click(function (e) {
+    jQuery('.showMenu').click(function (e) {
         e.preventDefault();
-        $(this).closest('.navWrapper').find('nav').slideToggle(300).toggleClass('active');
+        jQuery(this).closest('.navWrapper').find('nav').slideToggle(300).toggleClass('active');
     });
 
-    $('nav>ul>li>a.dropdown').click(function (event) {
+    jQuery('nav>ul>li>a.dropdown').click(function (event) {
         event.preventDefault();
-        if ($(this).closest('li').hasClass('active')) {
-            $(this).closest('li').find('ul').slideUp(300, function () {
-                $(this).closest('li').removeClass('active');
+        if (jQuery(this).closest('li').hasClass('active')) {
+            jQuery(this).closest('li').find('ul').slideUp(300, function () {
+                jQuery(this).closest('li').removeClass('active');
             });
         }
-        else if ($('nav ul li').hasClass('active')) {
-            $('nav ul li.active').find('ul').slideUp(300).closest('li').removeClass('active');
-            $(this).closest('li').find('ul').slideDown(300, function () {
-                $(this).closest('li').addClass('active');
+        else if (jQuery('nav ul li').hasClass('active')) {
+            jQuery('nav ul li.active').find('ul').slideUp(300).closest('li').removeClass('active');
+            jQuery(this).closest('li').find('ul').slideDown(300, function () {
+                jQuery(this).closest('li').addClass('active');
             });
         } else {
-            $(this).closest('li').find('ul').slideDown(300, function () {
-                $(this).closest('li').addClass('active');
+            jQuery(this).closest('li').find('ul').slideDown(300, function () {
+                jQuery(this).closest('li').addClass('active');
             });
         }
     });
