@@ -15,7 +15,7 @@ section.wrapper.pridatInzerat.singlePage
                         span Název
                     td
                         |{if isset($errors["title"])}
-                        label.error {echo join("<br/>", $errors["title"])}
+                        label.error {echo implode("<br/>", $errors["title"])}
                         |{/if}
                         |{echo \App\Helper\FormPrinter::input("text", "title", array($ad,"title"), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků"))}
                 tr
@@ -47,7 +47,7 @@ section.wrapper.pridatInzerat.singlePage
                         span Obsah
                     td
                         |{if isset($errors["content"])}
-                        label.error {echo join("<br/>", $errors["content"])}
+                        label.error {echo implode("<br/>", $errors["content"])}
                         |{/if}
                         textarea(name="content", required, rows=8) {echo \App\Helper\FormPrinter::iset($ad,"content")}
                 tr
@@ -55,7 +55,7 @@ section.wrapper.pridatInzerat.singlePage
                         span Klíčová slova
                     td
                         |{if isset($errors["keywords"])}
-                        label.error {echo join("<br/>", $errors["keywords"])}
+                        label.error {echo implode("<br/>", $errors["keywords"])}
                         |{/if}
                         |{echo \App\Helper\FormPrinter::input("text", "keywords", array($ad,"keywords"), array("placeholder" => "Pro rychlejší vyhledávání v bazaru"))}
                 tr
@@ -63,7 +63,7 @@ section.wrapper.pridatInzerat.singlePage
                         span Cena
                     td
                         |{if isset($errors["price"])}
-                        label.error {echo join("<br/>", $errors["price"])}
+                        label.error {echo implode("<br/>", $errors["price"])}
                         |{/if}
                         |{echo \App\Helper\FormPrinter::input("text", "price", array($ad,"price"), array("placeholder" => "při nevyplnění bude hodnota: Dohodou", "pattern" => "\d*", "title" => "Vyplňte pouze čísla"))}
                 tr
@@ -71,7 +71,7 @@ section.wrapper.pridatInzerat.singlePage
                         span Fotky
                     td
                         |{if isset($errors["uploadfile"])}
-                        label.error {echo join("<br/>", $errors["uploadfile"])}
+                        label.error {echo implode("<br/>", $errors["uploadfile"])}
                         |{/if}
                         p
                             span K inzerátu mohou být připojeny maximálně 3 fotky

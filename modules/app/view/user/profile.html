@@ -41,21 +41,21 @@
           <tr>
             <td><span>Jméno:</span></td>
             <td>{if isset($errors["firstname"])}
-              <label class="error fi-alert">{echo join("<br/>", $errors["firstname"])}</label>{/if}
+              <label class="error fi-alert">{echo implode("<br/>", $errors["firstname"])}</label>{/if}
               {echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true))}
             </td>
           </tr>
           <tr>
             <td><span>Příjmení:</span></td>
             <td>{if isset($errors["lastname"])}
-              <label class="error fi-alert">{echo join("<br/>", $errors["lastname"])}</label>{/if}
+              <label class="error fi-alert">{echo implode("<br/>", $errors["lastname"])}</label>{/if}
               {echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true))}
             </td>
           </tr>
           <tr>
             <td><span>Telefon:</span></td>
             <td>{if isset($errors["phoneNumber"])}
-              <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
+              <label class="error fi-alert">{echo implode("<br/>", $errors["phoneNumber"])}</label>{/if}
               {echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"))}
             </td>
           </tr>
@@ -79,28 +79,28 @@
           <tr>
             <td><span>Email:</span></td>
             <td>{if isset($errors["email"])}
-              <label class="error fi-alert">{echo join("<br/>", $errors["email"])}</label>{/if}
+              <label class="error fi-alert">{echo implode("<br/>", $errors["email"])}</label>{/if}
               {echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true))}
             </td>
           </tr>
           <tr>
             <td><span>Původní heslo:</span></td>
             <td>{if isset($errors["oldpass"])}
-              <label class="error fi-alert">{echo join("<br/>", $errors["oldpass"])}</label>{/if}
+              <label class="error fi-alert">{echo implode("<br/>", $errors["oldpass"])}</label>{/if}
               {echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>
           <tr>
             <td><span>Heslo:</span></td>
             <td>{if isset($errors["password"])}
-              <label class="error fi-alert">{echo join("<br/>", $errors["password"])}</label>{/if}
+              <label class="error fi-alert">{echo implode("<br/>", $errors["password"])}</label>{/if}
               {echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>
           <tr>
             <td><span>Ověření hesla:</span></td>
             <td>{if isset($errors["password2"])}
-              <label class="error fi-alert">{echo join("<br/>", $errors["password2"])}</label>{/if}
+              <label class="error fi-alert">{echo implode("<br/>", $errors["password2"])}</label>{/if}
               {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>

@@ -19,7 +19,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'title', array($template,'title'), array('required'=>true))}
                     {if isset($errors["title"])}
-                    <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["title"])}</label>
                     {/if}
                 </span>
             </p>
@@ -28,7 +28,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'subject', array($template,'subject'), array('required'=>true))}
                     {if isset($errors["subject"])}
-                    <label class="error">{echo join("<br/>", $errors["subject"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["subject"])}</label>
                     {/if}
                 </span>
             </p>
@@ -37,7 +37,7 @@
                 <span class="field">
                     <textarea rows="20" name="text" id="ckeditor">{echo \Admin\Helper\FormPrinter::iset($template,'body')}</textarea>
                     {if isset($errors["body"])}
-                    <label class="error">{echo join("<br/>", $errors["body"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["body"])}</label>
                     {/if}
                     <br/>
                     <button id="clear-text">Smazat</button>
@@ -53,7 +53,7 @@
                 <span class="field">
                     <textarea rows="20" name="texten" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($template,'bodyEn')}</textarea>
                     {if isset($errors["bodyEn"])}
-                    <label class="error">{echo join("<br/>", $errors["bodyEn"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["bodyEn"])}</label>
                     {/if}
                     <br/>
                     <button id="clear-texten">Smazat</button>

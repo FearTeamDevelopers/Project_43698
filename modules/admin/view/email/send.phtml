@@ -44,7 +44,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'singlerecipients', array($email,'recipientlist'), array('placeholder'=>'Emaily oddělené čárkou'))}
                     {if isset($errors["recipientlist"])}
-                    <label class="error">{echo join("<br/>", $errors["recipientlist"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["recipientlist"])}</label>
                     {/if}
                 </span>
             </p>
@@ -59,7 +59,7 @@
                         {/if}
                     </select>
                     {if isset($errors["recipientlist"])}
-                    <label class="error">{echo join("<br/>", $errors["recipientlist"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["recipientlist"])}</label>
                     {/if}
                 </span>
             </p>
@@ -70,7 +70,7 @@
                     <input type="checkbox" name="grouprecipients[]" value="role_participant">Členové s přístupem do administrace<br/>
                     <input type="checkbox" name="grouprecipients[]" value="role_admin">Adminové<br/>
                     {if isset($errors["recipientlist"])}
-                    <label class="error">{echo join("<br/>", $errors["recipientlist"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["recipientlist"])}</label>
                     {/if}
                 </span>
             </p>
@@ -79,7 +79,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'subject', array($email,'subject'), array('required'=>true))}
                     {if isset($errors["subject"])}
-                    <label class="error">{echo join("<br/>", $errors["subject"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["subject"])}</label>
                     {/if}
                 </span>
             </p>
@@ -88,7 +88,7 @@
                 <span class="field">
                     <textarea rows="20" name="text" id="ckeditor">{echo \Admin\Helper\FormPrinter::iset($email,'body')}</textarea>
                     {if isset($errors["body"])}
-                    <label class="error">{echo join("<br/>", $errors["body"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["body"])}</label>
                     {/if}
                     <br/>
                     <button id="clear-text">Smazat</button>

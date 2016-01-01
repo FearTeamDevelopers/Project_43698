@@ -19,7 +19,7 @@
             <span class="field">
                 {echo \Admin\Helper\FormPrinter::textInput('title', array($adsection,'title'), true)}
                 {if isset($errors["title"])}
-                <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                <label class="error">{echo implode("<br/>", $errors["title"])}</label>
                 {/if}
             </span>
         </p>

@@ -18,7 +18,7 @@
                 {echo \Admin\Helper\FormPrinter::input('text', 'firstname', array($user,'firstname'), array('required'=>true))}
                 {if isset($errors["firstname"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["firstname"])}
+                    {echo implode("<br/>", $errors["firstname"])}
                 </label>
                 {/if}
             </span>
@@ -29,7 +29,7 @@
                 {echo \Admin\Helper\FormPrinter::input('text', 'lastname', array($user,'lastname'), array('required'=>true))}
                 {if isset($errors["lastname"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["lastname"])}
+                    {echo implode("<br/>", $errors["lastname"])}
                 </label>
                 {/if}
             </span>
@@ -40,7 +40,7 @@
                 {echo \Admin\Helper\FormPrinter::input('tel', 'phone', array($user,'phoneNumber'))}
                 {if isset($errors["phoneNumber"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["phoneNumber"])}
+                    {echo implode("<br/>", $errors["phoneNumber"])}
                 </label>
                 {/if}
             </span>
@@ -63,7 +63,7 @@
                 {echo \Admin\Helper\FormPrinter::input('email', 'email', array($user,'email'), array('required'=>true))}
                 {if isset($errors["email"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["email"])}
+                    {echo implode("<br/>", $errors["email"])}
                 </label>
                 {/if}
             </span>
@@ -74,7 +74,7 @@
                 <input required type="password" name="password" class="width80" value=""/>
                 {if isset($errors["password"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["password"])}
+                    {echo implode("<br/>", $errors["password"])}
                 </label>
                 {/if}
             </span>
@@ -85,7 +85,7 @@
                 <input required type="password" name="password2" class="width80" value=""/>
                 {if isset($errors["password2"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["password2"])}
+                    {echo implode("<br/>", $errors["password2"])}
                 </label>
                 {/if}
             </span>
@@ -101,7 +101,7 @@
                 </select>
                 {if isset($errors["role"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["role"])}
+                    {echo implode("<br/>", $errors["role"])}
                 </label>
                 {/if}
             </span>
@@ -117,7 +117,7 @@
                 </select>
                 {if isset($errors["role"])}
                 <label class="error">
-                    {echo join("<br/>", $errors["role"])}
+                    {echo implode("<br/>", $errors["role"])}
                 </label>
                 {/if}
             </span>

@@ -6,7 +6,7 @@ section.wrapper.singlePage
             div Vaše návrhy a nápady, jak naše stránky ještě vylepšit. Nebo pokud někde něco nefunguje, tak nám o tom napište.
             form(method='POST' action='#').mv30
                 |{if isset($errors["message"])}
-                label.error {echo join("<br/>", $errors["message"])}
+                label.error {echo implode("<br/>", $errors["message"])}
                 |{/if}
                 textarea(name='message', required, rows=7) {echo \App\Helper\FormPrinter::iset($feedback,'message')}
                 input(type="submit" name="submitFeedback" value="Odeslat").more

@@ -52,17 +52,17 @@
             Vaše jméno:
             {echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
             {if isset($errors["msAuthor"])}
-            <label class="error">{echo join("<br/>", $errors["msAuthor"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["msAuthor"])}</label>{/if}
           </label>
           <label>
             Email, na který může majitel inzerátu odpovědět:
             {echo \App\Helper\FormPrinter::input("email", "email", array($admessage,"msEmail"), array("required"=>true))}
             {if isset($errors["msEmail"])}
-            <label class="error">{echo join("<br/>", $errors["msEmail"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["msEmail"])}</label>{/if}
           </label>
           <label>Váš dotaz:
             <textarea name="message" rows="6" required="required">{echo \App\Helper\FormPrinter::iset($admessage,"message")}</textarea>{if isset($errors["message"])}
-            <label class="error">{echo join("<br/>", $errors["message"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["message"])}</label>{/if}
           </label>
           <label>Chcete poslat kopii dotazu na váš email?
             <input type="checkbox" name="getemailcopy" value="1"/>

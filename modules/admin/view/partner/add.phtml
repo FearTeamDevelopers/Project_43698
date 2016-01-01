@@ -18,7 +18,7 @@
             <span class="field">
                 {echo \Admin\Helper\FormPrinter::textInput('title', array($partner,'title'), true)}
                 {if isset($errors["title"])}
-                <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                <label class="error">{echo implode("<br/>", $errors["title"])}</label>
                 {/if}
             </span>
         </p>
@@ -27,7 +27,7 @@
             <span class="field">
                 <input type="file" name="logo" accept="image/*"/>
                 {if isset($errors["logo"])}
-                <label class="error">{echo join("<br/>", $errors["logo"])}</label>
+                <label class="error">{echo implode("<br/>", $errors["logo"])}</label>
                 {/if}
             </span>
         </p>
@@ -37,7 +37,7 @@
                 <input type="url" required name="web" class="width80" 
                        value="{echo isset($partner)? $partner->web: ""}"/>
                 {if isset($errors["web"])}
-                <label class="error">{echo join("<br/>", $errors["web"])}</label>
+                <label class="error">{echo implode("<br/>", $errors["web"])}</label>
                 {/if}
             </span>
         </p>
@@ -55,7 +55,7 @@
             <span class="field">
                 {echo \Admin\Helper\FormPrinter::textInput('rank', array($partner,'rank',1))}
                 {if isset($errors["rank"])}
-                <label class="error">{echo join("<br/>", $errors["rank"])}</label>
+                <label class="error">{echo implode("<br/>", $errors["rank"])}</label>
                 {/if}
             </span>
         </p>

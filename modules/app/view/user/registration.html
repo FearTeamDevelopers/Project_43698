@@ -7,16 +7,16 @@
           <h2 class="fi-check">Registrace</h2>
         </header>
         <form method="post" action="#">{if isset($errors["firstname"])}
-          <label class="error fi-alert">{echo join("<br/>", $errors["firstname"])}</label>{/if}
+          <label class="error fi-alert">{echo implode("<br/>", $errors["firstname"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true, "placeholder" => "Jméno"))}
           {if isset($errors["lastname"])}
-          <label class="error fi-alert">{echo join("<br/>", $errors["lastname"])}</label>{/if}
+          <label class="error fi-alert">{echo implode("<br/>", $errors["lastname"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true, "placeholder" => "Příjmení"))}
           {if isset($errors["phoneNumber"])}
-          <label class="error fi-alert">{echo join("<br/>", $errors["phoneNumber"])}</label>{/if}
+          <label class="error fi-alert">{echo implode("<br/>", $errors["phoneNumber"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon - nepovinné"))}
           {if isset($errors["email"])}
-          <label class="error fi-alert">{echo join("<br/>", $errors["email"])}</label>{/if}
+          <label class="error fi-alert">{echo implode("<br/>", $errors["email"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}<span>Informace na email:<br/></span>
           <label>{if $user->getNewActionNotification}
             <input type="checkbox" name="actionNotification" value="1" checked="checked"/>Informace o nových akcích
@@ -30,10 +30,10 @@
             <input type="checkbox" name="reportNotification" value="1"/>Informace o nových reportážích
             {/else}
           </label>{if isset($errors["password"])}
-          <label class="error fi-alert">{echo join("<br/>", $errors["password"])}</label>{/if}
+          <label class="error fi-alert">{echo implode("<br/>", $errors["password"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Heslo"))}
           {if isset($errors["password2"])}
-          <label class="error fi-alert">{echo join("<br/>", $errors["password2"])}</label>{/if}
+          <label class="error fi-alert">{echo implode("<br/>", $errors["password2"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Ověření hesla"))}
           <input type="submit" name="register" value="Registrovat"/>
           <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>

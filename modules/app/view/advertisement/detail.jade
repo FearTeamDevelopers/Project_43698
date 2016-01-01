@@ -89,17 +89,17 @@ section.wrapper.bazar.detail.singlePage
                     label Vaše jméno:
                         |{echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
                         |{if isset($errors["msAuthor"])}
-                        label.error {echo join("<br/>", $errors["msAuthor"])}
+                        label.error {echo implode("<br/>", $errors["msAuthor"])}
                         |{/if}
                     label Email, na který může majitel inzerátu odpovědět:
                         |{echo \App\Helper\FormPrinter::input("email", "email", array($admessage,"msEmail"), array("required"=>true))}
                         |{if isset($errors["msEmail"])}
-                        label.error {echo join("<br/>", $errors["msEmail"])}
+                        label.error {echo implode("<br/>", $errors["msEmail"])}
                         |{/if}
                     label Váš dotaz:
                         textarea(name="message" rows=6 required) {echo \App\Helper\FormPrinter::iset($admessage,"message")}
                         |{if isset($errors["message"])}
-                        label.error {echo join("<br/>", $errors["message"])}
+                        label.error {echo implode("<br/>", $errors["message"])}
                         |{/if}
                     label Chcete poslat kopii dotazu na váš email?
                         input(type="checkbox" name="getemailcopy" value="1")

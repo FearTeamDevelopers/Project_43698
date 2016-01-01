@@ -14,7 +14,7 @@
         <tr>
           <td><span>Název</span></td>
           <td>{if isset($errors["title"])}
-            <label class="error">{echo join("<br/>", $errors["title"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["title"])}</label>{/if}
             {echo \App\Helper\FormPrinter::input("text", "title", array($ad,"title"), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků"))}
           </td>
         </tr>
@@ -44,28 +44,28 @@
         <tr>
           <td><span>Obsah</span></td>
           <td>{if isset($errors["content"])}
-            <label class="error">{echo join("<br/>", $errors["content"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["content"])}</label>{/if}
             <textarea name="content" required="required" rows="8">{echo \App\Helper\FormPrinter::iset($ad,"content")}</textarea>
           </td>
         </tr>
         <tr>
           <td><span>Klíčová slova</span></td>
           <td>{if isset($errors["keywords"])}
-            <label class="error">{echo join("<br/>", $errors["keywords"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["keywords"])}</label>{/if}
             {echo \App\Helper\FormPrinter::input("text", "keywords", array($ad,"keywords"), array("placeholder" => "Pro rychlejší vyhledávání v bazaru"))}
           </td>
         </tr>
         <tr>
           <td><span>Cena</span></td>
           <td>{if isset($errors["price"])}
-            <label class="error">{echo join("<br/>", $errors["price"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["price"])}</label>{/if}
             {echo \App\Helper\FormPrinter::input("text", "price", array($ad,"price"), array("placeholder" => "při nevyplnění bude hodnota: Dohodou", "pattern" => "\d*", "title" => "Vyplňte pouze čísla"))}
           </td>
         </tr>
         <tr>
           <td><span>Fotky</span></td>
           <td>{if isset($errors["uploadfile"])}
-            <label class="error">{echo join("<br/>", $errors["uploadfile"])}</label>{/if}
+            <label class="error">{echo implode("<br/>", $errors["uploadfile"])}</label>{/if}
             <p><span>K inzerátu mohou být připojeny maximálně 3 fotky</span><br/><span class="field"><a href="" class="multi_upload fi-plus mh10"></a><a href="" class="multi_upload_dec fi-minus mh10"></a></span><span class="field file_inputs">
                 <input type="file" name="uploadfile[]" accept="image/*"/></span></p>
           </td>

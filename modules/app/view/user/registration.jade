@@ -7,25 +7,25 @@ section.wrapper.login.singlePage
             form(method="post",action="#")
                |{if isset($errors["firstname"])}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["firstname"])}
+                  |{echo implode("<br/>", $errors["firstname"])}
                |{/if}
                |{echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true, "placeholder" => "Jméno"))}
 
                |{if isset($errors["lastname"])}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["lastname"])}
+                  |{echo implode("<br/>", $errors["lastname"])}
                |{/if}
                |{echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true, "placeholder" => "Příjmení"))}
 
                |{if isset($errors["phoneNumber"])}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["phoneNumber"])}
+                  |{echo implode("<br/>", $errors["phoneNumber"])}
                |{/if}
                |{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon - nepovinné"))}
 
                |{if isset($errors["email"])}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["email"])}
+                  |{echo implode("<br/>", $errors["email"])}
                |{/if}
                |{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}
 
@@ -49,13 +49,13 @@ section.wrapper.login.singlePage
 
                |{if isset($errors["password"])}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["password"])}
+                  |{echo implode("<br/>", $errors["password"])}
                |{/if}
                |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Heslo"))}
 
                |{if isset($errors["password2"])}
                label.error.fi-alert
-                  |{echo join("<br/>", $errors["password2"])}
+                  |{echo implode("<br/>", $errors["password2"])}
                |{/if}
                |{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Ověření hesla"))}
 

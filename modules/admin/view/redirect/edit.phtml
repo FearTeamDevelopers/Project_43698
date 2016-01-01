@@ -33,7 +33,7 @@
             <span class="field">
                 {echo \Admin\Helper\FormPrinter::input('text', 'fromurl', array($redirect,'fromPath'))}
                 {if isset($errors["fromPath"])}
-                <label class="error">{echo join("<br/>", $errors["fromPath"])}</label>
+                <label class="error">{echo implode("<br/>", $errors["fromPath"])}</label>
                 {/if}
             </span>
         </p>
@@ -42,7 +42,7 @@
             <span class="field">
                 {echo \Admin\Helper\FormPrinter::input('text', 'tourl', array($redirect,'toPath'))}
                 {if isset($errors["toPath"])}
-                <label class="error">{echo join("<br/>", $errors["toPath"])}</label>
+                <label class="error">{echo implode("<br/>", $errors["toPath"])}</label>
                 {/if}
             </span>
         </p>

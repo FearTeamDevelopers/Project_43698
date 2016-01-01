@@ -101,7 +101,7 @@ class ReportController extends Controller
                 }
             }
         }else{
-            $this->_errors['croppedimage'] = 'Foto je povinné';
+            $this->_errors['croppedimage'] = array('Foto je povinné');
         }
 
         $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
@@ -184,7 +184,7 @@ class ReportController extends Controller
                     }
                 }
             }else{
-                $this->_errors['croppedimage'] = 'Foto je povinné';
+                $this->_errors['croppedimage'] = array('Foto je povinné');
             }
         } else {
             $imgMain = $object->imgMain;

@@ -46,7 +46,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'title', array($news,'title'), array('required'=>true))}
                     {if isset($errors["title"])}
-                    <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["title"])}</label>
                     {/if}
                 </span>
             </p>
@@ -55,7 +55,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'rank', array($news,'rank',1))}
                     {if isset($errors["rank"])}
-                    <label class="error">{echo join("<br/>", $errors["rank"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["rank"])}</label>
                     {/if}
                 </span>
             </p>
@@ -64,7 +64,7 @@
                 <span class="field">
                     <textarea rows="20" name="shorttext" id="ckeditor2">{echo \Admin\Helper\FormPrinter::iset($news,'shortBody')}</textarea>
                     {if isset($errors["shortBody"])}
-                    <label class="error">{echo join("<br/>", $errors["shortBody"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["shortBody"])}</label>
                     {/if}
                     <br/>
                     {include teaserButtons.phtml}
@@ -75,7 +75,7 @@
                 <span class="field">
                     <textarea name="text" id="ckeditor">{echo \Admin\Helper\FormPrinter::iset($news,'body')}</textarea>
                     {if isset($errors["body"])}
-                    <label class="error">{echo join("<br/>", $errors["body"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["body"])}</label>
                     {/if}
                     <br/>
                     {include textButtons.phtml}
@@ -139,7 +139,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'metatitle', array($news,'metaTitle'), array('placeholder'=>'Výchozí hodnota: stejná jako Název'))}
                     {if isset($errors["metaTitle"])}
-                    <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["metaTitle"])}</label>
                     {/if}
                 </span>
             </p>
@@ -148,7 +148,7 @@
                 <span class="field">
                     <textarea rows="5" name="metadescription" class="width80" >{echo \Admin\Helper\FormPrinter::iset($news,'metaDescription')}</textarea>
                     {if isset($errors["metaDescription"])}
-                    <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["metaDescription"])}</label>
                     {/if}
                     <br/>
                 </span>
@@ -158,7 +158,7 @@
                 <span class="field">
                     {echo \Admin\Helper\FormPrinter::input('text', 'keywords', array($news,'keywords'), array('placeholder'=>"Oddělovač: mezera"))}
                     {if isset($errors["keywords"])}
-                    <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
+                    <label class="error">{echo implode("<br/>", $errors["keywords"])}</label>
                     {/if}
                 </span>
             </p>

@@ -44,7 +44,7 @@ section.wrapper.profil.singlePage
 						td
 							|{if isset($errors["firstname"])}
 							label.error.fi-alert
-								|{echo join("<br/>", $errors["firstname"])}
+								|{echo implode("<br/>", $errors["firstname"])}
 							|{/if}
 							|{echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true))}
 					tr
@@ -53,7 +53,7 @@ section.wrapper.profil.singlePage
 						td
 							|{if isset($errors["lastname"])}
 							label.error.fi-alert
-								|{echo join("<br/>", $errors["lastname"])}
+								|{echo implode("<br/>", $errors["lastname"])}
 							|{/if}
 							|{echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true))}
 					tr
@@ -62,7 +62,7 @@ section.wrapper.profil.singlePage
 						td
 							|{if isset($errors["phoneNumber"])}
 							label.error.fi-alert
-								|{echo join("<br/>", $errors["phoneNumber"])}
+								|{echo implode("<br/>", $errors["phoneNumber"])}
 							|{/if}
 							|{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"))}
 					tr
@@ -91,7 +91,7 @@ section.wrapper.profil.singlePage
 						td
 							|{if isset($errors["email"])}
 							label.error.fi-alert
-								|{echo join("<br/>", $errors["email"])}
+								|{echo implode("<br/>", $errors["email"])}
 							|{/if}
 							|{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true))}
 					tr
@@ -100,7 +100,7 @@ section.wrapper.profil.singlePage
 						td
 							|{if isset($errors["oldpass"])}
 							label.error.fi-alert
-								|{echo join("<br/>", $errors["oldpass"])}
+								|{echo implode("<br/>", $errors["oldpass"])}
 							|{/if}
 							|{echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr
@@ -109,7 +109,7 @@ section.wrapper.profil.singlePage
 						td
 							|{if isset($errors["password"])}
 							label.error.fi-alert
-								|{echo join("<br/>", $errors["password"])}
+								|{echo implode("<br/>", $errors["password"])}
 							|{/if}
 							|{echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr
@@ -118,7 +118,7 @@ section.wrapper.profil.singlePage
 						td
 							|{if isset($errors["password2"])}
 							label.error.fi-alert
-								|{echo join("<br/>", $errors["password2"])}
+								|{echo implode("<br/>", $errors["password2"])}
 							|{/if}
 							|{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr

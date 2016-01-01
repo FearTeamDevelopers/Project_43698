@@ -55,7 +55,7 @@
                     <span class="field">
                         {echo \Admin\Helper\FormPrinter::textInput('title', array($report,'title'), true)}
                         {if isset($errors["title"])}
-                        <label class="error">{echo join("<br/>", $errors["title"])}</label>
+                        <label class="error">{echo implode("<br/>", $errors["title"])}</label>
                         {/if}
                     </span>
                 </p>
@@ -64,7 +64,7 @@
                     <span class="field">
                         {echo \Admin\Helper\FormPrinter::textInput('rank', array($report,'rank',1))}
                         {if isset($errors["rank"])}
-                        <label class="error">{echo join("<br/>", $errors["rank"])}</label>
+                        <label class="error">{echo implode("<br/>", $errors["rank"])}</label>
                         {/if}
                     </span>
                 </p>
@@ -73,7 +73,7 @@
                     <span class="field">
                         <textarea rows="20" name="shorttext" id="ckeditor2">{echo $report->shortBody}</textarea>
                         {if isset($errors["shortBody"])}
-                        <label class="error">{echo join("<br/>", $errors["shortBody"])}</label>
+                        <label class="error">{echo implode("<br/>", $errors["shortBody"])}</label>
                         {/if}
                         <br/>
                         {include teaserButtons.phtml}
@@ -84,7 +84,7 @@
                     <span class="field">
                         <textarea rows="20" name="text" id="ckeditor">{echo $report->body}</textarea>
                         {if isset($errors["body"])}
-                        <label class="error">{echo join("<br/>", $errors["body"])}</label>
+                        <label class="error">{echo implode("<br/>", $errors["body"])}</label>
                         {/if}
                         <br/>
                         {include textButtons.phtml}
@@ -153,7 +153,7 @@
                     <span class="field">
                         {echo \Admin\Helper\FormPrinter::textInput('metatitle', array($report,'metaTitle'), false, 'width80', "Výchozí hodnota: stejná jako Název")}
                         {if isset($errors["metaTitle"])}
-                        <label class="error">{echo join("<br/>", $errors["metaTitle"])}</label>
+                        <label class="error">{echo implode("<br/>", $errors["metaTitle"])}</label>
                         {/if}
                     </span>
                 </p>
@@ -162,7 +162,7 @@
                     <span class="field">
                         <textarea rows="5" name="metadescription" class="width80" >{echo \Admin\Helper\FormPrinter::iset($report,'metaDescription')}</textarea>
                         {if isset($errors["metaDescription"])}
-                        <label class="error">{echo join("<br/>", $errors["metaDescription"])}</label>
+                        <label class="error">{echo implode("<br/>", $errors["metaDescription"])}</label>
                         {/if}
                         <br/>
                     </span>
@@ -172,7 +172,7 @@
                     <span class="field">
                         {echo \Admin\Helper\FormPrinter::textInput('keywords', array($report,'keywords'), false, 'width80', "Oddělovač: mezera")}
                         {if isset($errors["keywords"])}
-                        <label class="error">{echo join("<br/>", $errors["keywords"])}</label>
+                        <label class="error">{echo implode("<br/>", $errors["keywords"])}</label>
                         {/if}
                     </span>
                 </p>
@@ -201,7 +201,7 @@
                         <input type="range" class="cropit-image-zoom-input" />
                         {if isset($errors["croppedimage"])}
                         <label class="error">
-                            {echo join("<br/>", $errors["croppedimage"])}
+                            {echo implode("<br/>", $errors["croppedimage"])}
                         </label>
                         {/if}
                     </div>
@@ -218,7 +218,7 @@
                         <input type="range" class="cropit-image-zoom-input" />
                         {if isset($errors["croppedimage"])}
                         <label class="error">
-                            {echo join("<br/>", $errors["croppedimage"])}
+                            {echo implode("<br/>", $errors["croppedimage"])}
                         </label>
                         {/if}
                     </div>
