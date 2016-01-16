@@ -3,7 +3,7 @@
 namespace Admin\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicEmailModel extends Model 
 {
 
@@ -63,7 +63,6 @@ class BasicEmailModel extends Model
      * @type text
      * @validate html
      * @label text
-     * @null
      */
     protected $_body;
 
@@ -73,7 +72,6 @@ class BasicEmailModel extends Model
      * @type text
      * @validate html
      * @label text
-     * @null
      */
     protected $_bodyEn;
 
@@ -94,7 +92,6 @@ class BasicEmailModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -104,8 +101,117 @@ class BasicEmailModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getActive()
+    {
+        return $this->_active;
+    }
+
+    public function setActive($value)
+    {
+        $this->_active = $value;
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->_title;
+    }
+
+    public function setTitle($value)
+    {
+        $this->_title = $value;
+        return $this;
+    }
+
+    public function getUrlKey()
+    {
+        return $this->_urlKey;
+    }
+
+    public function setUrlKey($value)
+    {
+        $this->_urlKey = $value;
+        return $this;
+    }
+
+    public function getSubject()
+    {
+        return $this->_subject;
+    }
+
+    public function setSubject($value)
+    {
+        $this->_subject = $value;
+        return $this;
+    }
+
+    public function getBody()
+    {
+        return $this->_body;
+    }
+
+    public function setBody($value)
+    {
+        $this->_body = $value;
+        return $this;
+    }
+
+    public function getBodyEn()
+    {
+        return $this->_bodyEn;
+    }
+
+    public function setBodyEn($value)
+    {
+        $this->_bodyEn = $value;
+        return $this;
+    }
+
+    public function getType()
+    {
+        return $this->_type;
+    }
+
+    public function setType($value)
+    {
+        $this->_type = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

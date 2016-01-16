@@ -5,6 +5,7 @@ namespace Search\Etc;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\SubscriberInterface;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Core\Core;
 
 /**
  * Module specific observer class.
@@ -58,6 +59,15 @@ class ModuleObserver implements SubscriberInterface
             'params' => $paramStr,
         ));
 
+        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
+            'type' => 'searchLog',
+            'result' => $result,
+            'module' => $module,
+            'controller' => $controller,
+            'action' => $action,
+            'params' => $paramStr)
+        );
+
         if ($log->validate()) {
             $log->save();
         }
@@ -106,6 +116,15 @@ class ModuleObserver implements SubscriberInterface
             'httpreferer' => RequestMethods::getHttpReferer(),
             'params' => $paramStr,
         ));
+
+        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
+            'type' => 'searchLog',
+            'result' => $result,
+            'module' => $module,
+            'controller' => $controller,
+            'action' => $action,
+            'params' => $paramStr)
+        );
 
         if ($log->validate()) {
             $log->save();

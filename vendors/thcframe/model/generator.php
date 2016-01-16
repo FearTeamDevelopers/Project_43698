@@ -17,19 +17,19 @@ class Generator extends Base
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_dbIdent;
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_dbSchema;
-    
+
     /**
      *
-     * @var THCFrame\Database\Connector 
+     * @var THCFrame\Database\Connector
      */
     private $_db;
 
@@ -40,7 +40,7 @@ class Generator extends Base
     private $_connectionHandler;
 
     /**
-     * 
+     *
      * @param type $options
      */
     public function __construct($options = array())
@@ -56,7 +56,7 @@ class Generator extends Base
 
     /**
      * Get table prefix from system configuration
-     * 
+     *
      * @return string
      */
     private function _getTablePrefix()
@@ -69,7 +69,7 @@ class Generator extends Base
 
     /**
      * Get tables from database with system specific prefix
-     * 
+     *
      * @return array
      */
     private function _getTables()
@@ -77,12 +77,16 @@ class Generator extends Base
         $sqlResult = $this->_db->execute('SHOW TABLE STATUS IN ' . $this->getDbSchema() . " LIKE '" . $this->_getTablePrefix() . "%'");
         $tables = array();
 
-        while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
-            if ($row['Comment'] == 'system') {
-                continue;
-            }
+        $moduleNames = Core::getModuleNames(true);
 
-            $tables[$row['Name']] = $row['Comment'];
+        if (!empty($sqlResult)) {
+            while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
+                if (!in_array(strtolower($row['Comment']), $moduleNames)) {
+                    continue;
+                }
+
+                $tables[$row['Name']] = $row['Comment'];
+            }
         }
 
         return $tables;
@@ -90,7 +94,7 @@ class Generator extends Base
 
     /**
      * Get columns of table
-     * 
+     *
      * @param string $tableName
      * @return array
      */
@@ -102,7 +106,7 @@ class Generator extends Base
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             if (strtolower($row['Key']) == 'mul') {
                 $fkResult = $this->_db->execute(
-                        "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE 
+                        "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE
                         from INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i
                         LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS AS r
                         ON r.CONSTRAINT_SCHEMA=i.TABLE_SCHEMA
@@ -136,7 +140,7 @@ class Generator extends Base
 
     /**
      * Create model file name from table name and module name
-     * 
+     *
      * @param string $tableName
      * @param string $module
      * @return string
@@ -160,7 +164,7 @@ class Generator extends Base
 
     /**
      * Create model class name
-     * 
+     *
      * @param string $tableName
      * @return string
      */
@@ -173,7 +177,7 @@ class Generator extends Base
 
     /**
      * Create annotation comment for property from column definition
-     * 
+     *
      * @param array $column
      * @return string
      */
@@ -211,33 +215,42 @@ class Generator extends Base
                 }
             }
 
+            $required = false;
             if (!empty($column['Comment'])) {
                 $parts = explode(';', $column['Comment']);
                 foreach ($parts as $part) {
                     if(empty($part)){
                         continue;
                     }
+                    if(strpos($part, 'required') !== false){
+                        $required = true;
+                    }
                     $lines[] = '* ' . $part;
                 }
             }
 
             stripos($column['Type'], 'unsigned') !== false ? $lines[] = '* @unsigned' : '';
-            strtolower($column['Null']) == 'no' ? '' : $lines[] = '* @null';
-            
-            if ((int) $column['Default'] === 0 
-                    && strtolower($column['Null']) == 'no' 
+
+            if(strtolower($column['Null']) != 'no' && $required === false){
+                $lines[] = '* @null';
+            }
+
+            if ((int) $column['Default'] === 0
+                    && strtolower($column['Null']) == 'no'
                     && strtolower($column['Key']) != 'pri'
+                    && $required === false
                     && empty($column['Foreign'])
                     && in_array($matches[1], array('int', 'integer', 'tinyint', 'smallint', 'mediumint'))) {
                 $lines[] = '* @default 0';
-            } elseif ((int) $column['Default'] === 0 
-                    && strtolower($column['Null']) == 'no' 
+            } elseif ((int) $column['Default'] === 0
+                    && strtolower($column['Null']) == 'no'
+                    && $required === false
                     && in_array($matches[1], array('float', 'double', 'decimal'))) {
                 $lines[] = '* @default 0.0';
             } elseif (!empty($column['Default'])) {
                 $lines[] = '* @default '.$column['Default'];
             }
-                
+
             $definition = implode(PHP_EOL . '     ', $lines);
             $annotation = <<<ANNOTATION
     /**
@@ -281,7 +294,7 @@ ANNOTATION;
                     $modelWriter->writeModel();
                     unset($modelWriter, $columns);
                 }
-                
+
                 Core::getLogger()->log('-------- Model class was successfully created for table '.$table.' --------', 'system');
             }
         }

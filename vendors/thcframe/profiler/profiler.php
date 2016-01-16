@@ -217,7 +217,7 @@ class Profiler
     {
         if ($this->_isActive()) {
             $startTime = $this->_dbProfiles[$this->_dbLastIdentifier][$this->_dbLastQueryIdentifier]['startTime'];
-            $this->_dbProfiles[$this->_dbLastIdentifier][$this->_dbLastQueryIdentifier]['execTime'] = round(microtime(true) - $startTime, 8);
+            $this->_dbProfiles[$this->_dbLastIdentifier][$this->_dbLastQueryIdentifier]['execTime'] = round(microtime(true) - $startTime, 8)*1000;
             $this->_dbProfiles[$this->_dbLastIdentifier][$this->_dbLastQueryIdentifier]['totalRows'] = $totalRows;
             $this->_dbProfiles[$this->_dbLastIdentifier][$this->_dbLastQueryIdentifier]['backTrace'] = debug_backtrace();
         }
@@ -265,16 +265,20 @@ class Profiler
                         . "<span title=\"Execution time [s]\">{$profile['totalTime']}</span>"
                         . "<span title=\"Memory peak usage\">{$profile['endMemoryPeakUsage']}</span>"
                         . "<span title=\"Memory usage\">{$profile['endMomoryUsage']}</span>"
-                        . "<span title=\"SQL Query\"><a href=\"#\" class=\"profiler-show-query\" value=\"{$ident}\">SQL Query:</a>" . count($profile['dbProfiles']) . "</span>"
+                        . "<span title=\"SQL Query\"><a href=\"#\" class=\"profiler-show-query\" value=\"{$ident}\">SQL Query: </a>" . count($profile['dbProfiles']) . "</span>"
                         . "<span><a href=\"#\" class=\"profiler-show-globalvar\" value=\"{$ident}\">Global variables</a></span></div>";
                 $str .= "<div class=\"profiler-query\" id=\"{$ident}_db\">"
                         . "<table><tr style=\"font-weight:bold; border-top:1px solid black;\" class=\"query-header\">"
-                        . "<td colspan=5>Query</td><td>Execution time [s]</td><td>Returned rows</td><td colspan=6>Backtrace</td></tr>";
+                        . "<td colspan=5>Query</td><td>Execution time [ms]</td><td>Returned rows</td><td colspan=6>Backtrace</td></tr>";
 
                 foreach ($profile['dbProfiles'] as $key => $value) {
                     $str .= "<tr>";
                     $str .= "<td colspan=5 width=\"40%\">{$value['query']}</td>";
-                    $str .= "<td>{$value['execTime']}</td>";
+                    if($value['execTime'] > 100){
+                        $str .= "<td class='red'>{$value['execTime']}</td>";
+                    }else{
+                        $str .= "<td>{$value['execTime']}</td>";
+                    }
                     $str .= "<td>{$value['totalRows']}</td>";
                     $str .= "<td colspan=6 class=\"backtrace\"><div>";
 

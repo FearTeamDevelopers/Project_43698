@@ -3,7 +3,7 @@
 namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicPagecontentModel extends Model 
 {
 
@@ -53,7 +53,6 @@ class BasicPagecontentModel extends Model
      * @type mediumtext
      * @validate required,html
      * @label text
-     * @null
      */
     protected $_body;
 
@@ -63,7 +62,6 @@ class BasicPagecontentModel extends Model
      * @type mediumtext
      * @validate html
      * @label text en
-     * @null
      */
     protected $_bodyEn;
 
@@ -93,7 +91,6 @@ class BasicPagecontentModel extends Model
      * @type text
      * @validate alphanumeric
      * @label metadescription
-     * @null
      */
     protected $_metaDescription;
 
@@ -103,7 +100,6 @@ class BasicPagecontentModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -113,8 +109,128 @@ class BasicPagecontentModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getActive()
+    {
+        return $this->_active;
+    }
+
+    public function setActive($value)
+    {
+        $this->_active = $value;
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->_title;
+    }
+
+    public function setTitle($value)
+    {
+        $this->_title = $value;
+        return $this;
+    }
+
+    public function getUrlKey()
+    {
+        return $this->_urlKey;
+    }
+
+    public function setUrlKey($value)
+    {
+        $this->_urlKey = $value;
+        return $this;
+    }
+
+    public function getBody()
+    {
+        return $this->_body;
+    }
+
+    public function setBody($value)
+    {
+        $this->_body = $value;
+        return $this;
+    }
+
+    public function getBodyEn()
+    {
+        return $this->_bodyEn;
+    }
+
+    public function setBodyEn($value)
+    {
+        $this->_bodyEn = $value;
+        return $this;
+    }
+
+    public function getKeywords()
+    {
+        return $this->_keywords;
+    }
+
+    public function setKeywords($value)
+    {
+        $this->_keywords = $value;
+        return $this;
+    }
+
+    public function getMetaTitle()
+    {
+        return $this->_metaTitle;
+    }
+
+    public function setMetaTitle($value)
+    {
+        $this->_metaTitle = $value;
+        return $this;
+    }
+
+    public function getMetaDescription()
+    {
+        return $this->_metaDescription;
+    }
+
+    public function setMetaDescription($value)
+    {
+        $this->_metaDescription = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

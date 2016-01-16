@@ -126,11 +126,9 @@ class Module extends Base
                                 array('fromPath', 'toPath')
                 );
 
-                if (null === $redirects) {
-                    $redirects = array();
+                if (!empty($redirects)) {
+                    $cache->set('core_redirects_'.strtolower($this->getModuleName()), $redirects);
                 }
-                
-                $cache->set('core_redirects_'.strtolower($this->getModuleName()), $redirects);
             }
 
             return $redirects;

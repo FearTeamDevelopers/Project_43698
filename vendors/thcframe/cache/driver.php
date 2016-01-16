@@ -39,5 +39,4 @@ abstract class Driver extends Base
 
     public abstract function clearCache();
     
-    public abstract function invalidate();
 }

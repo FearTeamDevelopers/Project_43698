@@ -9,14 +9,14 @@ use THCFrame\Filesystem\FileManager;
 use THCFrame\Registry\Registry;
 
 /**
- * 
+ *
  */
 class GalleryController extends Controller
 {
 
     /**
      * Check whether gallery unique identifier already exist or not.
-     * 
+     *
      * @param string $key
      *
      * @return bool
@@ -34,7 +34,7 @@ class GalleryController extends Controller
 
     /**
      * Check whether user has access to gallery or not.
-     * 
+     *
      * @param \App\Model\GalleryModel $gallery
      *
      * @return bool
@@ -51,7 +51,7 @@ class GalleryController extends Controller
 
     /**
      * Get list of all gelleries.
-     * 
+     *
      * @before _secured, _participant
      */
     public function index()
@@ -65,7 +65,7 @@ class GalleryController extends Controller
 
     /**
      * Create new gallery.
-     * 
+     *
      * @before _secured, _participant
      */
     public function add()
@@ -75,13 +75,13 @@ class GalleryController extends Controller
         $view->set('gallery', null);
 
         if (RequestMethods::post('submitAddGallery')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
             $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
 
             if (!$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -116,7 +116,7 @@ class GalleryController extends Controller
 
     /**
      * Show detail of existing gallery.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id gallery id
@@ -138,7 +138,7 @@ class GalleryController extends Controller
 
     /**
      * Edit existing gallery.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id gallery id
@@ -164,12 +164,12 @@ class GalleryController extends Controller
         $view->set('gallery', $gallery);
 
         if (RequestMethods::post('submitEditGallery')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
             $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
 
             if ($gallery->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -205,24 +205,28 @@ class GalleryController extends Controller
 
     /**
      * Delete existing gallery and all photos (files and db)
-     * 
+     *
      * @before _secured, _participant
      * @param int $id gallery id
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $gallery = \App\Model\GalleryModel::first(
                         array('id = ?' => (int) $id), array('id', 'title', 'created', 'userId', 'urlKey')
         );
 
         if (null === $gallery) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($this->_checkAccess($gallery)) {
                 $fm = new FileManager();
-                $configuration = Registry::get('config');
+                $configuration = Registry::get('configuration');
 
                 if (!empty($configuration->files)) {
                     $pathToImages = trim($configuration->files->pathToImages, '/');
@@ -256,21 +260,21 @@ class GalleryController extends Controller
                 if ($gallery->delete()) {
                     $this->getCache()->erase('gallery');
                     Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
-                    echo 'success';
+                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                 } else {
                     Event::fire('admin.log', array('fail', 'Gallery id: ' . $id,
                         'Errors: ' . json_encode($gallery->getErrors())));
-                    echo $this->lang('COMMON_FAIL');
+                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
             } else {
-                echo $this->lang('LOW_PERMISSIONS');
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
         }
     }
 
     /**
      * Return list of galleries to insert gallery link to content.
-     * 
+     *
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -285,19 +289,17 @@ class GalleryController extends Controller
 
     /**
      * Upload photo into gallery.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id gallery id
      */
     public function upload()
     {
-        $this->_disableView();
+        $this->disableView();
 
         if (RequestMethods::post('submitUpload')) {
-
             $galleryId = RequestMethods::post('galleryid');
-
             $gallery = \App\Model\GalleryModel::first(
                             array(
                         'id = ?' => (int) $galleryId,
@@ -332,7 +334,7 @@ class GalleryController extends Controller
 
             if (!empty($fileErrors)) {
                 header('HTTP/1.0 400 Bad Request');
-                \THCFrame\Core\Core::getLogger()->log('Gallery image upload fail: ' . print_r($fileErrors, true));
+                Core::getLogger()->error('Gallery image upload fail: {error}', array('error' => print_r($fileErrors, true)));
                 echo implode('<br/>', $fileErrors);
                 exit;
             }
@@ -363,7 +365,7 @@ class GalleryController extends Controller
                         } else {
                             Event::fire('admin.log', array('fail', 'Photo in gallery ' . $gallery->getUrlKey(),
                                 'Errors: ' . json_encode($photo->getErrors())));
-                            \THCFrame\Core\Core::getLogger()->log('Gallery image create db record fail: ' . print_r($photo->getErrors(), true));
+                            Core::getLogger()->error('Gallery image create db record fail: {error}', array('error' => print_r($photo->getErrors(), true)));
                             $error = \THCFrame\Core\ArrayMethods::flatten($photo->getErrors());
 
                             header('HTTP/1.0 400 Bad Request');
@@ -391,41 +393,45 @@ class GalleryController extends Controller
 
     /**
      * Delete photo.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id photo id
      */
     public function deletePhoto($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $photo = \App\Model\PhotoModel::first(
                         array('id = ?' => $id), array('id', 'imgMain', 'imgThumb', 'galleryId')
         );
 
         if (null === $photo) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = \App\Model\GalleryModel::first(
                             array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
             );
 
             if (null === $gallery) {
-                echo $this->lang('NOT_FOUND');
+                $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
             } else {
                 if ($this->_checkAccess($gallery)) {
                     if ($photo->delete()) {
                         $this->getCache()->erase('gallery');
                         Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                        echo 'success';
+                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                     } else {
                         Event::fire('admin.log', array('fail', 'Photo id: ' . $id,
                             'Errors: ' . json_encode($photo->getErrors())));
-                        echo $this->lang('COMMON_FAIL');
+                        $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                     }
                 } else {
-                    echo $this->lang('LOW_PERMISSIONS');
+                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
                 }
             }
         }
@@ -433,26 +439,30 @@ class GalleryController extends Controller
 
     /**
      * Change photo state (active/inactive).
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id photo id
      */
     public function changePhotoStatus($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $photo = \App\Model\PhotoModel::first(array('id = ?' => (int) $id));
 
         if (null === $photo) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = \App\Model\GalleryModel::first(
                             array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
             );
 
             if (null === $gallery) {
-                echo $this->lang('NOT_FOUND');
+                $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
             } else {
                 if ($this->_checkAccess($gallery)) {
                     if (!$photo->active) {
@@ -463,9 +473,9 @@ class GalleryController extends Controller
                             $this->getCache()->erase('gallery');
 
                             Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                            echo 'active';
+                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, array('status' => 'active'));
                         } else {
-                            echo implode('<br/>', $photo->getErrors());
+                            $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
                         }
                     } elseif ($photo->active) {
                         $photo->active = false;
@@ -475,15 +485,15 @@ class GalleryController extends Controller
                             $this->getCache()->erase('gallery');
 
                             Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                            echo 'inactive';
+                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, array('status' => 'inactive'));
                         } else {
                             Event::fire('admin.log', array('fail', 'Photo id: ' . $id,
                                 'Errors: ' . json_encode($photo->getErrors())));
-                            echo implode('<br/>', $photo->getErrors());
+                            $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
                         }
                     }
                 } else {
-                    echo $this->lang('LOW_PERMISSIONS');
+                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
                 }
             }
         }

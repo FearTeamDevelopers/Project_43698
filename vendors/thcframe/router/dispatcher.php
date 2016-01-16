@@ -130,7 +130,10 @@ final class Dispatcher extends Base
             throw new Exception\Action('Method Name not specified');
         }
 
-        $status = Registry::get('configuration')->{$module.'status'};
+        $status = null;
+        if(in_array(ucfirst($module), \THCFrame\Core\Core::getModuleNames())){
+            $status = Registry::get('configuration')->{$module.'status'};
+        }
 
         if ($status !== null && $status != 1) {
             throw new Exception\Offline('Application is offline');
@@ -150,13 +153,13 @@ final class Dispatcher extends Base
             throw new Exception\Controller(sprintf('Disallowed characters in class name %s', $class));
         }
 
-        $file_name = strtolower("./modules/{$module}/controller/{$class}controller.php");
-        $class = "\\".ucfirst($module)."\Controller\\".ucfirst($class).'Controller';
+        $fileName = strtolower("./modules/{$module}/controller/{$class}controller.php");
+        $class = "\\".ucfirst($module)."\\Controller\\".ucfirst($class).'Controller';
 
-        if (FALSE === file_exists($file_name)) {
-            throw new Exception\Controller(sprintf('Class file %s not found', $file_name));
+        if (!file_exists($fileName)) {
+            throw new Exception\Controller(sprintf('Class file %s not found', $fileName));
         } else {
-            require_once($file_name);
+            require_once($fileName);
         }
 
         $this->_activeModule = $module;
@@ -223,7 +226,6 @@ final class Dispatcher extends Base
         Event::fire('framework.dispatcher.afterhooks.after', array($action, $parameters));
 
         // unset controller
-
         Registry::erase('controller');
     }
 

@@ -4,4 +4,3 @@ Do detailu akce, reportaze pridat vypis komentaru a formular pro pridavani komen
 Do bazaru pridat overlay pro inzerati, ktery maji nastaveny priznak sold
     pruhlednej obdelnik se svetlym textem Prodáno
 
-Na homepage přidat výpis akcí stejný způsob jako je to v hastrman.cz/akce, tak to samý zobrazení místo reportáží, ty dát až nakonec místo současných akcí

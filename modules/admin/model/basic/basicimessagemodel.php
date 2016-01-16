@@ -3,7 +3,7 @@
 namespace Admin\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicImessageModel extends Model 
 {
 
@@ -25,7 +25,6 @@ class BasicImessageModel extends Model
      * @validate numeric,max(11)
      * @label autor
      * @unsigned
-     * @null
      */
     protected $_userId;
 
@@ -77,7 +76,6 @@ class BasicImessageModel extends Model
      * @type text
      * @validate required,html
      * @label text
-     * @null
      */
     protected $_body;
 
@@ -107,7 +105,6 @@ class BasicImessageModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -117,8 +114,128 @@ class BasicImessageModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getUserId()
+    {
+        return $this->_userId;
+    }
+
+    public function setUserId($value)
+    {
+        $this->_userId = $value;
+        return $this;
+    }
+
+    public function getActive()
+    {
+        return $this->_active;
+    }
+
+    public function setActive($value)
+    {
+        $this->_active = $value;
+        return $this;
+    }
+
+    public function getMessageType()
+    {
+        return $this->_messageType;
+    }
+
+    public function setMessageType($value)
+    {
+        $this->_messageType = $value;
+        return $this;
+    }
+
+    public function getUserAlias()
+    {
+        return $this->_userAlias;
+    }
+
+    public function setUserAlias($value)
+    {
+        $this->_userAlias = $value;
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->_title;
+    }
+
+    public function setTitle($value)
+    {
+        $this->_title = $value;
+        return $this;
+    }
+
+    public function getBody()
+    {
+        return $this->_body;
+    }
+
+    public function setBody($value)
+    {
+        $this->_body = $value;
+        return $this;
+    }
+
+    public function getDisplayFrom()
+    {
+        return $this->_displayFrom;
+    }
+
+    public function setDisplayFrom($value)
+    {
+        $this->_displayFrom = $value;
+        return $this;
+    }
+
+    public function getDisplayTo()
+    {
+        return $this->_displayTo;
+    }
+
+    public function setDisplayTo($value)
+    {
+        $this->_displayTo = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

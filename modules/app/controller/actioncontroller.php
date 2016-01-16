@@ -8,7 +8,7 @@ use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 
 /**
- * 
+ *
  */
 class ActionController extends Controller
 {
@@ -39,7 +39,7 @@ class ActionController extends Controller
 
     /**
      * Get list of actions.
-     * 
+     *
      * @param int $page
      */
     public function index($page = 1)
@@ -78,7 +78,7 @@ class ActionController extends Controller
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($actionsPageCount, $page, '/akce/p/');
+        $this->pagerMetaLinks($actionsPageCount, $page, '/akce/p/');
 
         $view->set('actions', $actions)
                 ->set('pagerpathprefix', '/akce')
@@ -91,7 +91,7 @@ class ActionController extends Controller
 
     /**
      * Show action detail.
-     * 
+     *
      * @param string $urlKey
      */
     public function detail($urlKey)
@@ -106,7 +106,7 @@ class ActionController extends Controller
         }
 
         $this->_checkMetaData($layoutView, $action);
-        
+
         if($this->getUser() !== null){
             $authUserAttendance = \App\Model\AttendanceModel::fetchTypeByUserAndAction($this->getUser()->getId(), $action->getId());
             $attendance = \App\Model\AttendanceModel::fetchUsersByActionIdSimpleArr($action->getId());
@@ -126,7 +126,7 @@ class ActionController extends Controller
         }
 
         if (RequestMethods::post('submitAddComment')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/akce/r/'.$action->getId());
             }
@@ -158,7 +158,7 @@ class ActionController extends Controller
 
     /**
      * Show archivated actions.
-     * 
+     *
      * @param type $page
      */
     public function archive($page = 1)
@@ -196,7 +196,7 @@ class ActionController extends Controller
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($actionsPageCount, $page, '/archiv-akci/p/');
+        $this->pagerMetaLinks($actionsPageCount, $page, '/archiv-akci/p/');
 
         $view->set('actions', $actions)
                 ->set('pagerpathprefix', '/archiv-akci')
@@ -209,7 +209,7 @@ class ActionController extends Controller
 
     /**
      * Show old but not archivated actions.
-     * 
+     *
      * @param type $page
      */
     public function oldActions($page = 1)
@@ -240,7 +240,7 @@ class ActionController extends Controller
 
         $actionsPageCount = ceil($actionCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($actionsPageCount, $page, '/probehle-akce/p/');
+        $this->pagerMetaLinks($actionsPageCount, $page, '/probehle-akce/p/');
 
         $view->set('actions', $actions)
                 ->set('pagerpathprefix', '/probehle-akce')
@@ -253,7 +253,7 @@ class ActionController extends Controller
 
     /**
      * Preview of action created in administration but not saved into db.
-     * 
+     *
      * @before _secured, _participant
      */
     public function preview()
@@ -282,24 +282,29 @@ class ActionController extends Controller
      */
     public function attendance($actionId, $type)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
+
         $view = $this->getActionView();
 
         if ($type != \App\Model\AttendanceModel::ACCEPT &&
                 $type != \App\Model\AttendanceModel::REJECT &&
                 $type != \App\Model\AttendanceModel::MAYBE) {
             Event::fire('app.log', array('fail', 'Errors: Invalid attendance type - '.$type));
-            echo $this->lang('COMMON_FAIL');
+            $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             exit;
         }
 
         $action = \App\Model\ActionModel::first(array('id = ?' => (int) $actionId));
 
         if (null === $action) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             \App\Model\AttendanceModel::deleteAll(array('userId = ?' => $this->getUser()->getId(), 'actionId = ?' => $action->getId()));
-            
+
             $attendance = new \App\Model\AttendanceModel(array(
                 'userId' => $this->getUser()->getId(),
                 'actionId' => $action->getId(),
@@ -312,10 +317,10 @@ class ActionController extends Controller
 
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 Event::fire('app.log', array('success', 'Attendance - '.$type.' - action '.$action->getId().' by user: '.$this->getUser()->getId()));
-                echo 'active';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, array('status' => 'active'));
             } else {
                 Event::fire('app.log', array('fail', 'Errors: '.json_encode($attendance->getErrors())));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }

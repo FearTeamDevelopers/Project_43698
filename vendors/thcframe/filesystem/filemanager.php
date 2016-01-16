@@ -270,7 +270,7 @@ class FileManager extends Base
      */
     public function mkdir($dirs, $mode = null)
     {
-        if(null === $mode){
+        if($mode === null){
             $mode = self::DIR_CHMOD;
         }
         
@@ -393,7 +393,7 @@ class FileManager extends Base
 
         $tmpFile = tempnam($dir, basename($filename));
 
-        if (false === @file_put_contents($tmpFile, $content)) {
+        if (@file_put_contents($tmpFile, $content) === false) {
             throw new Exception\IO(sprintf('Failed to write file "%s".', $filename));
         }
 

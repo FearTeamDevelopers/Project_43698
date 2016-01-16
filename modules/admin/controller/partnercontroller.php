@@ -8,13 +8,13 @@ use THCFrame\Filesystem\FileManager;
 use THCFrame\Events\Events as Event;
 
 /**
- * 
+ *
  */
 class PartnerController extends Controller
 {
     /**
      * Get list of all partners.
-     * 
+     *
      * @before _secured, _admin
      */
     public function index()
@@ -28,7 +28,7 @@ class PartnerController extends Controller
 
     /**
      * Create new partner.
-     * 
+     *
      * @before _secured, _admin
      */
     public function add()
@@ -37,7 +37,7 @@ class PartnerController extends Controller
         $view->set('partner', null);
 
         if (RequestMethods::post('submitAddPartner')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/partner/');
             }
@@ -94,7 +94,7 @@ class PartnerController extends Controller
 
     /**
      * Edit existing partner.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id partner id
@@ -115,7 +115,7 @@ class PartnerController extends Controller
         $view->set('partner', $partner);
 
         if (RequestMethods::post('submitEditPartner')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/partner/');
             }
 
@@ -157,7 +157,7 @@ class PartnerController extends Controller
             if (empty($errors) && $partner->validate()) {
                 $partner->save();
                 $this->getCache()->erase('index-partners');
-                
+
                 Event::fire('admin.log', array('success', 'Partner id: '.$id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/partner/');
@@ -171,43 +171,51 @@ class PartnerController extends Controller
 
     /**
      * Delete existing partner.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id partner id
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $partner = \App\Model\PartnerModel::first(
                         array('id = ?' => (int) $id), array('id', 'logo')
         );
 
         if (null === $partner) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($partner->delete()) {
                 $this->getCache()->erase('index-partners');
                 Event::fire('admin.log', array('success', 'Partner id: '.$id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Partner id: '.$id));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Delete existing partner logo.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id partner id
      */
     public function deleteLogo($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $partner = \App\Model\PartnerModel::first(array('id = ?' => (int) $id));
 
@@ -221,19 +229,19 @@ class PartnerController extends Controller
                 $this->getCache()->erase('index-partners');
 
                 Event::fire('admin.log', array('success', 'Partner id: '.$id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Partner id: '.$id));
-                echo self::ERROR_MESSAGE_5;
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         } else {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         }
     }
 
     /**
      * Execute basic operation over multiple partners.
-     * 
+     *
      * @before _secured, _admin
      */
     public function massAction()
@@ -242,7 +250,7 @@ class PartnerController extends Controller
         $errors = array();
 
         if (RequestMethods::post('performPartnerAction')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/partner/');
             }
 

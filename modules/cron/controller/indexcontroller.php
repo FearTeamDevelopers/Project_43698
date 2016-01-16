@@ -6,51 +6,20 @@ use Cron\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Router\Model\RedirectModel;
-use THCFrame\Filesystem\FileManager;
 use THCFrame\Registry\Registry;
 
 /**
- * 
+ *
  */
 class IndexController extends Controller
 {
-
-    /**
-     * Remove old files from folder.
-     * 
-     * @param type $path
-     * @param type $days
-     */
-    private function _removeOldFiles($path, $days = 7)
-    {
-        $fm = new FileManager();
-
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
-
-            return;
-        }
-
-        if ($handle = opendir($path)) {
-            while (false !== ($file = readdir($handle))) {
-                if (is_file($path . $file) && filectime($path . $file) < (time() - ($days * 24 * 60 * 60))) {
-                    if (!preg_match('#.*\.gz$#i', $file)) {
-                        $fm->gzCompressFile($path . $file);
-                        unlink($path . $file);
-                    } else {
-                        unlink($path . $file);
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * @param type $dir
      *
      * @return type
      */
-    private function _folderSize($dir)
+    private function folderSize($dir)
     {
         $count_size = 0;
         $count = 0;
@@ -58,7 +27,7 @@ class IndexController extends Controller
         foreach ($dir_array as $key => $filename) {
             if ($filename != '..' && $filename != '.') {
                 if (is_dir($dir . '/' . $filename)) {
-                    $new_foldersize = $this->_folderSize($dir . '/' . $filename);
+                    $new_foldersize = $this->folderSize($dir . '/' . $filename);
                     $count_size = $count_size + $new_foldersize;
                 } elseif (is_file($dir . '/' . $filename)) {
                     $count_size = $count_size + filesize($dir . '/' . $filename);
@@ -73,7 +42,7 @@ class IndexController extends Controller
     /**
      * Reconnect to the database.
      */
-    private function _resertConnections()
+    private function resertConnections()
     {
         $config = Registry::get('configuration');
         Registry::get('database')->disconnectAll();
@@ -86,16 +55,14 @@ class IndexController extends Controller
         unset($database);
         unset($connectors);
     }
-    
+
     /**
      * Generate sitemap.xml by cron.
-     * 
+     *
      * @before _cron
      */
     public function generateSitemap()
     {
-        $this->_disableView();
-
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
         <urlset
             xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -168,53 +135,68 @@ class IndexController extends Controller
             }
 
             @file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml . $xmlEnd);
-            $this->_resertConnections();
+            $this->resertConnections();
             Event::fire('cron.log', array('success', 'Links count: ' . $linkCounter));
         } catch (\Exception $ex) {
-            $this->_resertConnections();
+            $this->resertConnections();
             Event::fire('cron.log', array('fail', 'Error while creating sitemap file: ' . $ex->getMessage()));
 
             $message = $ex->getMessage() . PHP_EOL . $ex->getTraceAsString();
-            $this->_sendEmail('Error while creating sitemap file: ' . $message, 'ERROR: Cron generateSitemap', null, 'cron@hastrman.cz');
+
+            $mailer = new \THCFrame\Mailer\Mailer(array(
+                'body' => 'Error while creating sitemap file: ' . $message,
+                'subject' => 'ERROR: Cron generateSitemap'
+            ));
+
+            $mailer->setFrom('cron@hastrman.cz')
+                    ->send();
         }
     }
 
     /**
      * Cron check database size and application disk space usage.
-     * 
+     *
      * @before _cron
      */
     public function systemCheck()
     {
-        $this->_disableView();
-
         $connHandler = Registry::get('database');
         $dbIdents = $connHandler->getIdentifications();
+
+        $message = '';
+
         foreach ($dbIdents as $id) {
             $db = $connHandler->get($id);
             $size = $db->getDatabaseSize();
             if ($size > 45) {
-                $body = sprintf('Database %s is growing large. Current size is %s MB', $db->getSchema(), $size);
-                $this->_sendEmail($body, 'WARNING: System chcek', null, 'cron@hastrman.cz');
+                $message .= sprintf('Database %s is growing large. Current size is %s MB', $db->getSchema(), $size).PHP_EOL;
             }
         }
 
-        $applicationFolderSize = $this->_folderSize(APP_PATH);
+        $applicationFolderSize = $this->folderSize(APP_PATH);
         $applicationFolderSizeMb = $applicationFolderSize / (1024 * 1024);
         if ($applicationFolderSizeMb > 600) {
-            $body = sprintf('Application folder is growing large. Current size is %s MB', $applicationFolderSizeMb);
-            $this->_sendEmail($body, 'WARNING: System chcek', null, 'cron@hastrman.cz');
+            $message .= sprintf('Application folder is growing large. Current size is %s MB', $applicationFolderSizeMb).PHP_EOL;
+        }
+
+        if ($message !== '') {
+            $mailer = new \THCFrame\Mailer\Mailer(array(
+                'body' => $message,
+                'subject' => 'WARNING: System chcek'
+            ));
+
+            $mailer->setFrom('cron@hastrman.cz')
+                    ->send();
         }
     }
 
     /**
      * Run File hash scan
-     * 
+     *
      * @before _cron
      */
     public function filehashscan()
     {
-        $this->_disableView();
         $scanner = new \THCFrame\Security\FileHashScanner\Scanner();
 
         $scanner->scan();

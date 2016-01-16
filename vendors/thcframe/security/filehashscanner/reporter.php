@@ -58,7 +58,7 @@ class Reporter extends Base
         }
 
         if ($this->_configuration->security->filescan->textOutput) {
-            Core::getLogger()->log(print_r($report, true), 'filescan', true, 'filescan');
+            Core::getLogger()->info('{fshr}', array('fshr', print_r($report, true)));
         }
     }
 
@@ -103,7 +103,7 @@ class Reporter extends Base
         }
 
         if ($this->_configuration->security->filescan->textOutput) {
-            Core::getLogger()->log(print_r($report, true), 'filescan', true, 'filescan');
+            Core::getLogger()->info('{fshr}', array('fshr', print_r($report, true)));
         }
     }
 

@@ -7,13 +7,14 @@ use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
 
 /**
- * 
+ *
  */
 class SearchController extends Controller
 {
+
     /**
      * Clean string. Cleaned string contains only [a-z0-9\s].
-     * 
+     *
      * @param string $str
      *
      * @return string
@@ -32,7 +33,7 @@ class SearchController extends Controller
 
     /**
      * Main search method.
-     * 
+     *
      * @return json encoded array
      */
     public function doSearch($page = 1)
@@ -61,7 +62,8 @@ class SearchController extends Controller
 
         if (count($words) > 0) {
             $whereCondArr = array_fill(0, count($words), "si.sword LIKE '%%?%%'");
-            $whereCond = "si.sourceModel NOT LIKE '%%AdvertisementModel%%' AND (".implode(' OR ', $whereCondArr).')';
+            $whereCond = "si.sourceModel NOT LIKE '%%AdvertisementModel%%' AND (" . implode(' OR ',
+                            $whereCondArr) . ')';
             array_unshift($paramArr, $whereCond);
         } else {
             unset($searchQuery);
@@ -86,20 +88,22 @@ class SearchController extends Controller
                 foreach ($searchResult as $model) {
                     $searchReturnArr[strval($model->getSourceTitle())] = array('path' => $model->getPathToSource(),
                         'meta' => $model->getSourceMetaDescription(),
-                        'created' => $model->getSourceCreated(), );
+                        'created' => $model->getSourceCreated(),);
                 }
             }
-            
-            $body = array_slice($searchReturnArr, (int) $articlesPerPage * ((int) $page - 1), $articlesPerPage + 1);
+
+            $body = array_slice($searchReturnArr,
+                    (int) $articlesPerPage * ((int) $page - 1),
+                    $articlesPerPage + 1);
         }
-        
+
         header('Content-Type: application/json');
         echo json_encode($body);
     }
 
     /**
      * Main bazaar search method.
-     * 
+     *
      * @return json encoded array
      */
     public function doAdSearch($page = 1)
@@ -128,7 +132,8 @@ class SearchController extends Controller
 
         if (count($words) > 0) {
             $whereCondArr = array_fill(0, count($words), "si.sword LIKE '%%?%%'");
-            $whereCond = "si.sourceModel LIKE '%%AdvertisementModel%%' AND (".implode(' OR ', $whereCondArr).')';
+            $whereCond = "si.sourceModel LIKE '%%AdvertisementModel%%' AND (" . implode(' OR ',
+                            $whereCondArr) . ')';
             array_unshift($paramArr, $whereCond);
         } else {
             unset($searchQuery);
@@ -153,14 +158,17 @@ class SearchController extends Controller
                 foreach ($searchResult as $model) {
                     $searchReturnArr[strval($model->getSourceTitle())] = array('path' => $model->getPathToSource(),
                         'meta' => $model->getSourceMetaDescription(),
-                        'created' => $model->getSourceCreated(), );
+                        'created' => $model->getSourceCreated(),);
                 }
             }
-            
-            $body = array_slice($searchReturnArr, (int) $articlesPerPage * ((int) $page - 1), $articlesPerPage + 1);
+
+            $body = array_slice($searchReturnArr,
+                    (int) $articlesPerPage * ((int) $page - 1),
+                    $articlesPerPage + 1);
         }
-        
+
         header('Content-Type: application/json');
         echo json_encode($body);
     }
+
 }

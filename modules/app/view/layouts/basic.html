@@ -122,7 +122,7 @@
       </div>{/if}
       {if !empty($longFlashMessage)}
       <div class="notification_long msginfo large-5 small-12 medium-8 centerBlock"><a href="#" class="fi-x-circle closeNotif"></a>
-        <p class="fi-info">{echo $longFlashMessage}</p></p>
+        <p class="fi-info">{echo $longFlashMessage}</p>
       </div>{/if}
     </div>
     <div class="content">
@@ -157,7 +157,8 @@
     <script type="text/javascript" src="/public/js/plugins/lightbox.min.js"></script>{if isset($includejssorslider)}
     <script type="text/javascript" src="/public/js/plugins/jssor.slider.mini.js"></script>
     <script type="text/javascript" src="/public/js/custom/build/jssor.slider.init.js"></script>{/if}
-    <script type="text/javascript" src="/public/js/custom/build/generalApp.js"></script>{if $env == "live"}
+    <script type="text/javascript" src="/public/js/custom/build/generalApp.js"></script>
+    {if $env == "live"}
     <!-- Piwik-->
     <script type="text/javascript">
       var _paq = _paq || [];
@@ -174,7 +175,8 @@
     <noscript>
       <p><img src="//piwik.hastrman.cz/piwik.php?idsite=1" style="border:0;" alt=""></p>
     </noscript>
-    <!-- End Piwik Code-->{/if}
+    <!-- End Piwik Code-->
+    {/if}
     <!-- End JS scripts-->
   </body>
 </html>

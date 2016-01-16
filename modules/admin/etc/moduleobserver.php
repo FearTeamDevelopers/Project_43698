@@ -6,6 +6,7 @@ use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\SubscriberInterface;
 use THCFrame\Security\Model\SecLogModel;
+use THCFrame\Core\Core;
 
 /**
  * Module specific observer class.
@@ -67,13 +68,22 @@ class ModuleObserver implements SubscriberInterface
             'params' => $paramStr,
         ));
 
+        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
+            'type' => 'adminLog',
+            'result' => $result,
+            'module' => $module,
+            'controller' => $controller,
+            'action' => $action,
+            'params' => $paramStr)
+        );
+
         if ($log->validate()) {
             $log->save();
         }
     }
 
     /**
-     * 
+     *
      */
     public function secLog()
     {
@@ -111,6 +121,14 @@ class ModuleObserver implements SubscriberInterface
             'userIp' => $uip,
             'params' => $paramStr,
         ));
+
+        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
+            'type' => 'secLog',
+            'module' => $module,
+            'controller' => $controller,
+            'action' => $action,
+            'params' => $paramStr)
+        );
 
         if ($log->validate()) {
             $log->save();

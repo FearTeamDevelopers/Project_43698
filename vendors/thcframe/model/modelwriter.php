@@ -12,27 +12,32 @@ use THCFrame\Core\Base;
 class Modelwriter extends Base
 {
     private $_use = array();
-    private $_implements = array();
     private $_property = array();
-    
+
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_namespace;
-    
+
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_extends;
-    
+
     /**
      * @readwrite
-     * @var string 
+     * @var type
+     */
+    protected $_implements = array();
+
+    /**
+     * @readwrite
+     * @var string
      */
     protected $_filename;
-    
+
     /**
      * @readwrite
      * @var string
@@ -44,10 +49,10 @@ class Modelwriter extends Base
     {
         parent::__construct($options);
     }
-    
+
     /**
      * Add class property
-     * 
+     *
      * @param type $propertyName
      * @param type $propertyAnnotations
      * @return \THCFrame\Model\Modelwriter
@@ -55,13 +60,13 @@ class Modelwriter extends Base
     public function addProperty($propertyName, $propertyAnnotations)
     {
         $this->_property[$propertyName] = $propertyAnnotations;
-        
+
         return $this;
     }
-    
+
     /**
      * Add implements to the class header
-     * 
+     *
      * @param type $implements
      * @return \THCFrame\Model\Modelwriter
      */
@@ -70,10 +75,10 @@ class Modelwriter extends Base
         $this->_implements[] = $implements;
         return $this;
     }
-    
+
     /**
      * Add use to the class header
-     * 
+     *
      * @param type $use
      * @param type $useAlias
      * @return \THCFrame\Model\Modelwriter
@@ -85,16 +90,16 @@ class Modelwriter extends Base
         }else{
             $this->_use[] = $use;
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Write class header to the file
      */
     private function _writeHeader()
     {
-        $extends = !empty($this->getExtends()) ? 'extends '.$this->getExtends(): '';
+        $extends = !empty($this->_extends) ? 'extends '.$this->_extends: '';
         $implements = !empty($this->_implements)? implode(',', $this->_implements) : '';
         $useStr = '';
 
@@ -104,23 +109,23 @@ class Modelwriter extends Base
             }else{
                 $useStr .= 'use '.$value.';'.PHP_EOL;
             }
-            
+
         }
-        
+
         $contentModel = <<<MODEL
 <?php
 
 namespace {$this->getNamespace()};
 
-{$useStr}                
+{$useStr}
 class {$this->getClassname()} {$extends} {$implements}
 {
 
 MODEL;
 
-        file_put_contents($this->getFilename(), $contentModel);
+        file_put_contents($this->_filename, $contentModel);
     }
-    
+
     /**
      * Write class properties to the file
      */
@@ -134,11 +139,39 @@ MODEL;
     protected \$_{$name};
 
 PROPERTY;
-                file_put_contents($this->getFilename(), $property, FILE_APPEND);
+                file_put_contents($this->_filename, $property, FILE_APPEND);
             }
         }
     }
-    
+
+    /**
+     * Write property getter and setter method
+     */
+    private function _writeGettersSetters()
+    {
+        if(!empty($this->_property)){
+            foreach($this->_property as $name => $annotation){
+                $normalizedName = ucfirst($name);
+
+                $getterSetter = <<<BASICMETHODS
+
+    public function get{$normalizedName}()
+    {
+        return \$this->_{$name};
+    }
+
+    public function set{$normalizedName}(\$value)
+    {
+        \$this->_{$name} = \$value;
+        return \$this;
+    }
+
+BASICMETHODS;
+                file_put_contents($this->_filename, $getterSetter, FILE_APPEND);
+            }
+        }
+    }
+
     /**
      * Add footer to the file
      */
@@ -148,9 +181,9 @@ PROPERTY;
 
 }
 END;
-        file_put_contents($this->getFilename(), $classEnd, FILE_APPEND);
+        file_put_contents($this->_filename, $classEnd, FILE_APPEND);
     }
-    
+
     /**
      * Public wrapper for write methods
      */
@@ -158,6 +191,7 @@ END;
     {
         $this->_writeHeader();
         $this->_writeProperties();
+        $this->_writeGettersSetters();
         $this->_writeFooter();
     }
 }

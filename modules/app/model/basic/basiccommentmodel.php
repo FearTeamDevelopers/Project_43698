@@ -3,7 +3,7 @@
 namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicCommentModel extends Model 
 {
 
@@ -25,7 +25,6 @@ class BasicCommentModel extends Model
      * @validate numeric,max(11)
      * @label id autora
      * @unsigned
-     * @null
      */
     protected $_userId;
 
@@ -38,7 +37,6 @@ class BasicCommentModel extends Model
      * @validate numeric,max(10)
      * @label id objektu
      * @unsigned
-     * @default 0
      */
     protected $_resourceId;
 
@@ -48,7 +46,6 @@ class BasicCommentModel extends Model
      * @type int
      * @length 10
      * @unsigned
-     * @default 0
      */
     protected $_replyTo;
 
@@ -58,7 +55,6 @@ class BasicCommentModel extends Model
      * @type tinyint
      * @length 1
      * @validate max(1)
-     * @default 0
      */
     protected $_type;
 
@@ -68,7 +64,6 @@ class BasicCommentModel extends Model
      * @type text
      * @validate required,html
      * @label text
-     * @null
      */
     protected $_body;
 
@@ -78,7 +73,6 @@ class BasicCommentModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -88,8 +82,95 @@ class BasicCommentModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getUserId()
+    {
+        return $this->_userId;
+    }
+
+    public function setUserId($value)
+    {
+        $this->_userId = $value;
+        return $this;
+    }
+
+    public function getResourceId()
+    {
+        return $this->_resourceId;
+    }
+
+    public function setResourceId($value)
+    {
+        $this->_resourceId = $value;
+        return $this;
+    }
+
+    public function getReplyTo()
+    {
+        return $this->_replyTo;
+    }
+
+    public function setReplyTo($value)
+    {
+        $this->_replyTo = $value;
+        return $this;
+    }
+
+    public function getType()
+    {
+        return $this->_type;
+    }
+
+    public function setType($value)
+    {
+        $this->_type = $value;
+        return $this;
+    }
+
+    public function getBody()
+    {
+        return $this->_body;
+    }
+
+    public function setBody($value)
+    {
+        $this->_body = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

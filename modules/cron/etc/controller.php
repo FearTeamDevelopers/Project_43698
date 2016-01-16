@@ -6,52 +6,12 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Request\RequestMethods;
-use THCFrame\Core\Lang;
 
 /**
  * Module specific controller class extending framework controller class.
  */
 class Controller extends BaseController
 {
-    /**
-     * Store security context object.
-     *
-     * @var THCFrame\Security\Security
-     * @read
-     */
-    protected $_security;
-
-    /**
-     * Store initialized cache object.
-     *
-     * @var THCFrame\Cache\Cache
-     * @read
-     */
-    protected $_cache;
-
-    /**
-     * Store configuration.
-     *
-     * @var THCFrame\Configuration\Configuration
-     * @read
-     */
-    protected $_config;
-
-    /**
-     * Store language extension.
-     *
-     * @var THCFrame\Core\Lang
-     * @read
-     */
-    protected $_lang;
-    
-    /**
-     * Store server host name.
-     *
-     * @var type
-     * @read
-     */
-    protected $_serverHost;
 
     /**
      * @param type $options
@@ -60,29 +20,13 @@ class Controller extends BaseController
     {
         parent::__construct($options);
 
-        $this->_security = Registry::get('security');
-        $this->_cache = Registry::get('cache');
-        $this->_config = Registry::get('configuration');
-        $this->_lang = Lang::getInstance();
-        $this->_serverHost = RequestMethods::server('HTTP_HOST');
-
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
 
-        // schedule disconnect from database 
+        // schedule disconnect from database
         Event::add('framework.controller.destruct.after', function ($name) {
             Registry::get('database')->disconnectAll();
         });
-    }
-
-    /**
-     * Disable view, used for ajax calls.
-     */
-    protected function _disableView()
-    {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
-        header('Content-Type: text/html; charset=utf-8');
     }
 
     /**
@@ -110,7 +54,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
+     *
      */
     public function render()
     {

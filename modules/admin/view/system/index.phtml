@@ -4,24 +4,30 @@
     {if $isAdmin}<li><a href="/admin/system/showlog/">Admin log</a></li>{/if}
 </ul><!--maintabmenu-->
 <div class="content">
-
-    <div class="grid_4">
-        <div class="contenttitle"><h2 class="form"><span>Smazat cache</span></h2></div>
-        <form class="stdform stdform2" method="post" action="/admin/system/clearcache/">
-            <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
-            <p class="stdformbutton">
-                <input name="clearCache" type="submit" value="Smazat cache" class="submit radius2" />
-            </p>
-        </form>
+    <div class="grid_5">
+        <div class="widgetbox">
+            <div class="title"><h2 class="general"><span>Běžné</span></h2></div>
+            <div class="widgetcontent">
+                <form class="stdform stdform2" method="post" action="/admin/system/common/">
+                    <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+                    <ul class="buttonlist">
+                        <li><input name="clearCache" type="submit" value="Smazat cache" class="submit radius2" /></li>
+                        <li><input name="minifyJs" type="submit" value="Minify JS" class="submit radius2" /></li>
+                    </ul>
+                </form>
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
     </div>
-    
+
+    <div class="clear"></div>
+
     <div class="grid_5">
         <div class="contenttitle"><h2 class="form"><span>Zálohovat databázi</span></h2></div>
         <form class="stdform stdform2" method="post" action="/admin/system/createdatabasebackup/">
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
             <p class="stdformbutton">
                 <input name="createBackup" type="submit" value="Vytvořit zálohu" class="submit radius2" />
-                Spouštěno automaticky každý den v 2:30
+                <span class="marginleft15">Spouštěno automaticky každý den v 2:30</span>
             </p>
         </form>
     </div>
@@ -31,10 +37,11 @@
             <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
             <p class="stdformbutton">
                 <input name="generateSitemap" type="submit" value="Aktualizovat sitemap.xml" class="submit radius2" />
-                Spouštěno automaticky každý den v 3:00
+                <span class="marginleft15">Spouštěno automaticky každý den v 3:00</span>
             </p>
         </form>
     </div>
-    
-    <div class="clear"></div>  
+
+    <div class="clear"></div>
+
 </div><!--widgetcontent-->

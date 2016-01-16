@@ -39,5 +39,4 @@ abstract class Driver extends Base
 
     protected abstract function _parse($path);
 
-    protected abstract function _parseDefault($path);
 }

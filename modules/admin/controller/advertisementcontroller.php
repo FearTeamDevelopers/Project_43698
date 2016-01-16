@@ -7,14 +7,14 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
 
 /**
- * 
+ *
  */
 class AdvertisementController extends Controller
 {
 
     /**
      * Check whether unique ad section identifier already exist or not.
-     * 
+     *
      * @param string $key
      *
      * @return bool
@@ -32,7 +32,7 @@ class AdvertisementController extends Controller
 
     /**
      * Get list of all advertisements.
-     * 
+     *
      * @before _secured, _participant
      */
     public function index()
@@ -44,7 +44,7 @@ class AdvertisementController extends Controller
 
     /**
      * Get list of advertisement sections.
-     * 
+     *
      * @before _secured, _participant
      */
     public function sections()
@@ -56,7 +56,7 @@ class AdvertisementController extends Controller
 
     /**
      * Show detail of existing ad.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id ad id
@@ -76,21 +76,25 @@ class AdvertisementController extends Controller
 
     /**
      * Delete existing ad.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id ad id
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $ad = \App\Model\AdvertisementModel::first(
                         array('id = ?' => (int) $id), array('id')
         );
 
         if (null === $ad) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $adImages = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
 
@@ -99,33 +103,37 @@ class AdvertisementController extends Controller
                     $image->delete();
                 }
             }
-            
+
             if ($ad->delete()) {
                 $this->getCache()->erase('bazar-');
                 Event::fire('admin.log', array('success', 'Ad id: ' . $id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Change ad state (active/inactive).
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id ad id
      */
     public function changeState($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id));
 
         if (null === $ad) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($ad->active) {
                 $ad->active = 0;
@@ -138,55 +146,58 @@ class AdvertisementController extends Controller
 
                 $this->getCache()->erase('bazar-');
                 Event::fire('admin.log', array('success', 'Ad id: ' . $id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id, 'Errors: ' . json_encode($ad->getErrors())));
-                echo $this->lang('COMMON_FAIL');
+                Event::fire('admin.log', array('fail', 'Ad id: ' . $id,
+                    'Errors: ' . json_encode($ad->getErrors())));
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Delete image from ad.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $imageId image id
      */
     public function deleteAdImage($imageId)
     {
-        $this->_disableView();
+        $this->disableView();
 
-        if ($this->_checkCSRFToken()) {
-            $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $imageId));
-            $ad = \App\Model\AdvertisementModel::first(array('id = ?' => $adImage->getAdId()));
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
-            if ($adImage->getId() === $ad->getMainPhotoId()) {
-                $ad->mainPhotoId = null;
-            }
+        $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $imageId));
+        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => $adImage->getAdId()));
 
-            if (null === $adImage) {
-                echo $this->lang('NOT_FOUND');
-            } else {
-                if ($adImage->delete()) {
-                    $this->getCache()->erase('bazar-');
-                    Event::fire('admin.log', array('success', 'Ad image id: ' . $imageId
-                        . ' from ad: ' . $adImage->getAdId(),));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Ad image id: ' . $imageId
-                        . ' from ad: ' . $adImage->getAdId(),));
-                    echo $this->lang('COMMON_FAIL');
-                }
-            }
+        if ($adImage->getId() === $ad->getMainPhotoId()) {
+            $ad->mainPhotoId = null;
+        }
+
+        if (null === $adImage) {
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            echo $this->lang('COMMON_FAIL');
+            if ($adImage->delete()) {
+                $this->getCache()->erase('bazar-');
+                Event::fire('admin.log',
+                        array('success', 'Ad image id: ' . $imageId
+                    . ' from ad: ' . $adImage->getAdId(),));
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
+            } else {
+                Event::fire('admin.log',
+                        array('fail', 'Ad image id: ' . $imageId
+                    . ' from ad: ' . $adImage->getAdId(),));
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
+            }
         }
     }
 
     /**
      * Create new section for advertisements.
-     * 
+     *
      * @before _secured, _admin
      */
     public function addSection()
@@ -196,13 +207,13 @@ class AdvertisementController extends Controller
         $view->set('adsection', null);
 
         if (RequestMethods::post('submitAddAdSection')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/advertisement/sections/');
             }
 
             $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
 
             if (!$this->_checkSectionUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -230,7 +241,7 @@ class AdvertisementController extends Controller
 
     /**
      * Edit existing advertisement section.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id section id
@@ -249,12 +260,12 @@ class AdvertisementController extends Controller
         $view->set('adsection', $adsection);
 
         if (RequestMethods::post('submitEditAdSection')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/advertisement/sections/');
             }
 
             $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
+            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
 
             if ($adsection->getUrlKey() !== $urlKey && !$this->_checkSectionUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -281,49 +292,57 @@ class AdvertisementController extends Controller
 
     /**
      * Delete existing advertisement section.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id section id
      */
     public function deleteSection($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $adsection = \App\Model\AdSectionModel::first(
                         array('id = ?' => (int) $id), array('id')
         );
 
         if (null === $adsection) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($adsection->delete()) {
                 $this->getCache()->erase('bazar-');
                 Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
                     'Errors: ' . json_encode($adsection->getErrors()),));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Extend ad availability for specific amount of days.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id ad id
      */
     public function extendAvailability($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id, 'hasAvailabilityRequest = ?' => true));
 
         if (null === $ad) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $adTtl = $this->getConfig()->bazar_ad_ttl;
 
@@ -339,23 +358,23 @@ class AdvertisementController extends Controller
 
                 $this->getCache()->erase('bazar-');
                 Event::fire('admin.log', array('success', 'Ad id: ' . $id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Ad id: ' . $id,
                     'Errors: ' . json_encode($ad->getErrors()),));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Response for ajax call from datatables plugin.
-     * 
+     *
      * @before _secured, _participant
      */
     public function load()
     {
-        $this->_disableView();
+        $this->disableView();
 
         $page = (int) RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';

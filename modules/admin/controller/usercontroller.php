@@ -10,7 +10,7 @@ use THCFrame\Core\Rand;
 use THCFrame\Core\StringMethods;
 
 /**
- * 
+ *
  */
 class UserController extends Controller
 {
@@ -89,7 +89,7 @@ class UserController extends Controller
             exit;
         }
 
-        $this->_disableView();
+        $this->disableView();
 
         $this->getSecurity()->logout();
         self::redirect('/admin/');
@@ -97,7 +97,7 @@ class UserController extends Controller
 
     /**
      * Get list users with basic roles.
-     * 
+     *
      * @before _secured, _admin
      */
     public function index()
@@ -111,7 +111,7 @@ class UserController extends Controller
 
     /**
      * Create new user.
-     * 
+     *
      * @before _secured, _admin
      */
     public function add()
@@ -123,7 +123,7 @@ class UserController extends Controller
                 ->set('roles', \App\Model\UserModel::getAllRoles());
 
         if (RequestMethods::post('submitAddUser')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/user/');
             }
@@ -201,7 +201,7 @@ class UserController extends Controller
 
     /**
      * Edit user currently logged in.
-     * 
+     *
      * @before _secured, _participant
      */
     public function profile()
@@ -221,7 +221,7 @@ class UserController extends Controller
                 ->set('roles', \App\Model\UserModel::getAllRoles());
 
         if (RequestMethods::post('submitUpdateProfile')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/user/');
             }
             $errors = array();
@@ -279,7 +279,7 @@ class UserController extends Controller
 
     /**
      * Edit existing user.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id user id
@@ -303,7 +303,7 @@ class UserController extends Controller
                 ->set('roles', \App\Model\UserModel::getAllRoles());
 
         if (RequestMethods::post('submitEditUser')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/user/');
             }
 
@@ -372,19 +372,23 @@ class UserController extends Controller
 
     /**
      * Delete existing user.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id user id
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
 
         if (null === $user) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $user->deleted = true;
             $user->active = false;
@@ -392,34 +396,34 @@ class UserController extends Controller
             if ($user->validate()) {
                 $user->save();
                 Event::fire('admin.log', array('success', 'User id: ' . $id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'User id: ' . $id));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Show help for user section.
-     * 
+     *
      * @before _secured, _participant
      */
     public function help()
     {
-        
+
     }
 
     /**
      * Generate new password and send it to the user.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id user id
      */
     public function forcePasswordReset($id)
     {
-        $this->_disableView();
+        $this->disableView();
         $view = $this->getActionView();
 
         $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
@@ -443,8 +447,12 @@ class UserController extends Controller
                 $data = array('{NEWPASS}' => $user->getNewCleanPassword());
                 $user->setNewCleanPassword(null);
 
-                $email = \Admin\Model\EmailModel::loadAndPrepare('password-reset', $data);
-                $email->setRecipient($user->getEmail())
+                $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('password-reset', $data);
+
+                $mailer = new \THCFrame\Mailer\Mailer();
+                $mailer->setBody($emailTpl->getBody())
+                        ->setSubject($emailTpl->getSubject())
+                        ->setSendTo($user->getEmail())
                         ->send();
 
                 $view->successMessage($this->lang('PASS_RESET_EMAIL'));
@@ -466,14 +474,14 @@ class UserController extends Controller
 
     /**
      * Activate user account and send email notification
-     * 
+     *
      * @before _secured, _admin
-     * 
+     *
      * @param type $id
      */
     public function accountActivation($id)
     {
-        $this->_disableView();
+        $this->disableView();
         $view = $this->getActionView();
 
         $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
@@ -488,9 +496,14 @@ class UserController extends Controller
 
         try {
             if ($user->activateAccount()) {
-                $email = \Admin\Model\EmailModel::loadAndPrepare('user-account-activation-notification');
-                $email->setRecipient($user->getEmail())
-                        ->send(false, 'registrace@hastrman.cz');
+                $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('user-account-activation-notification');
+
+                $mailer = new \THCFrame\Mailer\Mailer();
+                $mailer->setBody($emailTpl->getBody())
+                        ->setSubject($emailTpl->getSubject())
+                        ->setSendTo($user->getEmail())
+                        ->setFrom('registrace@hastrman.cz')
+                        ->send();
 
                 Event::fire('admin.log', array('success', 'Activate User id: ' . $id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
@@ -511,13 +524,13 @@ class UserController extends Controller
 
     /**
      * Force delete user from database
-     * 
+     *
      * @param string $email
      * @before _secured, _superadmin
      */
     public function forceUserDelete($email)
     {
-        $this->_disableView();
+        $this->disableView();
         if (strtolower(ENV) == 'live') {
             self::redirect('/admin/');
         }

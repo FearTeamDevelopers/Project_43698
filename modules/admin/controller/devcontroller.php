@@ -6,7 +6,7 @@ use Admin\Etc\Controller;
 use THCFrame\Core\StringMethods;
 
 /**
- * 
+ *
  */
 class DevController extends Controller
 {
@@ -16,7 +16,7 @@ class DevController extends Controller
      *      /admin/dev/filldatabase/1    - for tb_news
      *      /admin/dev/filldatabase/2    - for tb_action
      *      /admin/dev/filldatabase/3    - for tb_report.
-     * 
+     *
      * @before _secured, _superadmin
      */
     public function fillDatabase($type)
@@ -25,7 +25,7 @@ class DevController extends Controller
             exit;
         }
 
-        $this->_disableView();
+        $this->disableView();
 
         ini_set('max_execution_time', 1800);
         ini_set('memory_limit', '256M');
@@ -34,9 +34,9 @@ class DevController extends Controller
 
         $content = \App\Model\PageContentModel::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
 
-        $SHORT_TEXT = 'Vedle používání zdravého rozumu, dostatečné kvalifikace i praxe je kvalitní a spolehlivá 
-            potápěčská technika jednou z podmínek dosažení nejvyšší míry bezpečnosti vašich ponorů. 
-            Kupujte jen takovou výstroj, která tato kriteria splňuje! Pamatujte, že cena je až 
+        $SHORT_TEXT = 'Vedle používání zdravého rozumu, dostatečné kvalifikace i praxe je kvalitní a spolehlivá
+            potápěčská technika jednou z podmínek dosažení nejvyšší míry bezpečnosti vašich ponorů.
+            Kupujte jen takovou výstroj, která tato kriteria splňuje! Pamatujte, že cena je až
             druhotným ukazatelem ... nebo váš život stojí za pár ušetřených stokorun?';
 
         $LARGE_TEXT = str_replace('h1', 'h2', $content->getBody());
@@ -129,7 +129,7 @@ class DevController extends Controller
      *
      * @return type
      */
-    protected function _createUrlKey($string)
+    protected function createUrlKey($string)
     {
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
@@ -177,7 +177,7 @@ class DevController extends Controller
             exit;
         }
 
-        $this->_disableView();
+        $this->disableView();
 
         $oldDb = new \THCFrame\Database\Database();
         $db = $oldDb->initializeDirectly(array(
@@ -208,7 +208,7 @@ class DevController extends Controller
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
-                $urlKey = $this->_createUrlKey($title);
+                $urlKey = $this->createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'report');
                 if ($urlKeyCheck === true) {
@@ -226,7 +226,7 @@ class DevController extends Controller
                 $urlKeys[] = $urlKey;
 
                 $sql = sprintf($insertReportSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->log($sql, 'system', false);
+                \THCFrame\Core\Core::getLogger()->sql($sql);
                 $contentCount+=1;
             }
         }
@@ -239,7 +239,7 @@ class DevController extends Controller
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
-                $urlKey = $this->_createUrlKey($title);
+                $urlKey = $this->createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'action');
                 if ($urlKeyCheck === true) {
@@ -257,7 +257,7 @@ class DevController extends Controller
                 $urlKeys[] = $urlKey;
 
                 $sql = sprintf($insertActionSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->log($sql, 'system', false);
+                \THCFrame\Core\Core::getLogger()->sql($sql);
                 $contentCount+=1;
             }
         }
@@ -270,7 +270,7 @@ class DevController extends Controller
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
-                $urlKey = $this->_createUrlKey($title);
+                $urlKey = $this->createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'news');
                 if ($urlKeyCheck === true) {
@@ -288,7 +288,7 @@ class DevController extends Controller
                 $urlKeys[] = $urlKey;
 
                 $sql = sprintf($insertNewsSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->log($sql, 'system', false);
+                \THCFrame\Core\Core::getLogger()->sql($sql);
                 $contentCount+=1;
             }
         }
@@ -304,13 +304,13 @@ class DevController extends Controller
      */
     public function testSendEmail()
     {
-        $this->_disableView();
+        $this->disableView();
 
-        $email = new \Admin\Model\EmailModel(array(
-            'body' => 'Test message',
-            'subject' => 'Hastrman test email',
-        ));
-        $email->send();
+        $mailer = new \THCFrame\Mailer\Mailer();
+        $mailer->setBody('Test message')
+                ->setSubject('Hastrman test email');
+
+        $mailer->send();
 
         print('<pre>'.print_r('Send', true).'</pre>');
         die;

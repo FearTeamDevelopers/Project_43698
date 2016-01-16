@@ -3,7 +3,7 @@
 namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicAdmessageModel extends Model 
 {
 
@@ -53,7 +53,6 @@ class BasicAdmessageModel extends Model
      * @type text
      * @validate required,html,max(2048)
      * @label zpráva
-     * @null
      */
     protected $_message;
 
@@ -64,7 +63,6 @@ class BasicAdmessageModel extends Model
      * @length 1
      * @validate max(1)
      * @label zaslat kopii emailu
-     * @default 0
      */
     protected $_sendEmailCopy;
 
@@ -74,7 +72,6 @@ class BasicAdmessageModel extends Model
      * @type tinyint
      * @length 1
      * @validate max(1)
-     * @default 0
      */
     protected $_messageSent;
 
@@ -84,7 +81,6 @@ class BasicAdmessageModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -94,8 +90,106 @@ class BasicAdmessageModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getAdId()
+    {
+        return $this->_adId;
+    }
+
+    public function setAdId($value)
+    {
+        $this->_adId = $value;
+        return $this;
+    }
+
+    public function getMsAuthor()
+    {
+        return $this->_msAuthor;
+    }
+
+    public function setMsAuthor($value)
+    {
+        $this->_msAuthor = $value;
+        return $this;
+    }
+
+    public function getMsEmail()
+    {
+        return $this->_msEmail;
+    }
+
+    public function setMsEmail($value)
+    {
+        $this->_msEmail = $value;
+        return $this;
+    }
+
+    public function getMessage()
+    {
+        return $this->_message;
+    }
+
+    public function setMessage($value)
+    {
+        $this->_message = $value;
+        return $this;
+    }
+
+    public function getSendEmailCopy()
+    {
+        return $this->_sendEmailCopy;
+    }
+
+    public function setSendEmailCopy($value)
+    {
+        $this->_sendEmailCopy = $value;
+        return $this;
+    }
+
+    public function getMessageSent()
+    {
+        return $this->_messageSent;
+    }
+
+    public function setMessageSent($value)
+    {
+        $this->_messageSent = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

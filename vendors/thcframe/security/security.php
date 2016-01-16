@@ -10,6 +10,7 @@ use THCFrame\Security\SecurityInterface;
 use THCFrame\Security\CSRF;
 use THCFrame\Security\PasswordManager;
 use THCFrame\Security\Model\BasicUserModel;
+use THCFrame\Request\CookieBag;
 
 /**
  * Security context class. Wrapper for authentication and authorization methods
@@ -19,23 +20,23 @@ class Security extends Base implements SecurityInterface
 
     /**
      * Authentication object
-     * 
+     *
      * @read
-     * @var THCFrame\Security\Authentication\Authentication 
+     * @var THCFrame\Security\Authentication\Authentication
      */
     protected $_authentication;
 
     /**
      * Authorization object
-     * 
+     *
      * @read
-     * @var THCFrame\Security\Authorization\Authorization 
+     * @var THCFrame\Security\Authorization\Authorization
      */
     protected $_authorization;
 
     /**
      * Cross-site request forgery protection
-     * 
+     *
      * @read
      * @var THCFrame\Security\CSRF
      */
@@ -43,21 +44,30 @@ class Security extends Base implements SecurityInterface
 
     /**
      * PasswordManager object
-     * 
+     *
      * @read
-     * @var THCFrame\Security\PasswordManager 
+     * @var THCFrame\Security\PasswordManager
      */
     protected $_passwordManager;
 
     /**
      * Authenticated user object
+     *
      * @readwrite
      * @var \THCFrame\Security\Model\BasicUserModel or null
      */
     protected $_user = null;
 
     /**
-     * 
+     * Session object
+     *
+     * @read
+     * @var THCFrame\Session\Driver
+     */
+    protected $_session;
+
+    /**
+     *
      * @param type $method
      * @return \THCFrame\Security\Exception\Implementation
      */
@@ -73,15 +83,18 @@ class Security extends Base implements SecurityInterface
     public function initialize($configuration)
     {
         Event::fire('framework.security.initialize.before', array());
+        
+        @session_regenerate_id();
+        $this->_session = Registry::get('session');
 
         if (!empty($configuration->security)) {
-            $this->_csrf = new CSRF();
+            $this->_csrf = new CSRF($this->_session);
             $this->_passwordManager = new PasswordManager($configuration->security);
         } else {
             throw new \Exception('Error in configuration file');
         }
 
-        $user = Registry::get('session')->get('authUser');
+        $user = $this->_session->get('authUser');
 
         $authentication = new Authentication\Authentication();
         $this->_authentication = $authentication->initialize($configuration);
@@ -100,7 +113,7 @@ class Security extends Base implements SecurityInterface
     }
 
     /**
-     * 
+     *
      * @param BasicUserModel $user
      * @return type
      */
@@ -110,8 +123,7 @@ class Security extends Base implements SecurityInterface
         $user->password = null;
         $user->salt = null;
 
-        $session = Registry::get('session');
-        $session->set('authUser', $user)
+        $this->_session->set('authUser', $user)
                 ->set('lastActive', time());
 
         $this->_user = $user;
@@ -119,7 +131,7 @@ class Security extends Base implements SecurityInterface
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function getUser()
@@ -129,17 +141,17 @@ class Security extends Base implements SecurityInterface
 
     /**
      * Return Cross-site request forgery object
-     * 
+     *
      * @return THCFrame\Security\CSRF
      */
-    public function getCSRF()
+    public function getCsrf()
     {
         return $this->_csrf;
     }
 
     /**
      * Return PasswordManager object
-     * 
+     *
      * @return THCFrame\Security\PasswordManager
      */
     public function getPasswordManager()
@@ -153,20 +165,19 @@ class Security extends Base implements SecurityInterface
      */
     public function logout()
     {
-        $session = Registry::get('session');
-        $session->erase('authUser')
+        $this->_session->erase('authUser')
                 ->erase('lastActive')
                 ->erase('csrf');
-        
+
         BasicUserModel::deleteAuthenticationToken();
 
-        $this->_user = NULL;
+        $this->_user = null;
         @session_regenerate_id();
     }
 
     /**
      * Authentication facade method
-     * 
+     *
      * @param string $name
      * @param string $pass
      * @return true or re-throw exception
@@ -184,7 +195,7 @@ class Security extends Base implements SecurityInterface
 
     /**
      * Authorization facade method
-     * 
+     *
      * @param string $requiredRole
      * @return mixed
      */
@@ -199,7 +210,7 @@ class Security extends Base implements SecurityInterface
 
     /**
      * Encrypt provided text
-     * 
+     *
      * @param string $text
      * @return string
      */
@@ -218,7 +229,7 @@ class Security extends Base implements SecurityInterface
 
     /**
      * Decrypt encrypted text
-     * 
+     *
      * @param string $encryptedText
      * @return string
      */
@@ -234,31 +245,31 @@ class Security extends Base implements SecurityInterface
 
         return $plaintext_dec;
     }
-    
+
     /**
      * Function for user to log-in forcefully i.e without providing user-credentials
-     * 
+     *
      * @param integer $userId
      * @return boolean
      * @throws Exception\UserNotExists
      */
     public function forceLogin($userId)
     {
-        $user = \App\Model\UserModel::first(array('id = ?' => (int)$userId));
-        
-        if($user === null){
+        $user = \App\Model\UserModel::first(array('id = ?' => (int) $userId));
+
+        if ($user === null) {
             throw new Exception\UserNotExists('User not found');
         }
-        
+
         $this->setUser($user);
         return true;
     }
 
     /**
-     * Method creates new salt and salted password and 
+     * Method creates new salt and salted password and
      * returns new hash with salt as string.
      * Method can be used only in development environment
-     * 
+     *
      * @param string $string
      * @return string|null
      */

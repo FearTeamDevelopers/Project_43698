@@ -248,7 +248,7 @@ class Scanner extends Base
         }
 
         if (!empty($this->_errors)) {
-            Core::getLogger()->log(print_r($this->_errors, true), 'filescan', true, 'filescan');
+            Core::getLogger()->error('{fshr}', array('fshr', print_r($this->_errors, true)));
         }
 
         $this->_reporter->afterScanReport();

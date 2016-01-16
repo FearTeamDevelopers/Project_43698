@@ -10,7 +10,7 @@ use THCFrame\Filesystem\FileManager;
 use THCFrame\Core\StringMethods;
 
 /**
- * 
+ *
  */
 class ReportController extends Controller
 {
@@ -18,7 +18,7 @@ class ReportController extends Controller
 
     /**
      * Check whether user has access to report or not.
-     * 
+     *
      * @param \App\Model\ReportModel $report
      *
      * @return bool
@@ -35,7 +35,7 @@ class ReportController extends Controller
 
     /**
      * Check whether report unique identifier already exist or not.
-     * 
+     *
      * @param type $key
      *
      * @return bool
@@ -53,12 +53,12 @@ class ReportController extends Controller
 
     /**
      * Create and return new report object.
-     * 
+     *
      * @return \App\Model\ReportModel
      */
     private function _createObject()
     {
-        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
 
         for ($i = 1; $i <= 100; $i+=1) {
             if ($this->_checkUrlKey($urlKeyCh)) {
@@ -74,7 +74,7 @@ class ReportController extends Controller
         }
 
         $imgMain = $imgThumb = '';
-        
+
         if(!empty(RequestMethods::post('croppedimage'))){
             $fileManager = new FileManager(array(
                 'thumbWidth' => $this->getConfig()->thumb_width,
@@ -134,14 +134,14 @@ class ReportController extends Controller
 
     /**
      * Edit existing report object.
-     * 
+     *
      * @param \App\Model\ReportModel $object
      *
      * @return \\App\Model\ReportModel
      */
     private function _editObject(\App\Model\ReportModel $object)
     {
-        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
 
         if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
             for ($i = 1; $i <= 100; $i+=1) {
@@ -196,8 +196,8 @@ class ReportController extends Controller
             $object->userAlias = $this->getUser()->getWholeName();
         }
 
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), 
-                array('/reportaz/r/'.$urlKeyCh, '[Celý článek]'), 
+        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
+                array('/reportaz/r/'.$urlKeyCh, '[Celý článek]'),
                 RequestMethods::post('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -207,7 +207,7 @@ class ReportController extends Controller
         }else{
             $object->approved = RequestMethods::post('approve');
         }
-        
+
         $object->title = RequestMethods::post('title');
         $object->urlKey = $urlKeyCh;
         $object->body = RequestMethods::post('text');
@@ -228,7 +228,7 @@ class ReportController extends Controller
 
     /**
      * Check if there is object used for preview saved in session.
-     * 
+     *
      * @return \App\Model\ReportModel
      */
     private function _checkForObject()
@@ -252,14 +252,18 @@ class ReportController extends Controller
                 $data = array('{TITLE}' => '<a href="http://'.$this->getServerHost().'/report/r/'.$report->getUrlKey().'">'.$report->getTitle().'</a>',
                     '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody()),
                         );
-                $email = \Admin\Model\EmailModel::loadAndPrepare('new-report', $data);
-                $email->subject = $email->getSubject().' - '.$report->getTitle();
+
+                $mailer =  new \THCFrame\Mailer\Mailer();
+                $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('new-report', $data);
+
+                $mailer->setBody($emailTpl->getBody())
+                        ->setSubject($emailTpl->getSubject().' - '.$report->getTitle());
 
                 foreach ($users as $user) {
-                    $email->setRecipient($user->getEmail());
+                    $mailer->setSendTo($user->getEmail());
                 }
 
-                $email->send(true);
+                $mailer->send(true);
                 Event::fire('admin.log', array('success', 'Send new report notification to '.count($users).' users'));
             }
         }
@@ -268,7 +272,7 @@ class ReportController extends Controller
     /**
      * Get list of all actions. Loaded via datatables ajax.
      * For more check load function.
-     * 
+     *
      * @before _secured, _participant
      */
     public function index()
@@ -277,7 +281,7 @@ class ReportController extends Controller
 
     /**
      * Create new report.
-     * 
+     *
      * @before _secured, _participant
      */
     public function add()
@@ -294,7 +298,7 @@ class ReportController extends Controller
                 ->set('concepts', $reportConcepts);
 
         if (RequestMethods::post('submitAddReport')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/report/');
             }
@@ -320,7 +324,7 @@ class ReportController extends Controller
         }
 
         if (RequestMethods::post('submitPreviewReport')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/report/');
             }
@@ -345,7 +349,7 @@ class ReportController extends Controller
 
     /**
      * Edit existing report.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id report id
@@ -377,13 +381,13 @@ class ReportController extends Controller
                 array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($report->getId(), \App\Model\CommentModel::RESOURCE_REPORT);
-        
+
         $view->set('report', $report)
                 ->set('comments', $comments)
                 ->set('concepts', $reportConcepts);
 
         if (RequestMethods::post('submitEditReport')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/report/');
             }
 
@@ -408,7 +412,7 @@ class ReportController extends Controller
         }
 
         if (RequestMethods::post('submitPreviewReport')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/report/');
             }
 
@@ -428,86 +432,94 @@ class ReportController extends Controller
 
     /**
      * Delete existing report.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id report id
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $report = \App\Model\ReportModel::first(
                         array('id = ?' => (int) $id), array('id', 'userId')
         );
 
         if (null === $report) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($this->_checkAccess($report)) {
                 if ($report->delete()) {
                     $this->getCache()->erase('report');
                     Event::fire('admin.log', array('success', 'Report id: '.$id));
-                    echo 'success';
+                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                 } else {
                     Event::fire('admin.log', array('fail', 'Report id: '.$id));
-                    echo $this->lang('COMMON_FAIL');
+                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
             } else {
-                echo $this->lang('LOW_PERMISSIONS');
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
         }
     }
 
     /**
      * Delete report image.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id report id
      */
     public function deleteMainPhoto($id)
     {
-        $this->_disableView();
+        $this->disableView();
 
-        if ($this->_checkCSRFToken()) {
-            $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
-            if (null === $report) {
-                echo $this->lang('NOT_FOUND');
-            } else {
-                if (!$this->_checkAccess($report)) {
-                    echo $this->lang('LOW_PERMISSIONS');
-                }
+        $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
-                @unlink($report->getUnlinkPath());
-                @unlink($report->getUnlinkThumbPath());
-                $report->imgMain = '';
-                $report->imgThumb = '';
-
-                if ($report->validate()) {
-                    $report->save();
-
-                    Event::fire('admin.log', array('success', 'Report Id: '.$id));
-                    echo 'success';
-                } else {
-                    Event::fire('admin.log', array('fail', 'Report Id: '.$id));
-                    echo $this->lang('COMMON_FAIL');
-                }
-            }
+        if (null === $report) {
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            echo $this->lang('COMMON_FAIL');
+            if (!$this->_checkAccess($report)) {
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+            }
+
+            @unlink($report->getUnlinkPath());
+            @unlink($report->getUnlinkThumbPath());
+            $report->imgMain = '';
+            $report->imgThumb = '';
+
+            if ($report->validate()) {
+                $report->save();
+
+                Event::fire('admin.log', array('success', 'Report Id: ' . $id));
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
+            } else {
+                Event::fire('admin.log', array('fail', 'Report Id: ' . $id));
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
+            }
         }
     }
 
     /**
      * Delete image in report preview.
-     * 
+     *
      * @before _secured, _participant
      */
     public function previewDeletePhoto()
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $session = Registry::get('session');
         $photo = $session->get('reportPreviewPhoto');
@@ -522,28 +534,30 @@ class ReportController extends Controller
                     unlink('./'.$photo[$i]);
                 }
             }
-            echo 'success';
-            exit;
+            $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
         }
-        echo $this->lang('COMMON_FAIL');
-        exit;
+        $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
     }
 
     /**
      * Approve new report.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id report id
      */
     public function approveReport($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
         if (null === $report) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $report->approved = 1;
 
@@ -558,30 +572,34 @@ class ReportController extends Controller
                 $this->getCache()->erase('report');
 
                 Event::fire('admin.log', array('success', 'Report id: '.$id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Report id: '.$id,
                     'Errors: '.json_encode($report->getErrors()), ));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Reject new report.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id report id
      */
     public function rejectReport($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
 
         if (null === $report) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $report->approved = 2;
 
@@ -594,18 +612,18 @@ class ReportController extends Controller
                 $report->save();
 
                 Event::fire('admin.log', array('success', 'Report id: '.$id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Report id: '.$id,
                     'Errors: '.json_encode($report->getErrors()), ));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Return list of reports to insert report link to content.
-     * 
+     *
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -620,12 +638,16 @@ class ReportController extends Controller
 
     /**
      * Execute basic operation over multiple actions.
-     * 
+     *
      * @before _secured, _admin
      */
     public function massAction()
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $errors = array();
 
@@ -633,9 +655,7 @@ class ReportController extends Controller
         $action = RequestMethods::post('action');
 
         if (empty($ids)) {
-            echo $this->lang('NO_ROW_SELECTED');
-
-            return;
+            $this->ajaxResponse($this->lang('NO_ROW_SELECTED'), true);
         }
 
         switch ($action) {
@@ -653,13 +673,13 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->erase('report');
-                    Event::fire('admin.log', array('delete success', 'Report ids: '.implode(',', $ids)));
-                    echo $this->lang('DELETE_SUCCESS');
+                    Event::fire('admin.log', array('delete success', 'Report ids: ' . implode(',', $ids)));
+                    $this->getCache()->erase('actions');
+                    $this->ajaxResponse($this->lang('DELETE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -688,13 +708,13 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->erase('report');
-                    Event::fire('admin.log', array('activate success', 'Report ids: '.implode(',', $ids)));
-                    echo $this->lang('ACTIVATE_SUCCESS');
+                    Event::fire('admin.log', array('activate success', 'Report ids: ' . implode(',', $ids)));
+                    $this->getCache()->erase('actions');
+                    $this->ajaxResponse($this->lang('ACTIVATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -723,13 +743,13 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    $this->getCache()->erase('report');
-                    Event::fire('admin.log', array('deactivate success', 'Report ids: '.implode(',', $ids)));
-                    echo $this->lang('DEACTIVATE_SUCCESS');
+                    Event::fire('admin.log', array('deactivate success', 'Report ids: ' . implode(',', $ids)));
+                    $this->getCache()->erase('actions');
+                    $this->ajaxResponse($this->lang('DEACTIVATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -759,13 +779,13 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('approve success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->erase('report');
-                    echo $this->lang('UPDATE_SUCCESS');
+                    Event::fire('admin.log', array('approve success', 'Report ids: ' . implode(',', $ids)));
+                    $this->getCache()->erase('actions');
+                    $this->ajaxResponse($this->lang('UPDATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -794,30 +814,30 @@ class ReportController extends Controller
                 }
 
                 if (empty($errors)) {
-                    Event::fire('admin.log', array('reject success', 'Action ids: '.implode(',', $ids)));
-                    $this->getCache()->erase('report');
-                    echo $this->lang('UPDATE_SUCCESS');
+                    Event::fire('admin.log', array('reject success', 'Report ids: ' . implode(',', $ids)));
+                    $this->getCache()->erase('actions');
+                    $this->ajaxResponse($this->lang('UPDATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
             default:
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 break;
         }
     }
 
     /**
      * Response for ajax call from datatables plugin.
-     * 
+     *
      * @before _secured, _participant
      */
     public function load()
     {
-        $this->_disableView();
+        $this->disableView();
 
         $page = (int) RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
@@ -957,7 +977,7 @@ class ReportController extends Controller
 
     /**
      * Show help for report section.
-     * 
+     *
      * @before _secured, _participant
      */
     public function help()
@@ -966,12 +986,17 @@ class ReportController extends Controller
 
     /**
      * Load concept into active form.
-     * 
+     *
      * @before _secured, _participant
      */
     public function loadConcept($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
+
         $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
         if (null !== $concept) {
@@ -985,11 +1010,9 @@ class ReportController extends Controller
                 'metadescription' => $concept->getMetaDescription(),
             );
 
-            echo json_encode($conceptArr);
-            exit;
+            $this->ajaxResponse(json_encode($conceptArr));
         } else {
-            echo $this->lang('NOT_FOUND');
-            exit;
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         }
     }
 

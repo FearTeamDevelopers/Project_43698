@@ -14,53 +14,6 @@ use THCFrame\Core\Lang;
  */
 class Controller extends BaseController
 {
-    /**
-     * Store security context object.
-     *
-     * @var THCFrame\Security\Security
-     * @read
-     */
-    protected $_security;
-
-    /**
-     * Store initialized cache object.
-     *
-     * @var THCFrame\Cache\Cache
-     * @read
-     */
-    protected $_cache;
-
-    /**
-     * Store configuration.
-     *
-     * @var THCFrame\Configuration\Configuration
-     * @read
-     */
-    protected $_config;
-
-    /**
-     * Store language extension.
-     *
-     * @var THCFrame\Core\Lang
-     * @read
-     */
-    protected $_lang;
-
-    /**
-     * Store server host name.
-     *
-     * @var string
-     * @read
-     */
-    protected $_serverHost;
-    
-    /**
-     * Store device type from Mobile Detect class
-     * 
-     * @var string
-     * @read
-     */
-    protected $_deviceType;
 
     /**
      * @param type $options
@@ -69,14 +22,7 @@ class Controller extends BaseController
     {
         parent::__construct($options);
 
-        $this->_security = Registry::get('security');
-        $this->_serverHost = RequestMethods::server('HTTP_HOST');
-        $this->_cache = Registry::get('cache');
-        $this->_config = Registry::get('configuration');
-        $this->_lang = Lang::getInstance();
-        $this->_deviceType = Registry::get('session')->get('devicetype');
-
-        // schedule disconnect from database 
+        // schedule disconnect from database
         Event::add('framework.controller.destruct.after', function ($name) {
             Registry::get('database')->disconnectAll();
         });
@@ -116,7 +62,7 @@ class Controller extends BaseController
      *
      * @return type
      */
-    protected function _createUrlKey($string)
+    protected function createUrlKey($string)
     {
         $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
         $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
@@ -131,7 +77,7 @@ class Controller extends BaseController
      * @param type $page
      * @param type $path
      */
-    protected function _pagerMetaLinks($pageCount, $page, $path)
+    protected function pagerMetaLinks($pageCount, $page, $path)
     {
         if ($pageCount > 1) {
             $prevPage = $page - 1;
@@ -152,56 +98,11 @@ class Controller extends BaseController
     /**
      * Disable view, used for ajax calls.
      */
-    protected function _disableView()
+    protected function disableView()
     {
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
         header('Content-Type: text/html; charset=utf-8');
-    }
-
-    /**
-     * @param type $body
-     * @param type $subject
-     * @param type $sendTo
-     * @param type $sendFrom
-     *
-     * @return bool
-     */
-    protected function _sendEmail($body, $subject, $sendTo = null, $sendFrom = null)
-    {
-        try {
-            require_once APP_PATH.'/vendors/swiftmailer/swift_required.php';
-            $transport = \Swift_MailTransport::newInstance();
-            $mailer = \Swift_Mailer::newInstance($transport);
-
-            $message = \Swift_Message::newInstance(null)
-                    ->setSubject($subject)
-                    ->setBody($body, 'text/html');
-
-            if (null === $sendTo) {
-                $message->setTo($this->getConfig()->system->adminemail);
-            } else {
-                $message->setTo($sendTo);
-            }
-
-            if (null === $sendFrom) {
-                $message->setFrom('info@hastrman.cz');
-            } else {
-                $message->setFrom($sendFrom);
-            }
-
-            if ($mailer->send($message)) {
-                return true;
-            } else {
-                Event::fire('admin.log', array('fail', 'No email sent'));
-
-                return false;
-            }
-        } catch (\Exception $ex) {
-            Event::fire('admin.log', array('fail', 'Error while sending email: '.$ex->getMessage()));
-
-            return false;
-        }
     }
 
     /**
@@ -210,7 +111,7 @@ class Controller extends BaseController
     public function _secured()
     {
         $session = Registry::get('session');
-        $user = $this->_security->getUser();
+        $user = $this->getSecurity()->getUser();
 
         if (!$user) {
             $this->_willRenderActionView = false;
@@ -224,8 +125,8 @@ class Controller extends BaseController
         } else {
             $view = $this->getActionView();
 
-            $view->infoMessage('Byl jste odhlášen z důvodu dlouhé neaktivity');
-            $this->_security->logout();
+            $view->infoMessage($this->lang('LOGIN_TIMEOUT'));
+            $this->getSecurity()->logout();
             self::redirect('/');
         }
     }
@@ -235,7 +136,7 @@ class Controller extends BaseController
      */
     public function _member()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_member') !== true) {
+        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_member') !== true) {
             throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
@@ -245,7 +146,7 @@ class Controller extends BaseController
      */
     protected function isMember()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_member') === true) {
+        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_member') === true) {
             return true;
         } else {
             return false;
@@ -257,7 +158,7 @@ class Controller extends BaseController
      */
     public function _participant()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_participant') !== true) {
+        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_participant') !== true) {
             throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
@@ -267,7 +168,7 @@ class Controller extends BaseController
      */
     protected function isParticipant()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_participant') === true) {
+        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_participant') === true) {
             return true;
         } else {
             return false;
@@ -279,7 +180,7 @@ class Controller extends BaseController
      */
     public function getUser()
     {
-        return $this->_security->getUser();
+        return $this->getSecurity()->getUser();
     }
 
     /**
@@ -294,7 +195,7 @@ class Controller extends BaseController
     }
 
     /**
-     * 
+     *
      */
     public function render()
     {
@@ -302,23 +203,23 @@ class Controller extends BaseController
         $layoutView = $this->getLayoutView();
 
         if ($view) {
-            $view->set('authUser', $this->_security->getUser())
+            $view->set('authUser', $this->getSecurity()->getUser())
                     ->set('deviceType', $this->getDeviceType())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
                     ->set('submstoken', $this->_mutliSubmissionProtectionToken())
-                    ->set('token', $this->_security->getCSRF()->getToken());
+                    ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 
         if ($layoutView) {
-            $layoutView->set('authUser', $this->_security->getUser())
+            $layoutView->set('authUser', $this->getSecurity()->getUser())
                     ->set('deviceType', $this->getDeviceType())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
                     ->set('submstoken', $this->_mutliSubmissionProtectionToken())
-                    ->set('token', $this->_security->getCSRF()->getToken());
+                    ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 
         parent::render();

@@ -79,7 +79,7 @@ class ReportController extends Controller
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($reportsPageCount, $page, '/reportaze/p/');
+        $this->pagerMetaLinks($reportsPageCount, $page, '/reportaze/p/');
 
         $view->set('reports', $reports)
                 ->set('currentpage', $page)
@@ -129,7 +129,7 @@ class ReportController extends Controller
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($reportsPageCount, $page, '/archiv-reportazi/p/');
+        $this->pagerMetaLinks($reportsPageCount, $page, '/archiv-reportazi/p/');
 
         $view->set('reports', $reports)
                 ->set('currentpage', $page)
@@ -164,7 +164,7 @@ class ReportController extends Controller
                 ->set('comments', $comments);
 
         if (RequestMethods::post('submitAddComment')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/reportaze/r/'.$report->getId());
             }

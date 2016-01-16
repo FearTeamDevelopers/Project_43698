@@ -9,9 +9,9 @@ use THCFrame\Model\Model;
 use THCFrame\Core\Core;
 
 /**
- * The Database\Connector\Mysql class defines a handful of adaptable 
- * properties and methods used to perform MySQLi class-specific functions, 
- * and return MySQLi class-specific properties. We want to isolate these from 
+ * The Database\Connector\Mysql class defines a handful of adaptable
+ * properties and methods used to perform MySQLi class-specific functions,
+ * and return MySQLi class-specific properties. We want to isolate these from
  * the outside so that our system is essentially plug-and-play
  */
 class Mysql extends Database\Connector
@@ -71,7 +71,7 @@ class Mysql extends Database\Connector
 
     /**
      * Class constructor
-     * 
+     *
      * @param array $options
      */
     public function __construct($options = array())
@@ -89,7 +89,7 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * 
+     *
      * @param type $query
      * @param type $runQuery
      * @return type
@@ -112,7 +112,7 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * 
+     *
      * @param type $error
      * @param type $sql
      */
@@ -127,7 +127,7 @@ class Mysql extends Database\Connector
     /**
      * Method is used to ensure that the value of the
      * $_service is a valid MySQLi instance
-     * 
+     *
      * @return boolean
      */
     protected function _isValidService()
@@ -143,7 +143,7 @@ class Mysql extends Database\Connector
 
     /**
      * Method attempts to connect to the MySQL server at the specified host/port
-     * 
+     *
      * @return \THCFrame\Database\Connector\Mysql
      * @throws Exception\Service
      */
@@ -169,7 +169,7 @@ class Mysql extends Database\Connector
 
     /**
      * Method attempts to disconnect the $_service instance from the MySQL service
-     * 
+     *
      * @return \THCFrame\Database\Connector\Mysql
      */
     public function disconnect()
@@ -184,7 +184,7 @@ class Mysql extends Database\Connector
 
     /**
      * Return query object for specific connector
-     * 
+     *
      * @return \THCFrame\Database\Database\Query\Mysql
      */
     public function query()
@@ -196,7 +196,7 @@ class Mysql extends Database\Connector
 
     /**
      * Method execute sql query by using prepared statements
-     * 
+     *
      * @param string $sql
      * @return mysqli_stmt
      * @throws Exception\Service
@@ -283,7 +283,7 @@ class Mysql extends Database\Connector
 
     /**
      * Escapes values
-     * 
+     *
      * @param mixed $value
      * @return mixed
      * @throws Exception\Service
@@ -310,7 +310,7 @@ class Mysql extends Database\Connector
 
     /**
      * Returns last inserted id
-     * 
+     *
      * @return integer
      * @throws Exception\Service
      */
@@ -325,7 +325,7 @@ class Mysql extends Database\Connector
 
     /**
      * Returns count of affected rows by last query
-     * 
+     *
      * @return integer
      * @throws Exception\Service
      */
@@ -340,7 +340,7 @@ class Mysql extends Database\Connector
 
     /**
      * Return last error
-     * 
+     *
      * @return string
      * @throws Exception\Service
      */
@@ -381,7 +381,7 @@ class Mysql extends Database\Connector
 
     /**
      * Retrun columns in table with field name as key
-     * 
+     *
      * @param string $tableName
      * @return array
      */
@@ -390,17 +390,19 @@ class Mysql extends Database\Connector
         $sqlResult = $this->execute('SHOW FULL COLUMNS FROM ' . $tableName);
         $columns = array();
 
-        while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
-            $field = $row['Field'];
-            unset($row['Field']);
-            $columns[$field] = $row;
+        if (!empty($sqlResult)) {
+            while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
+                $field = $row['Field'];
+                unset($row['Field']);
+                $columns[$field] = $row;
+            }
         }
 
         return $columns;
     }
 
     /**
-     * 
+     *
      * @param type $modelColumns
      * @param type $databaseColumns
      */
@@ -419,28 +421,31 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * 
+     *
      * @param type $table
      */
     protected function _dropForeignKeys($table)
     {
         $fkResult = $this->execute(
-                "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME 
+                "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME
                         from INFORMATION_SCHEMA.KEY_COLUMN_USAGE i
-                        where i.TABLE_SCHEMA = '{$this->getSchema()}' and i.TABLE_NAME = '{$table}' 
+                        where i.TABLE_SCHEMA = '{$this->getSchema()}' and i.TABLE_NAME = '{$table}'
                         and i.referenced_column_name is not NULL;");
 
         $queries = array();
-        while ($row = $fkResult->fetch_array(MYSQLI_ASSOC)) {
-            $queries[] = "ALTER TABLE {$table} DROP FOREIGN KEY {$row['CONSTRAINT_NAME']}";
+
+        if (!empty($fkResult)) {
+            while ($row = $fkResult->fetch_array(MYSQLI_ASSOC)) {
+                $queries[] = "ALTER TABLE {$table} DROP FOREIGN KEY {$row['CONSTRAINT_NAME']}";
+            }
         }
-        
+
         return $queries;
     }
 
     /**
      * Prepare queries to execute
-     * 
+     *
      * @param Model $model
      * @param string $queryType
      * @param bool $dropIfExists
@@ -563,7 +568,7 @@ class Mysql extends Database\Connector
     /**
      * Get type of alter. If column exists in database retunr modify.
      * If column does not exists in database return add.
-     * 
+     *
      * @param string $columnName
      * @param array $databaseColumns
      * @return string
@@ -578,20 +583,20 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * Method converts the class/properties into a valid SQL query, and 
-     * ultimately into a physical database table. It does this by first 
-     * getting a list of the columns, by calling the model’s getColumns() method. 
+     * Method converts the class/properties into a valid SQL query, and
+     * ultimately into a physical database table. It does this by first
+     * getting a list of the columns, by calling the model’s getColumns() method.
      * Looping over the columns, it creates arrays of indices and field strings.
-     * After all the field strings have been created, they are joined (along with the indices), 
+     * After all the field strings have been created, they are joined (along with the indices),
      * and applied to the CREATE TABLE or ALTER TABLE $template string.
-     * 
+     *
      * @param Model $model
      * @return \THCFrame\Database\Connector\Mysql
      * @throws Exception\Sql
      */
     public function sync(Model $model, $runQuery = true, $queryType = 'alter', $dropIfExists = true)
     {
-        Core::getLogger()->log('---------- Sync Start ----------', 'sync', true, 'DbModelSync.log');
+        Core::getLogger()->log('---------- '.  get_class($model).' - Sync Start ----------', 'sync', true, 'DbModelSync.log');
 
         $queries = $this->_prepareQueries($model, $queryType, $dropIfExists);
 
@@ -609,19 +614,19 @@ class Mysql extends Database\Connector
             $this->execute('SET foreign_key_checks = 1;');
         } catch (\Exception $ex) {
             Core::getLogger()->log($ex->getMessage(), 'sync', true, 'DbModelSync.log');
-            Core::getLogger()->log('---------- Sync was finished with errors ----------', 'sync', true, 'DbModelSync.log');
+            Core::getLogger()->log('---------- '.  get_class($model).' - Sync was finished with errors ----------', 'sync', true, 'DbModelSync.log');
             $this->rollbackTransaction();
             return false;
         }
 
         $this->commitTransaction();
-        Core::getLogger()->log('---------- Sync was finished without errors ----------', 'sync', true, 'DbModelSync.log');
+        Core::getLogger()->log('---------- '.  get_class($model).' - Sync was finished without errors ----------', 'sync', true, 'DbModelSync.log');
 
         return true;
     }
 
     /**
-     * 
+     *
      */
     public function getDatabaseSize()
     {
@@ -643,7 +648,7 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function ping()

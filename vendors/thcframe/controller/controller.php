@@ -9,6 +9,8 @@ use THCFrame\Registry\Registry;
 use THCFrame\Controller\Exception;
 use THCFrame\View\Exception as ViewException;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Request\Response;
+use THCFrame\Core\Lang;
 
 /**
  * Parent controller class
@@ -18,7 +20,7 @@ class Controller extends Base
 
     /**
      * Controller name
-     * 
+     *
      * @read
      * @var string
      */
@@ -80,19 +82,71 @@ class Controller extends Base
     protected $_defaultContentType = 'text/html';
 
     /**
-     * 
-     * @return type
+     * Store device type from Mobile Detect class
+     *
+     * @var string
+     * @read
      */
-    protected function getName()
-    {
-        if (empty($this->_name)) {
-            $this->_name = get_class($this);
-        }
-        return $this->_name;
-    }
+    protected $_deviceType;
 
     /**
-     * 
+     * Response object
+     *
+     * @read
+     * @var THCFrame\Request\Response
+     */
+    protected $_response;
+
+    /**
+     * Store security context object.
+     *
+     * @var THCFrame\Security\Security
+     * @read
+     */
+    protected $_security;
+
+    /**
+     * Store initialized cache object.
+     *
+     * @var THCFrame\Cache\Cache
+     * @read
+     */
+    protected $_cache;
+
+    /**
+     * Store configuration.
+     *
+     * @var THCFrame\Configuration\Configuration
+     * @read
+     */
+    protected $_config;
+
+    /**
+     * Store language extension.
+     *
+     * @var THCFrame\Core\Lang
+     * @read
+     */
+    protected $_lang;
+
+    /**
+     * Store server host name.
+     *
+     * @var string
+     * @read
+     */
+    protected $_serverHost;
+
+    /**
+     * Session object
+     *
+     * @read
+     * @var THCFrame\Session\Driver
+     */
+    protected $_session;
+
+    /**
+     *
      * @param type $method
      * @return \THCFrame\Session\Exception\Implementation
      */
@@ -102,48 +156,45 @@ class Controller extends Base
     }
 
     /**
-     * 
+     *
      */
     protected function _mutliSubmissionProtectionToken()
     {
-        $session = Registry::get('session');
-        $token = $session->get('submissionprotection');
+        $token = $this->_session->get('submissionprotection');
 
         if ($token === null) {
             $token = md5(microtime());
-            $session->set('submissionprotection', $token);
+            $this->_session->set('submissionprotection', $token);
         }
 
         return $token;
     }
 
     /**
-     * 
+     *
      * @return type
      */
     protected function _revalidateMutliSubmissionProtectionToken()
     {
-        $session = Registry::get('session');
-        $session->erase('submissionprotection');
+        $this->_session->erase('submissionprotection');
         $token = md5(microtime());
-        $session->set('submissionprotection', $token);
+        $this->_session->set('submissionprotection', $token);
 
         return $token;
     }
 
     /**
-     * 
+     *
      * @param type $token
      */
     protected function _checkMutliSubmissionProtectionToken()
     {
-        $session = Registry::get('session');
-        $sessionToken = $session->get('submissionprotection');
+        $this->_sessionToken = $this->_session->get('submissionprotection');
 
         $token = RequestMethods::post('submstoken');
 
-        if ($token == $sessionToken) {
-            $session->erase('submissionprotection');
+        if ($token == $this->_sessionToken) {
+            $this->_session->erase('submissionprotection');
             return true;
         } else {
             return false;
@@ -151,22 +202,30 @@ class Controller extends Base
     }
 
     /**
-     * 
+     *
+     * @param type $message
+     * @param type $status
+     * @param type $error
      */
-    protected function _checkCSRFToken()
+    protected function ajaxResponse($message, $error = false, $status = 200, array $additionalData = array())
     {
-        $security = Registry::get('security');
-        
-        if ($security->getCSRF()->verifyRequest()) {
-            return true;
-        } else {
-            return false;
-        }
+        $data = array(
+            'message' => $message,
+            'error' => (bool) $error,
+            'csrf' => $this->getSecurity()->getCsrf()->getToken(),
+                ) + $additionalData;
+
+        $this->_response->setHttpVersionStatusHeader('HTTP/1.1 ' . (int) $status . ' ' . $this->_response->getStatusMessageByCode($status))
+                ->setHeader('Content-type', 'application/json')
+                ->setData($data);
+
+        $this->_response->sendHeaders();
+        $this->_response->send();
     }
 
     /**
      * Static function for redirects
-     * 
+     *
      * @param string $url
      */
     public static function redirect($url = null)
@@ -174,7 +233,7 @@ class Controller extends Base
         $schema = 'http';
         $host = RequestMethods::server('HTTP_HOST');
 
-        if (NULL === $url) {
+        if ($url === null) {
             header("Location: {$schema}://{$host}");
             exit;
         } else {
@@ -185,7 +244,7 @@ class Controller extends Base
 
     /**
      * Object constructor
-     * 
+     *
      * @param array $options
      */
     public function __construct($options = array())
@@ -196,8 +255,15 @@ class Controller extends Base
 
         //get resources
         $configuration = Registry::get('configuration');
-        $session = Registry::get('session');
         $router = Registry::get('router');
+
+        $this->_response = new Response();
+        $this->_session = Registry::get('session');
+        $this->_security = Registry::get('security');
+        $this->_serverHost = RequestMethods::server('HTTP_HOST');
+        $this->_cache = Registry::get('cache');
+        $this->_config = Registry::get('configuration');
+        $this->_lang = Lang::getInstance();
 
         if (!empty($configuration->view)) {
             $this->_defaultExtension = explode(',', $configuration->view->extension);
@@ -214,7 +280,7 @@ class Controller extends Base
         $controller = $router->getLastRoute()->getController();
         $action = $router->getLastRoute()->getAction();
 
-        $deviceType = $session->get('devicetype');
+        $deviceType = $this->getDeviceType();
 
         if ($deviceType == 'phone' && $this->_mobileLayout != '') {
             $defaultLayout = $this->_mobileLayout;
@@ -274,7 +340,7 @@ class Controller extends Base
 
     /**
      * Return action view
-     * 
+     *
      * @return View
      */
     public function getActionView()
@@ -284,7 +350,7 @@ class Controller extends Base
 
     /**
      * Return layout view
-     * 
+     *
      * @return View
      */
     public function getLayoutView()
@@ -294,7 +360,7 @@ class Controller extends Base
 
     /**
      * Return model instance
-     * 
+     *
      * @param string $model Format: module/model_name
      * @param null|array $options
      */
@@ -319,8 +385,34 @@ class Controller extends Base
     }
 
     /**
+     * Return device type string
+     *
+     * @return string
+     */
+    public function getDeviceType()
+    {
+        $detect = Registry::get('mobiledetect');
+
+        $deviceType = $this->_session->get('deviceType');
+
+        if ($deviceType === null) {
+            if ($detect->isMobile() && !$detect->isTablet()) {
+                $deviceType = 'phone';
+            } elseif ($detect->isTablet() && !$detect->isMobile()) {
+                $deviceType = 'tablet';
+            } else {
+                $deviceType = 'computer';
+            }
+
+            $this->_session->set('deviceType', $deviceType);
+        }
+
+        return $deviceType;
+    }
+
+    /**
      * Main render method
-     * 
+     *
      * @throws View\Exception\Renderer
      */
     public function render()
@@ -348,17 +440,25 @@ class Controller extends Base
                 $results = $this->_layoutView->render();
                 $profiler->stop();
 
-                //protection against clickjacking
-                header('X-Frame-Options: deny');
-                header("Content-type: {$defaultContentType}");
-                echo $results;
+                //protection against clickjacking and xss
+                $this->_response->setHeader('X-Frame-Options', 'deny')
+                        ->setHeader('X-XSS-Protection', '1; mode=block')
+                        ->setHeader('Content-type', $defaultContentType)
+                        ->setBody($results);
+
+                $this->_response->sendHeaders()
+                        ->send(false);
             } elseif ($doAction) {
                 $profiler->stop();
 
-                //protection against clickjacking
-                header('X-Frame-Options: deny');
-                header("Content-type: {$defaultContentType}");
-                echo $results;
+                //protection against clickjacking and xss
+                $this->_response->setHeader('X-Frame-Options', 'deny')
+                        ->setHeader('X-XSS-Protection', '1; mode=block')
+                        ->setHeader('Content-type', $defaultContentType)
+                        ->setBody($results);
+
+                $this->_response->sendHeaders()
+                        ->send(false);
             }
 
             $this->_willRenderLayoutView = false;

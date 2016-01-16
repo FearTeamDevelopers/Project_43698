@@ -131,42 +131,44 @@ class Router extends Base
     /**
      * Create routes
      */
-    private function _createRoutes(array $routes)
+    private function _createRoutes(array $routes = array())
     {
-        foreach ($routes as $route) {
-            $new_route = new Route\Dynamic(array('pattern' => $route['pattern']));
+        if (!empty($routes)) {
+            foreach ($routes as $route) {
+                $newRoute = new Route\Dynamic(array('pattern' => $route['pattern']));
 
-            if (preg_match('/^:/', $route['module'])) {
-                $new_route->addDynamicElement(':module', ':module');
-            } else {
-                $new_route->setModule($route['module']);
-            }
+                if (preg_match('/^:/', $route['module'])) {
+                    $newRoute->addDynamicElement(':module', ':module');
+                } else {
+                    $newRoute->setModule($route['module']);
+                }
 
-            if (preg_match('/^:/', $route['controller'])) {
-                $new_route->addDynamicElement(':controller', ':controller');
-            } else {
-                $new_route->setController($route['controller']);
-            }
+                if (preg_match('/^:/', $route['controller'])) {
+                    $newRoute->addDynamicElement(':controller', ':controller');
+                } else {
+                    $newRoute->setController($route['controller']);
+                }
 
-            if (preg_match('/^:/', $route['action'])) {
-                $new_route->addDynamicElement(':action', ':action');
-            } else {
-                $new_route->setAction($route['action']);
-            }
+                if (preg_match('/^:/', $route['action'])) {
+                    $newRoute->addDynamicElement(':action', ':action');
+                } else {
+                    $newRoute->setAction($route['action']);
+                }
 
-            if (isset($route['args']) && is_array($route['args'])) {
-                foreach ($route['args'] as $arg) {
-                    if (preg_match('/^:/', $arg)) {
-                        $new_route->addDynamicElement($arg, $arg);
+                if (isset($route['args']) && is_array($route['args'])) {
+                    foreach ($route['args'] as $arg) {
+                        if (preg_match('/^:/', $arg)) {
+                            $newRoute->addDynamicElement($arg, $arg);
+                        }
+                    }
+                } elseif (isset($route['args']) && !is_array($route['args'])) {
+                    if (preg_match('/^:/', $route['args'])) {
+                        $newRoute->addDynamicElement($route['args'], $route['args']);
                     }
                 }
-            } elseif (isset($route['args']) && !is_array($route['args'])) {
-                if (preg_match('/^:/', $route['args'])) {
-                    $new_route->addDynamicElement($route['args'], $route['args']);
-                }
-            }
 
-            $this->addRoute($new_route);
+                $this->addRoute($newRoute);
+            }
         }
     }
 
@@ -180,7 +182,7 @@ class Router extends Base
         Event::fire('framework.router.findroute.checkredirect.before', array($path));
 
         if (!empty($this->_redirects)) {
-            if (array_key_exists($path, $this->_redirects)) {
+            if (isset($this->_redirects[$path])) {
                 $path = $this->_redirects[$path];
             }
         }
@@ -189,7 +191,7 @@ class Router extends Base
         Event::fire('framework.router.findroute.before', array($path));
 
         foreach ($this->_routes as $route) {
-            if (TRUE === $route->matchMap($path)) {
+            if ($route->matchMap($path) === true) {
                 $this->_lastRoute = $route;
                 break;
             }

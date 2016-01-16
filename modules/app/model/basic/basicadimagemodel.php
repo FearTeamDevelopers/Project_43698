@@ -3,7 +3,7 @@
 namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicAdimageModel extends Model 
 {
 
@@ -35,7 +35,6 @@ class BasicAdimageModel extends Model
      * @length 11
      * @validate required,numeric,max(11)
      * @unsigned
-     * @null
      */
     protected $_userId;
 
@@ -75,7 +74,6 @@ class BasicAdimageModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -85,8 +83,95 @@ class BasicAdimageModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getAdId()
+    {
+        return $this->_adId;
+    }
+
+    public function setAdId($value)
+    {
+        $this->_adId = $value;
+        return $this;
+    }
+
+    public function getUserId()
+    {
+        return $this->_userId;
+    }
+
+    public function setUserId($value)
+    {
+        $this->_userId = $value;
+        return $this;
+    }
+
+    public function getPhotoName()
+    {
+        return $this->_photoName;
+    }
+
+    public function setPhotoName($value)
+    {
+        $this->_photoName = $value;
+        return $this;
+    }
+
+    public function getImgThumb()
+    {
+        return $this->_imgThumb;
+    }
+
+    public function setImgThumb($value)
+    {
+        $this->_imgThumb = $value;
+        return $this;
+    }
+
+    public function getImgMain()
+    {
+        return $this->_imgMain;
+    }
+
+    public function setImgMain($value)
+    {
+        $this->_imgMain = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

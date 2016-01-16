@@ -9,13 +9,13 @@ use THCFrame\Router\Model\RedirectModel;
 use THCFrame\Core\Core;
 
 /**
- * 
+ *
  */
 class RedirectController extends Controller
 {
     /**
      * Get list of all redirects.
-     * 
+     *
      * @before _secured, _superadmin
      */
     public function index()
@@ -27,7 +27,7 @@ class RedirectController extends Controller
 
     /**
      * Create new redirect.
-     * 
+     *
      * @before _secured, _superadmin
      */
     public function add()
@@ -38,7 +38,7 @@ class RedirectController extends Controller
         $view->set('modules', $modules);
 
         if (RequestMethods::post('submitAddRedirect')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/redirect/');
             }
@@ -67,7 +67,7 @@ class RedirectController extends Controller
 
     /**
      * Edit existing redirect.
-     * 
+     *
      * @before _secured, _superadmin
      *
      * @param int $id redirect id
@@ -89,7 +89,7 @@ class RedirectController extends Controller
                 ->set('modules', $modules);
 
         if (RequestMethods::post('submitEditRedirect')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/redirect/');
             }
 
@@ -114,29 +114,33 @@ class RedirectController extends Controller
 
     /**
      * Delete existing redirect.
-     * 
+     *
      * @before _secured, _superadmin
      *
      * @param int $id redirect id
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $redirect = RedirectModel::first(
                         array('id = ?' => (int) $id), array('id')
         );
 
         if (null === $redirect) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($redirect->delete()) {
                 $this->getCache()->invalidate();
                 Event::fire('admin.log', array('success', 'Redirect id: '.$id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Redirect id: '.$id));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }

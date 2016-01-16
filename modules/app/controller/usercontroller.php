@@ -11,7 +11,7 @@ use THCFrame\Registry\Registry;
 use THCFrame\Core\StringMethods;
 
 /**
- * 
+ *
  */
 class UserController extends Controller
 {
@@ -41,7 +41,7 @@ class UserController extends Controller
                 ->set('canonical', $canonical);
 
         if (RequestMethods::post('submitLogin')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/prihlasit');
             }
 
@@ -122,7 +122,7 @@ class UserController extends Controller
             exit;
         }
 
-        $this->_disableView();
+        $this->disableView();
 
         $this->getSecurity()->logout();
         self::redirect('/');
@@ -145,7 +145,7 @@ class UserController extends Controller
                 ->set('canonical', $canonical);
 
         if (RequestMethods::post('register')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/');
             }
@@ -215,15 +215,20 @@ class UserController extends Controller
             if (empty($errors) && $user->validate()) {
                 $uid = $user->save();
 
+                $mailer = new \THCFrame\Mailer\Mailer();
+
                 //odeslani notifikace administratorum, ze byl zaregistrovan novy uzivatel
                 if ($adminAccountActivation) {
                     $admins = \App\Model\UserModel::fetchAdminsEmail();
 
                     $data = array('{USERNAME}' => $user->getWholeName(), '{USEREMAIL}' => $user->getEmail());
-                    $email = \Admin\Model\EmailModel::loadAndPrepare('new-registration-notification', $data);
-                    $email->setRecipient($admins);
+                    $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('new-registration-notification', $data);
+                    $mailer->setBody($emailTpl->getBody())
+                            ->setBody($emailTpl->getSubject())
+                            ->setFrom('registrace@hastrman.cz')
+                            ->setSendTo($admins);
 
-                    if ($email->send(false, 'registrace@hastrman.cz')) {
+                    if ($mailer->send()) {
                         Event::fire('app.log', array('success', 'Notification email about new registration to admin'));
                         $view->successMessage($this->lang('REGISTRATION_SUCCESS_ADMIN_ACTIVATION'));
                     } else {
@@ -233,10 +238,13 @@ class UserController extends Controller
                     }
                 } elseif ($verifyEmail) { //odeslani overovaciho emailu
                     $data = array('{TOKEN}' => $actToken);
-                    $email = \Admin\Model\EmailModel::loadAndPrepare('email-verification', $data);
-                    $email->setRecipient($user->getEmail());
+                    $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('email-verification', $data);
+                    $mailer->setBody($emailTpl->getBody())
+                            ->setBody($emailTpl->getSubject())
+                            ->setFrom('registrace@hastrman.cz')
+                            ->setSendTo($user->getEmail());
 
-                    if ($email->send(false, 'registrace@hastrman.cz')) {
+                    if ($mailer->send()) {
                         Event::fire('app.log', array('success', 'User Id with email activation: ' . $uid));
                         $view->successMessage($this->lang('REGISTRATION_EMAIL_SUCCESS'));
                     } else {
@@ -261,7 +269,7 @@ class UserController extends Controller
 
     /**
      * Edit user currently logged in.
-     * 
+     *
      * @before _secured, _member
      */
     public function profile()
@@ -290,7 +298,7 @@ class UserController extends Controller
                 ->set('myactions', $myActions);
 
         if (RequestMethods::post('editProfile')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/muj-profil');
             }
 
@@ -348,7 +356,7 @@ class UserController extends Controller
 
     /**
      * Activate account via activation link send by email.
-     * 
+     *
      * @param string $key activation token
      */
     public function activateAccount($key)
@@ -395,7 +403,7 @@ class UserController extends Controller
                 ->set('metatitle', 'Hastrman - Feedback');
 
         if (RequestMethods::post('submitFeedback')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/feedback');
             }
@@ -432,7 +440,7 @@ class UserController extends Controller
     }
 
     /**
-     * 
+     *
      */
     public function eprivacy()
     {

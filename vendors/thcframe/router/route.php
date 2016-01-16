@@ -11,7 +11,7 @@ use THCFrame\Router\Exception;
  * All of the protected properties relate to the variables provided when a 
  * new Router\Route (or subclass) instance are created, and contain information about the URL requested.
  */
-class Route extends Base
+abstract class Route extends Base
 {
 
     /**
@@ -56,4 +56,5 @@ class Route extends Base
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
+    abstract public function matchMap($pathToMatch);
 }

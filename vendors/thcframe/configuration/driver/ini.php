@@ -18,19 +18,13 @@ class Ini extends Configuration\Driver
      * @readwrite
      * @var type 
      */
-    private $_parsed;
-
-    /**
-     * @readwrite
-     * @var type 
-     */
     private $_defaultConfig;
 
     /**
      * @readwrite
      * @var type 
      */
-    private $_configArrMerged;
+    private $_configuration;
 
     /**
      * Class constructor
@@ -41,9 +35,9 @@ class Ini extends Configuration\Driver
     {
         parent::__construct($options);
 
-        $this->_parseDefault('./vendors/thcframe/configuration/default/defaultConfig.ini');
+        $this->_parse('./vendors/thcframe/configuration/default/defaultConfig.ini', true);
 
-        switch ($this->getEnv()) {
+        switch (strtolower($this->getEnv())) {
             case 'dev': {
                     $this->_parse('./application/configuration/config_dev.ini');
                     break;
@@ -58,9 +52,7 @@ class Ini extends Configuration\Driver
                 }
         }
 
-        $this->_configArrMerged = $this->_mergeConfiguration();
-        $this->_parsed = ArrayMethods::toObject($this->_configArrMerged);
-        Registry::set('configuration', $this->_parsed);
+        $this->_configuration = ArrayMethods::toObject($this->_mergeConfiguration());
     }
 
     /**
@@ -71,41 +63,7 @@ class Ini extends Configuration\Driver
      */
     protected function _mergeConfiguration()
     {
-        return array_replace_recursive($this->_defaultConfig, $this->_parsed);
-    }
-
-    /**
-     * Method is same as parse() method. This one is preparing default
-     * configuration
-     * 
-     * @param string $path
-     */
-    protected function _parseDefault($path)
-    {
-        if (empty($path) || !file_exists($path)) {
-            throw new Exception\Argument('Path argument is not valid');
-        }
-
-        if (!isset($this->_defaultConfig)) {
-            $config = array();
-
-            ob_start();
-            include($path);
-            $string = ob_get_contents();
-            ob_end_clean();
-
-            $pairs = parse_ini_string($string);
-
-            if ($pairs == false) {
-                throw new Exception\Syntax('Could not parse configuration file');
-            }
-
-            foreach ($pairs as $key => $value) {
-                $config = $this->_pair($config, $key, $value);
-            }
-
-            $this->_defaultConfig = $config;
-        }
+        return array_replace_recursive($this->_defaultConfig, $this->_configuration);
     }
 
     /**
@@ -153,13 +111,13 @@ class Ini extends Configuration\Driver
      * @throws Exception\Argument
      * @throws Exception\Syntax
      */
-    protected function _parse($path)
+    protected function _parse($path, $isDefault = false)
     {
         if (empty($path) || !file_exists($path)) {
             throw new Exception\Argument('Path argument is not valid');
         }
 
-        if (!isset($this->_parsed)) {
+        if (!isset($this->_configuration)) {
             $config = array();
 
             ob_start();
@@ -177,7 +135,11 @@ class Ini extends Configuration\Driver
                 $config = $this->_pair($config, $key, $value);
             }
 
-            $this->_parsed = $config;
+            if ($isDefault === true) {
+                $this->_defaultConfig = $config;
+            } else {
+                $this->_configuration = $config;
+            }
         }
     }
 
@@ -190,12 +152,18 @@ class Ini extends Configuration\Driver
         $ca = ConfigModel::all(array(), array('xkey', 'value'));
 
         if ($ca !== null) {
-            foreach ($ca as $key => $value) {
-                $this->_configArrMerged[$value->getXkey()] = $value->getValue();
+            if ($this->_configuration instanceof \stdClass) {
+                foreach ($ca as $key => $value) {
+                    $this->_configuration->{$value->getXkey()} = $value->getValue();
+                }
+            } elseif (is_array($this->_configuration)) {
+                foreach ($ca as $key => $value) {
+                    $this->_configuration[$value->getXkey()] = $value->getValue();
+                }
+                $this->_configuration = ArrayMethods::toObject($this->_configuration);
+            } else {
+                throw new Exception\Syntax('Error while loading configuration from database');
             }
-
-            $this->_parsed = ArrayMethods::toObject($this->_configArrMerged);
-            Registry::set('configuration', $this->_parsed);
         }
     }
 
@@ -203,8 +171,9 @@ class Ini extends Configuration\Driver
      * 
      * @return type
      */
-    public function getParsed()
+    public function getConfiguration()
     {
-        return $this->_parsed;
+        return $this->_configuration;
     }
+
 }

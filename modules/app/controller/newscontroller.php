@@ -75,7 +75,7 @@ class NewsController extends Controller
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($newsPageCount, $page, '/novinky/p/');
+        $this->pagerMetaLinks($newsPageCount, $page, '/novinky/p/');
 
         $view->set('news', $news)
                 ->set('currentpage', $page)
@@ -125,7 +125,7 @@ class NewsController extends Controller
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
-        $this->_pagerMetaLinks($newsPageCount, $page, '/archiv-novinek/p/');
+        $this->pagerMetaLinks($newsPageCount, $page, '/archiv-novinek/p/');
 
         $view->set('news', $news)
                 ->set('currentpage', $page)

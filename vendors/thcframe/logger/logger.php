@@ -31,7 +31,7 @@ class Logger extends Base
     {
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
-    
+
     /**
      * Factory method
      * It accepts initialization options and selects the type of returned object, 
@@ -43,8 +43,6 @@ class Logger extends Base
     public function initialize()
     {
         Event::fire('framework.logger.initialize.before', array($this->_type, $this->_options));
-
-        $this->_type = 'file';
 
         if (!$this->_type) {
             throw new Exception\Argument('Error in configuration file');

@@ -45,7 +45,7 @@ class GalleryController extends Controller
         );
         $galleryPageCount = ceil($galleryCount / 30);
 
-        $this->_pagerMetaLinks($galleryPageCount, $page, '/galerie/p/');
+        $this->pagerMetaLinks($galleryPageCount, $page, '/galerie/p/');
 
         $view->set('galleries', $galleries)
                 ->set('currentpage', $page)
@@ -78,7 +78,7 @@ class GalleryController extends Controller
         $photosCount = \App\Model\PhotoModel::count(array('active = ?' => true, 'galleryId = ?' => $gallery->getId()));
         $photosPageCount = ceil($photosCount / 30);
 
-        $this->_pagerMetaLinks($photosPageCount, $page, '/galerie/'.$gallery->getUrlKey().'/p/');
+        $this->pagerMetaLinks($photosPageCount, $page, '/galerie/'.$gallery->getUrlKey().'/p/');
         $canonical = 'http://'.$this->getServerHost().'/galerie/r/'.$gallery->getUrlKey();
 
         $view->set('gallery', $gallery)

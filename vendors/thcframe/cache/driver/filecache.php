@@ -33,8 +33,7 @@ class Filecache extends Cache\Driver
     protected $_mode;
     
     /**
-     *
-     * @var type 
+     * @var THCFrame\Filesystem\FileManager 
      */
     private $_fileManager;
 
@@ -144,14 +143,6 @@ class Filecache extends Cache\Driver
     {
         $this->_fileManager->remove($this->_path);
         return;
-    }
-
-    /**
-     * Alias for clearCache
-     */
-    public function invalidate()
-    {
-        $this->clearCache();
     }
 
 }

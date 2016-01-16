@@ -9,18 +9,18 @@ use THCFrame\Filesystem\FileManager;
 use THCFrame\Registry\Registry;
 
 /**
- * 
+ *
  */
 class BackupController extends Controller
 {
 
     /**
      * Remove old files from folder.
-     * 
+     *
      * @param type $path
      * @param type $days
      */
-    private function _removeOldFiles($path, $days = 7)
+    private function removeOldFiles($path, $days = 7)
     {
         $fm = new FileManager();
 
@@ -47,7 +47,7 @@ class BackupController extends Controller
     /**
      * Reconnect to the test database.
      */
-    private function _resertTestConnection()
+    private function resertTestConnection()
     {
         $oldDb = new \THCFrame\Database\Database();
         $db = $oldDb->initializeDirectly(array(
@@ -72,7 +72,7 @@ class BackupController extends Controller
     /**
      * Reconnect to the database.
      */
-    private function _resertConnections()
+    private function resertConnections()
     {
         $config = Registry::get('configuration');
         Registry::get('database')->disconnectAll();
@@ -88,15 +88,13 @@ class BackupController extends Controller
 
     /**
      * Create daily db backup by cron.
-     * 
+     *
      * @before _cron
      */
     public function dailyDatabaseBackup()
     {
-        $this->_disableView();
-
         $path = APP_PATH . '/temp/db/day/';
-        $this->_removeOldFiles($path);
+        $this->removeOldFiles($path);
 
         $dump = new Mysqldump();
         $dump->setBackupDir($path);
@@ -106,28 +104,41 @@ class BackupController extends Controller
                 Event::fire('cron.log', array('success', 'Database backup'));
             } else {
                 Event::fire('cron.log', array('fail', 'Database backup'));
-                $this->_sendEmail('Error in mysqldump class while creating database backup', 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+                $mailer = new \THCFrame\Mailer\Mailer(array(
+                    'body' => 'Error in mysqldump class while creating database backup',
+                    'subject' => 'ERROR: Cron databaseBackup'
+                ));
+
+                $mailer->setFrom('cron@hastrman.cz')
+                        ->send();
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
-            Event::fire('cron.log', array('fail', 'Database backup',
+            Event::fire('cron.log',
+                    array('fail', 'Database backup',
                 'Error: ' . $ex->getMessage(),));
 
             $message = $ex->getMessage() . PHP_EOL . $ex->getTraceAsString();
-            $this->_sendEmail('Error while creating database backup: ' . $message, 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+            $mailer = new \THCFrame\Mailer\Mailer(array(
+                'body' => 'Error in mysqldump class while creating database backup: ' . $message,
+                'subject' => 'ERROR: Cron databaseBackup'
+            ));
+
+            $mailer->setFrom('cron@hastrman.cz')
+                    ->send();
         }
     }
 
     /**
      * Create monthly db backup by cron.
-     * 
+     *
      * @before _cron
      */
     public function monthlyDatabaseBackup()
     {
-        $this->_disableView();
+        $this->disableView();
 
         $path = APP_PATH . '/temp/db/month/';
-        $this->_removeOldFiles($path);
+        $this->removeOldFiles($path);
 
         $dump = new Mysqldump();
         $dump->setBackupDir($path);
@@ -137,33 +148,46 @@ class BackupController extends Controller
                 Event::fire('cron.log', array('success', 'Database backup'));
             } else {
                 Event::fire('cron.log', array('fail', 'Database backup'));
-                $this->_sendEmail('Error in mysqldump class while creating database backup', 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+                $mailer = new \THCFrame\Mailer\Mailer(array(
+                    'body' => 'Error in mysqldump class while creating database backup',
+                    'subject' => 'ERROR: Cron databaseBackup'
+                ));
+
+                $mailer->setFrom('cron@hastrman.cz')
+                        ->send();
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
-            Event::fire('cron.log', array('fail', 'Database backup',
+            Event::fire('cron.log',
+                    array('fail', 'Database backup',
                 'Error: ' . $ex->getMessage(),));
 
             $message = $ex->getMessage() . PHP_EOL . $ex->getTraceAsString();
-            $this->_sendEmail('Error while creating database backup: ' . $message, 'ERROR: Cron databaseBackup', null, 'cron@hastrman.cz');
+            $mailer = new \THCFrame\Mailer\Mailer(array(
+                'body' => 'Error in mysqldump class while creating database backup: ' . $message,
+                'subject' => 'ERROR: Cron databaseBackup'
+            ));
+
+            $mailer->setFrom('cron@hastrman.cz')
+                    ->send();
         }
     }
 
     /**
      * Clone production database to test.
-     * 
+     *
      * @before _cron
      */
     public function databaseProdToTest()
     {
-        $this->_disableView();
+        $this->disableView();
 
         $starttime = microtime(true);
 
         $dbDataPath = APP_PATH . '/temp/db/data/';
         $dbStructurePath = APP_PATH . '/temp/db/structure/';
 
-        $this->_removeOldFiles($dbDataPath, 31);
-        $this->_removeOldFiles($dbStructurePath, 31);
+        $this->removeOldFiles($dbDataPath, 31);
+        $this->removeOldFiles($dbStructurePath, 31);
 
         $settingsNoData = array('main' => array(
                 'no-data' => true,
@@ -188,7 +212,7 @@ class BackupController extends Controller
 
         try {
             if ($dumpNoData->create('main') && $dumpOnlyData->create('main')) {
-                $db = $this->_resertTestConnection();
+                $db = $this->resertTestConnection();
 
                 $dbStructureSql = file_get_contents($dumpNoData->getDumpFile('main'));
                 $sqls = explode(';', $dbStructureSql);
@@ -199,7 +223,7 @@ class BackupController extends Controller
                     $db->execute($sql);
                 }
 
-                $db = $this->_resertTestConnection();
+                $db = $this->resertTestConnection();
 
                 $dataSql = file_get_contents($dumpOnlyData->getDumpFile('main'));
                 $dataSqlArr = explode('INSERT INTO', $dataSql);
@@ -218,7 +242,7 @@ class BackupController extends Controller
                         $i += 1;
 
                         if ($i == 500) {
-                            $db = $this->_resertTestConnection();
+                            $db = $this->resertTestConnection();
                             $db->execute('SET FOREIGN_KEY_CHECKS=0');
                             $i = 0;
                         }
@@ -228,17 +252,32 @@ class BackupController extends Controller
                 $db->execute('SET FOREIGN_KEY_CHECKS=1');
 
                 $time = round(microtime(true) - $starttime, 2);
-                Event::fire('cron.log', array('success', sprintf('Database clone to test took %s sec', $time)));
+                Event::fire('cron.log',
+                        array('success', sprintf('Database clone to test took %s sec',
+                            $time)));
             } else {
                 Event::fire('cron.log', array('fail', 'Database clone to test'));
-                $this->_sendEmail('Unknown error', 'ERROR: Cron clone production database', null, 'cron@hastrman.cz');
+                $mailer = new \THCFrame\Mailer\Mailer(array(
+                    'body' => 'Error occured while cloning production database',
+                    'subject' => 'ERROR: Cron clone production database'
+                ));
+
+                $mailer->setFrom('cron@hastrman.cz')
+                        ->send();
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
-            Event::fire('cron.log', array('fail', 'Database clone to test',
+            Event::fire('cron.log',
+                    array('fail', 'Database clone to test',
                 'Error: ' . $ex->getMessage(),));
 
             $message = $ex->getMessage() . PHP_EOL . $ex->getTraceAsString();
-            $this->_sendEmail('Error: ' . $message, 'ERROR: Cron clone production database', null, 'cron@hastrman.cz');
+            $mailer = new \THCFrame\Mailer\Mailer(array(
+                'body' => 'Error occured while cloning production database: ' . $message,
+                'subject' => 'ERROR: Cron clone production database'
+            ));
+
+            $mailer->setFrom('cron@hastrman.cz')
+                    ->send();
         }
     }
 

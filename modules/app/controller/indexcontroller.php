@@ -8,7 +8,7 @@ use THCFrame\Model\Model;
 use THCFrame\Request\Request;
 
 /**
- * 
+ *
  */
 class IndexController extends Controller
 {
@@ -162,7 +162,7 @@ class IndexController extends Controller
 
             $searchPageCount = ceil($articleCount['totalCount'] / $articlesPerPage);
 
-            $this->_pagerMetaLinks($searchPageCount, $page, '/hledat/p/');
+            $this->pagerMetaLinks($searchPageCount, $page, '/hledat/p/');
 
             $view->set('urls', $urls)
                     ->set('currentpage', $page)

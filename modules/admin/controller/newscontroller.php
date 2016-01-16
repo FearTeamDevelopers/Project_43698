@@ -9,7 +9,7 @@ use THCFrame\Registry\Registry;
 use THCFrame\Core\StringMethods;
 
 /**
- * 
+ *
  */
 class NewsController extends Controller
 {
@@ -17,7 +17,7 @@ class NewsController extends Controller
 
     /**
      * Check whether user has access to news or not.
-     * 
+     *
      * @param \App\Model\NewsModel $news
      *
      * @return bool
@@ -34,7 +34,7 @@ class NewsController extends Controller
 
     /**
      * Check whether news unique identifier already exist or not.
-     * 
+     *
      * @param type $key
      *
      * @return bool
@@ -52,12 +52,12 @@ class NewsController extends Controller
 
     /**
      * Create and return new news object.
-     * 
+     *
      * @return \App\Model\NewsModel
      */
     private function _createObject()
     {
-        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
 
         for ($i = 1; $i <= 100; $i+=1) {
             if ($this->_checkUrlKey($urlKeyCh)) {
@@ -96,14 +96,14 @@ class NewsController extends Controller
 
     /**
      * Edit existing news object.
-     * 
+     *
      * @param \App\Model\NewsModel $object
      *
      * @return \App\Model\NewsModel
      */
     private function _editObject(\App\Model\NewsModel $object)
     {
-        $urlKey = $urlKeyCh = $this->_createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
 
         if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
             for ($i = 1; $i <= 100; $i+=1) {
@@ -134,7 +134,7 @@ class NewsController extends Controller
         }else{
             $object->approved = RequestMethods::post('approve');
         }
-        
+
         $object->title = RequestMethods::post('title');
         $object->urlKey = $urlKeyCh;
         $object->body = RequestMethods::post('text');
@@ -151,7 +151,7 @@ class NewsController extends Controller
 
     /**
      * Check if there is object used for preview saved in session.
-     * 
+     *
      * @return \App\Model\NewsModel
      */
     private function _checkForObject()
@@ -166,7 +166,7 @@ class NewsController extends Controller
     /**
      * Get list of all actions. Loaded via datatables ajax.
      * For more check load function.
-     * 
+     *
      * @before _secured, _participant
      */
     public function index()
@@ -175,7 +175,7 @@ class NewsController extends Controller
 
     /**
      * Create new news.
-     * 
+     *
      * @before _secured, _participant
      */
     public function add()
@@ -192,7 +192,7 @@ class NewsController extends Controller
                 ->set('concepts', $newsConcepts);
 
         if (RequestMethods::post('submitAddNews')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
@@ -218,7 +218,7 @@ class NewsController extends Controller
         }
 
         if (RequestMethods::post('submitPreviewNews')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
@@ -242,7 +242,7 @@ class NewsController extends Controller
 
     /**
      * Edit existing news.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id news id
@@ -278,7 +278,7 @@ class NewsController extends Controller
                 ->set('concepts', $newsConcepts);
 
         if (RequestMethods::post('submitEditNews')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -303,7 +303,7 @@ class NewsController extends Controller
         }
 
         if (RequestMethods::post('submitPreviewNews')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -323,52 +323,60 @@ class NewsController extends Controller
 
     /**
      * Delete existing news.
-     * 
+     *
      * @before _secured, _participant
      *
      * @param int $id news id
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $news = \App\Model\NewsModel::first(
                         array('id = ?' => (int) $id), array('id', 'userId')
         );
 
         if (null === $news) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($this->_checkAccess($news)) {
                 if ($news->delete()) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('success', 'News id: '.$id));
-                    echo 'success';
+                    Event::fire('admin.log', array('success', 'News id: ' . $id));
+                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('fail', 'News id: '.$id));
-                    echo $this->lang('COMMON_FAIL');
+                    Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
             } else {
-                echo $this->lang('LOW_PERMISSIONS');
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
         }
     }
 
     /**
      * Approve new news.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id news id
      */
     public function approveNews($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
         if (null === $news) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $news->approved = 1;
 
@@ -381,31 +389,35 @@ class NewsController extends Controller
                 $news->save();
                 $this->getCache()->erase('news');
 
-                Event::fire('admin.log', array('success', 'News id: '.$id));
-                echo 'success';
+                Event::fire('admin.log', array('success', 'News id: ' . $id));
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'News id: '.$id,
-                    'Errors: '.json_encode($news->getErrors()), ));
-                echo $this->lang('COMMON_FAIL');
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors()),));
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Reject new news.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id news id
      */
     public function rejectNews($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
 
         if (null === $news) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $news->approved = 2;
 
@@ -417,19 +429,19 @@ class NewsController extends Controller
             if ($news->validate()) {
                 $news->save();
 
-                Event::fire('admin.log', array('success', 'News id: '.$id));
-                echo 'success';
+                Event::fire('admin.log', array('success', 'News id: ' . $id));
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'News id: '.$id,
-                    'Errors: '.json_encode($news->getErrors()), ));
-                echo $this->lang('COMMON_FAIL');
+                Event::fire('admin.log', array('fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors()),));
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
 
     /**
      * Return list of news to insert news link to content.
-     * 
+     *
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -444,12 +456,16 @@ class NewsController extends Controller
 
     /**
      * Execute basic operation over multiple news.
-     * 
+     *
      * @before _secured, _admin
      */
     public function massAction()
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $errors = array();
 
@@ -457,9 +473,7 @@ class NewsController extends Controller
         $action = RequestMethods::post('action');
 
         if (empty($ids)) {
-            echo $this->lang('NO_ROW_SELECTED');
-
-            return;
+            $this->ajaxResponse($this->lang('NO_ROW_SELECTED'), true);
         }
 
         switch ($action) {
@@ -470,19 +484,19 @@ class NewsController extends Controller
                 if (null !== $news) {
                     foreach ($news as $_news) {
                         if (!$_news->delete()) {
-                            $errors[] = $this->lang('DELETE_FAIL').' - '.$_news->getTitle();
+                            $errors[] = $this->lang('DELETE_FAIL') . ' - ' . $_news->getTitle();
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('delete success', 'News ids: '.implode(',', $ids)));
-                    echo $this->lang('DELETE_SUCCESS');
+                    Event::fire('admin.log', array('delete success', 'News ids: ' . implode(',', $ids)));
+                    $this->ajaxResponse($this->lang('DELETE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -504,19 +518,19 @@ class NewsController extends Controller
                             $_news->save();
                         } else {
                             $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    .implode(', ', $_news->getErrors());
+                                    . implode(', ', $_news->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('activate success', 'News ids: '.implode(',', $ids)));
-                    echo $this->lang('ACTIVATE_SUCCESS');
+                    Event::fire('admin.log', array('activate success', 'News ids: ' . implode(',', $ids)));
+                    $this->ajaxResponse($this->lang('ACTIVATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -538,19 +552,19 @@ class NewsController extends Controller
                             $_news->save();
                         } else {
                             $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    .implode(', ', $_news->getErrors());
+                                    . implode(', ', $_news->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('deactivate success', 'News ids: '.implode(',', $ids)));
-                    echo $this->lang('DEACTIVATE_SUCCESS');
+                    Event::fire('admin.log', array('deactivate success', 'News ids: ' . implode(',', $ids)));
+                    $this->ajaxResponse($this->lang('DEACTIVATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -573,19 +587,19 @@ class NewsController extends Controller
                             $_news->save();
                         } else {
                             $errors[] = "Action id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    .implode(', ', $_news->getErrors());
+                                    . implode(', ', $_news->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('approve success', 'Action ids: '.implode(',', $ids)));
-                    echo $this->lang('UPDATE_SUCCESS');
+                    Event::fire('admin.log', array('approve success', 'Action ids: ' . implode(',', $ids)));
+                    $this->ajaxResponse($this->lang('UPDATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
@@ -608,36 +622,36 @@ class NewsController extends Controller
                             $_news->save();
                         } else {
                             $errors[] = "Action id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    .implode(', ', $_news->getErrors());
+                                    . implode(', ', $_news->getErrors());
                         }
                     }
                 }
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('reject success', 'Action ids: '.implode(',', $ids)));
-                    echo $this->lang('UPDATE_SUCCESS');
+                    Event::fire('admin.log', array('reject success', 'Action ids: ' . implode(',', $ids)));
+                    $this->ajaxResponse($this->lang('UPDATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Errors:'.json_encode($errors)));
+                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
                     $message = implode(PHP_EOL, $errors);
-                    echo $message;
+                    $this->ajaxResponse($message, true);
                 }
 
                 break;
             default:
-                echo $this->lang('NOT_FOUND');
+                $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
                 break;
         }
     }
 
     /**
      * Response for ajax call from datatables plugin.
-     * 
+     *
      * @before _secured, _participant
      */
     public function load()
     {
-        $this->_disableView();
+        $this->disableView();
 
         $page = (int) RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
@@ -777,7 +791,7 @@ class NewsController extends Controller
 
     /**
      * Show help for news section.
-     * 
+     *
      * @before _secured, _participant
      */
     public function help()
@@ -786,12 +800,17 @@ class NewsController extends Controller
 
     /**
      * Load concept into active form.
-     * 
+     *
      * @before _secured, _participant
      */
     public function loadConcept($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
+
         $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
         if (null !== $concept) {
@@ -805,11 +824,9 @@ class NewsController extends Controller
                 'metadescription' => $concept->getMetaDescription(),
             );
 
-            echo json_encode($conceptArr);
-            exit;
+            $this->ajaxResponse(json_encode($conceptArr));
         } else {
-            echo 'notfound';
-            exit;
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         }
     }
 }

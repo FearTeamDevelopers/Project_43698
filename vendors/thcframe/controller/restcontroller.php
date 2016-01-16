@@ -5,6 +5,7 @@ namespace THCFrame\Controller;
 use THCFrame\Core\Base;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Controller\Exception;
+use THCFrame\Request\Response;
 
 /**
  * Base controller for REST Api
@@ -24,6 +25,12 @@ class RestController extends Base
      */
     protected $_method;
 
+    /**
+     * @read
+     * @var THCFrame\Request\Response
+     */
+    protected $_response;
+    
     /**
      * 
      * @param type $data
@@ -45,29 +52,11 @@ class RestController extends Base
 
     private function _response($data, $status = 200)
     {
-        header("HTTP/1.1 " . $status . " " . $this->_requestStatus($status));
-        return json_encode($data);
-    }
-
-    private function _requestStatus($code)
-    {
-        $status = array(
-            200 => 'OK',
-            404 => 'Not Found',
-            405 => 'Method Not Allowed',
-            500 => 'Internal Server Error',
-        );
-        return ($status[$code]) ? $status[$code] : $status[500];
-    }
-
-    /**
-     * 
-     * @param type $method
-     * @return \THCFrame\Session\Exception\Implementation
-     */
-    protected function _getImplementationException($method)
-    {
-        return new Exception\Implementation(sprintf('%s method not implemented', $method));
+        $this->_response->setHttpVersionStatusHeader(
+                "HTTP/1.1 " . $status . " " . $this->_response->getStatusMessageByCode($status)
+                );
+        $this->_response->setBody($data);
+        return $this->_response;
     }
 
     /**
@@ -79,9 +68,9 @@ class RestController extends Base
     {
         parent::__construct($options);
 
-        header("Access-Control-Allow-Orgin: *");
-        header("Access-Control-Allow-Methods: *");
-        header("Content-Type: application/json");
+        $this->_response = new Response();
+        $this->_response->setHeader('Access-Control-Allow-Orgin', '*')
+                ->setHeader('Access-Control-Allow-Methods', '*');
 
         $this->method = RequestMethods::server('REQUEST_METHOD');
         if ($this->method == 'POST' && RequestMethods::issetserver('HTTP_X_HTTP_METHOD')) {
@@ -104,6 +93,15 @@ class RestController extends Base
      */
     public function runApi($resource, $args = array(), $type = 'Resource')
     {
+        $this->checkAuthToken();
+        
+        $route = \THCFrame\Registry\Registry::get('router')->getLastPath();
+        $parameters = $route->getMapArguments();
+        
+        if(empty($parameters)){
+            $type = 'Collection';
+        }
+        
         switch ($this->method) {
             case 'DELETE':
                 $actionName = strtolower($resource) . 'ResourceDelete';
@@ -129,4 +127,13 @@ class RestController extends Base
         return $this->_response(sprintf('Method %s not implemented', $actionName), 404);
     }
 
+    public function checkAuthToken()
+    {
+        
+    }
+    
+    public function generateAuthToken()
+    {
+        
+    }
 }

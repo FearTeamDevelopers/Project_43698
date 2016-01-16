@@ -5,8 +5,6 @@ namespace THCFrame\Core;
 use THCFrame\Core\Inspector;
 use THCFrame\Core\StringMethods;
 use THCFrame\Core\Exception as Exception;
-use THCFrame\Registry\Registry;
-use THCFrame\Configuration\Model\ConfigModel as Config;
 
 /**
  * Base class can create getters/setters simply by adding comments around the
@@ -231,44 +229,6 @@ class Base
     {
         $function = 'uns' . ucfirst($name);
         return $this->$function();
-    }
-
-    /**
-     * Method try to load additional configuration from database.
-     * Config table is required
-     * 
-     * @param string $key
-     * @return mixed
-     */
-    public function loadConfigFromDb($key)
-    {
-        $conf = Config::first(array('xkey = ?' => $key));
-        if ($conf !== null) {
-            return $conf->getValue();
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Method save additional configuration into database
-     * Config table is required
-     * 
-     * @param string $key
-     * @param mixed $value
-     * @return boolean
-     */
-    public function saveConfigToDb($key, $value)
-    {
-        $conf = Config::first(array('xkey = ?' => $key));
-        $conf->value = $value;
-
-        if ($conf->validate()) {
-            $conf->save();
-            return true;
-        } else {
-            return false;
-        }
     }
 
 }

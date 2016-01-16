@@ -18,7 +18,7 @@ use THCFrame\Model\Model;
 PRIMARY KEY (`id`),
 UNIQUE KEY (`fromPath`, `toPath`, `module`),
 KEY `ix_redirect` (`fromPath`, `module`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='system';
  */
 class RedirectModel extends Model
 {

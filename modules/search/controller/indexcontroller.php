@@ -8,10 +8,11 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
 
 /**
- * 
+ *
  */
 class IndexController extends Controller
 {
+
     const RANKER_TERMWEIGHT = 100;
     const RANKER_TITLEWEIGHT = 1000;
     const RANKER_URLWEIGHT = 6000;
@@ -35,7 +36,7 @@ class IndexController extends Controller
             'identifier' => 'urlKey',
             'columns' => array('urlKey', 'keywords', 'metaDescription', 'title', 'created'),
             'textColumns' => array('keywords', 'metaDescription'),
-            'previewColumns' => array('metaDescription', 'created'), ),
+            'previewColumns' => array('metaDescription', 'created'),),
         'tb_report' => array(
             'model' => 'App\Model\ReportModel',
             'modelLabel' => 'Reportáže',
@@ -44,7 +45,7 @@ class IndexController extends Controller
             'identifier' => 'urlKey',
             'columns' => array('urlKey', 'keywords', 'metaDescription', 'title', 'created'),
             'textColumns' => array('keywords', 'metaDescription'),
-            'previewColumns' => array('metaDescription', 'created'), ),
+            'previewColumns' => array('metaDescription', 'created'),),
         'tb_pagecontent' => array(
             'model' => 'App\Model\PageContentModel',
             'modelLabel' => 'Obsah webu - statické stránky',
@@ -53,7 +54,7 @@ class IndexController extends Controller
             'identifier' => 'urlKey',
             'columns' => array('urlKey', 'metaDescription', 'title', 'keywords', 'created'),
             'textColumns' => array('keywords', 'metaDescription'),
-            'previewColumns' => array('metaDescription', 'created'), ),
+            'previewColumns' => array('metaDescription', 'created'),),
         'tb_news' => array(
             'model' => 'App\Model\NewsModel',
             'modelLabel' => 'Novinky',
@@ -62,7 +63,7 @@ class IndexController extends Controller
             'identifier' => 'urlKey',
             'columns' => array('urlKey', 'keywords', 'metaDescription', 'title', 'created'),
             'textColumns' => array('keywords', 'metaDescription'),
-            'previewColumns' => array('metaDescription', 'created'), ),
+            'previewColumns' => array('metaDescription', 'created'),),
         'tb_advertisement' => array(
             'model' => 'App\Model\AdvertisementModel',
             'modelLabel' => 'Bazar',
@@ -71,12 +72,12 @@ class IndexController extends Controller
             'identifier' => 'uniqueKey',
             'columns' => array('uniqueKey', 'keywords', 'content', 'title', 'created'),
             'textColumns' => array('keywords', 'content'),
-            'previewColumns' => array('null', 'created'), ),
+            'previewColumns' => array('null', 'created'),),
     );
 
     /**
      * Get weight for specific term.
-     * 
+     *
      * @param string $term
      * @param int    $occurence
      * @param string $title
@@ -88,9 +89,9 @@ class IndexController extends Controller
     {
         $cleanTitle = $this->_cleanString($title);
 
-        preg_match_all('/ '.$term.' /i', $url, $urlcount);
-        preg_match_all('/'.$term.'/i', $keywords, $keywordscount);
-        preg_match_all('/ '.$term.' /i', $cleanTitle, $titlecount);
+        preg_match_all('/ ' . $term . ' /i', $url, $urlcount);
+        preg_match_all('/' . $term . '/i', $keywords, $keywordscount);
+        preg_match_all('/ ' . $term . ' /i', $cleanTitle, $titlecount);
 
         $words_in_url = count($urlcount[0]);
         $words_in_keywords = count($keywordscount[0]);
@@ -110,7 +111,7 @@ class IndexController extends Controller
 
     /**
      * Clean string. Cleaned string contains only [a-z0-9\s].
-     * 
+     *
      * @param string     $str
      * @param null|array $stopWordsCs
      * @param null|array $stopWordsEn
@@ -124,8 +125,10 @@ class IndexController extends Controller
         $cleanStr = preg_replace('/[^a-z0-9\s]+/', ' ', $cleanStr);
 
         if (null !== $stopWordsCs && null !== $stopWordsEn) {
-            $cleanStr = preg_replace('/\b('.$stopWordsCs.')\b/', ' ', $cleanStr);
-            $cleanStr = preg_replace('/\b('.$stopWordsEn.')\b/', ' ', $cleanStr);
+            $cleanStr = preg_replace('/\b(' . $stopWordsCs . ')\b/', ' ',
+                    $cleanStr);
+            $cleanStr = preg_replace('/\b(' . $stopWordsEn . ')\b/', ' ',
+                    $cleanStr);
         }
 
         $cleanStr2 = preg_replace('/\s+/', ' ', $cleanStr);
@@ -160,13 +163,14 @@ class IndexController extends Controller
 
     /**
      * Get search index log and controll panel for search module.
-     * 
+     *
      * @before _secured, _admin
      */
     public function index()
     {
         $view = $this->getActionView();
-        $searchIndexLog = \Search\Model\SearchIndexLogModel::all(array(), array('*'), array('created' => 'desc'), 150);
+        $searchIndexLog = \Search\Model\SearchIndexLogModel::all(array(),
+                        array('*'), array('created' => 'desc'), 150);
 
         $view->set('tables', $this->_textSource)
                 ->set('indexLog', $searchIndexLog);
@@ -174,7 +178,7 @@ class IndexController extends Controller
 
     /**
      * Completly delete and create new search index.
-     * 
+     *
      * @before _cron
      */
     public function buildIndex()
@@ -204,9 +208,9 @@ class IndexController extends Controller
             foreach ($this->_textSource as $table => $variables) {
                 $starttime = microtime(true);
 
-                $sql = 'SELECT '.implode(', ', $variables['columns'])
-                        .' FROM '.$table
-                        .' WHERE '.implode(' AND ', $variables['where']);
+                $sql = 'SELECT ' . implode(', ', $variables['columns'])
+                        . ' FROM ' . $table
+                        . ' WHERE ' . implode(' AND ', $variables['where']);
 
                 $articles = $this->_dbConnMain->execute($sql);
                 $wordsCount = 0;
@@ -216,17 +220,18 @@ class IndexController extends Controller
                         $superText = '';
 
                         foreach ($variables['textColumns'] as $column) {
-                            $superText .= $article[$column].' ';
+                            $superText .= $article[$column] . ' ';
                         }
 
-                        $cleanStr = $this->_cleanString($superText, $stopWordsCs, $stopWordsEn);
+                        $cleanStr = $this->_cleanString($superText,
+                                $stopWordsCs, $stopWordsEn);
 
                         unset($superText);
 
                         $words = array_count_values(str_word_count($cleanStr, 1));
                         arsort($words);
 
-                        $path = $variables['path'].$article[$variables['identifier']];
+                        $path = $variables['path'] . $article[$variables['identifier']];
                         $title = $article['title'];
                         $rowDesc = '';
                         if ($variables['previewColumns'][0] != 'null') {
@@ -239,10 +244,13 @@ class IndexController extends Controller
                                 continue;
                             }
                             $wordsCount+=1;
-                            $weight = $this->_getWeight($word, $occ, $title, $article['keywords'], $path);
+                            $weight = $this->_getWeight($word, $occ, $title,
+                                    $article['keywords'], $path);
 
                             $this->_resertConnections();
-                            $this->_dbConnSearch->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
+                            $this->_dbConnSearch->execute($insertSql,
+                                    $variables['model'], $word, $path, $title,
+                                    $rowDesc, $rowCreated, $occ, $weight);
                         }
 
                         unset($words);
@@ -253,30 +261,37 @@ class IndexController extends Controller
                         $this->_resertConnections();
                     }
                 } else {
-                    Event::fire('search.log.user', array('warning', sprintf('No articles found for indexing in %s', $variables['modelLabel'])));
+                    Event::fire('search.log.user',
+                            array('warning', sprintf('No articles found for indexing in %s',
+                                $variables['modelLabel'])));
                     continue;
                 }
 
                 $time = round(microtime(true) - $starttime, 2);
                 $this->_resertConnections();
-                $this->_dbConnSearch->execute($insertSqlLog, $variables['modelLabel'], $table, $wordsCount);
-                Event::fire('search.log', array('success', sprintf('Search index for %s built in %s sec', $variables['modelLabel'], $time)));
+                $this->_dbConnSearch->execute($insertSqlLog,
+                        $variables['modelLabel'], $table, $wordsCount);
+                Event::fire('search.log',
+                        array('success', sprintf('Search index for %s built in %s sec',
+                            $variables['modelLabel'], $time)));
             }
         } catch (\Exception $ex) {
             $this->_resertConnections();
-            $body = 'Error while building index: '.$ex->getMessage();
+            $body = 'Error while building index: ' . $ex->getMessage();
             Event::fire('search.log', array('fail', $body));
-            $email = new \Admin\Model\EmailModel(array(
+            $mailer = new \THCFrame\Mailer\Mailer(array(
                 'body' => $body,
                 'subject' => 'ERROR: Search buildIndex',
             ));
-            $email->send(false, 'cron@hastrman.cz');
+
+            $mailer->setFrom('cron@hastrman.cz')
+                    ->send();
         }
     }
 
     /**
      * Manualy build index for specific table.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param string $table table name
@@ -290,7 +305,9 @@ class IndexController extends Controller
             self::redirect('/search/');
         }
 
-        Event::fire('search.log.user', array('success', sprintf('Building search index for table %s', $table)));
+        Event::fire('search.log.user',
+                array('success', sprintf('Building search index for table %s',
+                    $table)));
         $userName = $this->getUser()->getWholeName();
 
         $stopWordsCs = implode('|', $this->stopwords_cs);
@@ -307,9 +324,9 @@ class IndexController extends Controller
         $variables = $this->_textSource[$table];
 
         try {
-            $selectSql = 'SELECT '.implode(', ', $variables['columns'])
-                    .' FROM '.$table
-                    .' WHERE '.implode(' AND ', $variables['where']);
+            $selectSql = 'SELECT ' . implode(', ', $variables['columns'])
+                    . ' FROM ' . $table
+                    . ' WHERE ' . implode(' AND ', $variables['where']);
 
             $this->_dbConnSearch->execute($deleteSql, $variables['model']);
             $articles = $this->_dbConnMain->execute($selectSql);
@@ -320,17 +337,18 @@ class IndexController extends Controller
                     $superText = '';
 
                     foreach ($variables['textColumns'] as $column) {
-                        $superText .= $article[$column].' ';
+                        $superText .= $article[$column] . ' ';
                     }
 
-                    $cleanStr = $this->_cleanString($superText, $stopWordsCs, $stopWordsEn);
+                    $cleanStr = $this->_cleanString($superText, $stopWordsCs,
+                            $stopWordsEn);
 
                     unset($superText);
 
                     $words = array_count_values(str_word_count($cleanStr, 1));
                     arsort($words);
 
-                    $path = $variables['path'].$article[$variables['identifier']];
+                    $path = $variables['path'] . $article[$variables['identifier']];
                     $title = $article['title'];
                     $rowDesc = '';
                     if ($variables['previewColumns'][0] != 'null') {
@@ -343,10 +361,13 @@ class IndexController extends Controller
                             continue;
                         }
                         $wordsCount+=1;
-                        $weight = $this->_getWeight($word, $occ, $title, $article['keywords'], $path);
+                        $weight = $this->_getWeight($word, $occ, $title,
+                                $article['keywords'], $path);
 
                         $this->_resertConnections();
-                        $this->_dbConnSearch->execute($insertSql, $variables['model'], $word, $path, $title, $rowDesc, $rowCreated, $occ, $weight);
+                        $this->_dbConnSearch->execute($insertSql,
+                                $variables['model'], $word, $path, $title,
+                                $rowDesc, $rowCreated, $occ, $weight);
                     }
 
                     unset($words);
@@ -357,25 +378,35 @@ class IndexController extends Controller
 
                 $time = round(microtime(true) - $starttime, 2);
                 $this->_resertConnections();
-                $this->_dbConnSearch->execute($insertSqlLog, $variables['modelLabel'], $table, $userName, $wordsCount);
+                $this->_dbConnSearch->execute($insertSqlLog,
+                        $variables['modelLabel'], $table, $userName, $wordsCount);
 
-                Event::fire('search.log.user', array('success', sprintf('Search index for %s built in %s sec', $table, $time)));
-                $view->successMessage(sprintf('Search index for %s has been successfully built', $this->_textSource[$table]['modelLabel']));
+                Event::fire('search.log.user',
+                        array('success', sprintf('Search index for %s built in %s sec',
+                            $table, $time)));
+                $view->successMessage(sprintf('Search index for %s has been successfully built',
+                                $this->_textSource[$table]['modelLabel']));
                 self::redirect('/search/');
             } else {
-                Event::fire('search.log.user', array('warning', sprintf('No articles found for indexing in %s', $this->_textSource[$table]['modelLabel'])));
-                $view->warningMessage(sprintf('No articles found for indexing in %s', $this->_textSource[$table]['modelLabel']));
+                Event::fire('search.log.user',
+                        array('warning', sprintf('No articles found for indexing in %s',
+                            $this->_textSource[$table]['modelLabel'])));
+                $view->warningMessage(sprintf('No articles found for indexing in %s',
+                                $this->_textSource[$table]['modelLabel']));
                 self::redirect('/search/');
             }
         } catch (\Exception $ex) {
             $this->_resertConnections();
-            $body = 'Error while building index: '.$ex->getMessage();
+            $body = 'Error while building index: ' . $ex->getMessage();
             Event::fire('search.log.user', array('fail', $body));
-            $email = new \Admin\Model\EmailModel(array(
+            $mailer = new \THCFrame\Mailer\Mailer(array(
                 'body' => $body,
                 'subject' => 'ERROR: Search buildIndex',
             ));
-            $email->send(false, 'cron@hastrman.cz');
+
+            $mailer->setFrom('cron@hastrman.cz')
+                    ->send();
         }
     }
+
 }

@@ -8,7 +8,7 @@ use THCFrame\Core\Core;
 use THCFrame\Request\RequestMethods;
 
 /**
- * 
+ *
  */
 class SystemController extends Controller
 {
@@ -18,7 +18,7 @@ class SystemController extends Controller
      */
     public function showProfiler()
     {
-        $this->_disableView();
+        $this->disableView();
 
         echo Profiler::display();
     }
@@ -28,13 +28,13 @@ class SystemController extends Controller
      */
     public function logresolution()
     {
-        $this->_disableView();
+        $this->disableView();
 
         $width = RequestMethods::post('scwidth');
         $height = RequestMethods::post('scheight');
         $res = $width . ' x ' . $height;
 
-        Core::getLogger()->log($res, 'system', true, 'scres.log');
+        Core::getLogger()->debug($res);
     }
 
 }

@@ -182,12 +182,4 @@ class Memcached extends Cache\Driver
         return $this;
     }
 
-    /**
-     * Alias for clearCache
-     */
-    public function invalidate()
-    {
-        $this->clearCache();
-    }
-
 }

@@ -11,6 +11,7 @@ use THCFrame\Core\Rand;
 use THCFrame\Date\Date;
 use THCFrame\Registry\Registry;
 use THCFrame\Core\StringMethods;
+use THCFrame\Request\CookieBag;
 
 /**
  * Basic user class
@@ -344,6 +345,10 @@ class BasicUserModel extends Model
             $this->setDeleted(false);
             $this->setPassExipre();
             $this->setAccountExpire();
+            $this->setLastLogin(0);
+            $this->setTotalLoginAttempts(0);
+            $this->setLastLoginAttempt(0);
+            $this->setFirstLoginAttempt(0);
         }
 
         $this->setModified(date('Y-m-d H:i:s'));
@@ -565,14 +570,14 @@ class BasicUserModel extends Model
             throw new Exception\WrongPassword('Wrong Password provided');
         }
 
-        if (null === $passStrength) {
+        if ($passStrength === null) {
             if ($this->getRole() == 'role_member') {
                 $passStrength = self::MEMBER_PASS_STRENGHT;
             } else {
                 $passStrength = self::ADMIN_PASS_STRENGHT;
             }
         }
-        
+
         if (PasswordManager::strength($newPassword) <= $passStrength) {
             throw new Exception\WeakPassword('Password is too weak');
         }
@@ -607,23 +612,23 @@ class BasicUserModel extends Model
      */
     public function forceResetPassword($newPassword = null, $passStrength = null)
     {
-        if (null === $passStrength) {
+        if ($passStrength === null) {
             if ($this->getRole() == 'role_member') {
                 $passStrength = self::MEMBER_PASS_STRENGHT;
             } else {
                 $passStrength = self::ADMIN_PASS_STRENGHT;
             }
         }
-        if (null === $newPassword) {
+        if ($newPassword === null) {
             $newPassword = PasswordManager::generate($passStrength);
         }
-        
+
         if (PasswordManager::strength($newPassword) <= $passStrength) {
             throw new Exception\WeakPassword('Password is too weak');
         }
 
         $this->_newCleanPassword = $newPassword;
-        
+
         $cleanHash = StringMethods::getHash($newPassword);
         $this->_passwordHistory2 = $this->_passwordHistory1;
         $this->_passwordHistory1 = $cleanHash;
@@ -648,6 +653,7 @@ class BasicUserModel extends Model
     public static function enableRememberMe($userID, $secure = TRUE, $httpOnly = TRUE)
     {
         $authID = Rand::randStr(128);
+        $cookieBag = CookieBag::getInstance();
 
         $token = new AuthtokenModel(array(
             'userId' => $userID,
@@ -658,13 +664,13 @@ class BasicUserModel extends Model
             $token->save();
 
             if ($secure && $httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, TRUE, TRUE);
+                $cookieBag->set('AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, TRUE, TRUE);
             } elseif (!$secure && !$httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, FALSE, FALSE);
+                $cookieBag->set('AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, FALSE, FALSE);
             } elseif ($secure && !$httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, TRUE, FALSE);
+                $cookieBag->set('AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, TRUE, FALSE);
             } elseif (!$secure && $httpOnly) {
-                \setcookie('THCF_AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, FALSE, TRUE);
+                $cookieBag->set('AUTHID', $authID, time() + static::$_rememberMeExpiryTime, null, null, FALSE, TRUE);
             }
 
             return true;
@@ -680,7 +686,9 @@ class BasicUserModel extends Model
      */
     public static function checkRememberMe()
     {
-        if (RequestMethods::cookie('THCF_AUTHID') != '') {
+        $cookieBag = CookieBag::getInstance();
+
+        if ($cookieBag->get('AUTHID') != '') {
             $token = AuthtokenModel::first(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
 
             if ($token !== null) {
@@ -696,7 +704,7 @@ class BasicUserModel extends Model
                 }
             } else {
                 //If this AUTH token is not found in DB, then erase the cookie from the client's machine and return FALSE
-                \setcookie('THCF_AUTHID', '');
+                $cookieBag->erase('AUTHID');
                 return false;
             }
         } else {
@@ -710,9 +718,11 @@ class BasicUserModel extends Model
      */
     public static function deleteAuthenticationToken()
     {
-        if (RequestMethods::cookie('THCF_AUTHID') != '') {
+        $cookieBag = CookieBag::getInstance();
+
+        if ($cookieBag->get('AUTHID') != '') {
             AuthtokenModel::deleteAll(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
-            \setcookie('THCF_AUTHID', '', time() - 1800);
+            $cookieBag->erase('AUTHID');
         }
     }
 

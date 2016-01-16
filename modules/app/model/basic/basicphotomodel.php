@@ -3,7 +3,7 @@
 namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicPhotoModel extends Model 
 {
 
@@ -74,7 +74,6 @@ class BasicPhotoModel extends Model
      * @type text
      * @validate alphanumeric,max(500)
      * @label popis
-     * @null
      */
     protected $_description;
 
@@ -116,7 +115,6 @@ class BasicPhotoModel extends Model
      * @length 10
      * @validate required,numeric,max(10)
      * @label size
-     * @default 0
      */
     protected $_size;
 
@@ -127,7 +125,6 @@ class BasicPhotoModel extends Model
      * @length 5
      * @validate required,numeric,max(5)
      * @label width
-     * @default 0
      */
     protected $_width;
 
@@ -138,7 +135,6 @@ class BasicPhotoModel extends Model
      * @length 5
      * @validate required,numeric,max(5)
      * @label height
-     * @default 0
      */
     protected $_height;
 
@@ -148,7 +144,6 @@ class BasicPhotoModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -158,8 +153,172 @@ class BasicPhotoModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getGalleryId()
+    {
+        return $this->_galleryId;
+    }
+
+    public function setGalleryId($value)
+    {
+        $this->_galleryId = $value;
+        return $this;
+    }
+
+    public function getActive()
+    {
+        return $this->_active;
+    }
+
+    public function setActive($value)
+    {
+        $this->_active = $value;
+        return $this;
+    }
+
+    public function getPhotoName()
+    {
+        return $this->_photoName;
+    }
+
+    public function setPhotoName($value)
+    {
+        $this->_photoName = $value;
+        return $this;
+    }
+
+    public function getImgThumb()
+    {
+        return $this->_imgThumb;
+    }
+
+    public function setImgThumb($value)
+    {
+        $this->_imgThumb = $value;
+        return $this;
+    }
+
+    public function getImgMain()
+    {
+        return $this->_imgMain;
+    }
+
+    public function setImgMain($value)
+    {
+        $this->_imgMain = $value;
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->_description;
+    }
+
+    public function setDescription($value)
+    {
+        $this->_description = $value;
+        return $this;
+    }
+
+    public function getRank()
+    {
+        return $this->_rank;
+    }
+
+    public function setRank($value)
+    {
+        $this->_rank = $value;
+        return $this;
+    }
+
+    public function getMime()
+    {
+        return $this->_mime;
+    }
+
+    public function setMime($value)
+    {
+        $this->_mime = $value;
+        return $this;
+    }
+
+    public function getFormat()
+    {
+        return $this->_format;
+    }
+
+    public function setFormat($value)
+    {
+        $this->_format = $value;
+        return $this;
+    }
+
+    public function getSize()
+    {
+        return $this->_size;
+    }
+
+    public function setSize($value)
+    {
+        $this->_size = $value;
+        return $this;
+    }
+
+    public function getWidth()
+    {
+        return $this->_width;
+    }
+
+    public function setWidth($value)
+    {
+        $this->_width = $value;
+        return $this;
+    }
+
+    public function getHeight()
+    {
+        return $this->_height;
+    }
+
+    public function setHeight($value)
+    {
+        $this->_height = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

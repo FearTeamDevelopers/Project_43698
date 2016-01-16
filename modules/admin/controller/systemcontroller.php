@@ -13,7 +13,7 @@ use THCFrame\Filesystem\LineCounter;
 use THCFrame\Core\Core;
 
 /**
- * 
+ *
  */
 class SystemController extends Controller
 {
@@ -23,17 +23,22 @@ class SystemController extends Controller
      */
     public function index()
     {
-        
+
     }
 
     /**
      * Ability to clear cache from administration.
-     * 
+     *
      * @before _secured, _admin
      */
-    public function clearCache()
+    public function common()
     {
+        $this->disableView();
         $view = $this->getActionView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            self::redirect('/admin/system/');
+        }
 
         if (RequestMethods::post('clearCache')) {
             Event::fire('admin.log', array('success'));
@@ -42,17 +47,36 @@ class SystemController extends Controller
             $view->successMessage($this->lang('SYSTEM_DELETE_CACHE'));
             self::redirect('/admin/system/');
         }
+
+        if (RequestMethods::post('minifyJs')) {
+            $jsPath = APP_PATH . '/public/js/custom';
+
+            foreach (glob($jsPath . '/*.js') as $file) {
+                $content = file_get_contents($file);
+                $fileName = basename($file, '.js');
+                $minified = \PHPWee\Minify::js($content);
+                file_put_contents($jsPath . '/build/' . $fileName . '.js',
+                        $minified);
+            }
+
+            $view->successMessage('JS resources have been sucessfully minified');
+            self::redirect('/admin/system/');
+        }
     }
 
     /**
      * Create db bakcup.
-     * 
+     *
      * @before _secured, _admin
      */
     public function createDatabaseBackup()
     {
         $view = $this->getActionView();
         $dump = new Mysqldump();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            self::redirect('/admin/system/');
+        }
 
         try {
             if ($dump->create()) {
@@ -73,7 +97,7 @@ class SystemController extends Controller
 
     /**
      * Get admin log.
-     * 
+     *
      * @before _secured, _admin
      */
     public function showLog()
@@ -84,13 +108,13 @@ class SystemController extends Controller
     }
 
     /**
-     * 
+     *
      * @param type $id
      * @before _secured, _admin
      */
     public function showLogDetail($id)
     {
-        $this->_disableView();
+        $this->disableView();
 
         $log = \Admin\Model\AdminLogModel::first(array('id = ?' => (int) $id));
 
@@ -104,13 +128,13 @@ class SystemController extends Controller
             $str .= 'Parametry: <br/><strong>' . $params . '</strong>';
             echo $str;
         } else {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         }
     }
 
     /**
      * Edit application settings.
-     * 
+     *
      * @before _secured, _admin
      */
     public function settings()
@@ -120,7 +144,7 @@ class SystemController extends Controller
         $view->set('config', $config);
 
         if (RequestMethods::post('submitEditSet')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/');
             }
             $errors = array();
@@ -150,19 +174,19 @@ class SystemController extends Controller
 
     /**
      * Get profiler result.
-     * 
+     *
      * @before _secured
      */
     public function showProfiler()
     {
-        $this->_disableView();
+        $this->disableView();
 
         echo Profiler::display();
     }
 
     /**
      * Generate sitemap.xml.
-     * 
+     *
      * @before _secured, _admin
      */
     public function generateSitemap()
@@ -270,7 +294,7 @@ class SystemController extends Controller
      */
     public function generator($dbIdent = 'main')
     {
-        $this->_disableView();
+        $this->disableView();
         $view = $this->getActionView();
 
         try {
@@ -293,8 +317,7 @@ class SystemController extends Controller
     public function sync($type = 1)
     {
         //set_time_limit(0);
-
-        $this->_disableView();
+        $this->disableView();
         $view = $this->getActionView();
 
         $models = array(
@@ -321,16 +344,11 @@ class SystemController extends Controller
             '\Admin\Model\Basic\BasicNewshistoryModel',
             '\Admin\Model\Basic\BasicPagecontentHistoryModel',
             '\Admin\Model\Basic\BasicReporthistoryModel',
-            '\THCFrame\Configuration\Model\ConfigModel',
-            '\THCFrame\Router\Model\RedirectModel',
-            '\THCFrame\Security\Model\AuthtokenModel',
-            '\THCFrame\Security\Model\FhsBaselineModel',
-            '\THCFrame\Security\Model\FhsHistoryModel',
-            '\THCFrame\Security\Model\FhsScannedModel',
         );
 
         $db = \THCFrame\Registry\Registry::get('database')->get();
         $error = false;
+        $executeQuery = false;
 
         $dump = new Mysqldump();
         $dump->create();
@@ -339,20 +357,14 @@ class SystemController extends Controller
             $m = new $model();
 
             if ($type == 1) {
-                if (!$db->sync($m, false, 'alter', false)) {
+                if (!$db->sync($m, $executeQuery, 'create', true)) {
                     $errMsg = 'An error occured while executing db sync for model: ' . $model . '. Check error log';
                     $error = true;
-
-                    Event::fire('admin.log', array('fail', $errMsg));
-                    Core::getLogger()->log($errMsg, 'sync', true, 'DbModelSync.log');
                 }
             } elseif ($type == 2) {
-                if (!$db->sync($m, true, 'alter', false)) {
+                if (!$db->sync($m, $executeQuery, 'alter', false)) {
                     $errMsg = 'An error occured while executing db sync for model: ' . $model . '. Check error log';
                     $error = true;
-
-                    Event::fire('admin.log', array('fail', $errMsg));
-                    Core::getLogger()->log($errMsg, 'sync', true, 'DbModelSync.log');
                 }
             }
 
@@ -360,6 +372,8 @@ class SystemController extends Controller
         }
 
         if ($error === true) {
+            Event::fire('admin.log', array('fail', $errMsg));
+            Core::getLogger()->error($errMsg);
             $view->errorMessage('An error occured while executing db sync. Check error log');
             self::redirect('/admin/system/');
         } else {

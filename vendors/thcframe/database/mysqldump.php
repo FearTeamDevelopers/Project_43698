@@ -135,12 +135,12 @@ class Mysqldump extends Base
         $sqlResult = $dbc->execute("SHOW CREATE TABLE `{$table}`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
-            if (true === $this->_settings[$dbid]['only-data']) {
+            if ($this->_settings[$dbid]['only-data'] === true) {
                 return true;
             }
 
             if (isset($row['Create Table'])) {
-                if (true === $this->_settings[$dbid]['write-comments']) {
+                if ($this->_settings[$dbid]['write-comments'] === true) {
                     $this->_write(
                             '-- -----------------------------------------------------' . PHP_EOL .
                             "-- Table structure for table `{$table}` --" . PHP_EOL);
@@ -167,7 +167,7 @@ class Mysqldump extends Base
      */
     private function _getTableValues(Connector $dbc, $dbid, $tablename)
     {
-        if (true === $this->_settings[$dbid]['write-comments']) {
+        if ($this->_settings[$dbid]['write-comments'] === true) {
             $this->_write('--' . PHP_EOL .
                     "-- Dumping data for table `{$tablename}` --" . PHP_EOL);
         }
@@ -240,7 +240,7 @@ class Mysqldump extends Base
     {
         $header = '';
 
-        if (true === $this->_settings[$dbid]['write-comments']) {
+        if ($this->_settings[$dbid]['write-comments'] === true) {
             $header .= '-- mysqldump-php SQL Dump' . PHP_EOL .
                     '--' . PHP_EOL .
                     "-- Host: {$dbc->getHost()}" . PHP_EOL .
@@ -283,7 +283,7 @@ class Mysqldump extends Base
     {
         $this->_fileHandler = fopen($filename, 'wb');
 
-        if (false === $this->_fileHandler) {
+        if ($this->_fileHandler === false) {
             return false;
         }
         return true;
@@ -299,7 +299,7 @@ class Mysqldump extends Base
     private function _write($str)
     {
         $bytesWritten = 0;
-        if (false === ($bytesWritten = fwrite($this->_fileHandler, $str))) {
+        if (($bytesWritten = fwrite($this->_fileHandler, $str)) === false) {
             throw new Exception\Mysqldump('Writting to file failed!', 4);
         }
         return $bytesWritten;
@@ -326,7 +326,7 @@ class Mysqldump extends Base
     private function _writeData(Connector $db, $id)
     {
 
-        if (null === $this->_backupFileName) {
+        if ($this->_backupFileName === null) {
             $filename = $this->_backupDir . $db->getSchema() . '_' . date('Y-m-d') . '.sql';
         } else {
             $filename = $this->_backupDir . $this->_backupFileName;
@@ -354,7 +354,7 @@ class Mysqldump extends Base
                 }
 
                 $is_table = $this->_getTableStructure($db, $id, $table);
-                if (true === $is_table && false === $this->_settings[$id]['no-data']) {
+                if ($is_table === true && $this->_settings[$id]['no-data'] === false) {
                     $this->_getTableValues($db, $id, $table);
                 }
             }
@@ -439,7 +439,7 @@ class Mysqldump extends Base
      */
     public function getDumpFile($id = null)
     {
-        if (null === $id) {
+        if ($id === null) {
             return $this->_backupFiles;
         } else {
             if (array_key_exists($id, $this->_backupFiles)) {

@@ -5,13 +5,13 @@ namespace Admin\Controller;
 use Admin\Etc\Controller;
 
 /**
- * 
+ *
  */
 class IndexController extends Controller
 {
     /**
      * Get some basic info for dashboard.
-     * 
+     *
      * @before _secured, _participant
      */
     public function index()

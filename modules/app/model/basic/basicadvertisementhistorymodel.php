@@ -3,7 +3,7 @@
 namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicAdvertisementhistoryModel extends Model 
 {
 
@@ -24,7 +24,6 @@ class BasicAdvertisementhistoryModel extends Model
      * @validate numeric,max(10)
      * @label source id
      * @unsigned
-     * @default 0
      */
     protected $_originId;
 
@@ -37,7 +36,6 @@ class BasicAdvertisementhistoryModel extends Model
      * @validate numeric,max(10)
      * @label editor id
      * @unsigned
-     * @default 0
      */
     protected $_editedBy;
 
@@ -67,7 +65,6 @@ class BasicAdvertisementhistoryModel extends Model
      * @type text
      * @validate alphanumeric
      * @label changes
-     * @null
      */
     protected $_changedData;
 
@@ -77,8 +74,84 @@ class BasicAdvertisementhistoryModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getOriginId()
+    {
+        return $this->_originId;
+    }
+
+    public function setOriginId($value)
+    {
+        $this->_originId = $value;
+        return $this;
+    }
+
+    public function getEditedBy()
+    {
+        return $this->_editedBy;
+    }
+
+    public function setEditedBy($value)
+    {
+        $this->_editedBy = $value;
+        return $this;
+    }
+
+    public function getRemoteAddr()
+    {
+        return $this->_remoteAddr;
+    }
+
+    public function setRemoteAddr($value)
+    {
+        $this->_remoteAddr = $value;
+        return $this;
+    }
+
+    public function getReferer()
+    {
+        return $this->_referer;
+    }
+
+    public function setReferer($value)
+    {
+        $this->_referer = $value;
+        return $this;
+    }
+
+    public function getChangedData()
+    {
+        return $this->_changedData;
+    }
+
+    public function setChangedData($value)
+    {
+        $this->_changedData = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
 
 }

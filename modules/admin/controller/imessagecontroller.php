@@ -7,7 +7,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 
 /**
- * 
+ *
  */
 class ImessageController extends Controller
 {
@@ -33,7 +33,7 @@ class ImessageController extends Controller
         $view->set('imessage', null);
 
         if (RequestMethods::post('submitAddImessage')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/imessage/');
             }
@@ -83,7 +83,7 @@ class ImessageController extends Controller
         $view->set('imessage', $imessage);
 
         if (RequestMethods::post('submitEditImessage')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/imessage/');
             }
 
@@ -115,19 +115,23 @@ class ImessageController extends Controller
      */
     public function delete($id)
     {
-        $this->_disableView();
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
 
         $imessage = \Admin\Model\ImessageModel::first(array('id = ?' => $id));
 
         if (null === $imessage) {
-            echo $this->lang('NOT_FOUND');
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($imessage->delete()) {
                 Event::fire('admin.log', array('success', 'Imessage id: '.$id));
-                echo 'success';
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 Event::fire('admin.log', array('fail', 'Imessage id: '.$id));
-                echo $this->lang('COMMON_FAIL');
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }

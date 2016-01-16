@@ -145,11 +145,12 @@ jQuery(document).ready(function ($) {
             buttons: {
                 "Smazat": function () {
                     jQuery("#loader, .loader").show();
-                    jQuery.post(url, {csrf: csrf}, function (msg) {
-                        if (msg == 'success') {
+                    jQuery.post(url, {csrf: csrf}, function (data) {
+                        if (data.error == false) {
+                            jQuery('#csrf').val(data.csrf);
                             clicked.parent('span').hide('explode', 500);
                         } else {
-                            alert(msg);
+                            alert(data.message);
                         }
                         jQuery("#loader, .loader").hide();
                     });
@@ -163,29 +164,31 @@ jQuery(document).ready(function ($) {
         return false;
     });
 
+    //delete individual row
     jQuery('.ajaxDelete').click(function (event) {
         event.preventDefault();
-        var parentTr = jQuery(this).parents('article');
+        var parentTr = jQuery(this).parents('tr');
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
-        jQuery('#dialog p').text('Opravdu chcete pokračovat v mazání?');
+        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat v mazání?');
 
-        jQuery('#dialog').dialog({
+        jQuery('#deleteDialog').dialog({
             resizable: false,
-            width: 350,
-            height: 200,
+            width: 300,
+            height: 150,
             modal: true,
             buttons: {
                 "Smazat": function () {
                     jQuery("#loader, .loader").show();
-                    jQuery.post(url, {csrf: csrf}, function (msg) {
-                        if (msg == 'success') {
+                    jQuery.post(url, {csrf: csrf}, function (data) {
+                        if (data.error == false) {
+                            jQuery('#csrf').val(data.csrf);
+                            jQuery("#loader, .loader").hide();
                             parentTr.fadeOut();
                         } else {
-                            alert(msg);
+                            alert(data.message);
                         }
-                        jQuery("#loader, .loader").hide();
                     });
                     jQuery(this).dialog("close");
                 },
@@ -198,25 +201,27 @@ jQuery(document).ready(function ($) {
         return false;
     });
 
-    jQuery('.ajaxReload').click(function (event) {
+    jQuery('.ajaxReload').click(function () {
         event.preventDefault();
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
-        jQuery('#dialog p').text('Opravdu chcete pokračovat?');
+        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat?');
 
-        jQuery('#dialog').dialog({
+        jQuery('#deleteDialog').dialog({
             resizable: false,
-            width: 350,
-            height: 200,
+            width: 300,
+            height: 150,
             modal: true,
             buttons: {
                 "Ano": function () {
-                    jQuery.post(url, {csrf: csrf}, function (msg) {
-                        if (msg == 'success') {
+                    jQuery("#loader, .loader").show();
+                    jQuery.post(url, {csrf: csrf}, function (data) {
+                        if (data.error == false) {
+                            jQuery('#csrf').val(data.csrf);
                             location.reload();
                         } else {
-                            alert(msg);
+                            alert(data.message);
                         }
                     });
                 },
@@ -228,17 +233,19 @@ jQuery(document).ready(function ($) {
         return false;
     });
 
+    //activate/deactivate
     jQuery('.ajaxChangestate').click(function () {
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
+
         jQuery("#loader, .loader").show();
-        jQuery.post(url, {csrf: csrf}, function (msg) {
-            if (msg == 'active' || msg == 'inactive') {
+        jQuery.post(url, {csrf: csrf}, function (data) {
+            if (data.error == false) {
+                jQuery('#csrf').val(data.csrf);
                 location.reload();
             } else {
-                alert(msg);
+                alert(data.message);
             }
-            jQuery("#loader, .loader").hide();
         });
 
         return false;

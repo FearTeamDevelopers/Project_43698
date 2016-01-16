@@ -3,7 +3,7 @@
 namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
-                
+
 class BasicAttendanceModel extends Model 
 {
 
@@ -25,7 +25,6 @@ class BasicAttendanceModel extends Model
      * @validate numeric,max(11)
      * @label id uzivatele
      * @unsigned
-     * @null
      */
     protected $_userId;
 
@@ -48,7 +47,6 @@ class BasicAttendanceModel extends Model
      * @type tinyint
      * @length 1
      * @validate max(1)
-     * @default 0
      */
     protected $_type;
 
@@ -68,7 +66,6 @@ class BasicAttendanceModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_created;
 
@@ -78,8 +75,84 @@ class BasicAttendanceModel extends Model
      * @type char
      * @length 19
      * @validate datetime,max(19)
-     * @null
      */
     protected $_modified;
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+        return $this;
+    }
+
+    public function getUserId()
+    {
+        return $this->_userId;
+    }
+
+    public function setUserId($value)
+    {
+        $this->_userId = $value;
+        return $this;
+    }
+
+    public function getActionId()
+    {
+        return $this->_actionId;
+    }
+
+    public function setActionId($value)
+    {
+        $this->_actionId = $value;
+        return $this;
+    }
+
+    public function getType()
+    {
+        return $this->_type;
+    }
+
+    public function setType($value)
+    {
+        $this->_type = $value;
+        return $this;
+    }
+
+    public function getComment()
+    {
+        return $this->_comment;
+    }
+
+    public function setComment($value)
+    {
+        $this->_comment = $value;
+        return $this;
+    }
+
+    public function getCreated()
+    {
+        return $this->_created;
+    }
+
+    public function setCreated($value)
+    {
+        $this->_created = $value;
+        return $this;
+    }
+
+    public function getModified()
+    {
+        return $this->_modified;
+    }
+
+    public function setModified($value)
+    {
+        $this->_modified = $value;
+        return $this;
+    }
 
 }

@@ -3,6 +3,7 @@
 namespace THCFrame\Request;
 
 use THCFrame\Registry\Registry;
+use THCFrame\Request\CookieBag;
 
 /**
  * Request methods wrapper class
@@ -116,9 +117,12 @@ class RequestMethods
      */
     public static function cookie($key, $default = '')
     {
-        if (!empty($_COOKIE[$key])) {
-            return $_COOKIE[$key];
+        $cookieBag = CookieBag::getInstance();
+        
+        if($cookieBag->get($key) !== null){
+           return $cookieBag->get($key);
         }
+        
         return $default;
     }
 

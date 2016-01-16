@@ -57,13 +57,13 @@ class ContentController extends Controller
         $view->set('content', null);
 
         if (RequestMethods::post('submitAddContent')) {
-            if ($this->_checkCSRFToken() !== true &&
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
                     $this->_checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/content/');
             }
 
             $errors = array();
-            $urlKey = $this->_createUrlKey(RequestMethods::post('page'));
+            $urlKey = $this->createUrlKey(RequestMethods::post('page'));
 
             if (!$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -120,13 +120,13 @@ class ContentController extends Controller
         $view->set('content', $content);
 
         if (RequestMethods::post('submitEditContent')) {
-            if ($this->_checkCSRFToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/content/');
             }
 
             $errors = array();
             $originalContent = clone $content;
-            $urlKey = $this->_createUrlKey(RequestMethods::post('page'));
+            $urlKey = $this->createUrlKey(RequestMethods::post('page'));
 
             if ($content->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));

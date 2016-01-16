@@ -7,7 +7,7 @@ use THCFrame\Events\Observable;
 /**
  *  Basic interface for observer objects
  */
-interface Observer
+interface ObserverInterface
 {
     public function update(Observable $observable);
 }

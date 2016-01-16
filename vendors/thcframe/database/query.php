@@ -92,10 +92,8 @@ class Query extends Base
      */
     protected function _logError($error, $sql)
     {
-        $errMessage = sprintf('There was an error in the query %s', $error) . PHP_EOL;
-        $errMessage .= 'SQL: ' . $sql;
-
-        Core::getLogger()->log($errMessage);
+        $errMessage = 'There was an error in the query {error} - SQL: {query}';
+        Core::getLogger()->error($errMessage, array('error' => $error, 'query' => $sql));
     }
 
     /**
@@ -211,7 +209,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
         
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->log($output,'system', true, 'sql.log');
+            Core::getLogger()->sql('{sql}', array('sql' => $output));
         }
 
         return $output;
@@ -240,7 +238,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
         
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->log($output,'system', true, 'sql.log');
+            Core::getLogger()->sql('{sql}', array('sql' => $output));
         }
         
         return $output;
@@ -284,7 +282,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
         
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->log($output,'system', true, 'sql.log');
+            Core::getLogger()->sql('{sql}', array('sql' => $output));
         }
         
         return $output;
@@ -320,7 +318,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
         
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->log($output,'system', true, 'sql.log');
+            Core::getLogger()->sql('{sql}', array('sql' => $output));
         }
         
         return $output;
