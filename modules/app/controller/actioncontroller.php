@@ -127,7 +127,7 @@ class ActionController extends Controller
 
         if (RequestMethods::post('submitAddComment')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/akce/r/'.$action->getId());
             }
 
@@ -150,7 +150,7 @@ class ActionController extends Controller
             } else {
                 Event::fire('app.log', array('fail', 'Errors: '.json_encode($comment->getErrors())));
                 $view->set('errors', $comment->getErrors())
-                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                     ->set('newcomment', $comment);
             }
         }

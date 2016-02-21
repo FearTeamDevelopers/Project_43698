@@ -251,6 +251,13 @@ class ModuleConfig extends Module
             'args' => ':page',
         ),
         array(
+            'pattern' => '/smazat-komentar/:id',
+            'module' => 'app',
+            'controller' => 'comment',
+            'action' => 'delete',
+            'args' => ':id',
+        ),
+        array(
             'pattern' => '/bazar/moje-inzeraty/p/:page',
             'module' => 'app',
             'controller' => 'advertisement',

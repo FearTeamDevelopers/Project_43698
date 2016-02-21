@@ -208,7 +208,7 @@ class DevController extends Controller
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
-                $urlKey = $this->createUrlKey($title);
+                $urlKey = StringMethods::createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'report');
                 if ($urlKeyCheck === true) {
@@ -239,7 +239,7 @@ class DevController extends Controller
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
-                $urlKey = $this->createUrlKey($title);
+                $urlKey = StringMethods::createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'action');
                 if ($urlKeyCheck === true) {
@@ -270,7 +270,7 @@ class DevController extends Controller
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
                 $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
-                $urlKey = $this->createUrlKey($title);
+                $urlKey = StringMethods::createUrlKey($title);
 
                 $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'news');
                 if ($urlKeyCheck === true) {

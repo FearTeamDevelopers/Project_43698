@@ -20,6 +20,7 @@ return array(
     'COMMON_SUCCESS' => 'Všechno proběhlo v pořádku',
     'COMMON_FAIL' => 'Oops, něco se pokazilo',
     'COMMON_VALIDATION_FAIL' => 'Povinná pole nejsou vyplněná správně',
+    'FIELD_REQUIRED' => 'Toto pole je povinné',
 
     'UNKNOW_ERROR' => 'Nastala neznámá chyba',
     'NOT_FOUND' => 'Nenalezeno',
@@ -94,11 +95,12 @@ return array(
     'TITLE_USER_ADD' => 'Uživatelé - Přidat',
     'TITLE_USER_EDIT' => 'Uživatelé - Upravit',
     'TITLE_USER_PROFILE' => 'Můj Profil',
-    
-    'ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS' => 'Žádost o prodloužení platnosti inzerátu byla úspěšně odeslána',
+
+    'AD_AVAILABILITY_REQUEST_SUCCESS' => 'Žádost o prodloužení platnosti inzerátu byla úspěšně odeslána',
     'AD_ALREADY_SOLD' => 'Inzerát označený jako prodaný již nelze editovat',
+    'AD_ALREADY_EXISTS' => 'Inzerát s takovýmto názvem už existuje',
     'AD_PHOTO_NOT_FOUND' => 'Daný inzerát takovou fotku nemá',
-    
+
     //UPLOAD ERRORS
     'UPLOAD_ERR_INI_SIZE' => 'Narávaný soubor %s překročil maximální velikost natavenou v php.ini',
     'UPLOAD_ERR_FORM_SIZE' => 'Narávaný soubor %s překročil maximální velikost natavenou v HTML formuláři',
@@ -110,7 +112,7 @@ return array(
     'UPLOAD_ERR_DEFAULT' => 'Nastala neočekávaná chyba při nahrávání souboru %s',
     'UPLOAD_ERR_EXT' => 'Tento typ souboru není podporován. Můžete nahrát pouze: %s',
     'UPLOAD_ERR_EMPTY_SOURCE' => 'Zdroj %s nemůže být prázdný',
-    
+
     'SEND_FEEDBACK_SUCCESS' => 'Děkujeme za Vaše nápady a návrhy',
     'SEND_FEEDBACK_FAIL' => 'Nepodařilo se odeslat zprávu s Vašimy nápady',
 );

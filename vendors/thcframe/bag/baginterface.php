@@ -1,6 +1,6 @@
 <?php
 
-namespace THCFrame\Core;
+namespace THCFrame\Bag;
 
 /**
  * Description of BagInterface
@@ -10,11 +10,15 @@ namespace THCFrame\Core;
 interface BagInterface
 {
 
+    public function setName($name);
+
+    public function getName();
+
     public function get($key, $default = null);
 
     public function set($key, $value);
 
-    public function erase($key);
+    public function remove($key);
 
     public function clear();
 

@@ -36,7 +36,7 @@ class Lang
             $key = strtoupper(str_replace(' ', '_', $key));
             $prepared[$key] = $value;
         }
-        
+
         unset($custom);
 
         if (isset($prepared['defaultMessage'])) {
@@ -52,7 +52,7 @@ class Lang
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public static function getInstance()
@@ -65,19 +65,19 @@ class Lang
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $args
      * @return type
      */
     public static function get($key, $args = array())
     {
-        $lang = new static();
+        $lang = self::getInstance();
         return $lang->_get($key, $args);
     }
 
     /**
-     * 
+     *
      */
     public function _get($key, $args = array())
     {

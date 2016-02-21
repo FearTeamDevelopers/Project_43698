@@ -98,7 +98,7 @@ class SystemController extends Controller
     /**
      * Get admin log.
      *
-     * @before _secured, _admin
+     * @before _secured, _superadmin
      */
     public function showLog()
     {
@@ -110,7 +110,7 @@ class SystemController extends Controller
     /**
      *
      * @param type $id
-     * @before _secured, _admin
+     * @before _secured, _superadmin
      */
     public function showLogDetail($id)
     {

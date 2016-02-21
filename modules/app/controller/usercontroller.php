@@ -76,13 +76,13 @@ class UserController extends Controller
 
                     self::redirect('/muj-profil');
                 } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
-                    $view->set('account_error', $this->lang('ACCOUNT_LOCKED'));
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', array('fail', sprintf('Account locked for %s', $email)));
                 } catch (\THCFrame\Security\Exception\UserInactive $ex) {
-                    $view->set('account_error', $this->lang('ACCOUNT_INACTIVE'));
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', array('fail', sprintf('Account inactive for %s', $email)));
                 } catch (\THCFrame\Security\Exception\UserExpired $ex) {
-                    $view->set('account_error', $this->lang('ACCOUNT_EXPIRED'));
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', array('fail', sprintf('Account expired for %s', $email)));
                 } catch (\THCFrame\Security\Exception\UserNotExists $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
@@ -91,7 +91,7 @@ class UserController extends Controller
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', array('fail', sprintf('Wrong password provided for user %s', $email)));
                 } catch (\THCFrame\Security\Exception\UserPassExpired $ex) {
-                    $view->set('account_error', $this->lang('ACCOUNT_PASS_EXPIRED'));
+                    $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', array('fail', sprintf('Password has expired for user %s', $email)));
                 } catch (\Exception $e) {
                     Event::fire('app.log', array('fail', 'Exception: ' . $e->getMessage()));
@@ -113,7 +113,7 @@ class UserController extends Controller
     {
         $view = $this->getActionView();
 
-        if ($this->getUser() !== null && $this->getUser()->getForcePassChange() == true) {
+        if ($this->getUser() !== null && $this->getUser()->getForcePassChange() === true) {
             $view->errorMessage($this->lang('LOGOUT_PASS_EXP_CHECK'));
             $this->getUser()
                     ->setForcePassChange(false)
@@ -146,7 +146,7 @@ class UserController extends Controller
 
         if (RequestMethods::post('register')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/');
             }
             $errors = array();
@@ -404,7 +404,7 @@ class UserController extends Controller
 
         if (RequestMethods::post('submitFeedback')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/feedback');
             }
 
@@ -433,7 +433,7 @@ class UserController extends Controller
             } else {
                 Event::fire('app.log', array('fail', 'Errors: ' . json_encode($feedback->getErrors())));
                 $view->set('feedback', $feedback)
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $feedback->getErrors());
             }
         }

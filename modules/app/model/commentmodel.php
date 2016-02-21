@@ -5,7 +5,7 @@ namespace App\Model;
 use App\Model\Basic\BasicCommentModel;
 
 /**
- * 
+ *
  */
 class CommentModel extends BasicCommentModel
 {
@@ -33,7 +33,7 @@ class CommentModel extends BasicCommentModel
     public $_replies;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -41,6 +41,7 @@ class CommentModel extends BasicCommentModel
         $raw = $primary['raw'];
 
         if (empty($this->$raw)) {
+            $this->setDeleted(false);
             $this->setCreated(date('Y-m-d H:i:s'));
         }
 
@@ -60,7 +61,7 @@ class CommentModel extends BasicCommentModel
 
     /**
      * Called from admin module.
-     * 
+     *
      * @return array
      */
     public static function fetchWithLimit($limit = 10)
@@ -89,7 +90,7 @@ class CommentModel extends BasicCommentModel
      *
      * @return type
      */
-    public static function fetchCommentsByResourceAndType($resourceId, $type, $limit = 15)
+    public static function fetchCommentsByResourceAndType($resourceId, $type, $limit = 20)
     {
         $query = self::getQuery(array('cm.*'))
                 ->join('tb_user', 'cm.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
@@ -114,7 +115,7 @@ class CommentModel extends BasicCommentModel
      * @param type $actionId
      * @param type $created
      */
-    public static function fetchByTypeAndCreated($type, $resourceId, $created, $limit = 15)
+    public static function fetchByTypeAndCreated($type, $resourceId, $created, $limit = 20)
     {
         $types = array_values(self::$_resourceConv);
 

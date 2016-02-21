@@ -5,6 +5,7 @@ namespace Admin\Controller;
 use Admin\Etc\Controller;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Core\StringMethods;
 
 /**
  *
@@ -182,13 +183,11 @@ class AdvertisementController extends Controller
         } else {
             if ($adImage->delete()) {
                 $this->getCache()->erase('bazar-');
-                Event::fire('admin.log',
-                        array('success', 'Ad image id: ' . $imageId
+                Event::fire('admin.log', array('success', 'Ad image id: ' . $imageId
                     . ' from ad: ' . $adImage->getAdId(),));
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log',
-                        array('fail', 'Ad image id: ' . $imageId
+                Event::fire('admin.log', array('fail', 'Ad image id: ' . $imageId
                     . ' from ad: ' . $adImage->getAdId(),));
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
@@ -208,12 +207,12 @@ class AdvertisementController extends Controller
 
         if (RequestMethods::post('submitAddAdSection')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/advertisement/sections/');
             }
 
             $errors = array();
-            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
+            $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
             if (!$this->_checkSectionUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -233,7 +232,7 @@ class AdvertisementController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $adsection->getErrors())));
                 $view->set('adsection', $adsection)
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $adsection->getErrors());
             }
         }
@@ -265,7 +264,7 @@ class AdvertisementController extends Controller
             }
 
             $errors = array();
-            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
+            $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
             if ($adsection->getUrlKey() !== $urlKey && !$this->_checkSectionUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));

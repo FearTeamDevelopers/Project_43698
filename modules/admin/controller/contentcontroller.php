@@ -58,12 +58,12 @@ class ContentController extends Controller
 
         if (RequestMethods::post('submitAddContent')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/content/');
             }
 
             $errors = array();
-            $urlKey = $this->createUrlKey(RequestMethods::post('page'));
+            $urlKey = StringMethods::createUrlKey(RequestMethods::post('page'));
 
             if (!$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -92,7 +92,7 @@ class ContentController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $content->getErrors())));
                 $view->set('errors', $errors + $content->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('content', $content);
             }
         }
@@ -126,7 +126,7 @@ class ContentController extends Controller
 
             $errors = array();
             $originalContent = clone $content;
-            $urlKey = $this->createUrlKey(RequestMethods::post('page'));
+            $urlKey = StringMethods::createUrlKey(RequestMethods::post('page'));
 
             if ($content->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));

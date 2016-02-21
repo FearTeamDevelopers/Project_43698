@@ -124,7 +124,7 @@ class UserController extends Controller
 
         if (RequestMethods::post('submitAddUser')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/user/');
             }
 
@@ -193,7 +193,7 @@ class UserController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $user->getErrors())));
                 $view->set('errors', $errors + $user->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('user', $user);
             }
         }

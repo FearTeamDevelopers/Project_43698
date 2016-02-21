@@ -4,6 +4,7 @@ namespace THCFrame\Request;
 
 use THCFrame\Registry\Registry;
 use THCFrame\Request\CookieBag;
+use THCFrame\Bag\DataBag;
 
 /**
  * Request methods wrapper class
@@ -11,19 +12,21 @@ use THCFrame\Request\CookieBag;
 class RequestMethods
 {
 
+    private static $dataBags = array();
+
     private function __construct()
     {
-        
+
     }
 
     private function __clone()
     {
-        
+
     }
 
     /**
      * Get value from $_GET array
-     * 
+     *
      * @param mixed $key
      * @param mixed $default
      * @return mixed
@@ -38,7 +41,7 @@ class RequestMethods
 
     /**
      * Check if key is in $_GET array
-     * 
+     *
      * @param mixed $key
      * @return boolean
      */
@@ -52,7 +55,7 @@ class RequestMethods
 
     /**
      * Get value from $_POST array
-     * 
+     *
      * @param mixed $key
      * @param mixed $default
      * @return mixed
@@ -67,7 +70,7 @@ class RequestMethods
 
     /**
      * Check if key is in $_POST array
-     * 
+     *
      * @param mixed $key
      * @return boolean
      */
@@ -81,7 +84,7 @@ class RequestMethods
 
     /**
      * Get value from $_SERVER array
-     * 
+     *
      * @param mixed $key
      * @param mixed $default
      * @return mixed
@@ -96,7 +99,7 @@ class RequestMethods
 
     /**
      * Check if key is in $_POST array
-     * 
+     *
      * @param mixed $key
      * @return boolean
      */
@@ -107,10 +110,10 @@ class RequestMethods
         }
         return false;
     }
-    
+
     /**
      * Get value from $_COOKIE array
-     * 
+     *
      * @param mixed $key
      * @param mixed $default
      * @return mixed
@@ -118,17 +121,17 @@ class RequestMethods
     public static function cookie($key, $default = '')
     {
         $cookieBag = CookieBag::getInstance();
-        
-        if($cookieBag->get($key) !== null){
-           return $cookieBag->get($key);
+
+        if ($cookieBag->get($key) !== null) {
+            return $cookieBag->get($key);
         }
-        
+
         return $default;
     }
 
     /**
      * Return client ip address
-     * 
+     *
      * @return string
      */
     public static function getClientIpAddress()
@@ -154,17 +157,17 @@ class RequestMethods
 
     /**
      * Return client browser identification
-     * 
+     *
      * @return string
      */
     public static function getBrowser()
     {
         $browser = Registry::get('browser');
-        return $browser->getBrowser().' '.$browser->getVersion().' '.$browser->getPlatform().' '.$browser->getUserAgent();
+        return $browser->getBrowser() . ' ' . $browser->getVersion() . ' ' . $browser->getPlatform() . ' ' . $browser->getUserAgent();
     }
 
     /**
-     * 
+     *
      * @return null
      */
     public static function getHttpReferer()
@@ -175,4 +178,51 @@ class RequestMethods
             return $_SERVER['HTTP_REFERER'];
         }
     }
+
+    /**
+     * Return POST array in DataBag object
+     *
+     * @return DataBag
+     */
+    public static function getPostDataBag()
+    {
+        if (isset(self::$dataBags['post'])) {
+            $postDataBag = self::$dataBags['post'];
+            $postDataBag->clear()
+                    ->initialize($_POST);
+
+            self::$dataBags['post'] = $postDataBag;
+        } else {
+            $postDataBag = new DataBag($_POST);
+            $postDataBag->setName('post');
+
+            self::$dataBags['post'] = $postDataBag;
+        }
+
+        return self::$dataBags['post'];
+    }
+
+    /**
+     * Return GET array in DataBag object
+     *
+     * @return DataBag
+     */
+    public static function getGetDataBag()
+    {
+        if (isset(self::$dataBags['get'])) {
+            $postDataBag = self::$dataBags['get'];
+            $postDataBag->clear()
+                    ->initialize($_GET);
+
+            self::$dataBags['get'] = $postDataBag;
+        } else {
+            $postDataBag = new DataBag($_GET);
+            $postDataBag->setName('get');
+
+            self::$dataBags['get'] = $postDataBag;
+        }
+
+        return self::$dataBags['get'];
+    }
+
 }

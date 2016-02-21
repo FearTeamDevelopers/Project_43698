@@ -3,9 +3,12 @@
 namespace App\Model;
 
 use App\Model\Basic\BasicReportModel;
+use THCFrame\Core\StringMethods;
+use THCFrame\Filesystem\FileManager;
+use THCFrame\Core\Lang;
 
 /**
- * 
+ *
  */
 class ReportModel extends BasicReportModel
 {
@@ -34,7 +37,25 @@ class ReportModel extends BasicReportModel
     protected $_fbLikeUrl;
 
     /**
-     * 
+     * Check whether action unique identifier already exist or not.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    private static function checkUrlKey($key)
+    {
+        $status = self::first(array('urlKey = ?' => $key));
+
+        if (null === $status) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *
      */
     public function preSave()
     {
@@ -55,7 +76,7 @@ class ReportModel extends BasicReportModel
 
     /**
      * Delete report and image
-     * 
+     *
      * @return type
      */
     public function delete()
@@ -72,7 +93,7 @@ class ReportModel extends BasicReportModel
 
         return $state;
     }
-    
+
     /**
      * @return array
      */
@@ -181,12 +202,185 @@ class ReportModel extends BasicReportModel
 
     /**
      * Return action states.
-     * 
+     *
      * @return array
      */
     public static function getStates()
     {
         return self::$_statesConv;
+    }
+
+    public static function createFromPost(\THCFrame\Bag\BagInterface $post,
+            array $options = array())
+    {
+        $urlKey = $urlKeyCh = StringMethods::createUrlKey($post->get('title'));
+        $errors = array();
+        $user = $options['user'];
+        $config = $options['config'];
+
+        for ($i = 1; $i <= 100; $i+=1) {
+            if (self::checkUrlKey($urlKeyCh)) {
+                break;
+            } else {
+                $urlKeyCh = $urlKey . '-' . $i;
+            }
+
+            if ($i == 100) {
+                $errors['title'] = array(Lang::get('ARTICLE_UNIQUE_ID'));
+                break;
+            }
+        }
+
+        $imgMain = $imgThumb = '';
+
+        if (!empty($post->get('croppedimage'))) {
+            $fileManager = new FileManager(array(
+                'thumbWidth' => $config->thumb_width,
+                'thumbHeight' => $config->thumb_height,
+                'thumbResizeBy' => $config->thumb_resizeby,
+                'maxImageWidth' => $config->photo_maxwidth,
+                'maxImageHeight' => $config->photo_maxheight,
+            ));
+
+            $fileErrors = $fileManager->uploadBase64Image($post->get('croppedimage'), $urlKeyCh, 'report', time() . '_')
+                    ->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
+
+            if (!empty($fileErrors)) {
+                $errors['croppedimage'] = $fileErrors;
+            }
+
+            if (!empty($files)) {
+                foreach ($files as $i => $file) {
+                    if ($file instanceof \THCFrame\Filesystem\Image) {
+                        $imgMain = trim($file->getFilename(), '.');
+                        $imgThumb = trim($file->getThumbname(), '.');
+                        break;
+                    }
+                }
+            }
+        } else {
+            $errors['croppedimage'] = array(Lang::get('FIELD_REQUIRED'));
+        }
+
+        $shortText = str_replace(
+                array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKeyCh, '[Celý článek]'), $post->get('shorttext')
+        );
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks($post->get('keywords')));
+
+        $report = new static(array(
+            'title' => $post->get('title'),
+            'userId' => $user()->getId(),
+            'userAlias' => $user()->getWholeName(),
+            'urlKey' => $urlKeyCh,
+            'approved' => $config()->report_autopublish,
+            'archive' => 0,
+            'shortBody' => $shortText,
+            'body' => $post->get('text'),
+            'rank' => $post->get('rank', 1),
+            'keywords' => $keywords,
+            'metaTitle' => $post->get('metatitle', $post->get('title')),
+            'metaDescription' => strip_tags($post->get('metadescription', $shortText)),
+            'metaImage' => $imgMain,
+            'photoName' => $urlKey,
+            'imgMain' => $imgMain,
+            'imgThumb' => $imgThumb,
+        ));
+
+        return array($report, $errors);
+    }
+
+    public static function editFromPost(\THCFrame\Bag\BagInterface $post,
+            \App\Model\ReportModel $report, array $options = array())
+    {
+        $urlKey = $urlKeyCh = StringMethods::createUrlKey($post->get('title'));
+        $errors = array();
+        $user = $options['user'];
+        $config = $options['config'];
+
+        if ($report->urlKey != $urlKey && !self::checkUrlKey($urlKey)) {
+            for ($i = 1; $i <= 100; $i+=1) {
+                if (self::checkUrlKey($urlKeyCh)) {
+                    break;
+                } else {
+                    $urlKeyCh = $urlKey . '-' . $i;
+                }
+
+                if ($i == 100) {
+                    $errors['title'] = array(Lang::get('ARTICLE_TITLE_IS_USED'));
+                    break;
+                }
+            }
+        }
+
+        $fileManager = new FileManager(array(
+            'thumbWidth' => $config->thumb_width,
+            'thumbHeight' => $config->thumb_height,
+            'thumbResizeBy' => $config->thumb_resizeby,
+            'maxImageWidth' => $config->photo_maxwidth,
+            'maxImageHeight' => $config->photo_maxheight,
+        ));
+
+        $imgMain = $imgThumb = '';
+        if ($report->imgMain == '' && !empty($post->get('croppedimage'))) {
+            $fileErrors = $fileManager->uploadBase64Image($post->get('croppedimage'), $urlKeyCh, 'report', time() . '_')
+                    ->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
+
+            if (!empty($fileErrors)) {
+                $errors['croppedimage'] = $fileErrors;
+            }
+
+            if (!empty($files)) {
+                foreach ($files as $i => $file) {
+                    if ($file instanceof \THCFrame\Filesystem\Image) {
+                        $imgMain = trim($file->getFilename(), '.');
+                        $imgThumb = trim($file->getThumbname(), '.');
+                        break;
+                    }
+                }
+            } else {
+                $errors['croppedimage'] = array(Lang::get('FIELD_REQUIRED'));
+            }
+        } else {
+            $imgMain = $report->imgMain;
+            $imgThumb = $report->imgThumb;
+        }
+
+        if (null === $report->userId) {
+            $report->userId = $user->getId();
+            $report->userAlias = $user->getWholeName();
+        }
+
+        $shortText = str_replace(
+                array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKeyCh, '[Celý článek]'), $post->get('shorttext')
+        );
+
+        $keywords = strtolower(StringMethods::removeDiacriticalMarks($post->get('keywords')));
+
+        if (!$this->isAdmin()) {
+            $report->approved = $config->report_autopublish;
+        } else {
+            $report->approved = $post->get('approve');
+        }
+
+        $report->title = $post->get('title');
+        $report->urlKey = $urlKeyCh;
+        $report->body = $post->get('text');
+        $report->shortBody = $shortText;
+        $report->rank = $post->get('rank', 1);
+        $report->active = $post->get('active');
+        $report->archive = $post->get('archive');
+        $report->keywords = $keywords;
+        $report->metaTitle = $post->get('metatitle', $post->get('title'));
+        $report->metaDescription = strip_tags($post->get('metadescription', $shortText));
+        $report->metaImage = $imgMain;
+        $report->photoName = $urlKey;
+        $report->imgMain = $imgMain;
+        $report->imgThumb = $imgThumb;
+
+        return array($report, $errors);
     }
 
 }

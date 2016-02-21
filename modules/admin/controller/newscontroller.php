@@ -57,7 +57,7 @@ class NewsController extends Controller
      */
     private function _createObject()
     {
-        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
 
         for ($i = 1; $i <= 100; $i+=1) {
             if ($this->_checkUrlKey($urlKeyCh)) {
@@ -103,7 +103,7 @@ class NewsController extends Controller
      */
     private function _editObject(\App\Model\NewsModel $object)
     {
-        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
+        $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
 
         if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
             for ($i = 1; $i <= 100; $i+=1) {
@@ -158,7 +158,7 @@ class NewsController extends Controller
     {
         $session = Registry::get('session');
         $news = $session->get('newsPreview');
-        $session->erase('newsPreview');
+        $session->remove('newsPreview');
 
         return $news;
     }
@@ -193,7 +193,7 @@ class NewsController extends Controller
 
         if (RequestMethods::post('submitAddNews')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -211,7 +211,7 @@ class NewsController extends Controller
                 Event::fire('admin.log', array('fail',
                     'Errors: '.json_encode($this->_errors + $news->getErrors()), ));
                 $view->set('errors', $this->_errors + $news->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('news', $news)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -219,7 +219,7 @@ class NewsController extends Controller
 
         if (RequestMethods::post('submitPreviewNews')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
@@ -233,7 +233,7 @@ class NewsController extends Controller
                 self::redirect('/news/preview?action=add');
             } else {
                 $view->set('errors', $this->_errors + $news->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('news', $news)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }

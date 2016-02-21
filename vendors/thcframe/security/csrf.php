@@ -119,7 +119,7 @@ class CSRF
     public function eraseToken()
     {
         $this->token = null;
-        $this->session->erase(self::$tokenName);
+        $this->session->remove(self::$tokenName);
 
         return $this;
     }

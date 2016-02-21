@@ -7,6 +7,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Registry\Registry;
+use THCFrame\Core\StringMethods;
 
 /**
  *
@@ -76,12 +77,12 @@ class GalleryController extends Controller
 
         if (RequestMethods::post('submitAddGallery')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
             $errors = array();
-            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
+            $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
             if (!$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
@@ -108,7 +109,7 @@ class GalleryController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $gallery->getErrors())));
                 $view->set('gallery', $gallery)
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $gallery->getErrors());
             }
         }
@@ -169,7 +170,7 @@ class GalleryController extends Controller
             }
 
             $errors = array();
-            $urlKey = $this->createUrlKey(RequestMethods::post('title'));
+            $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
             if ($gallery->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
                 $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));

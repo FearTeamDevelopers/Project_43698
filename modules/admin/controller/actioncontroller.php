@@ -5,7 +5,6 @@ namespace Admin\Controller;
 use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry;
 use THCFrame\Core\StringMethods;
 
 /**
@@ -14,8 +13,6 @@ use THCFrame\Core\StringMethods;
 class ActionController extends Controller
 {
 
-    private $_errors = array();
-
     /**
      * Check whether user has access to action or not.
      *
@@ -23,7 +20,7 @@ class ActionController extends Controller
      *
      * @return bool
      */
-    private function _checkAccess(\App\Model\ActionModel $action)
+    private function checkAccess(\App\Model\ActionModel $action)
     {
         if ($this->isAdmin() === true ||
                 $action->getUserId() == $this->getUser()->getId()) {
@@ -34,164 +31,14 @@ class ActionController extends Controller
     }
 
     /**
-     * Check whether action unique identifier already exist or not.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function _checkUrlKey($key)
-    {
-        $status = \App\Model\ActionModel::first(array('urlKey = ?' => $key));
-
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Create and return new action object.
-     *
-     * @return \App\Model\ActionModel
-     */
-    private function _createObject()
-    {
-        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
-
-        for ($i = 1; $i <= 100; $i+=1) {
-            if ($this->_checkUrlKey($urlKeyCh)) {
-                break;
-            } else {
-                $urlKeyCh = $urlKey.'-'.$i;
-            }
-
-            if ($i == 100) {
-                $this->_errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
-                break;
-            }
-        }
-
-        if(RequestMethods::post('datestart') > RequestMethods::post('dateend')){
-            $this->_errors['startDate'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
-        }
-
-        if(!empty(RequestMethods::post('timestart')) && empty(RequestMethods::post('timeend'))){
-            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
-        }elseif(!empty(RequestMethods::post('timeend')) && empty(RequestMethods::post('timestart'))){
-            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
-        }
-
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
-                array('/akce/r/'.$urlKey, '[Celý článek]'),
-                RequestMethods::post('shorttext'));
-
-        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-        $action = new \App\Model\ActionModel(array(
-            'title' => RequestMethods::post('title'),
-            'userId' => $this->getUser()->getId(),
-            'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKeyCh,
-            'approved' => $this->getConfig()->action_autopublish,
-            'archive' => 0,
-            'shortBody' => $shortText,
-            'body' => RequestMethods::post('text'),
-            'rank' => RequestMethods::post('rank', 1),
-            'startDate' => RequestMethods::post('datestart'),
-            'endDate' => RequestMethods::post('dateend'),
-            'startTime' => RequestMethods::post('timestart'),
-            'endTime' => RequestMethods::post('timeend'),
-            'keywords' => $keywords,
-            'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-            'metaDescription' => strip_tags(RequestMethods::post('metadescription', $shortText)),
-        ));
-
-        return $action;
-    }
-
-    /**
-     * Edit existing action object.
-     *
-     * @param \App\Model\ActionModel $object
-     *
-     * @return \App\Model\ActionModel
-     */
-    private function _editObject(\App\Model\ActionModel $object)
-    {
-        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
-
-        if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-            for ($i = 1; $i <= 100; $i+=1) {
-                if ($this->_checkUrlKey($urlKeyCh)) {
-                    break;
-                } else {
-                    $urlKeyCh = $urlKey . '-' . $i;
-                }
-
-                if ($i == 100) {
-                    $this->_errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
-                    break;
-                }
-            }
-        }
-
-        if (null === $object->userId) {
-            $object->userId = $this->getUser()->getId();
-            $object->userAlias = $this->getUser()->getWholeName();
-        }
-
-        $shortText = str_replace(
-                array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/'.$urlKey, '[Celý článek]'), RequestMethods::post('shorttext')
-        );
-
-        if(RequestMethods::post('datestart') > RequestMethods::post('dateend')){
-            $this->_errors['startDate'] = array($this->lang('ARTICLE_STARTDATE_ERROR'));
-        }
-
-        if(!empty(RequestMethods::post('timestart')) && empty(RequestMethods::post('timeend'))){
-            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
-        }elseif(!empty(RequestMethods::post('timeend')) && empty(RequestMethods::post('timestart'))){
-            $this->_errors['startTime'] = array($this->lang('ARTICLE_TIME_ERROR'));
-        }
-
-        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-        if(!$this->isAdmin()){
-            $object->approved = $this->getConfig()->action_autopublish;
-        }else{
-            $object->approved = RequestMethods::post('approve');
-        }
-
-        $object->title = RequestMethods::post('title');
-        $object->urlKey = $urlKeyCh;
-        $object->body = RequestMethods::post('text');
-        $object->shortBody = $shortText;
-        $object->rank = RequestMethods::post('rank', 1);
-        $object->startDate = RequestMethods::post('datestart');
-        $object->endDate = RequestMethods::post('dateend');
-        $object->startTime = RequestMethods::post('timestart');
-        $object->endTime = RequestMethods::post('timeend');
-        $object->active = RequestMethods::post('active');
-        $object->archive = RequestMethods::post('archive');
-        $object->keywords = $keywords;
-        $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-        $object->metaDescription = strip_tags(RequestMethods::post('metadescription',$shortText));
-
-        return $object;
-    }
-
-    /**
      * Check if there is object used for preview saved in session.
      *
      * @return \App\Model\ActionModel
      */
-    private function _checkForObject()
+    private function checkForObject()
     {
-        $session = Registry::get('session');
-        $action = $session->get('actionPreview');
-        $session->erase('actionPreview');
+        $action = $this->getSession()->get('actionPreview');
+        $this->getSession()->remove('actionPreview');
 
         return $action;
     }
@@ -199,28 +46,28 @@ class ActionController extends Controller
     /**
      * Send email notification abou new action published on web.
      */
-    private function _sendEmailNotification(\App\Model\ActionModel $action)
+    private function sendEmailNotification(\App\Model\ActionModel $action)
     {
         if ($action->getApproved() && $this->getConfig()->new_action_notification) {
             $users = \App\Model\UserModel::all(array('getNewActionNotification = ?' => true), array('email'));
 
             if (!empty($users)) {
-                $data = array('{TITLE}' => '<a href="http://'.$this->getServerHost().'/akce/r/'.$action->getUrlKey().'">'.$action->getTitle().'</a>',
+                $data = array('{TITLE}' => '<a href="http://' . $this->getServerHost() . '/akce/r/' . $action->getUrlKey() . '">' . $action->getTitle() . '</a>',
                     '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody()),
-                        );
+                );
 
-                $mailer =  new \THCFrame\Mailer\Mailer();
+                $mailer = new \THCFrame\Mailer\Mailer();
                 $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('new-action', $data);
 
                 $mailer->setBody($emailTpl->getBody())
-                        ->setSubject($emailTpl->getSubject().' - '.$action->getTitle());
+                        ->setSubject($emailTpl->getSubject() . ' - ' . $action->getTitle());
 
                 foreach ($users as $user) {
                     $mailer->setSendTo($user->getEmail());
                 }
 
                 $mailer->send(true);
-                Event::fire('admin.log', array('success', 'Send new action notification to '.count($users).' users'));
+                Event::fire('admin.log', array('success', 'Send new action notification to ' . count($users) . ' users'));
             }
         }
     }
@@ -233,6 +80,7 @@ class ActionController extends Controller
      */
     public function index()
     {
+
     }
 
     /**
@@ -243,37 +91,39 @@ class ActionController extends Controller
     public function add()
     {
         $view = $this->getActionView();
-        $action = $this->_checkForObject();
+        $action = $this->checkForObject();
 
         $actionConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION, ),
-                array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION,), array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $view->set('action', $action)
                 ->set('concepts', $actionConcepts);
 
         if (RequestMethods::post('submitAddAction')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
-            $action = $this->_createObject();
+            list($action, $errors) = \App\Model\ActionModel::createFromPost(
+                            RequestMethods::getPostDataBag(),
+                            array('user' => $this->getUser(), 'autoPublish' => $this->getConfig()->action_autopublish)
+            );
 
-            if (empty($this->_errors) && $action->validate()) {
+            if (empty($errors) && $action->validate()) {
                 $id = $action->save();
-                $this->_sendEmailNotification($action);
+                $this->sendEmailNotification($action);
                 $this->getCache()->erase('actions');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
-                Event::fire('admin.log', array('success', 'Action id: '.$id));
+                Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/action/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($this->_errors + $action->getErrors())));
-                $view->set('errors', $this->_errors + $action->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $action->getErrors())));
+                $view->set('errors', $errors + $action->getErrors())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('action', $action)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -281,21 +131,22 @@ class ActionController extends Controller
 
         if (RequestMethods::post('submitPreviewAction')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
-            $action = $this->_createObject();
+            list($action, $errors) = \App\Model\ActionModel::createFromPost(
+                            RequestMethods::getPostDataBag(), array('autoPublish' => $this->getConfig()->action_autopublish)
+            );
 
-            if (empty($this->_errors) && $action->validate()) {
-                $session = Registry::get('session');
-                $session->set('actionPreview', $action);
+            if (empty($errors) && $action->validate()) {
+                $this->getSession()->set('actionPreview', $action);
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
                 self::redirect('/action/preview?action=add');
             } else {
-                $view->set('errors', $this->_errors + $action->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                $view->set('errors', $errors + $action->getErrors())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('action', $action)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -313,7 +164,7 @@ class ActionController extends Controller
     {
         $view = $this->getActionView();
 
-        $action = $this->_checkForObject();
+        $action = $this->checkForObject();
 
         if (null === $action) {
             $action = \App\Model\ActionModel::first(array('id = ?' => (int) $id));
@@ -324,7 +175,7 @@ class ActionController extends Controller
                 self::redirect('/admin/action/');
             }
 
-            if (!$this->_checkAccess($action)) {
+            if (!$this->checkAccess($action)) {
                 $view->warningMessage($this->lang('LOW_PERMISSIONS'));
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/action/');
@@ -333,9 +184,7 @@ class ActionController extends Controller
 
         $actionConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION, ),
-                array('id', 'created', 'modified'),
-                array('created' => 'DESC'), 10);
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION,), array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
 
         $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
         $attUsers = \App\Model\AttendanceModel::fetchUsersByActionId($action->getId());
@@ -351,21 +200,25 @@ class ActionController extends Controller
             }
 
             $originalAction = clone $action;
-            $action = $this->_editObject($action);
 
-            if (empty($this->_errors) && $action->validate()) {
+            list($action, $errors) = \App\Model\ActionModel::createFromPost(
+                            RequestMethods::getPostDataBag(),
+                            array('user' => $this->getUser(), 'autoPublish' => $this->getConfig()->action_autopublish)
+            );
+
+            if (empty($errors) && $action->validate()) {
                 $action->save();
                 \Admin\Model\ActionHistoryModel::logChanges($originalAction, $action);
                 $this->getCache()->erase('actions');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
-                Event::fire('admin.log', array('success', 'Action id: '.$id));
+                Event::fire('admin.log', array('success', 'Action id: ' . $id));
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/action/');
             } else {
-                Event::fire('admin.log', array('fail', 'Action id: '.$id,
-                    'Errors: '.json_encode($this->_errors + $action->getErrors()), ));
-                $view->set('errors', $this->_errors + $action->getErrors())
+                Event::fire('admin.log', array('fail', 'Action id: ' . $id,
+                    'Errors: ' . json_encode($errors + $action->getErrors()),));
+                $view->set('errors', $errors + $action->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
@@ -375,15 +228,14 @@ class ActionController extends Controller
                 self::redirect('/admin/action/');
             }
 
-            $action = $this->_editObject($action);
+            list($action, $errors) = \App\Model\ActionModel::editFromPost(RequestMethods::getPostDataBag(), $action);
 
-            if (empty($this->_errors) && $action->validate()) {
-                $session = Registry::get('session');
-                $session->set('actionPreview', $action);
+            if (empty($errors) && $action->validate()) {
+                $this->getSession()->set('actionPreview', $action);
 
                 self::redirect('/action/preview?action=edit');
             } else {
-                $view->set('errors', $this->_errors + $action->getErrors())
+                $view->set('errors', $errors + $action->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
@@ -411,7 +263,7 @@ class ActionController extends Controller
         if (null === $action) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            if ($this->_checkAccess($action)) {
+            if ($this->checkAccess($action)) {
                 if ($action->delete()) {
                     $this->getCache()->erase('actions');
 
@@ -458,7 +310,7 @@ class ActionController extends Controller
 
             if ($action->validate()) {
                 $action->save();
-                $this->_sendEmailNotification($action);
+                $this->sendEmailNotification($action);
                 $this->getCache()->erase('actions');
 
                 Event::fire('admin.log', array('success', 'Action id: ' . $id));
@@ -660,7 +512,7 @@ class ActionController extends Controller
 
                         if ($action->validate()) {
                             $action->save();
-                            $this->_sendEmailNotification($action);
+                            $this->sendEmailNotification($action);
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
                                     . implode(', ', $action->getErrors());
@@ -737,7 +589,7 @@ class ActionController extends Controller
 
             $query = \App\Model\ActionModel::getQuery(
                             array('ac.id', 'ac.userId', 'ac.userAlias', 'ac.title',
-                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created', ))
+                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created',))
                     ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
                     ->wheresql($whereCond, $search, $search, $search);
 
@@ -773,7 +625,7 @@ class ActionController extends Controller
         } else {
             $query = \App\Model\ActionModel::getQuery(
                             array('ac.id', 'ac.userId', 'ac.userAlias', 'ac.title',
-                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created', ))
+                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created',))
                     ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
 
             if (RequestMethods::issetpost('iSortCol_0')) {
@@ -802,7 +654,7 @@ class ActionController extends Controller
 
         $draw = $page + 1 + time();
 
-        $str = '{ "draw": '.$draw.', "recordsTotal": '.$count.', "recordsFiltered": '.$count.', "data": [';
+        $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
 
         $returnArr = array();
         if (null !== $actions) {
@@ -833,31 +685,31 @@ class ActionController extends Controller
                 }
 
                 $arr = array();
-                $arr [] = '[ "'.$action->getId().'"';
-                $arr [] = '"'.htmlentities($action->getTitle()).'"';
-                $arr [] = '"'.$action->getUserAlias().'"';
-                $arr [] = '"'.$action->getCreated().'"';
-                $arr [] = '"'.$label.'"';
-                $arr [] = '"'.$archiveLabel.'"';
+                $arr [] = '[ "' . $action->getId() . '"';
+                $arr [] = '"' . htmlentities($action->getTitle()) . '"';
+                $arr [] = '"' . $action->getUserAlias() . '"';
+                $arr [] = '"' . $action->getCreated() . '"';
+                $arr [] = '"' . $label . '"';
+                $arr [] = '"' . $archiveLabel . '"';
 
                 $tempStr = '"';
                 if ($this->isAdmin() || $action->userId == $this->getUser()->getId()) {
-                    $tempStr .= "<a href='/admin/action/edit/".$action->id."#comments' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
-                    $tempStr .= "<a href='/admin/action/edit/".$action->id."#attendance' class='btn btn3 btn_users' title='Zobrazit účastníky'></a>";
-                    $tempStr .= "<a href='/admin/action/edit/".$action->id."#basic' class='btn btn3 btn_pencil' title='Upravit'></a>";
-                    $tempStr .= "<a href='/admin/action/delete/".$action->id."' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
+                    $tempStr .= "<a href='/admin/action/edit/" . $action->id . "#comments' class='btn btn3 btn_chat2' title='Zobrazit komentáře'></a>";
+                    $tempStr .= "<a href='/admin/action/edit/" . $action->id . "#attendance' class='btn btn3 btn_users' title='Zobrazit účastníky'></a>";
+                    $tempStr .= "<a href='/admin/action/edit/" . $action->id . "#basic' class='btn btn3 btn_pencil' title='Upravit'></a>";
+                    $tempStr .= "<a href='/admin/action/delete/" . $action->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
                 if ($this->isAdmin() && $action->approved == 0) {
-                    $tempStr .= "<a href='/admin/action/approveaction/".$action->id."' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
-                    $tempStr .= "<a href='/admin/action/rejectaction/".$action->id."' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                    $tempStr .= "<a href='/admin/action/approveaction/" . $action->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/action/rejectaction/" . $action->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
                 }
 
-                $arr [] = $tempStr.'"]';
+                $arr [] = $tempStr . '"]';
                 $returnArr[] = implode(',', $arr);
             }
 
-            $str .= implode(',', $returnArr).']}';
+            $str .= implode(',', $returnArr) . ']}';
 
             echo $str;
         } else {
@@ -874,6 +726,7 @@ class ActionController extends Controller
      */
     public function help()
     {
+
     }
 
     /**

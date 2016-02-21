@@ -32,6 +32,7 @@ class Server extends Session\Driver
     public function __construct($options = array())
     {
         parent::__construct($options);
+        $this->setName('session_server');
         @session_start();
     }
 
@@ -43,9 +44,9 @@ class Server extends Session\Driver
      */
     public function hashKey($key)
     {
-        if(ENV === 'live'){
+        if (ENV === 'live') {
             return hash_hmac('sha512', $key, $this->getSecret());
-        }else{
+        } else {
             return $key;
         }
     }
@@ -86,7 +87,7 @@ class Server extends Session\Driver
      * @param type $key
      * @return \THCFrame\Session\Driver\Server
      */
-    public function erase($key)
+    public function remove($key)
     {
         $key = $this->hashKey($key);
         unset($_SESSION[$this->prefix . $key]);
@@ -100,6 +101,17 @@ class Server extends Session\Driver
     public function clear()
     {
         $_SESSION = array();
+        return $this;
+    }
+
+    public function getName()
+    {
+        return $this->dataBagName;
+    }
+
+    public function setName($name)
+    {
+        $this->dataBagName = '_databag_' . $name;
         return $this;
     }
 

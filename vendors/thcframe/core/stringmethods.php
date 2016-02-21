@@ -150,25 +150,25 @@ class StringMethods
     );
 
     /**
-     * 
+     *
      */
     private function __construct()
     {
-        
+
     }
 
     /**
-     * 
+     *
      */
     private function __clone()
     {
-        
+
     }
 
     /**
-     * Normalization of regular expression strings, so that the remaining 
+     * Normalization of regular expression strings, so that the remaining
      * methods can operate on them without first having to check or normalize them
-     * 
+     *
      * @param string $pattern
      * @return string
      */
@@ -179,7 +179,7 @@ class StringMethods
 
     /**
      * Return delimiter
-     * 
+     *
      * @return string
      */
     public static function getDelimiter()
@@ -189,7 +189,7 @@ class StringMethods
 
     /**
      * Set delimiter
-     * 
+     *
      * @param string $delimiter
      */
     public static function setDelimiter($delimiter)
@@ -199,10 +199,10 @@ class StringMethods
 
     /**
      * Methods perform similarly to the preg_match_all() function, but require less
-     * formal structure to the regular expressions, and return a more predictable set of results. 
-     * The match() method will return the first captured substring, 
+     * formal structure to the regular expressions, and return a more predictable set of results.
+     * The match() method will return the first captured substring,
      * the entire substring match, or null.
-     * 
+     *
      * @param string $string
      * @param string $pattern
      * @return mixed
@@ -224,7 +224,7 @@ class StringMethods
 
     /**
      * Return hash of given string or object
-     * 
+     *
      * @param string|object $string
      * @param string        $algo
      * @return string
@@ -234,16 +234,16 @@ class StringMethods
         if($algo === null){
             $algo = Registry::get('configuration')->security->encoder;
         }
-        
+
         return hash_hmac($algo, $string, '');
     }
 
     /**
      * Methods perform similarly to the preg_split() functions, but require less
-     * formal structure to the regular expressions, and return a more predictable set of results. 
-     * The split() method will return the results of a call to the preg_split() function, 
+     * formal structure to the regular expressions, and return a more predictable set of results.
+     * The split() method will return the results of a call to the preg_split() function,
      * after setting some flags and normalizing the regular expression.
-     * 
+     *
      * @param type $string
      * @param type $pattern
      * @param type $limit
@@ -256,9 +256,9 @@ class StringMethods
     }
 
     /**
-     * Method loops through the characters of a string, replacing them with 
+     * Method loops through the characters of a string, replacing them with
      * regular expression friendly character representations
-     * 
+     *
      * @param string $string
      * @param mixed $mask
      * @return string
@@ -272,7 +272,7 @@ class StringMethods
         } else {
             return $string;
         }
-        
+
         foreach ($parts as $part) {
             $normalized = self::_normalize("\\{$part}");
             $string = preg_replace("{$normalized}m", "\\{$part}", $string);
@@ -284,7 +284,7 @@ class StringMethods
 
     /**
      * Method eliminates all duplicated characters in a string
-     * 
+     *
      * @param string $string
      * @return string
      */
@@ -303,9 +303,9 @@ class StringMethods
     }
 
     /**
-     * Method returns the position of a substring within a larger string, 
+     * Method returns the position of a substring within a larger string,
      * or -1 if the substring isn’t found
-     * 
+     *
      * @param string $string
      * @param string $substring
      * @param type $offset
@@ -321,7 +321,7 @@ class StringMethods
     }
 
     /**
-     * 
+     *
      * @param string $string
      * @param string $substring
      * @param type $offset
@@ -337,7 +337,7 @@ class StringMethods
     }
 
     /**
-     * 
+     *
      * @param string $string
      * @return string
      */
@@ -358,7 +358,7 @@ class StringMethods
     }
 
     /**
-     * 
+     *
      * @param string $string
      * @return string
      */
@@ -380,7 +380,7 @@ class StringMethods
 
     /**
      * Method remove diacritical marks form string
-     * 
+     *
      * @param string $string
      * @return string
      */
@@ -390,7 +390,7 @@ class StringMethods
     }
 
     /**
-     * 
+     *
      * @param string $string
      * @param array $badChars
      * @param string $replace
@@ -415,16 +415,16 @@ class StringMethods
         }else{
             $noDiacriticString = $string;
         }
-        
+
         $cleanString = trim(str_replace($badChars, $replace, $noDiacriticString));
-        
+
         unset($noDiacriticString);
         return $cleanString;
     }
-    
+
     /**
      * Version of stripos with needles as an array or string
-     * 
+     *
      * @param type $haystack
      * @param type $needles
      * @return type
@@ -552,7 +552,7 @@ class StringMethods
 
     /**
      * Returns XSS-safe equivalent of string
-     * 
+     *
      * @param mixed $data
      */
     protected static function xss_safe($data)
@@ -580,7 +580,7 @@ class StringMethods
     /**
      * XSS-safe replacement for echo.
      * Basically you should never use echo or print in your project, instead use php tags and this
-     * 
+     *
      * @param mixed $data
      */
     public static function exho($data)
@@ -591,7 +591,7 @@ class StringMethods
     /**
      * XSS-safe replacement for echo, with formatting and ability to dump elements and attributes
      * Usage: echo_param("Hello, you're number <strong>?</strong>",$number);
-     * 
+     *
      * @param $string the format string
      */
     public static function echof($string)
@@ -614,7 +614,7 @@ class StringMethods
     /**
      * Safe printf. Escapes all arguments
      * The format string should not contain any concatenations or variables, just plain text
-     * 
+     *
      * @param string $formatString
      */
     public static function printf($formatString)
@@ -632,7 +632,7 @@ class StringMethods
     /**
      * Safe vprintf. Escapes all arguments
      * The format string should not contain any concatenations or variables, just plain text
-     * 
+     *
      * @param string $formatString
      * @param array args
      */
@@ -646,7 +646,7 @@ class StringMethods
 
     /**
      * This one replaces NewLines with <br/>
-     * 
+     *
      * @param unknown $data
      */
     public static function echo_br($data)
@@ -656,7 +656,7 @@ class StringMethods
 
     /**
      * Prepare text for inserting into email template
-     * 
+     *
      * @param string $text
      * @return string
      */
@@ -664,7 +664,23 @@ class StringMethods
     {
         $prepared = str_replace(array('</p>', '</div>'), '<br/>', $text);
         $prepared = strip_tags($prepared,'<br/><br><a><img/><img><table><tr><td><tbody><meta/><meta>');
-        
+
         return $prepared;
+    }
+
+
+    /**
+     * @param type $string
+     *
+     * @return type
+     */
+    public static function createUrlKey($string)
+    {
+        $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
+        $preCleaned = static::fastClean($string, $neutralChars, '-');
+        $cleaned = static::fastClean($preCleaned);
+        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
+
+        return strtolower($return);
     }
 }

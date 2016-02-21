@@ -58,21 +58,6 @@ class Controller extends BaseController
     }
 
     /**
-     * @param type $string
-     *
-     * @return type
-     */
-    protected function createUrlKey($string)
-    {
-        $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
-        $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
-        $cleaned = StringMethods::fastClean($preCleaned);
-        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
-
-        return strtolower($return);
-    }
-
-    /**
      * @param type $pageCount
      * @param type $page
      * @param type $path
@@ -102,7 +87,6 @@ class Controller extends BaseController
     {
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
-        header('Content-Type: text/html; charset=utf-8');
     }
 
     /**
@@ -208,7 +192,7 @@ class Controller extends BaseController
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
-                    ->set('submstoken', $this->_mutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->mutliSubmissionProtectionToken())
                     ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 
@@ -218,7 +202,7 @@ class Controller extends BaseController
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
-                    ->set('submstoken', $this->_mutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->mutliSubmissionProtectionToken())
                     ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 

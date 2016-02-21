@@ -23,7 +23,7 @@ class ReportController extends Controller
      *
      * @return bool
      */
-    private function _checkAccess(\App\Model\ReportModel $report)
+    private function checkAccess(\App\Model\ReportModel $report)
     {
         if ($this->isAdmin() === true ||
                 $report->getUserId() == $this->getUser()->getId()) {
@@ -34,208 +34,15 @@ class ReportController extends Controller
     }
 
     /**
-     * Check whether report unique identifier already exist or not.
-     *
-     * @param type $key
-     *
-     * @return bool
-     */
-    private function _checkUrlKey($key)
-    {
-        $status = \App\Model\ReportModel::first(array('urlKey = ?' => $key));
-
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Create and return new report object.
-     *
-     * @return \App\Model\ReportModel
-     */
-    private function _createObject()
-    {
-        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
-
-        for ($i = 1; $i <= 100; $i+=1) {
-            if ($this->_checkUrlKey($urlKeyCh)) {
-                break;
-            } else {
-                $urlKeyCh = $urlKey.'-'.$i;
-            }
-
-            if ($i == 100) {
-                $this->_errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
-                break;
-            }
-        }
-
-        $imgMain = $imgThumb = '';
-
-        if(!empty(RequestMethods::post('croppedimage'))){
-            $fileManager = new FileManager(array(
-                'thumbWidth' => $this->getConfig()->thumb_width,
-                'thumbHeight' => $this->getConfig()->thumb_height,
-                'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
-                'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-                'maxImageHeight' => $this->getConfig()->photo_maxheight,
-            ));
-
-            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKeyCh, 'report', time().'_')->getUploadErrors();
-            $files = $fileManager->getUploadedFiles();
-
-            if (!empty($fileErrors)) {
-                $this->_errors['croppedimage'] = $fileErrors;
-            }
-
-            if (!empty($files)) {
-                foreach ($files as $i => $file) {
-                    if ($file instanceof \THCFrame\Filesystem\Image) {
-                        $imgMain = trim($file->getFilename(), '.');
-                        $imgThumb = trim($file->getThumbname(), '.');
-                        break;
-                    }
-                }
-            }
-        }else{
-            $this->_errors['croppedimage'] = array('Foto je povinné');
-        }
-
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
-                array('/reportaz/r/'.$urlKeyCh, '[Celý článek]'),
-                RequestMethods::post('shorttext'));
-
-        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-        $report = new \App\Model\ReportModel(array(
-            'title' => RequestMethods::post('title'),
-            'userId' => $this->getUser()->getId(),
-            'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKeyCh,
-            'approved' => $this->getConfig()->report_autopublish,
-            'archive' => 0,
-            'shortBody' => $shortText,
-            'body' => RequestMethods::post('text'),
-            'rank' => RequestMethods::post('rank', 1),
-            'keywords' => $keywords,
-            'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-            'metaDescription' => strip_tags(RequestMethods::post('metadescription',$shortText)),
-            'metaImage' => $imgMain,
-            'photoName' => $urlKey,
-            'imgMain' => $imgMain,
-            'imgThumb' => $imgThumb,
-        ));
-
-        return $report;
-    }
-
-    /**
-     * Edit existing report object.
-     *
-     * @param \App\Model\ReportModel $object
-     *
-     * @return \\App\Model\ReportModel
-     */
-    private function _editObject(\App\Model\ReportModel $object)
-    {
-        $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
-
-        if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-            for ($i = 1; $i <= 100; $i+=1) {
-                if ($this->_checkUrlKey($urlKeyCh)) {
-                    break;
-                } else {
-                    $urlKeyCh = $urlKey . '-' . $i;
-                }
-
-                if ($i == 100) {
-                    $this->_errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
-                    break;
-                }
-            }
-        }
-
-        $fileManager = new FileManager(array(
-            'thumbWidth' => $this->getConfig()->thumb_width,
-            'thumbHeight' => $this->getConfig()->thumb_height,
-            'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
-            'maxImageWidth' => $this->getConfig()->photo_maxwidth,
-            'maxImageHeight' => $this->getConfig()->photo_maxheight,
-        ));
-
-        $imgMain = $imgThumb = '';
-        if ($object->imgMain == '' && !empty(RequestMethods::post('croppedimage'))) {
-            $fileErrors = $fileManager->uploadBase64Image(RequestMethods::post('croppedimage'), $urlKeyCh, 'report', time().'_')->getUploadErrors();
-            $files = $fileManager->getUploadedFiles();
-
-            if (!empty($fileErrors)) {
-                $this->_errors['croppedimage'] = $fileErrors;
-            }
-
-            if (!empty($files)) {
-                foreach ($files as $i => $file) {
-                    if ($file instanceof \THCFrame\Filesystem\Image) {
-                        $imgMain = trim($file->getFilename(), '.');
-                        $imgThumb = trim($file->getThumbname(), '.');
-                        break;
-                    }
-                }
-            }else{
-                $this->_errors['croppedimage'] = array('Foto je povinné');
-            }
-        } else {
-            $imgMain = $object->imgMain;
-            $imgThumb = $object->imgThumb;
-        }
-
-        if (null === $object->userId) {
-            $object->userId = $this->getUser()->getId();
-            $object->userAlias = $this->getUser()->getWholeName();
-        }
-
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'),
-                array('/reportaz/r/'.$urlKeyCh, '[Celý článek]'),
-                RequestMethods::post('shorttext'));
-
-        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-        if(!$this->isAdmin()){
-            $object->approved = $this->getConfig()->report_autopublish;
-        }else{
-            $object->approved = RequestMethods::post('approve');
-        }
-
-        $object->title = RequestMethods::post('title');
-        $object->urlKey = $urlKeyCh;
-        $object->body = RequestMethods::post('text');
-        $object->shortBody = $shortText;
-        $object->rank = RequestMethods::post('rank', 1);
-        $object->active = RequestMethods::post('active');
-        $object->archive = RequestMethods::post('archive');
-        $object->keywords = $keywords;
-        $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-        $object->metaDescription = strip_tags(RequestMethods::post('metadescription',$shortText));
-        $object->metaImage = $imgMain;
-        $object->photoName = $urlKey;
-        $object->imgMain = $imgMain;
-        $object->imgThumb = $imgThumb;
-
-        return $object;
-    }
-
-    /**
      * Check if there is object used for preview saved in session.
      *
      * @return \App\Model\ReportModel
      */
-    private function _checkForObject()
+    private function checkForObject()
     {
         $session = Registry::get('session');
         $report = $session->get('reportPreview');
-        $session->erase('reportPreview');
+        $session->remove('reportPreview');
 
         return $report;
     }
@@ -243,7 +50,7 @@ class ReportController extends Controller
     /**
      * Send email notification abou new report published on web.
      */
-    private function _sendEmailNotification(\App\Model\ReportModel $report)
+    private function sendEmailNotification(\App\Model\ReportModel $report)
     {
         if ($report->getApproved() && $this->getConfig()->new_report_notification) {
             $users = \App\Model\UserModel::all(array('getNewReportNotification = ?' => true), array('email'));
@@ -287,7 +94,7 @@ class ReportController extends Controller
     public function add()
     {
         $view = $this->getActionView();
-        $report = $this->_checkForObject();
+        $report = $this->checkForObject();
 
         $reportConcepts = \Admin\Model\ConceptModel::all(array(
                     'userId = ?' => $this->getUser()->getId(),
@@ -299,15 +106,18 @@ class ReportController extends Controller
 
         if (RequestMethods::post('submitAddReport')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/report/');
             }
 
-            $report = $this->_createObject();
+            list($report, $errors) = \App\Model\ReportModel::createFromPost(
+                            RequestMethods::getPostDataBag(),
+                            array('user' => $this->getUser(), 'config' => $this->getConfig())
+            );
 
-            if (empty($this->_errors) && $report->validate()) {
+            if (empty($errors) && $report->validate()) {
                 $id = $report->save();
-                $this->_sendEmailNotification($report);
+                $this->sendEmailNotification($report);
                 $this->getCache()->erase('report');
                 \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
 
@@ -315,9 +125,9 @@ class ReportController extends Controller
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/report/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($this->_errors + $report->getErrors())));
-                $view->set('errors', $this->_errors + $report->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($errors + $report->getErrors())));
+                $view->set('errors', $errors + $report->getErrors())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('report', $report)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -325,13 +135,16 @@ class ReportController extends Controller
 
         if (RequestMethods::post('submitPreviewReport')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/report/');
             }
 
-            $report = $this->_createObject();
+            list($report, $errors) = \App\Model\ReportModel::createFromPost(
+                            RequestMethods::getPostDataBag(),
+                            array('user' => $this->getUser(), 'config' => $this->getConfig())
+            );
 
-            if (empty($this->_errors) && $report->validate()) {
+            if (empty($errors) && $report->validate()) {
                 $session = Registry::get('session');
                 $session->set('reportPreview', $report);
                 $session->set('reportPreviewPhoto', array($report->imgMain, $report->imgThumb));
@@ -339,8 +152,8 @@ class ReportController extends Controller
 
                 self::redirect('/report/preview?action=add');
             } else {
-                $view->set('errors', $this->_errors + $report->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                $view->set('errors', $errors + $report->getErrors())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('report', $report)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -357,7 +170,7 @@ class ReportController extends Controller
     public function edit($id)
     {
         $view = $this->getActionView();
-        $report = $this->_checkForObject();
+        $report = $this->checkForObject();
 
         if (null === $report) {
             $report = \App\Model\ReportModel::first(array('id = ?' => (int) $id));
@@ -368,7 +181,7 @@ class ReportController extends Controller
                 self::redirect('/admin/report/');
             }
 
-            if (!$this->_checkAccess($report)) {
+            if (!$this->checkAccess($report)) {
                 $view->warningMessage($this->lang('LOW_PERMISSIONS'));
                 $this->_willRenderActionView = false;
                 self::redirect('/admin/report/');
@@ -392,9 +205,12 @@ class ReportController extends Controller
             }
 
             $originalReport = clone $report;
-            $report = $this->_editObject($report);
+            list($report, $errors) = \App\Model\ReportModel::createFromPost(
+                            RequestMethods::getPostDataBag(),
+                            array('user' => $this->getUser(), 'config' => $this->getConfig())
+            );
 
-            if (empty($this->_errors) && $report->validate()) {
+            if (empty($errors) && $report->validate()) {
                 $report->save();
                 \Admin\Model\ReportHistoryModel::logChanges($originalReport, $report);
                 $this->getCache()->erase('report');
@@ -405,8 +221,8 @@ class ReportController extends Controller
                 self::redirect('/admin/report/');
             } else {
                 Event::fire('admin.log', array('fail', 'Report id: '.$id,
-                    'Errors: '.json_encode($this->_errors + $report->getErrors()), ));
-                $view->set('errors', $this->_errors + $report->getErrors())
+                    'Errors: '.json_encode($errors + $report->getErrors()), ));
+                $view->set('errors', $errors + $report->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
@@ -416,15 +232,18 @@ class ReportController extends Controller
                 self::redirect('/admin/report/');
             }
 
-            $report = $this->_editObject($report);
+            list($report, $errors) = \App\Model\ReportModel::createFromPost(
+                            RequestMethods::getPostDataBag(),
+                            array('user' => $this->getUser(), 'config' => $this->getConfig())
+            );
 
-            if (empty($this->_errors) && $report->validate()) {
+            if (empty($errors) && $report->validate()) {
                 $session = Registry::get('session');
                 $session->set('reportPreview', $report);
 
                 self::redirect('/report/preview?action=edit');
             } else {
-                $view->set('errors', $this->_errors + $report->getErrors())
+                $view->set('errors', $errors + $report->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
@@ -452,7 +271,7 @@ class ReportController extends Controller
         if (null === $report) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            if ($this->_checkAccess($report)) {
+            if ($this->checkAccess($report)) {
                 if ($report->delete()) {
                     $this->getCache()->erase('report');
                     Event::fire('admin.log', array('success', 'Report id: '.$id));
@@ -487,7 +306,7 @@ class ReportController extends Controller
         if (null === $report) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            if (!$this->_checkAccess($report)) {
+            if (!$this->checkAccess($report)) {
                 $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
 
@@ -559,7 +378,7 @@ class ReportController extends Controller
         if (null === $report) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            $report->approved = 1;
+            $report->approved = \App\Model\ReportModel::STATE_APPROVED;
 
             if (null === $report->userId) {
                 $report->userId = $this->getUser()->getId();
@@ -568,7 +387,7 @@ class ReportController extends Controller
 
             if ($report->validate()) {
                 $report->save();
-                $this->_sendEmailNotification($report);
+                $this->sendEmailNotification($report);
                 $this->getCache()->erase('report');
 
                 Event::fire('admin.log', array('success', 'Report id: '.$id));
@@ -601,7 +420,7 @@ class ReportController extends Controller
         if (null === $report) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            $report->approved = 2;
+            $report->approved = \App\Model\ReportModel::STATE_REJECTED;
 
             if (null === $report->userId) {
                 $report->userId = $this->getUser()->getId();
@@ -761,7 +580,7 @@ class ReportController extends Controller
 
                 if (null !== $reports) {
                     foreach ($reports as $report) {
-                        $report->approved = 1;
+                        $report->approved = \App\Model\ReportModel::STATE_APPROVED;
 
                         if (null === $report->userId) {
                             $report->userId = $this->getUser()->getId();
@@ -770,7 +589,7 @@ class ReportController extends Controller
 
                         if ($report->validate()) {
                             $report->save();
-                            $this->_sendEmailNotification($report);
+                            $this->sendEmailNotification($report);
                         } else {
                             $errors[] = "Action id {$report->getId()} - {$report->getTitle()} errors: "
                                     .implode(', ', $report->getErrors());
@@ -797,7 +616,7 @@ class ReportController extends Controller
 
                 if (null !== $reports) {
                     foreach ($reports as $report) {
-                        $report->approved = 2;
+                        $report->approved = \App\Model\ReportModel::STATE_REJECTED;
 
                         if (null === $report->userId) {
                             $report->userId = $this->getUser()->getId();
@@ -923,9 +742,9 @@ class ReportController extends Controller
                     $label .= "<span class='infoLabel infoLabelRed'>Neaktivní</span>";
                 }
 
-                if ($report->approved == 1) {
+                if ($report->approved == \App\Model\ReportModel::STATE_APPROVED) {
                     $label .= "<span class='infoLabel infoLabelGreen'>Schváleno</span>";
-                } elseif ($report->approved == 2) {
+                } elseif ($report->approved == \App\Model\ReportModel::STATE_REJECTED) {
                     $label .= "<span class='infoLabel infoLabelRed'>Zamítnuto</span>";
                 } else {
                     $label .= "<span class='infoLabel infoLabelOrange'>Čeká na schválení</span>";

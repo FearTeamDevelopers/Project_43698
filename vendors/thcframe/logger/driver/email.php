@@ -120,10 +120,6 @@ class Email extends Logger\Driver
 
     public function debug($message, array $context = array())
     {
-        $this->level = self::DEBUG;
-        $body = $this->prepareEmailBody($message, $context);
-        $this->sendEmail($body);
-
         return $this;
     }
 
@@ -147,46 +143,26 @@ class Email extends Logger\Driver
 
     public function info($message, array $context = array())
     {
-        $this->level = self::INFO;
-        $body = $this->prepareEmailBody($message, $context);
-        $this->sendEmail($body);
-
         return $this;
     }
 
     public function notice($message, array $context = array())
     {
-        $this->level = self::NOTICE;
-        $body = $this->prepareEmailBody($message, $context);
-        $this->sendEmail($body);
-
         return $this;
     }
 
     public function warning($message, array $context = array())
     {
-        $this->level = self::WARNING;
-        $body = $this->prepareEmailBody($message, $context);
-        $this->sendEmail($body);
-
         return $this;
     }
 
     public function cron($message, array $context = array())
     {
-        $this->level = self::CRON;
-        $body = $this->prepareEmailBody($message, $context);
-        $this->sendEmail($body);
-
         return $this;
     }
 
     public function sql($message, array $context = array())
     {
-        $this->level = self::SQL;
-        $body = $this->prepareEmailBody($message, $context);
-        $this->sendEmail($body);
-
         return $this;
     }
 

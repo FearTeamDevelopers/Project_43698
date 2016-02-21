@@ -5,7 +5,6 @@ namespace Admin\Etc;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
-use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
 
 /**
@@ -15,28 +14,12 @@ class Controller extends BaseController
 {
 
     /**
-     * @param type $string
-     *
-     * @return type
-     */
-    protected function createUrlKey($string)
-    {
-        $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
-        $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
-        $cleaned = StringMethods::fastClean($preCleaned);
-        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
-
-        return strtolower($return);
-    }
-
-    /**
      * Disable view, used for ajax calls.
      */
     protected function disableView()
     {
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
-        header('Content-Type: text/html; charset=utf-8');
     }
 
     /**
@@ -209,7 +192,7 @@ class Controller extends BaseController
                     ->set('isParticipant', $this->isParticipant())
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
-                    ->set('submstoken', $this->_mutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->mutliSubmissionProtectionToken())
                     ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 
@@ -220,7 +203,7 @@ class Controller extends BaseController
                     ->set('isParticipant', $this->isParticipant())
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
-                    ->set('submstoken', $this->_mutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->mutliSubmissionProtectionToken())
                     ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 

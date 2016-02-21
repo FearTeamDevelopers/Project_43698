@@ -20,6 +20,7 @@ return array(
     'COMMON_SUCCESS' => 'Everything went well',
     'COMMON_FAIL' => 'Oops, something went wrong',
     'COMMON_VALIDATION_FAIL' => 'Required fields are not valid',
+    'FIELD_REQUIRED' => 'This field is required',
 
     'UNKNOW_ERROR' => 'Unknown error eccured',
     'NOT_FOUND' => 'Not found',
@@ -94,11 +95,12 @@ return array(
     'TITLE_USER_ADD' => 'User - Add',
     'TITLE_USER_EDIT' => 'User - Edit',
     'TITLE_USER_PROFILE' => 'My Profile',
-    
-    'ADVERTISEMENT_AVAILABILITY_REQUEST_SUCCESS' => 'Advertisement availability request has been successfully sent',
+
+    'AD_AVAILABILITY_REQUEST_SUCCESS' => 'Advertisement availability request has been successfully sent',
     'AD_ALREADY_SOLD' => 'Ad which has status sold cannot be changed',
+    'AD_ALREADY_EXISTS' => 'Ad with this title already exists',
     'AD_PHOTO_NOT_FOUND' => 'No such a photo is connected to the advertisement',
-    
+
     //UPLOAD ERRORS
     'UPLOAD_ERR_INI_SIZE' => 'The uploaded file %s exceeds the upload_max_filesize directive in php.ini',
     'UPLOAD_ERR_FORM_SIZE' => 'The uploaded file %s exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
@@ -110,7 +112,7 @@ return array(
     'UPLOAD_ERR_DEFAULT' => 'Unknown upload error occured while uploading file %s',
     'UPLOAD_ERR_EXT' => 'File has unsupported extension. Extensions: %s',
     'UPLOAD_ERR_EMPTY_SOURCE' => 'Source %s cannot be empty',
-    
+
     'SEND_FEEDBACK_SUCCESS' => 'Thank you for your help',
     'SEND_FEEDBACK_FAIL' => 'An error occured while sending message',
 );

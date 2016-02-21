@@ -60,7 +60,7 @@ class Mailer extends Base
             $this->message = \Swift_Message::newInstance(null);
             $this->config = Registry::get('configuration');
         } catch (\Exception $e) {
-
+            Core::getLogger()->error('Exception while sending email: {exception}', array('exception' => $e));
         }
     }
 
@@ -132,8 +132,7 @@ class Mailer extends Base
 
     /**
      *
-     * @param type $oneByOne
-     * @param type $sendFrom
+     * @param bool $oneByOne
      * @return boolean
      */
     public function send($oneByOne = false)
@@ -142,11 +141,11 @@ class Mailer extends Base
             $this->message->setSubject($this->getSubject())
                     ->setBody($this->getBody(), 'text/html');
 
-            if (null === $sendFrom || !filter_var($sendFrom,
-                            FILTER_VALIDATE_EMAIL)) {
+            if (null === $this->_from
+                    || !filter_var($this->_from, FILTER_VALIDATE_EMAIL)) {
                 $this->message->setFrom($this->config->system->defaultemail);
             } else {
-                $this->message->setFrom($sendFrom);
+                $this->message->setFrom($this->_from);
             }
 
             if (empty($this->_sendTo)) {

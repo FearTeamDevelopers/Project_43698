@@ -213,7 +213,7 @@ class Controller extends BaseController
                     ->set('env', ENV)
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
-                    ->set('submstoken', $this->_mutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->mutliSubmissionProtectionToken())
                     ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 
@@ -222,7 +222,7 @@ class Controller extends BaseController
                     ->set('env', ENV)
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
-                    ->set('submstoken', $this->_mutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->mutliSubmissionProtectionToken())
                     ->set('token', $this->getSecurity()->getCsrf()->getToken());
         }
 

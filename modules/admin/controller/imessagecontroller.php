@@ -34,7 +34,7 @@ class ImessageController extends Controller
 
         if (RequestMethods::post('submitAddImessage')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/imessage/');
             }
 
@@ -57,7 +57,7 @@ class ImessageController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.json_encode($imessage->getErrors())));
                 $view->set('errors', $imessage->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('imessage', $imessage);
             }
         }

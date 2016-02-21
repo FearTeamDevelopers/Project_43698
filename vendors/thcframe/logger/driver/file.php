@@ -10,9 +10,13 @@ use THCFrame\Logger;
 class File extends Logger\Driver
 {
 
+    /** Default options */
     const DIR_CHMOD = 0755;
     const FILE_CHMOD = 0644;
     const MAX_FILE_SIZE = 5000000;
+
+    /** Logger type options */
+    const COMMON_LOG = 0;
     const ERROR_LOG = 1;
     const DEBUG_LOG = 2;
     const SQL_LOG = 3;
@@ -27,33 +31,46 @@ class File extends Logger\Driver
     {
         $options = array(
             'path' => 'application' . DIRECTORY_SEPARATOR . 'logs',
-            'debuglog' => '{date}-debug.log',
-            'errorlog' => '{date}-error.log',
-            'sqllog' => '{date}-sql.log',
-            'cronlog' => '{date}-cron.log',
-            'log' => '{date}.log',
         );
 
         parent::__construct($options);
 
         $this->path = APP_PATH . DIRECTORY_SEPARATOR . trim($this->path, DIRECTORY_SEPARATOR);
-        $this->log = $this->path . DIRECTORY_SEPARATOR
-                . str_replace('{date}', date('Y-m-d', time()), trim($this->log, DIRECTORY_SEPARATOR));
-        $this->debuglog = $this->path . DIRECTORY_SEPARATOR
-                . str_replace('{date}', date('Y-m-d', time()), trim($this->debuglog, DIRECTORY_SEPARATOR));
-        $this->sqllog = $this->path . DIRECTORY_SEPARATOR
-                . str_replace('{date}', date('Y-m-d', time()), trim($this->sqllog, DIRECTORY_SEPARATOR));
-        $this->cronlog = $this->path . DIRECTORY_SEPARATOR
-                . str_replace('{date}', date('Y-m-d', time()), trim($this->cronlog, DIRECTORY_SEPARATOR));
-        $this->errorlog = $this->path . DIRECTORY_SEPARATOR
-                . str_replace('{date}', date('Y-m-d', time()), trim($this->errorlog, DIRECTORY_SEPARATOR));
 
         if (!is_dir($this->path)) {
-            mkdir($this->path, self::DIR_CHMOD);
+            @mkdir($this->path, self::DIR_CHMOD, true);
         }
 
         $date = date('Y-m-d', strtotime('-90 days'));
         $this->deleteOldLogs($date);
+    }
+
+    private function prepareLogPath($type = self::COMMON_LOG, $level = self::INFO)
+    {
+        $pathTypeSuffix = DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m') . DIRECTORY_SEPARATOR . date('d') . DIRECTORY_SEPARATOR;
+        switch ($type) {
+            case self::ERROR_LOG:
+                $path = $this->path . DIRECTORY_SEPARATOR . 'error' . $pathTypeSuffix . $level . '.log';
+                break;
+            case self::DEBUG_LOG:
+                $path = $this->path . DIRECTORY_SEPARATOR . 'debug' . $pathTypeSuffix . $level . '.log';
+                break;
+            case self::SQL_LOG:
+                $path = $this->path . DIRECTORY_SEPARATOR . 'sql' . $pathTypeSuffix . $level . '.log';
+                break;
+            case self::CRON_LOG:
+                $path = $this->path . DIRECTORY_SEPARATOR . 'cron' . $pathTypeSuffix . $level . '.log';
+                break;
+            default :
+                $path = $this->path . DIRECTORY_SEPARATOR . 'log' . $pathTypeSuffix . $level . '.log';
+                break;
+        }
+
+        if (!is_dir($path)) {
+            @mkdir($path, self::DIR_CHMOD, true);
+        }
+
+        return $path;
     }
 
     private function putContents($file, $message)
@@ -79,17 +96,8 @@ class File extends Logger\Driver
     {
         $message = '[' . date('Y-m-d H:i:s') . '][' . $level . ']' . $this->interpolate($message, $context) . PHP_EOL;
 
-        if ($type === self::DEBUG_LOG) {
-            $this->putContents($this->debuglog, $message);
-        } elseif ($type === self::SQL_LOG) {
-            $this->putContents($this->sqllog, $message);
-        } elseif ($type === self::CRON_LOG) {
-            $this->putContents($this->cronlog, $message);
-        } elseif ($type === self::ERROR_LOG) {
-            $this->putContents($this->errorlog, $message);
-        } else {
-            $this->putContents($this->log, $message);
-        }
+        $path = $this->prepareLogPath($type, $level);
+        $this->putContents($path, $message);
     }
 
     /**

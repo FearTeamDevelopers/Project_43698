@@ -158,7 +158,7 @@ class Controller extends Base
     /**
      *
      */
-    protected function _mutliSubmissionProtectionToken()
+    protected function mutliSubmissionProtectionToken()
     {
         $token = $this->_session->get('submissionprotection');
 
@@ -174,9 +174,9 @@ class Controller extends Base
      *
      * @return type
      */
-    protected function _revalidateMutliSubmissionProtectionToken()
+    protected function revalidateMutliSubmissionProtectionToken()
     {
-        $this->_session->erase('submissionprotection');
+        $this->_session->remove('submissionprotection');
         $token = md5(microtime());
         $this->_session->set('submissionprotection', $token);
 
@@ -187,14 +187,14 @@ class Controller extends Base
      *
      * @param type $token
      */
-    protected function _checkMutliSubmissionProtectionToken()
+    protected function checkMutliSubmissionProtectionToken()
     {
         $this->_sessionToken = $this->_session->get('submissionprotection');
 
         $token = RequestMethods::post('submstoken');
 
         if ($token == $this->_sessionToken) {
-            $this->_session->erase('submissionprotection');
+            $this->_session->remove('submissionprotection');
             return true;
         } else {
             return false;

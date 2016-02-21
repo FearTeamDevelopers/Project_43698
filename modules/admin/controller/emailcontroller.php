@@ -71,7 +71,7 @@ class EmailController extends Controller
 
         if (RequestMethods::post('submitSendEmail')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/email/send/');
             }
 
@@ -148,7 +148,7 @@ class EmailController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '));
                 $view->set('errors', $errors)
-                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                     ->set('email', $email);
             }
         }
@@ -195,12 +195,12 @@ class EmailController extends Controller
 
         if (RequestMethods::post('submitAddEmailTemplate')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/email/');
             }
 
             $errors = array();
-            $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
+            $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
 
             for ($i = 1; $i <= 100; $i+=1) {
                 if ($this->_checkUrlKey($urlKeyCh)) {
@@ -233,7 +233,7 @@ class EmailController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.json_encode($errors + $emailTemplate->getErrors())));
                 $view->set('errors', $errors + $emailTemplate->getErrors())
-                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                     ->set('template', $emailTemplate);
             }
         }
@@ -270,7 +270,7 @@ class EmailController extends Controller
             }
 
             $errors = array();
-            $urlKey = $urlKeyCh = $this->createUrlKey(RequestMethods::post('title'));
+            $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
 
             if ($emailTemplate->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
                 for ($i = 1; $i <= 100; $i+=1) {

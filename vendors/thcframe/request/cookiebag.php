@@ -2,7 +2,7 @@
 
 namespace THCFrame\Request;
 
-use THCFrame\Core\BagInterface;
+use THCFrame\Bag\AbstractBag;
 use THCFrame\Registry\Registry;
 
 /**
@@ -10,11 +10,18 @@ use THCFrame\Registry\Registry;
  *
  * @author Tomy
  */
-class CookieBag implements BagInterface
+class CookieBag extends AbstractBag
 {
 
+    /**
+     * @var CookieBag
+     */
     private static $_instance = null;
 
+    /**
+     * Cookie name prefix
+     * @var string
+     */
     private $_prefix = 'THCF_';
 
     /**
@@ -23,7 +30,7 @@ class CookieBag implements BagInterface
      */
     public static function getInstance()
     {
-        if(self::$_instance === null) {
+        if (self::$_instance === null) {
             self::$_instance = new static();
         }
 
@@ -32,7 +39,7 @@ class CookieBag implements BagInterface
 
     private function __construct()
     {
-
+        $this->setName('cookie');
     }
 
     private function __clone()
@@ -42,21 +49,21 @@ class CookieBag implements BagInterface
 
     public function clear()
     {
-        if(!empty($_COOKIE)){
-            foreach ($_COOKIE as $key => $cookie){
+        if (!empty($_COOKIE)) {
+            foreach ($_COOKIE as $key => $cookie) {
                 unset($_COOKIE[$key]);
-                setcookie($this->_prefix.$key, '', time()-1800, '/', null, false, true);
+                setcookie($this->_prefix . $key, '', time() - 1800, '/', null, false, true);
             }
         }
     }
 
-    public function erase($key)
+    public function remove($key)
     {
         $key = $this->hashKey($key);
 
-        if(isset($_COOKIE[$this->_prefix.$key])){
-            unset($_COOKIE[$this->_prefix.$key]);
-            setcookie($this->_prefix.$key, '', time()-1800, '/', null, false, true);
+        if (isset($_COOKIE[$this->_prefix . $key])) {
+            unset($_COOKIE[$this->_prefix . $key]);
+            setcookie($this->_prefix . $key, '', time() - 1800, '/', null, false, true);
         }
     }
 
@@ -64,8 +71,8 @@ class CookieBag implements BagInterface
     {
         $key = $this->hashKey($key);
 
-        if(!empty($_COOKIE[$this->_prefix.$key])){
-            return $_COOKIE[$this->_prefix.$key];
+        if (!empty($_COOKIE[$this->_prefix . $key])) {
+            return $_COOKIE[$this->_prefix . $key];
         }
 
         return $default;
@@ -73,7 +80,7 @@ class CookieBag implements BagInterface
 
     public function hashKey($key)
     {
-        if(ENV === 'live') {
+        if (ENV === 'live') {
             $secret = Registry::get('configuration')->session->secret;
             return hash_hmac('sha512', $key, $secret);
         } else {
@@ -81,16 +88,17 @@ class CookieBag implements BagInterface
         }
     }
 
-    public function set($key, $value, $exp = null, $path = '/', $domain = null, $secure = false, $httponly = true)
+    public function set($key, $value, $exp = null, $path = '/', $domain = null,
+            $secure = false, $httponly = true)
     {
         $key = $this->hashKey($key);
 
-        if($exp === null){
-            $exp = time() + 4*3600;
+        if ($exp === null) {
+            $exp = time() + 4 * 3600;
         }
 
-        $_COOKIE[$this->_prefix.$key] = $value;
-        setcookie($this->_prefix.$key, $value, $exp, $path, $domain, $secure, $httponly);
+        $_COOKIE[$this->_prefix . $key] = $value;
+        setcookie($this->_prefix . $key, $value, $exp, $path, $domain, $secure, $httponly);
 
         return $this;
     }

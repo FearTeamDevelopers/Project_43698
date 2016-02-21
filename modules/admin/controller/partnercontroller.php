@@ -38,7 +38,7 @@ class PartnerController extends Controller
 
         if (RequestMethods::post('submitAddPartner')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/partner/');
             }
 
@@ -76,7 +76,7 @@ class PartnerController extends Controller
                         } else {
                             Event::fire('admin.log', array('fail', 'Errors: '.json_encode($partner->getErrors())));
                             $view->set('errors', $partner->getErrors())
-                                    ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                                     ->set('partner', $partner);
                         }
 
@@ -87,7 +87,7 @@ class PartnerController extends Controller
                 $errors['logo'] = $fileErrors;
                 Event::fire('admin.log', array('fail', 'Errors: '.json_encode($errors + $partner->getErrors())));
                 $view->set('errors', $errors)
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken());
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken());
             }
         }
     }

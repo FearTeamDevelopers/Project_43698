@@ -17,34 +17,34 @@ class View extends Base
 
     /**
      * View file
-     * 
+     *
      * @readwrite
      */
     protected $_file;
 
     /**
      * Storage for view data
-     * 
+     *
      * @readwrite
      */
     protected $_data;
 
     /**
      * Template instance
-     * 
+     *
      * @read
      */
     protected $_template;
-    
+
     /**
      * Session object
-     * 
+     *
      * @var \THCFrame\Session\Session
      */
     private $_session;
 
     /**
-     * 
+     *
      * @param type $options
      */
     public function __construct($options = array())
@@ -65,7 +65,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param type $method
      * @return \THCFrame\View\Exception\Implementation
      */
@@ -81,42 +81,42 @@ class View extends Base
     {
         if ($this->_session->get('infoMessage') !== null) {
             $this->set('infoMessage', $this->_session->get('infoMessage'));
-            $this->_session->erase('infoMessage');
+            $this->_session->remove('infoMessage');
         } else {
             $this->set('infoMessage', '');
         }
 
         if ($this->_session->get('warningMessage') !== null) {
             $this->set('warningMessage', $this->_session->get('warningMessage'));
-            $this->_session->erase('warningMessage');
+            $this->_session->remove('warningMessage');
         } else {
             $this->set('warningMessage', '');
         }
 
         if ($this->_session->get('successMessage') !== null) {
             $this->set('successMessage', $this->_session->get('successMessage'));
-            $this->_session->erase('successMessage');
+            $this->_session->remove('successMessage');
         } else {
             $this->set('successMessage', '');
         }
 
         if ($this->_session->get('errorMessage') !== null) {
             $this->set('errorMessage', $this->_session->get('errorMessage'));
-            $this->_session->erase('errorMessage');
+            $this->_session->remove('errorMessage');
         } else {
             $this->set('errorMessage', '');
         }
 
         if ($this->_session->get('longFlashMessage') !== null) {
             $this->set('longFlashMessage', $this->_session->get('longFlashMessage'));
-            $this->_session->erase('longFlashMessage');
+            $this->_session->remove('longFlashMessage');
         } else {
             $this->set('longFlashMessage', '');
         }
     }
 
     /**
-     * 
+     *
      * @return string
      */
     public function render()
@@ -133,7 +133,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @return null
      */
     public function getHttpReferer()
@@ -146,7 +146,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $default
      * @return type
@@ -160,7 +160,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $value
      * @throws Exception\Data
@@ -182,7 +182,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $value
      * @return \THCFrame\View\View
@@ -201,7 +201,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @return \THCFrame\View\View
      */
@@ -212,7 +212,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param text $msg
      * @return text
      */
@@ -226,7 +226,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param text $msg
      * @return text
      */
@@ -240,7 +240,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param text $msg
      * @return text
      */
@@ -254,7 +254,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param text $msg
      * @return text
      */
@@ -268,7 +268,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param text $msg
      * @return text
      */
@@ -282,7 +282,7 @@ class View extends Base
     }
 
     /**
-     * 
+     *
      * @param type $title
      * @return \THCFrame\View\View
      */
@@ -292,5 +292,5 @@ class View extends Base
         $this->_set('metatitle', $title);
         return $this;
     }
-    
+
 }

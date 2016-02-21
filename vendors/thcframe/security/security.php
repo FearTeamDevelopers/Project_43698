@@ -83,7 +83,7 @@ class Security extends Base implements SecurityInterface
     public function initialize($configuration)
     {
         Event::fire('framework.security.initialize.before', array());
-        
+
         @session_regenerate_id();
         $this->_session = Registry::get('session');
 
@@ -165,9 +165,9 @@ class Security extends Base implements SecurityInterface
      */
     public function logout()
     {
-        $this->_session->erase('authUser')
-                ->erase('lastActive')
-                ->erase('csrf');
+        $this->_session->remove('authUser')
+                ->remove('lastActive')
+                ->remove('csrf');
 
         BasicUserModel::deleteAuthenticationToken();
 

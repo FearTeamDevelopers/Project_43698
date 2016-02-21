@@ -4,7 +4,7 @@ namespace App\Model\Basic;
 
 use THCFrame\Model\Model;
 
-class BasicCommentModel extends Model 
+class BasicCommentModel extends Model
 {
 
     /**
@@ -40,6 +40,16 @@ class BasicCommentModel extends Model
      */
     protected $_resourceId;
 
+    /**
+     * @column
+     * @readwrite
+     * @index
+     * @type tinyint
+     * @length 1
+     * @default 0
+     * @validate max(1)
+     */
+    protected $_deleted;
     /**
      * @column
      * @readwrite

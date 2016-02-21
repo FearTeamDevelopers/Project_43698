@@ -39,7 +39,7 @@ class RedirectController extends Controller
 
         if (RequestMethods::post('submitAddRedirect')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->_checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMutliSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/redirect/');
             }
 
@@ -59,7 +59,7 @@ class RedirectController extends Controller
             } else {
                 Event::fire('admin.log', array('fail', 'Errors: '.json_encode($redirect->getErrors())));
                 $view->set('errors', $redirect->getErrors())
-                        ->set('submstoken', $this->_revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('redirect', $redirect);
             }
         }

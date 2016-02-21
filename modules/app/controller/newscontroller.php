@@ -7,10 +7,11 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Registry\Registry;
 
 /**
- * 
+ *
  */
 class NewsController extends Controller
 {
+    
     /**
      * Check if are set specific metadata or leave their default values.
      */
@@ -38,7 +39,7 @@ class NewsController extends Controller
 
     /**
      * Get list of news.
-     * 
+     *
      * @param int $page
      */
     public function index($page = 1)
@@ -88,7 +89,7 @@ class NewsController extends Controller
 
     /**
      * Get list of archivated news.
-     * 
+     *
      * @param int $page
      */
     public function archive($page = 1)
@@ -138,7 +139,7 @@ class NewsController extends Controller
 
     /**
      * Show news detail.
-     * 
+     *
      * @param string $urlKey
      */
     public function detail($urlKey)
@@ -158,7 +159,7 @@ class NewsController extends Controller
 
     /**
      * Preview of news created in administration but not saved into db.
-     * 
+     *
      * @before _secured, _participant
      */
     public function preview()
