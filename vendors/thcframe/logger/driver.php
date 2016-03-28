@@ -21,8 +21,6 @@ abstract class Driver extends Base implements LoggerInterface
     const NOTICE = 'notice';
     const INFO = 'info';
     const DEBUG = 'debug';
-    const SQL = 'sql';
-    const CRON = 'cron';
 
     /**
      * @return \THCFrame\Logger\Driver
@@ -61,4 +59,5 @@ abstract class Driver extends Base implements LoggerInterface
         }
         return $message;
     }
+
 }

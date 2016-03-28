@@ -25,14 +25,14 @@ class BasicUserModel extends Model
     /**
      * Maximum time after which the user must re-login
      * approx 1 month
-     * 
+     *
      * @var int
      */
     protected static $_rememberMeExpiryTime = 2592000;
 
     /**
-     * 
-     * @var int 
+     *
+     * @var int
      */
     protected static $_accountBlockTime = 300;
 
@@ -81,7 +81,7 @@ class BasicUserModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 1
      * @validate max(1)
      */
@@ -93,7 +93,7 @@ class BasicUserModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 0
      * @validate max(1)
      * @label acc blocked
@@ -106,7 +106,7 @@ class BasicUserModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 0
      * @validate max(1)
      */
@@ -117,7 +117,7 @@ class BasicUserModel extends Model
      * @readwrite
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 0
      * @validate max(1)
      */
@@ -139,7 +139,7 @@ class BasicUserModel extends Model
      * @readwrite
      * @type varchar
      * @length 25
-     * 
+     *
      * @validate required, alpha, max(25)
      * @label user role
      */
@@ -151,7 +151,7 @@ class BasicUserModel extends Model
      * @type int
      * @length 10
      * @unsigned
-     * 
+     *
      * @validate numeric, max(10)
      * @label last login
      */
@@ -175,7 +175,7 @@ class BasicUserModel extends Model
      * @type int
      * @length 10
      * @unsigned
-     * 
+     *
      * @validate numeric, max(10)
      * @label last login attempt
      */
@@ -187,7 +187,7 @@ class BasicUserModel extends Model
      * @type int
      * @length 10
      * @unsigned
-     * 
+     *
      * @validate numeric, max(10)
      * @label first login attempt
      */
@@ -199,7 +199,7 @@ class BasicUserModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      * @label pass expiration time
@@ -212,7 +212,7 @@ class BasicUserModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      * @label pass expiration time
@@ -245,7 +245,7 @@ class BasicUserModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -257,7 +257,7 @@ class BasicUserModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -291,7 +291,7 @@ class BasicUserModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -303,7 +303,7 @@ class BasicUserModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -311,13 +311,13 @@ class BasicUserModel extends Model
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_newCleanPassword;
 
     /**
      * Check if new password doesnt math to the previous
-     * 
+     *
      * @param string $newPasswordHash
      * @return boolean
      */
@@ -331,7 +331,7 @@ class BasicUserModel extends Model
     }
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -355,7 +355,7 @@ class BasicUserModel extends Model
     }
 
     /**
-     * 
+     *
      */
     public function preUpdate()
     {
@@ -363,7 +363,7 @@ class BasicUserModel extends Model
     }
 
     /**
-     * 
+     *
      * @param type $value
      * @throws \THCFrame\Security\Exception\Role
      */
@@ -394,7 +394,7 @@ class BasicUserModel extends Model
     }
 
     /**
-     * 
+     *
      * @return \THCFrame\Security\Model\BasicUserModel
      */
     public function setPassExipre()
@@ -412,7 +412,7 @@ class BasicUserModel extends Model
     }
 
     /**
-     * 
+     *
      * @return \THCFrame\Security\Model\BasicUserModel
      */
     public function setAccountExpire()
@@ -463,7 +463,7 @@ class BasicUserModel extends Model
 
     /**
      * Function to check if the user's account is active or not
-     * 
+     *
      * @return boolean
      */
     public function isActive()
@@ -473,7 +473,7 @@ class BasicUserModel extends Model
 
     /**
      * Function to check if the user's account is blocked or not
-     * 
+     *
      * @return boolean
      */
     public function isBlocked()
@@ -492,9 +492,9 @@ class BasicUserModel extends Model
     }
 
     /**
-     * To check if the password has aged. i.e. if the time has passed 
+     * To check if the password has aged. i.e. if the time has passed
      * after which the password must be changed.
-     * 
+     *
      * @return boolean
      */
     public function isPasswordExpired()
@@ -519,7 +519,7 @@ class BasicUserModel extends Model
     }
 
     /**
-     * 
+     *
      * @return boolean
      */
     public function getDaysToPassExpiration()
@@ -533,9 +533,9 @@ class BasicUserModel extends Model
     }
 
     /**
-     * To check if the account has aged. i.e. if the time has passed 
+     * To check if the account has aged. i.e. if the time has passed
      * after which the account will be blocked.
-     * 
+     *
      * @return boolean
      */
     public function isAccountExpired()
@@ -556,7 +556,7 @@ class BasicUserModel extends Model
     }
 
     /**
-     * 
+     *
      * @param type $oldPassword
      * @param type $newPassword
      * @param type $passStrength
@@ -606,7 +606,7 @@ class BasicUserModel extends Model
 
     /**
      * Force password reset for user
-     * 
+     *
      * @param type $newPassword
      * @return boolean
      */
@@ -644,7 +644,7 @@ class BasicUserModel extends Model
 
     /**
      * Function to enable 'Remember Me' functionality
-     * 
+     *
      * @param type $userID
      * @param type $secure
      * @param type $httpOnly
@@ -681,7 +681,7 @@ class BasicUserModel extends Model
 
     /**
      * Function to check for AUTH token validity
-     * 
+     *
      * @return boolean
      */
     public static function checkRememberMe()
@@ -689,13 +689,14 @@ class BasicUserModel extends Model
         $cookieBag = CookieBag::getInstance();
 
         if ($cookieBag->get('AUTHID') != '') {
-            $token = AuthtokenModel::first(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
+            $count = RememberMeTokenModel::count(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
+            $token = RememberMeTokenModel::first(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
 
             if ($token !== null) {
                 $currentTime = time();
 
                 //If cookie time has expired, then delete the cookie from the DB and the user's browser.
-                if (($currentTime - $token->created) >= static::$_rememberMeExpiryTime) {
+                if (($currentTime - $token->created) >= static::$_rememberMeExpiryTime || $count > 1) {
                     static::deleteAuthenticationToken();
                     return false;
                 } else {
@@ -721,7 +722,7 @@ class BasicUserModel extends Model
         $cookieBag = CookieBag::getInstance();
 
         if ($cookieBag->get('AUTHID') != '') {
-            AuthtokenModel::deleteAll(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
+            RememberMeTokenModel::deleteAll(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
             $cookieBag->erase('AUTHID');
         }
     }

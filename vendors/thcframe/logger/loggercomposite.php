@@ -58,17 +58,6 @@ class LoggerComposite implements LoggerInterface
         return $this;
     }
 
-    public function cron($message, array $context = array())
-    {
-        if (!empty($this->childs)) {
-            foreach ($this->childs as $logger) {
-                $logger->cron($message, $context);
-            }
-        }
-
-        return $this;
-    }
-
     public function debug($message, array $context = array())
     {
         if (!empty($this->childs)) {
@@ -129,17 +118,6 @@ class LoggerComposite implements LoggerInterface
         if (!empty($this->childs)) {
             foreach ($this->childs as $logger) {
                 $logger->notice($message, $context);
-            }
-        }
-
-        return $this;
-    }
-
-    public function sql($message, array $context = array())
-    {
-        if (!empty($this->childs)) {
-            foreach ($this->childs as $logger) {
-                $logger->sql($message, $context);
             }
         }
 

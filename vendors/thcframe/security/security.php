@@ -10,7 +10,6 @@ use THCFrame\Security\SecurityInterface;
 use THCFrame\Security\CSRF;
 use THCFrame\Security\PasswordManager;
 use THCFrame\Security\Model\BasicUserModel;
-use THCFrame\Request\CookieBag;
 
 /**
  * Security context class. Wrapper for authentication and authorization methods

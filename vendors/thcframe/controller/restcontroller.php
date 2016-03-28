@@ -30,9 +30,49 @@ class RestController extends Base
      * @var THCFrame\Request\Response
      */
     protected $_response;
-    
+
     /**
-     * 
+     * Store initialized cache object.
+     *
+     * @var THCFrame\Cache\Cache
+     * @read
+     */
+    protected $_cache;
+
+    /**
+     * Store configuration.
+     *
+     * @var THCFrame\Configuration\Configuration
+     * @read
+     */
+    protected $_config;
+
+    /**
+     * Store language extension.
+     *
+     * @var THCFrame\Core\Lang
+     * @read
+     */
+    protected $_lang;
+
+    /**
+     * Store server host name.
+     *
+     * @var string
+     * @read
+     */
+    protected $_serverHost;
+
+    /**
+     * Session object
+     *
+     * @read
+     * @var THCFrame\Session\Driver
+     */
+    protected $_session;
+
+    /**
+     *
      * @param type $data
      * @return type
      */
@@ -50,17 +90,8 @@ class RestController extends Base
         return $cleanInput;
     }
 
-    private function _response($data, $status = 200)
-    {
-        $this->_response->setHttpVersionStatusHeader(
-                "HTTP/1.1 " . $status . " " . $this->_response->getStatusMessageByCode($status)
-                );
-        $this->_response->setBody($data);
-        return $this->_response;
-    }
-
     /**
-     * 
+     *
      * @param type $options
      * @throws Exception\Header
      */
@@ -69,15 +100,21 @@ class RestController extends Base
         parent::__construct($options);
 
         $this->_response = new Response();
+        $this->_session = Registry::get('session');
+        $this->_serverHost = RequestMethods::server('HTTP_HOST');
+        $this->_cache = Registry::get('cache');
+        $this->_config = Registry::get('configuration');
+        $this->_lang = Lang::getInstance();
+
         $this->_response->setHeader('Access-Control-Allow-Orgin', '*')
                 ->setHeader('Access-Control-Allow-Methods', '*');
 
-        $this->method = RequestMethods::server('REQUEST_METHOD');
-        if ($this->method == 'POST' && RequestMethods::issetserver('HTTP_X_HTTP_METHOD')) {
+        $this->_method = RequestMethods::server('REQUEST_METHOD');
+        if ($this->_method == 'POST' && RequestMethods::issetserver('HTTP_X_HTTP_METHOD')) {
             if (RequestMethods::server('HTTP_X_HTTP_METHOD') == 'DELETE') {
-                $this->method = 'DELETE';
+                $this->_method = 'DELETE';
             } else if (RequestMethods::server('HTTP_X_HTTP_METHOD') == 'PUT') {
-                $this->method = 'PUT';
+                $this->_method = 'PUT';
             } else {
                 throw new Exception\Header("Unexpected Header");
             }
@@ -85,55 +122,76 @@ class RestController extends Base
     }
 
     /**
-     * 
-     * @param string $resource
-     * @param array $args
-     * @param string $type      Resource|Collection
-     * @return type
+     *
+     * @param type $message
+     * @param type $status
+     * @param type $error
      */
-    public function runApi($resource, $args = array(), $type = 'Resource')
+    protected function ajaxResponse($message, $error = false, $status = 200,
+            array $additionalData = array())
     {
-        $this->checkAuthToken();
-        
-        $route = \THCFrame\Registry\Registry::get('router')->getLastPath();
-        $parameters = $route->getMapArguments();
-        
-        if(empty($parameters)){
-            $type = 'Collection';
-        }
-        
-        switch ($this->method) {
-            case 'DELETE':
-                $actionName = strtolower($resource) . 'ResourceDelete';
-                break;
-            case 'POST':
-                $actionName = strtolower($resource) . ucfirst($type) . 'Update';
-                break;
-            case 'GET':
-                $actionName = strtolower($resource) . ucfirst($type) . 'Retriew';
-                break;
-            case 'PUT':
-                $actionName = strtolower($resource) . ucfirst($type) . 'Create';
-                break;
-            default:
-                $this->_response('Invalid request method', 405);
-                break;
-        }
+        $data = array(
+            'message' => $message,
+            'error' => (bool) $error,
+                ) + $additionalData;
 
-        if (method_exists($this, $actionName)) {
-            return $this->_response($this->{$actionName}($args));
-        }
+        $this->_response->setHttpVersionStatusHeader('HTTP/1.1 ' . (int) $status . ' ' . $this->_response->getStatusMessageByCode($status))
+                ->setHeader('Content-type', $this->_defaultContentType)
+                ->setData($data);
 
-        return $this->_response(sprintf('Method %s not implemented', $actionName), 404);
+        $this->_response->sendHeaders();
+        $this->_response->send();
     }
 
-    public function checkAuthToken()
+    /**
+     * Check if provided api token is valid or not
+     *
+     * @protected
+     */
+    public function checkUserApiToken()
     {
-        
+        $apiToken = \THCFrame\Security\Model\ApiTokenModel::first(array('token = ?' => RequestMethods::post('apiV1Token')));
+
+        if (null !== $apiToken) {
+            $user = \App\Model\UserModel::first(array('id = ?' => (int) $apiToken->getUserId()));
+
+            if (null === $user) {
+                $this->ajaxResponse('User not found', true, 404);
+            }
+        } else {
+            $this->ajaxResponse('Api token is not valid', true, 401);
+        }
     }
-    
-    public function generateAuthToken()
+
+    /**
+     *
+     * @param \THCFrame\Security\Model\ApiTokenModel $apiToken
+     * @param \THCFrame\Controller\THCFrame\Request\Response $response
+     * @param type $method
+     * @param type $request
+     */
+    public function logApiRequestResponseData(\THCFrame\Security\Model\ApiTokenModel $apiToken,
+            THCFrame\Request\Response $response, $method, $request)
     {
-        
+        $apiLog = new \THCFrame\Security\Model\ApiRequestLogModel(array(
+            'userId' => $apiToken->getUserId(),
+            'apiId' => $apiToken->getId(),
+            'requestMethod' => $method,
+            'apiRequest' => serialize($request),
+            'apiResponse' => serialize($response),
+        ));
+
+        if ($apiLog->validate()) {
+            $apiLog->save();
+        } else {
+            \THCFrame\Core\Core::getLogger()->error('ApiLog {apiId} - {method} - {request} - {response}', array(
+                'apiId' => $apiToken->getId(),
+                'method' => $method,
+                'request' => json_encode($request),
+                'response' => json_encode($response)
+                    )
+            );
+        }
     }
+
 }

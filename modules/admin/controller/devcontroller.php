@@ -226,7 +226,7 @@ class DevController extends Controller
                 $urlKeys[] = $urlKey;
 
                 $sql = sprintf($insertReportSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->sql($sql);
+                \THCFrame\Core\Core::getLogger()->debug($sql);
                 $contentCount+=1;
             }
         }
@@ -257,7 +257,7 @@ class DevController extends Controller
                 $urlKeys[] = $urlKey;
 
                 $sql = sprintf($insertActionSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->sql($sql);
+                \THCFrame\Core\Core::getLogger()->debug($sql);
                 $contentCount+=1;
             }
         }
@@ -288,7 +288,7 @@ class DevController extends Controller
                 $urlKeys[] = $urlKey;
 
                 $sql = sprintf($insertNewsSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->sql($sql);
+                \THCFrame\Core\Core::getLogger()->debug($sql);
                 $contentCount+=1;
             }
         }

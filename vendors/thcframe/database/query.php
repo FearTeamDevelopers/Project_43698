@@ -76,7 +76,7 @@ class Query extends Base
     protected $_having = array();
 
     /**
-     * 
+     *
      * @param type $method
      * @return \THCFrame\Database\Exception\Implementation
      */
@@ -86,7 +86,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $error
      * @param type $sql
      */
@@ -97,7 +97,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $value
      * @return string
      */
@@ -126,7 +126,7 @@ class Query extends Base
             $buffer = join(', ', $buffer);
             return "({$buffer})";
         }
-        
+
         if (is_null($value)) {
             return 'NULL';
         }
@@ -139,7 +139,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      */
     protected function _buildSelect()
@@ -207,16 +207,16 @@ class Query extends Base
 
         $input = sprintf($template, $joinedFields, $this->from, $this->alias, $join, $where, $groupBy, $having, $order, $limit);
         $output = mb_ereg_replace('\s+', ' ', $input);
-        
+
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->sql('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', array('sql' => $output));
         }
 
         return $output;
     }
 
     /**
-     * 
+     *
      * @param type $data
      * @return type
      */
@@ -236,16 +236,16 @@ class Query extends Base
 
         $input = sprintf($template, $this->from, $fields, $values);
         $output = mb_ereg_replace('\s+', ' ', $input);
-        
+
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->sql('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', array('sql' => $output));
         }
-        
+
         return $output;
     }
 
     /**
-     * 
+     *
      * @param type $data
      * @return type
      */
@@ -280,16 +280,16 @@ class Query extends Base
 
         $input = sprintf($template, $this->from, $parts, $where, $limit);
         $output = mb_ereg_replace('\s+', ' ', $input);
-        
+
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->sql('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', array('sql' => $output));
         }
-        
+
         return $output;
     }
 
     /**
-     * 
+     *
      * @return type
      */
     protected function _buildDelete()
@@ -316,16 +316,16 @@ class Query extends Base
 
         $input = sprintf($template, $this->from, $where, $limit);
         $output = mb_ereg_replace('\s+', ' ', $input);
-        
+
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->sql('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', array('sql' => $output));
         }
-        
+
         return $output;
     }
 
     /**
-     * 
+     *
      * @return type
      * @throws Exception\Connector
      */
@@ -351,7 +351,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function getTableAlias()
@@ -360,7 +360,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $alias
      */
     public function setTableAlias($alias)
@@ -375,7 +375,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $alias
      * @return \THCFrame\Database\Query
      */
@@ -387,7 +387,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $data
      * @return int
      * @throws Exception\Sql
@@ -423,7 +423,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      * @throws Exception\Sql
      */
@@ -447,7 +447,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      * @throws Exception\Sql
      */
@@ -471,7 +471,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $from
      * @param type $fields
      * @return \THCFrame\Database\Query
@@ -493,7 +493,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $join
      * @param type $on
      * @param type $fields
@@ -518,7 +518,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $join
      * @param type $on
      * @param type $fields
@@ -543,7 +543,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $join
      * @param type $on
      * @param type $fields
@@ -568,7 +568,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $limit
      * @param type $page
      * @return \THCFrame\Database\Query
@@ -593,7 +593,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $order
      * @param type $direction
      * @return \THCFrame\Database\Query
@@ -611,7 +611,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
      */
@@ -639,7 +639,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return \THCFrame\Database\Query
      * @throws Exception\Sql
      */
@@ -668,7 +668,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
      */
@@ -692,7 +692,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @param type $field
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
@@ -709,7 +709,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function first()
@@ -733,7 +733,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function count()
@@ -763,7 +763,7 @@ class Query extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function assemble()

@@ -5,15 +5,15 @@ namespace THCFrame\Security\Model;
 use THCFrame\Model\Model;
 
 /**
- * Authtoken used by "Remember me" function
+ * Log for api requests and their responses
  */
-class AuthtokenModel extends Model
+class ApiRequestLogModel extends Model
 {
 
     /**
      * @readwrite
      */
-    protected $_alias = 'auth';
+    protected $_alias = 'apil';
 
     /**
      * @column
@@ -32,7 +32,7 @@ class AuthtokenModel extends Model
      * @length 10
      * @unsigned
      * @null
-     * 
+     *
      * @validate required,numeric, max(10)
      */
     protected $_userId;
@@ -40,15 +40,45 @@ class AuthtokenModel extends Model
     /**
      * @column
      * @readwrite
-     * @type varchar
-     * @length 130
      * @index
-     * @unique
+     * @type int
+     * @length 10
+     * @unsigned
+     * @null
      *
-     * @validate required, alphanumeric, max(130)
-     * @label auth token
+     * @validate required,numeric, max(10)
      */
-    protected $_token;
+    protected $_apiId;
+
+    /**
+     * @column
+     * @readwrite
+     * @type varchar
+     * @length 20
+     * @index
+     *
+     * @validate required, alphanumeric, max(20)
+     * @label method
+     */
+    protected $_requestMethod;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @validate html
+     * @label text
+     */
+    protected $_apiRequest;
+
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @validate html
+     * @label text
+     */
+    protected $_apiResponse;
 
     /**
      * @column
@@ -56,7 +86,7 @@ class AuthtokenModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -68,14 +98,14 @@ class AuthtokenModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {

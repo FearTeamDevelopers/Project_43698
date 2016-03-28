@@ -102,24 +102,6 @@ interface LoggerInterface
     public function debug($message, array $context = array());
 
     /**
-     * Logování sql dotazů
-     *
-     * @param string $message
-     * @param array $context
-     * @return \THCFrame\Logger\LoggerInterface
-     */
-    public function sql($message, array $context = array());
-    
-    /**
-     * Logování událostí cronu
-     *
-     * @param string $message
-     * @param array $context
-     * @return \THCFrame\Logger\LoggerInterface
-     */
-    public function cron($message, array $context = array());
-    
-    /**
      * Zaloguje s libovolnou úrovní.
      *
      * @param mixed $level

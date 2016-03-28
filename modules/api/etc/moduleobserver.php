@@ -1,10 +1,10 @@
 <?php
 
-namespace Cron\Etc;
+namespace Api\Etc;
 
 use THCFrame\Registry\Registry;
-use THCFrame\Events\SubscriberInterface;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Events\SubscriberInterface;
 use THCFrame\Core\Core;
 
 /**
@@ -18,14 +18,14 @@ class ModuleObserver implements SubscriberInterface
     public function getSubscribedEvents()
     {
         return array(
-            'cron.log' => 'cronLog',
+            'api.log' => 'apiLog',
         );
     }
 
     /**
      * @param array $params
      */
-    public function cronLog()
+    public function apiLog()
     {
         $params = func_get_args();
 
@@ -38,6 +38,7 @@ class ModuleObserver implements SubscriberInterface
 
         if (!empty($params)) {
             $result = array_shift($params);
+            $userId = (int) array_shift($params);
 
             $paramStr = '';
             if (!empty($params)) {
@@ -45,11 +46,12 @@ class ModuleObserver implements SubscriberInterface
             }
         } else {
             $result = 'fail';
+            $userId = 'annonymous';
             $paramStr = '';
         }
 
         $log = new \Admin\Model\AdminLogModel(array(
-            'userId' => 'cronjob',
+            'userId' => $userId,
             'module' => $module,
             'controller' => $controller,
             'action' => $action,
@@ -58,7 +60,8 @@ class ModuleObserver implements SubscriberInterface
             'params' => $paramStr,
         ));
 
-        Core::getLogger()->info('{result} /{module}/{controller}/{action} {params}', array(
+        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
+            'type' => 'apiLog',
             'result' => $result,
             'module' => $module,
             'controller' => $controller,
@@ -70,4 +73,5 @@ class ModuleObserver implements SubscriberInterface
             $log->save();
         }
     }
+
 }

@@ -41,8 +41,7 @@ class Email extends Logger\Driver
                 ->setTo($this->sendTo)
                 ->setBody($message);
 
-        file_put_contents($this->path . date('Y-m-d') . '_mail.log',
-                $email->toString());
+        file_put_contents($this->path . date('Y-m-d') . '_mail.log', $email->toString());
 
         $result = $mailer->send($email);
     }
@@ -88,12 +87,6 @@ class Email extends Logger\Driver
                 break;
             case self::DEBUG:
                 $this->debug($message, $context);
-                break;
-            case self::SQL:
-                $this->sql($message, $context);
-                break;
-            case self::CRON:
-                $this->cron($message, $context);
                 break;
         }
 
@@ -152,16 +145,6 @@ class Email extends Logger\Driver
     }
 
     public function warning($message, array $context = array())
-    {
-        return $this;
-    }
-
-    public function cron($message, array $context = array())
-    {
-        return $this;
-    }
-
-    public function sql($message, array $context = array())
     {
         return $this;
     }
