@@ -6,7 +6,7 @@ class HTMLPurifier_URIFilter_Munge extends HTMLPurifier_URIFilter
     public $post = true;
     private $target, $parser, $doEmbed, $secretKey;
 
-    protected $replace = array();
+    protected $replace = [];
 
     public function prepare($config) {
         $this->target    = $config->get('URI.' . $this->name);

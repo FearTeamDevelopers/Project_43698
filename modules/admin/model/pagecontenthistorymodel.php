@@ -35,9 +35,9 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('pch.*'))
+        $query = self::getQuery(['pch.*'])
                 ->join('tb_user', 'pch.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                        ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -49,9 +49,9 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('pch.*'))
+        $query = self::getQuery(['pch.*'])
                 ->join('tb_user', 'pch.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                        ['us.firstname', 'us.lastname'])
                 ->order('pch.created', 'desc')
                 ->limit((int) $limit);
 
@@ -71,7 +71,7 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
 
         $remoteAddr = RequestMethods::getClientIpAddress();
         $referer = RequestMethods::server('HTTP_REFERER');
-        $changes = array();
+        $changes = [];
 
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
@@ -95,19 +95,19 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
             }
         }
 
-        $historyRecord = new self(array(
+        $historyRecord = new self([
             'originId' => $original->getId(),
             'editedBy' => $user->getId(),
             'remoteAddr' => $remoteAddr,
             'referer' => $referer,
             'changedData' => json_encode($changes),
-        ));
+        ]);
 
         if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'PageContent '.$original->getId().' changes saved'));
+            Event::fire('admin.log', ['success', 'PageContent '.$original->getId().' changes saved']);
         } else {
-            Event::fire('admin.log', array('fail', 'PageContent history errors: '.json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', ['fail', 'PageContent history errors: '.json_encode($historyRecord->getErrors())]);
         }
     }
 }

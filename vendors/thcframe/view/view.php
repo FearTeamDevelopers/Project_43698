@@ -4,6 +4,7 @@ namespace THCFrame\View;
 
 use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
+use THCFrame\Session\Session;
 use THCFrame\Template;
 use THCFrame\View\Exception as Exception;
 use THCFrame\Request\RequestMethods;
@@ -15,58 +16,63 @@ use THCFrame\Registry\Registry;
 class View extends Base
 {
 
+    CONST TITLE = 'title';
+    CONST META_CANONICAL = 'canonical';
+    CONST META_TITLE = 'metatitle';
+    CONST META_DESCRIPTION = 'metadescription';
+
     /**
      * View file
      *
      * @readwrite
      */
-    protected $_file;
+    protected $file;
 
     /**
      * Storage for view data
      *
      * @readwrite
      */
-    protected $_data;
+    protected $data;
 
     /**
      * Template instance
      *
      * @read
      */
-    protected $_template;
+    protected $template;
 
     /**
      * Session object
      *
      * @var \THCFrame\Session\Session
      */
-    private $_session;
+    private $session;
 
     /**
-     *
-     * @param type $options
+     * View constructor.
+     * @param array $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
-        Event::fire('framework.view.construct.before', array($this->_file));
+        Event::fire('framework.view.construct.before', [$this->file]);
 
-        $this->_session = Registry::get('session');
+        $this->session = Registry::get('session');
 
-        $this->_template = new Template\Template(array(
+        $this->template = new Template\Template([
             'implementation' => new Template\Implementation\Extended()
-        ));
+        ]);
 
         $this->_checkMessage();
 
-        Event::fire('framework.view.construct.after', array($this->_file, $this->_template));
+        Event::fire('framework.view.construct.after', [$this->file, $this->template]);
     }
 
     /**
      *
-     * @param type $method
+     * @param string $method
      * @return \THCFrame\View\Exception\Implementation
      */
     protected function _getImplementationException($method)
@@ -79,57 +85,58 @@ class View extends Base
      */
     private function _checkMessage()
     {
-        if ($this->_session->get('infoMessage') !== null) {
-            $this->set('infoMessage', $this->_session->get('infoMessage'));
-            $this->_session->remove('infoMessage');
+        if ($this->session->get('infoMessage') !== null) {
+            $this->set('infoMessage', $this->session->get('infoMessage'));
+            $this->session->remove('infoMessage');
         } else {
             $this->set('infoMessage', '');
         }
 
-        if ($this->_session->get('warningMessage') !== null) {
-            $this->set('warningMessage', $this->_session->get('warningMessage'));
-            $this->_session->remove('warningMessage');
+        if ($this->session->get('warningMessage') !== null) {
+            $this->set('warningMessage', $this->session->get('warningMessage'));
+            $this->session->remove('warningMessage');
         } else {
             $this->set('warningMessage', '');
         }
 
-        if ($this->_session->get('successMessage') !== null) {
-            $this->set('successMessage', $this->_session->get('successMessage'));
-            $this->_session->remove('successMessage');
+        if ($this->session->get('successMessage') !== null) {
+            $this->set('successMessage', $this->session->get('successMessage'));
+            $this->session->remove('successMessage');
         } else {
             $this->set('successMessage', '');
         }
 
-        if ($this->_session->get('errorMessage') !== null) {
-            $this->set('errorMessage', $this->_session->get('errorMessage'));
-            $this->_session->remove('errorMessage');
+        if ($this->session->get('errorMessage') !== null) {
+            $this->set('errorMessage', $this->session->get('errorMessage'));
+            $this->session->remove('errorMessage');
         } else {
             $this->set('errorMessage', '');
         }
 
-        if ($this->_session->get('longFlashMessage') !== null) {
-            $this->set('longFlashMessage', $this->_session->get('longFlashMessage'));
-            $this->_session->remove('longFlashMessage');
+        if ($this->session->get('longFlashMessage') !== null) {
+            $this->set('longFlashMessage', $this->session->get('longFlashMessage'));
+            $this->session->remove('longFlashMessage');
         } else {
             $this->set('longFlashMessage', '');
         }
     }
 
     /**
-     *
-     * @return string
+     * @return mixed|string
+     * @throws Template\Exception\Implementation
+     * @throws Template\Exception\Parser
      */
     public function render()
     {
-        Event::fire('framework.view.render.before', array($this->_file));
+        Event::fire('framework.view.render.before', [$this->file]);
 
-        if (!file_exists($this->_file)) {
+        if (!file_exists($this->file)) {
             return '';
         }
 
-        return $this->_template
-                        ->parse(file_get_contents($this->_file))
-                        ->process($this->_data);
+        return $this->template
+                        ->parse(file_get_contents($this->file))
+                        ->process($this->data);
     }
 
     /**
@@ -147,22 +154,22 @@ class View extends Base
 
     /**
      *
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param string|int $key
+     * @param mixed $default
+     * @return mixed
      */
     public function get($key, $default = '')
     {
-        if (isset($this->_data[$key])) {
-            return $this->_data[$key];
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
         }
         return $default;
     }
 
     /**
      *
-     * @param type $key
-     * @param type $value
+     * @param string|int $key
+     * @param mixed $value
      * @throws Exception\Data
      */
     protected function _set($key, $value)
@@ -171,21 +178,21 @@ class View extends Base
             throw new Exception\Data('Key must be a string or a number');
         }
 
-        $data = $this->_data;
+        $data = $this->data;
 
         if (!$data) {
-            $data = array();
+            $data = [];
         }
 
         $data[$key] = $value;
-        $this->_data = $data;
+        $this->data = $data;
     }
 
     /**
-     *
-     * @param type $key
-     * @param type $value
-     * @return \THCFrame\View\View
+     * @param string$key
+     * @param null|mixed $value
+     * @return $this
+     * @throws Exception\Data
      */
     public function set($key, $value = null)
     {
@@ -207,19 +214,19 @@ class View extends Base
      */
     public function erase($key)
     {
-        unset($this->_data[$key]);
+        unset($this->data[$key]);
         return $this;
     }
 
     /**
      *
-     * @param text $msg
-     * @return text
+     * @param string $msg
+     * @return mixed|string
      */
     public function infoMessage($msg = '')
     {
         if (!empty($msg)) {
-            $this->_session->set('infoMessage', $msg);
+            $this->session->set('infoMessage', $msg);
         } else {
             return $this->get('infoMessage');
         }
@@ -227,13 +234,13 @@ class View extends Base
 
     /**
      *
-     * @param text $msg
-     * @return text
+     * @param string $msg
+     * @return mixed|string
      */
     public function warningMessage($msg = '')
     {
         if (!empty($msg)) {
-            $this->_session->set('warningMessage', $msg);
+            $this->session->set('warningMessage', $msg);
         } else {
             return $this->get('warningMessage');
         }
@@ -241,13 +248,13 @@ class View extends Base
 
     /**
      *
-     * @param text $msg
-     * @return text
+     * @param string $msg
+     * @return mixed|string
      */
     public function successMessage($msg = '')
     {
         if (!empty($msg)) {
-            $this->_session->set('successMessage', $msg);
+            $this->session->set('successMessage', $msg);
         } else {
             return $this->get('successMessage');
         }
@@ -255,13 +262,13 @@ class View extends Base
 
     /**
      *
-     * @param text $msg
-     * @return text
+     * @param string $msg
+     * @return mixed|string
      */
     public function errorMessage($msg = '')
     {
         if (!empty($msg)) {
-            $this->_session->set('errorMessage', $msg);
+            $this->session->set('errorMessage', $msg);
         } else {
             return $this->get('errorMessage');
         }
@@ -269,13 +276,13 @@ class View extends Base
 
     /**
      *
-     * @param text $msg
-     * @return text
+     * @param string $msg
+     * @return mixed|string
      */
     public function longFlashMessage($msg = '')
     {
         if (!empty($msg)) {
-            $this->_session->set('longFlashMessage', $msg);
+            $this->session->set('longFlashMessage', $msg);
         } else {
             return $this->get('longFlashMessage');
         }
@@ -283,13 +290,73 @@ class View extends Base
 
     /**
      *
-     * @param type $title
-     * @return \THCFrame\View\View
+     * @param string $title
+     * @return $this
+     * @throws Exception\Data
      */
     public function setTitle($title)
     {
-        $this->_set('title', $title);
-        $this->_set('metatitle', $title);
+        $this->_set(self::TITLE, $title);
+        $this->_set(self::META_TITLE, $title);
+        return $this;
+    }
+
+    /**
+     *
+     * @param string $title
+     * @param string $canonical
+     * @return $this
+     * @throws Exception\Data
+     */
+    public function setBasicMeta($title, $canonical)
+    {
+        $this->_set(self::TITLE, $title);
+        $this->_set(self::META_TITLE, $title);
+        $this->_set(self::META_CANONICAL, $canonical);
+        return $this;
+    }
+
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    public function setFile($file)
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
+        return $this;
+    }
+
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+        return $this;
+    }
+
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
         return $this;
     }
 

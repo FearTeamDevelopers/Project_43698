@@ -17,12 +17,12 @@ class HTMLPurifier_Doctype
      * List of standard modules (string identifiers or literal objects)
      * that this doctype uses
      */
-    public $modules = array();
+    public $modules = [];
 
     /**
      * List of modules to use for tidying up code
      */
-    public $tidyModules = array();
+    public $tidyModules = [];
 
     /**
      * Is the language derived from XML (i.e. XHTML)?
@@ -32,7 +32,7 @@ class HTMLPurifier_Doctype
     /**
      * List of aliases for this doctype
      */
-    public $aliases = array();
+    public $aliases = [];
 
     /**
      * Public DTD identifier
@@ -44,8 +44,8 @@ class HTMLPurifier_Doctype
      */
     public $dtdSystem;
 
-    public function __construct($name = null, $xml = true, $modules = array(),
-        $tidyModules = array(), $aliases = array(), $dtd_public = null, $dtd_system = null
+    public function __construct($name = null, $xml = true, $modules = [],
+        $tidyModules = [], $aliases = [], $dtd_public = null, $dtd_system = null
     ) {
         $this->name         = $name;
         $this->xml          = $xml;

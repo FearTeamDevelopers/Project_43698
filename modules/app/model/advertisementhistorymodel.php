@@ -36,8 +36,8 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $query = self::getQuery(['ac.*'])
+                ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -49,8 +49,8 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['ac.*'])
+                ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->order('ac.created', 'desc')
                 ->limit((int) $limit);
 
@@ -70,7 +70,7 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
 
         $remoteAddr = RequestMethods::getClientIpAddress();
         $referer = RequestMethods::server('HTTP_REFERER');
-        $changes = array();
+        $changes = [];
 
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
@@ -94,19 +94,19 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
             }
         }
 
-        $historyRecord = new self(array(
+        $historyRecord = new self([
             'originId' => $original->getId(),
             'editedBy' => $user->getId(),
             'remoteAddr' => $remoteAddr,
             'referer' => $referer,
             'changedData' => json_encode($changes),
-        ));
+        ]);
 
         if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'Advertisement ' . $original->getId() . ' changes saved'));
+            Event::fire('app.log', ['success', 'Advertisement ' . $original->getId() . ' changes saved']);
         } else {
-            Event::fire('admin.log', array('fail', 'Advertisement history errors: ' . json_encode($historyRecord->getErrors())));
+            Event::fire('app.log', ['fail', 'Advertisement history errors: ' . json_encode($historyRecord->getErrors())]);
         }
     }
 

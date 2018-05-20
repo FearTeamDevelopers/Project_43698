@@ -59,13 +59,13 @@ class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
 
         // stack that contains the indexes of all parents,
         // $stack[count($stack)-1] being the current parent
-        $stack = array();
+        $stack = [];
 
         // stack that contains all elements that are excluded
         // it is organized by parent elements, similar to $stack,
         // but it is only populated when an element with exclusions is
         // processed, i.e. there won't be empty exclusions.
-        $exclude_stack = array();
+        $exclude_stack = [];
 
         // variable that contains the start token while we are processing
         // nodes. This enables error reporting to do its job
@@ -83,7 +83,7 @@ class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
             // Gather information on children
 
             // child token accumulator
-            $child_tokens = array();
+            $child_tokens = [];
 
             // scroll to the end of this node, report number, and collect
             // all children
@@ -163,7 +163,7 @@ class HTMLPurifier_Strategy_FixNesting extends HTMLPurifier_Strategy
             if ($excluded) {
                 // there is an exclusion, remove the entire node
                 $result = false;
-                $excludes = array(); // not used, but good to initialize anyway
+                $excludes = []; // not used, but good to initialize anyway
             } else {
                 // DEFINITION CALL
                 if ($i === 0) {

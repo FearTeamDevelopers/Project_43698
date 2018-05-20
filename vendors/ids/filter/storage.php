@@ -78,7 +78,7 @@ class Storage
      *
      * @var array
      */
-    protected $filterSet = array();
+    protected $filterSet = [];
 
     /**
      * Constructor
@@ -230,7 +230,7 @@ class Storage
             if ($nocache)
             {
                 // build filters and cache them for re-use on next run
-                $data    = array();
+                $data    = [];
                 $filters = $filters->filter;
                 
                 foreach ($filters as $filter) {
@@ -250,13 +250,13 @@ class Storage
                             )
                     );
                 
-                    $data[] = array(
+                    $data[] = [
                             'id'          => $id,
                             'rule'        => $rule,
                             'impact'      => $impact,
                             'tags'        => $tags,
                             'description' => $description
-                    );
+                    ];
                 }
                 
                 /*
@@ -322,7 +322,7 @@ class Storage
             if ($nocache) {
                 
                 // build filters and cache them for re-use on next run
-                $data    = array();
+                $data    = [];
                 $filters = $filters->filters->filter;
                 
                 foreach ($filters as $filter) {
@@ -343,13 +343,13 @@ class Storage
                         )
                     );
     
-                    $data[] = array(
+                    $data[] = [
                         'id'          => $id,
                         'rule'        => $rule,
                         'impact'      => $impact,
                         'tags'        => $tags,
                         'description' => $description
-                    );
+                    ];
                 }
     
                 /*

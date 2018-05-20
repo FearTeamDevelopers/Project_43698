@@ -252,7 +252,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
             // and make it a quoted-string
             if (preg_match('/^'.$this->getGrammar()->getDefinition('text').'*$/D', $phraseStr)) {
                 $phraseStr = $this->getGrammar()->escapeSpecials(
-                    $phraseStr, array('"'), $this->getGrammar()->getSpecials()
+                    $phraseStr, ['"'], $this->getGrammar()->getSpecials()
                     );
                 $phraseStr = '"'.$phraseStr.'"';
             } else {
@@ -332,7 +332,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
      */
     protected function getEncodableWordTokens($string)
     {
-        $tokens = array();
+        $tokens = [];
 
         $encodedToken = '';
         // Split at all whitespace boundaries
@@ -453,7 +453,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
             $string = $this->getFieldBody();
         }
 
-        $tokens = array();
+        $tokens = [];
 
         // Generate atoms; split at all invisible boundaries followed by WSP
         foreach (preg_split('~(?=[ \t])~', $string) as $token) {
@@ -477,7 +477,7 @@ abstract class Swift_Mime_Headers_AbstractHeader implements Swift_Mime_Header
     private function _tokensToString(array $tokens)
     {
         $lineCount = 0;
-        $headerLines = array();
+        $headerLines = [];
         $headerLines[] = $this->_name.': ';
         $currentLine = & $headerLines[$lineCount++];
 

@@ -15,9 +15,6 @@ section.wrapper.akce.singlePage
                     h3 {echo $action->getTitle()}
             .body
                 div {echo html_entity_decode($action->getShortBody())}
-                |{if $deviceType === 'computer'}
-                a.readMore(href!='/akce/r/{echo $action->getUrlKey()}') čti více
-                |{/if}
         |{/foreach}
         |{/if}{else}
         .large-12.medium-12.small-12.columns

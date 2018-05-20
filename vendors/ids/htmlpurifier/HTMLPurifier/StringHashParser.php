@@ -47,7 +47,7 @@ class HTMLPurifier_StringHashParser
      */
     public function parseMultiFile($file) {
         if (!file_exists($file)) return false;
-        $ret = array();
+        $ret = [];
         $fh = fopen($file, 'r');
         if (!$fh) return false;
         while (!feof($fh)) {
@@ -68,7 +68,7 @@ class HTMLPurifier_StringHashParser
     protected function parseHandle($fh) {
         $state   = false;
         $single  = false;
-        $ret     = array();
+        $ret     = [];
         do {
             $line = fgets($fh);
             if ($line === false) break;

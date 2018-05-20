@@ -58,9 +58,9 @@
             <ul class="imagelist">
                 {foreach $photo in $photos}
                 {if $photo->active}
-                <li class="photoactive">
+                <li class="active">
                     {/if}{else}
-                <li class="photoinactive">
+                <li class="inactive">
                     {/else}
                     <a href="{echo $photo->imgMain}" data-lightbox="ad_photos_{echo $ad->getId()}">
                         <img src="{echo $photo->imgThumb}" alt="" height="140px" />
@@ -91,7 +91,7 @@
                 <th class="head1">Email</th>
                 <th class="head0">Zpráva</th>
                 <th class="head1">Vytvořeno</th>
-            </tr> 
+            </tr>
         </thead>
 
         <tbody>

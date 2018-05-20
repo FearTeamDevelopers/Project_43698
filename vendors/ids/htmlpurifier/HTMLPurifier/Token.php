@@ -12,7 +12,7 @@ class HTMLPurifier_Token {
      * Currently, valid values are "ValidateAttributes" and
      * "MakeWellFormed_TagClosedError"
      */
-    public $armor = array();
+    public $armor = [];
 
     /**
      * Used during MakeWellFormed.

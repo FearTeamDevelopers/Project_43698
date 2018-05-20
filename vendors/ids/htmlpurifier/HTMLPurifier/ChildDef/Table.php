@@ -7,8 +7,8 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
 {
     public $allow_empty = false;
     public $type = 'table';
-    public $elements = array('tr' => true, 'tbody' => true, 'thead' => true,
-        'tfoot' => true, 'caption' => true, 'colgroup' => true, 'col' => true);
+    public $elements = ['tr' => true, 'tbody' => true, 'thead' => true,
+        'tfoot' => true, 'caption' => true, 'colgroup' => true, 'col' => true];
     public function __construct() {}
     public function validateChildren($tokens_of_children, $config, $context) {
         if (empty($tokens_of_children)) return false;
@@ -24,13 +24,13 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
         $tfoot   = false;
 
         // as many of these as you want
-        $cols    = array();
-        $content = array();
+        $cols    = [];
+        $content = [];
 
         $nesting = 0; // current depth so we can determine nodes
         $is_collecting = false; // are we globbing together tokens to package
                                 // into one of the collectors?
-        $collection = array(); // collected nodes
+        $collection = []; // collected nodes
         $tag_index = 0; // the first node might be whitespace,
                             // so this tells us where the start tag is
 
@@ -77,7 +77,7 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
                             $cols[] = $collection;
                             break;
                     }
-                    $collection = array();
+                    $collection = [];
                     $is_collecting = false;
                     $tag_index = 0;
                 } else {
@@ -94,8 +94,8 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
                 if ($token->name == 'col') {
                     // the only empty tag in the possie, we can handle it
                     // immediately
-                    $cols[] = array_merge($collection, array($token));
-                    $collection = array();
+                    $cols[] = array_merge($collection, [$token]);
+                    $collection = [];
                     $tag_index = 0;
                     continue;
                 }
@@ -121,7 +121,7 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
 
         if (empty($content)) return false;
 
-        $ret = array();
+        $ret = [];
         if ($caption !== false) $ret = array_merge($ret, $caption);
         if ($cols !== false)    foreach ($cols as $token_array) $ret = array_merge($ret, $token_array);
         if ($thead !== false)   $ret = array_merge($ret, $thead);

@@ -23,24 +23,24 @@ class HTMLPurifier_HTMLModule_Legacy extends HTMLPurifier_HTMLModule
 
     public function setup($config) {
 
-        $this->addElement('basefont', 'Inline', 'Empty', false, array(
+        $this->addElement('basefont', 'Inline', 'Empty', false, [
             'color' => 'Color',
             'face' => 'Text', // extremely broad, we should
             'size' => 'Text', // tighten it
             'id' => 'ID'
-        ));
+        ]);
         $this->addElement('center', 'Block', 'Flow', 'Common');
-        $this->addElement('dir', 'Block', 'Required: li', 'Common', array(
+        $this->addElement('dir', 'Block', 'Required: li', 'Common', [
             'compact' => 'Bool#compact'
-        ));
-        $this->addElement('font', 'Inline', 'Inline', array('Core', 'I18N'), array(
+        ]);
+        $this->addElement('font', 'Inline', 'Inline', ['Core', 'I18N'], [
             'color' => 'Color',
             'face' => 'Text', // extremely broad, we should
             'size' => 'Text', // tighten it
-        ));
-        $this->addElement('menu', 'Block', 'Required: li', 'Common', array(
+        ]);
+        $this->addElement('menu', 'Block', 'Required: li', 'Common', [
             'compact' => 'Bool#compact'
-        ));
+        ]);
 
         $s = $this->addElement('s', 'Inline', 'Inline', 'Common');
         $s->formatting = true;

@@ -46,10 +46,10 @@ abstract class Driver extends Base implements LoggerInterface
      * @param array $context
      * @return type
      */
-    protected function interpolate($message, array $context = array())
+    protected function interpolate($message, array $context = [])
     {
         // vytvoří nahrazovací pole se závorkami okolo kontextových klíčů
-        $replace = array();
+        $replace = [];
         if (!empty($context)) {
             foreach ($context as $key => $val) {
                 $replace['{' . $key . '}'] = $val;

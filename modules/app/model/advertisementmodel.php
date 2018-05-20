@@ -3,11 +3,12 @@
 namespace App\Model;
 
 use App\Model\Basic\BasicAdvertisementModel;
+use Search\Model\IndexableInterface;
 
 /**
- * 
+ *
  */
-class AdvertisementModel extends BasicAdvertisementModel
+class AdvertisementModel extends BasicAdvertisementModel implements IndexableInterface
 {
 
     const STATE_SOLD = 2;
@@ -32,8 +33,23 @@ class AdvertisementModel extends BasicAdvertisementModel
      */
     protected $_images;
 
+    public function getBody()
+    {
+        return '';
+    }
+
+    public function getMetaDescription()
+    {
+        return $this->getContent();
+    }
+
+    public function getUrlKey()
+    {
+        return $this->getUniqueKey();
+    }
+
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -49,41 +65,59 @@ class AdvertisementModel extends BasicAdvertisementModel
     }
 
     /**
+     * Check whether ad unique identifier already exist or not.
+     *
+     * @param string $str
+     *
+     * @return bool
+     */
+    public static function checkAdKey($str)
+    {
+        $ad = self::first(['uniqueKey = ?' => $str]);
+
+        if ($ad === null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Called from admin module.
-     * 
+     *
      * @return array
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('adv.id', 'adv.title', 'adv.adType', 'adv.expirationDate',
+        $query = self::getQuery(['adv.id', 'adv.title', 'adv.adType', 'adv.expirationDate',
                     'adv.active', 'adv.created', 'adv.hasAvailabilityRequest', 'adv.userId', 'adv.state',
-                    '(SELECT COUNT(adm.id) FROM tb_admessage adm where adm.adId = adv.id)' => 'messageCount',))
-                ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'));
+                    '(SELECT COUNT(adm.id) FROM tb_admessage adm where adm.adId = adv.id)' => 'messageCount',])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle']);
 
         return self::initialize($query);
     }
 
     /**
      * Called from admin module.
-     * 
+     *
      * @param type $id
      *
      * @return type
      */
     public static function fetchById($id)
     {
-        $query = self::getQuery(array('adv.*'))
-                ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
+        $query = self::getQuery(['adv.*'])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
                 ->where('adv.id = ?', (int) $id);
 
         $adArr = self::initialize($query);
         $ad = !empty($adArr) ? array_shift($adArr) : null;
 
         if (null !== $ad) {
-            $ad->messages = \App\Model\AdMessageModel::all(array('adId = ?' => $ad->getId()));
-            $ad->images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
+            $ad->messages = \App\Model\AdMessageModel::all(['adId = ?' => $ad->getId()]);
+            $ad->images = \App\Model\AdImageModel::all(['adId = ?' => $ad->getId()]);
         }
 
         return $ad;
@@ -91,17 +125,18 @@ class AdvertisementModel extends BasicAdvertisementModel
 
     /**
      * Called from app module.
-     * 
+     *
      * @return type
      */
     public static function fetchAdsActive($adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                    'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
-                ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
-                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
+        $query = self::getQuery(['adv.id', 'adv.uniqueKey', 'adv.userAlias',
+                    'adv.title', 'adv.price', 'adv.userId', 'adv.state', 'adv.content'])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
+                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', ['adi.photoName', 'adi.imgMain', 'adi.imgThumb'])
                 ->where('adv.active = ?', true)
+                ->where('adv.state <> ?', self::STATE_SOLD)
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
                 ->order('adv.created', 'desc')
                 ->limit((int) $adsPerPage, (int) $page);
@@ -113,7 +148,28 @@ class AdvertisementModel extends BasicAdvertisementModel
 
     /**
      * Called from app module.
-     * 
+     *
+     * @return type
+     */
+    public static function fetchAdsActiveNoLimit()
+    {
+        $query = self::getQuery(['adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
+                    'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state', 'adv.mainPhotoId',
+                    'adv.content', 'adv.keywords', 'adv.expirationDate'])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
+                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', ['adi.photoName', 'adi.imgMain', 'adi.imgThumb'])
+                ->where('adv.active = ?', true)
+                ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'));
+
+        $ads = self::initialize($query);
+
+        return $ads;
+    }
+
+    /**
+     * Called from app module.
+     *
      * @param type $type
      * @param type $page
      *
@@ -122,11 +178,11 @@ class AdvertisementModel extends BasicAdvertisementModel
     public static function fetchActiveByType($type, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                        'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
-                    ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
-                    ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
-                    ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
+            $query = self::getQuery(['adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
+                        'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'])
+                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                    ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
+                    ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', ['adi.photoName', 'adi.imgMain', 'adi.imgThumb'])
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
                     ->where('adv.adType = ?', $type)
@@ -149,7 +205,7 @@ class AdvertisementModel extends BasicAdvertisementModel
     public static function countActiveByType($type)
     {
         if ($type == 'tender' || $type == 'demand') {
-            return self::count(array('active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'), 'adType = ?' => $type), array('id'));
+            return self::count(['active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'), 'adType = ?' => $type], ['id']);
         } else {
             return null;
         }
@@ -157,7 +213,7 @@ class AdvertisementModel extends BasicAdvertisementModel
 
     /**
      * Called from app module.
-     * 
+     *
      * @param type $type
      * @param type $page
      *
@@ -166,11 +222,11 @@ class AdvertisementModel extends BasicAdvertisementModel
     public static function fetchActiveByTypeSection($type, $section, $adsPerPage = 10, $page = 1)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                        'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
-                    ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
-                    ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
-                    ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
+            $query = self::getQuery(['adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
+                        'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'])
+                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                    ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
+                    ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', ['adi.photoName', 'adi.imgMain', 'adi.imgThumb'])
                     ->where('ads.urlKey = ?', $section)
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
@@ -195,8 +251,8 @@ class AdvertisementModel extends BasicAdvertisementModel
     public static function countActiveByTypeSection($type, $section)
     {
         if ($type == 'tender' || $type == 'demand') {
-            $query = self::getQuery(array('COUNT(adv.id) as count'))
-                    ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
+            $query = self::getQuery(['COUNT(adv.id) as count'])
+                    ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
                     ->where('ads.urlKey = ?', $section)
                     ->where('adv.active = ?', true)
                     ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
@@ -213,7 +269,7 @@ class AdvertisementModel extends BasicAdvertisementModel
 
     /**
      * Called from app module.
-     * 
+     *
      * @param type $type
      * @param type $page
      *
@@ -221,11 +277,11 @@ class AdvertisementModel extends BasicAdvertisementModel
      */
     public static function fetchActiveBySection($section, $adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                    'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'))
-                ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
-                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
+        $query = self::getQuery(['adv.id', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
+                    'adv.title', 'adv.price', 'adv.created', 'adv.userId', 'adv.state'])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
+                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', ['adi.photoName', 'adi.imgMain', 'adi.imgThumb'])
                 ->where('ads.urlKey = ?', $section)
                 ->where('adv.active = ?', true)
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
@@ -245,8 +301,8 @@ class AdvertisementModel extends BasicAdvertisementModel
      */
     public static function countActiveBySection($section)
     {
-        $query = self::getQuery(array('COUNT(adv.id) as count'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
+        $query = self::getQuery(['COUNT(adv.id) as count'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
                 ->where('ads.urlKey = ?', $section)
                 ->where('adv.active = ?', true)
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'));
@@ -259,16 +315,16 @@ class AdvertisementModel extends BasicAdvertisementModel
 
     /**
      * Called from app module.
-     * 
+     *
      * @param type $uniquekey
      *
      * @return type
      */
     public static function fetchActiveByKey($uniquekey)
     {
-        $query = self::getQuery(array('adv.*'))
-                ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname', 'us.email'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
+        $query = self::getQuery(['adv.*'])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname', 'us.email'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
                 ->where('adv.uniqueKey = ?', $uniquekey)
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'))
                 ->where('adv.active = ?', true);
@@ -277,8 +333,8 @@ class AdvertisementModel extends BasicAdvertisementModel
         $ad = !empty($adArr) ? array_shift($adArr) : null;
 
         if (null !== $ad) {
-            $ad->messages = \App\Model\AdMessageModel::all(array('adId = ?' => $ad->getId()));
-            $ad->images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
+            $ad->messages = \App\Model\AdMessageModel::all(['adId = ?' => $ad->getId()]);
+            $ad->images = \App\Model\AdImageModel::all(['adId = ?' => $ad->getId()]);
         }
 
         return $ad;
@@ -286,18 +342,18 @@ class AdvertisementModel extends BasicAdvertisementModel
 
     /**
      * Called from app module.
-     * 
+     *
      * @param type $userId
      *
      * @return type
      */
     public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
-        $query = self::getQuery(array('adv.id', 'adv.userId', 'adv.uniqueKey', 'adv.adType', 'adv.userAlias',
-                    'adv.title', 'adv.price', 'adv.created', 'adv.expirationDate', 'adv.state'))
-                ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
-                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', array('adi.photoName', 'adi.imgMain', 'adi.imgThumb'))
+        $query = self::getQuery(['adv.id', 'adv.userId', 'adv.uniqueKey', 'adv.created',
+                    'adv.title', 'adv.price', 'adv.content', 'adv.expirationDate', 'adv.state'])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
+                ->leftjoin('tb_adimage', 'adi.id = adv.mainPhotoId', 'adi', ['adi.photoName', 'adi.imgMain', 'adi.imgThumb'])
                 ->where('adv.userId = ?', $userId)
                 ->where('adv.active = ?', true)
                 ->order('adv.created', 'desc')
@@ -315,7 +371,7 @@ class AdvertisementModel extends BasicAdvertisementModel
      */
     public static function countActiveByUser($userId)
     {
-        return self::count(array('active = ?' => true, 'userId = ?' => (int) $userId), array('id'));
+        return self::count(['active = ?' => true, 'userId = ?' => (int) $userId], ['id']);
     }
 
     /**
@@ -326,10 +382,10 @@ class AdvertisementModel extends BasicAdvertisementModel
      */
     public static function fetchAdByKeyUserId($uniqueKey, $userId)
     {
-        $ad = self::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $userId));
+        $ad = self::first(['uniqueKey = ?' => $uniqueKey, 'userId = ?' => $userId]);
 
         if (null !== $ad) {
-            $ad->_images = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
+            $ad->_images = \App\Model\AdImageModel::all(['adId = ?' => $ad->getId()]);
         }
 
         return $ad;
@@ -338,17 +394,17 @@ class AdvertisementModel extends BasicAdvertisementModel
     /**
      * Return advertisements that are going to expire in x days based on parameters
      * Advertisements returned in array are grouped by author email
-     * 
+     *
      * @param integer $min
      * @param integer $max
      * @return array
      */
     public static function expireInDays($max = 7)
     {
-        $query = self::getQuery(array('adv.id', 'adv.uniqueKey', 'adv.title', 'adv.userId', 'adv.state',
-                    'adv.created', 'adv.expirationDate', 'datediff(expirationDate, curdate())' => 'expireIn'))
-                ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname', 'us.email'))
-                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', array('ads.title' => 'sectionTitle'))
+        $query = self::getQuery(['adv.id', 'adv.uniqueKey', 'adv.title', 'adv.userId', 'adv.state',
+                    'adv.created', 'adv.expirationDate', 'datediff(expirationDate, curdate())' => 'expireIn'])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname', 'us.email'])
+                ->join('tb_adsection', 'adv.sectionId = ads.id', 'ads', ['ads.title' => 'sectionTitle'])
                 ->where('adv.active = ?', true)
                 ->where('adv.hasAvailabilityRequest = ?', false)
                 ->where('adv.state <> ?', 2)
@@ -356,14 +412,15 @@ class AdvertisementModel extends BasicAdvertisementModel
                 ->order('adv.created', 'desc');
 
         $ads = self::initialize($query);
-        $returnArr = array();
+        $returnArr = [];
 
         if (!empty($ads)) {
             foreach ($ads as $ad) {
-                $returnArr[$ad->email][] = array('uniqueKey' => $ad->uniqueKey,
+                $returnArr[$ad->email][] = [
+                    'uniqueKey' => $ad->uniqueKey,
                     'expireIn' => $ad->expireIn,
                     'title' => $ad->title,
-                    'created' => $ad->created);
+                    'created' => $ad->created];
             }
         }
 

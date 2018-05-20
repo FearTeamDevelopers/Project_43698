@@ -1,19 +1,24 @@
 section.wrapper.galleryDetail.singlePage
-   |{if empty($photos)}
-   header.row
-      h2 V této galerii nejsou žádné fotky
-   |{/if}{else}
-   header.row
-      h2 {echo $gallery->getTitle()}
-   .row
-      .buttonWrapper
-         ul
-            li
-               a(href!='/galerieslideshow/r/{echo $gallery->getUrlKey()}').fi-photo Zobrazit jako slideshow
-      |{foreach $photo in $photos}
-      .image.large-3.medium-6.small-12.columns.left
+    header.row
+        h2 {echo $gallery->getTitle()}
+
+    |{if !empty($videos)}
+    .row.container.videoContainer
+        |{foreach $video in $videos}
+        .video.large-6.medium-6.small-12.columns.left
+            iframe(width="100%" height="100%" src!="https://www.youtube.com/embed/{echo $video->videoCode}" frameborder="0" allowfullscreen)
+        |{/foreach}
+    |{/if}
+
+    |{if empty($photos)}
+    .row
+        h2 V této galerii nejsou žádné fotky
+    |{/if}{else}
+    .row.container
+        |{foreach $photo in $photos}
+        .image.large-3.medium-6.small-12.columns.left
             a(href!="{echo $photo->getImgMain()}" data-lightbox!="gallery_{echo $gallery->getId()}")
-                img(src!="{echo $photo->getImgThumb()}")
-      |{/foreach}
-   include ../components/pager
-   |{/else}
+                img(src!="{echo $photo->getImgThumb()}" alt!="{echo $photo->getPhotoName()}")
+        |{/foreach}
+    include ../components/pager
+    |{/else}

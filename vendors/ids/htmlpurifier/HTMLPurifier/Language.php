@@ -20,12 +20,12 @@ class HTMLPurifier_Language
     /**
      * Array of localizable messages
      */
-    public $messages = array();
+    public $messages = [];
 
     /**
      * Array of localizable error codes
      */
-    public $errorNames = array();
+    public $errorNames = [];
 
     /**
      * True if no message file was found for this language, so English
@@ -114,11 +114,11 @@ class HTMLPurifier_Language
      * @todo Implement conditionals? Right now, some messages make
      *     reference to line numbers, but those aren't always available
      */
-    public function formatMessage($key, $args = array()) {
+    public function formatMessage($key, $args = []) {
         if (!$this->_loaded) $this->load();
         if (!isset($this->messages[$key])) return "[$key]";
         $raw = $this->messages[$key];
-        $subst = array();
+        $subst = [];
         $generator = false;
         foreach ($args as $i => $value) {
             if (is_object($value)) {
@@ -134,7 +134,7 @@ class HTMLPurifier_Language
                     // may need to be factored out into a dedicated class
                     if (!empty($value->attr)) {
                         $stripped_token = clone $value;
-                        $stripped_token->attr = array();
+                        $stripped_token->attr = [];
                         $subst['$'.$i.'.Compact'] = $generator->generateFromToken($stripped_token);
                     }
                     $subst['$'.$i.'.Line'] = $value->line ? $value->line : 'unknown';

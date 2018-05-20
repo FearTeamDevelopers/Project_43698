@@ -5,7 +5,7 @@ namespace App\Model;
 use App\Model\Basic\BasicPhotoModel;
 
 /**
- * 
+ *
  */
 class PhotoModel extends BasicPhotoModel
 {
@@ -16,7 +16,7 @@ class PhotoModel extends BasicPhotoModel
     protected $_alias = 'ph';
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -32,7 +32,7 @@ class PhotoModel extends BasicPhotoModel
 
     /**
      * Delete ad record and connected images
-     * 
+     *
      * @return type
      */
     public function delete()
@@ -57,12 +57,12 @@ class PhotoModel extends BasicPhotoModel
     {
         $bytes = floatval($this->_size);
 
-        $units = array(
+        $units = [
             'b' => 1,
             'kb' => 1024,
             'mb' => pow(1024, 2),
             'gb' => pow(1024, 3),
-        );
+        ];
 
         $result = $bytes / $units[strtolower($unit)];
         $result = strval(round($result, 2)) . ' ' . strtoupper($unit);
@@ -116,7 +116,9 @@ class PhotoModel extends BasicPhotoModel
     public static function fetchPhotosByGalleryIdPaged($galleryId, $limit = 30, $page = 1)
     {
         return self::all(
-                        array('active = ?' => true, 'galleryId = ?' => (int) $galleryId), array('*'), array('rank' => 'desc', 'created' => 'desc'), $limit, $page
+                ['active = ?' => true, 'galleryId = ?' => (int) $galleryId],
+                ['*'],
+                ['rank' => 'desc', 'created' => 'desc'], $limit, $page
         );
     }
 

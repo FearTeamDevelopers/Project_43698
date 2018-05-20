@@ -1,65 +1,65 @@
-section.wrapper.login.singlePage
-   .row
-      .small-12.medium-12.large-12.columns
-         .container
-            header
-               h2.fi-check Registrace
-            form(method="post",action="#")
-               |{if isset($errors["firstname"])}
-               label.error.fi-alert
-                  |{echo implode("<br/>", $errors["firstname"])}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true, "placeholder" => "Jméno"))}
+section.wrapper.registration.singlePage
+    .row
+        .small-12.medium-12.large-12.columns
+            .container
+                header
+                    h2.fi-check Registrace
+                form(method="post",action="#")
+                    input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+                    input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")
+                    p.adContFormUrl Toto pole nechte prázdné:
+                        input(type="text",name="url")
 
-               |{if isset($errors["lastname"])}
-               label.error.fi-alert
-                  |{echo implode("<br/>", $errors["lastname"])}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true, "placeholder" => "Příjmení"))}
+                    |{if isset($errors["firstname"])}
+                    label.error.fi-alert
+                        |{echo implode("<br/>", $errors["firstname"])}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true, "placeholder" => "Jméno"))}
 
-               |{if isset($errors["phoneNumber"])}
-               label.error.fi-alert
-                  |{echo implode("<br/>", $errors["phoneNumber"])}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon - nepovinné"))}
+                    |{if isset($errors["lastname"])}
+                    label.error.fi-alert
+                        |{echo implode("<br/>", $errors["lastname"])}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("text", "lastname", array($user,"lastname"), array("required"=>true, "placeholder" => "Příjmení"))}
 
-               |{if isset($errors["email"])}
-               label.error.fi-alert
-                  |{echo implode("<br/>", $errors["email"])}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}
+                    |{if isset($errors["phoneNumber"])}
+                    label.error.fi-alert
+                        |{echo implode("<br/>", $errors["phoneNumber"])}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon - nepovinné"))}
 
-               span Informace na email:<br/>
-               label
-                  |{if $user->getNewActionNotification}
-                  input(type="checkbox",name="actionNotification",value="1",checked="checked")
-                  | Informace o nových akcích
-                  |{/if}{else}
-                  input(type="checkbox",name="actionNotification",value="1")
-                  | Informace o nových akcích
-                  |{/else}
-               label
-                  |{if $user->getNewReportNotification}
-                  input(type="checkbox",name="reportNotification",value="1",checked="checked")
-                  | Informace o nových reportážích
-                  |{/if}{else}
-                  input(type="checkbox",name="reportNotification",value="1")
-                  | Informace o nových reportážích
-                  |{/else}
+                    |{if isset($errors["email"])}
+                    label.error.fi-alert
+                        |{echo implode("<br/>", $errors["email"])}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}
 
-               |{if isset($errors["password"])}
-               label.error.fi-alert
-                  |{echo implode("<br/>", $errors["password"])}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Heslo"))}
+                    |{if isset($errors["password"])}
+                    label.error.fi-alert
+                        |{echo implode("<br/>", $errors["password"])}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "Heslo"))}
 
-               |{if isset($errors["password2"])}
-               label.error.fi-alert
-                  |{echo implode("<br/>", $errors["password2"])}
-               |{/if}
-               |{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Ověření hesla"))}
+                    |{if isset($errors["password2"])}
+                    label.error.fi-alert
+                        |{echo implode("<br/>", $errors["password2"])}
+                    |{/if}
+                    |{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("required"=>true, "pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "Ověření hesla"))}
 
-               input(type="submit", name="register", value="Registrovat")
+                    label
+                        input(type='checkbox',name='pdConsentToProcessing',value='1', required, oninvalid='this.setCustomValidity(this.willValidate ? "" :"You must choose the account type from the list")')
+                        |&nbsp;Souhlasím se zpracováváním osobních údajů podle&nbsp;
+                        a(href="/ochrana-soukromi") Zásad ochrany soukromí
 
-               input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
-               input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")
+                    span Informace na email:<br/>
+                    label
+                        input(type="checkbox",name="actionNotification",value="1")
+                        |&nbsp;Souhlasím se zasíláním informací o akcích na e-mail
+                    label
+                        input(type="checkbox",name="reportNotification",value="1")
+                        |&nbsp;Souhlasím se zasíláním informací o reportážích na e-mail
+                    label
+                        input(type="checkbox",name="newsNotification",value="1")
+                        |&nbsp;Souhlasím se zasíláním informací o novinkách na e-mail
+                    br
+                    input(type="submit", name="register", value="Registrovat")

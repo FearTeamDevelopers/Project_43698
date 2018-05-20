@@ -23,7 +23,7 @@ class HTMLPurifier_VarParser
      * Lookup table of allowed types. Mainly for backwards compatibility, but
      * also convenient for transforming string type names to the integer constants.
      */
-    static public $types = array(
+    static public $types = [
         'string'    => self::STRING,
         'istring'   => self::ISTRING,
         'text'      => self::TEXT,
@@ -35,18 +35,18 @@ class HTMLPurifier_VarParser
         'list'      => self::ALIST,
         'hash'      => self::HASH,
         'mixed'     => self::MIXED
-    );
+    ];
 
     /**
      * Lookup table of types that are string, and can have aliases or
      * allowed value lists.
      */
-    static public $stringTypes = array(
+    static public $stringTypes = [
         self::STRING    => true,
         self::ISTRING   => true,
         self::TEXT      => true,
         self::ITEXT     => true,
-    );
+    ];
 
     /**
      * Validate a variable according to type. Throws

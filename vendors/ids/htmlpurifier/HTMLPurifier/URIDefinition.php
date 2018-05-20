@@ -4,9 +4,9 @@ class HTMLPurifier_URIDefinition extends HTMLPurifier_Definition
 {
 
     public $type = 'URI';
-    protected $filters = array();
-    protected $postFilters = array();
-    protected $registeredFilters = array();
+    protected $filters = [];
+    protected $postFilters = [];
+    protected $registeredFilters = [];
 
     /**
      * HTMLPurifier_URI object of the base specified at %URI.Base

@@ -4,20 +4,30 @@
     <h2>Výsledky hledání</h2>
   </header>
   <section class="row container">
-    {if !empty($urls)}
-    {foreach $url in $urls}
+    {if !empty($results)}
+    {foreach $result in $results}
     <article>
-      <header><a href="{echo $url['path']}">
-          <h3>{echo $url_i}</h3></a></header><span><small>{echo \App\Helper\DateFormater::t2dt($url['created'])}</small></span>
-      <div class="body">
-        <div>{echo html_entity_decode($url['meta'])}</div>
+      {if stripos($result['model'], 'akce') !== false}
+      {if $result['additionalData']['startDate'] !== null}
+      <div class="date">
+        <div class="den">{echo \App\Helper\DateFormater::g2dn($result['additionalData']['startDate'])}</div>
+        <div class="mesic">{echo \App\Helper\DateFormater::g2mn($result['additionalData']['startDate'])}</div>
+      </div>{/if}
+      {/if}{elseif stripos($result['model'], 'bazar') !== false || stripos($result['model'], 'reportáž') !== false}
+      {if !empty($result['additionalData']['imgThumb'])}
+      <div class="imgThumb"><img src="{echo $result['additionalData']['imgThumb']}" alt=""/></div>{/if}
+      {/elseif}
+      <header><a href="{echo $result['path']}">
+          <h3>{echo $result['title']}</h3></a></header><span><small>{echo \App\Helper\DateFormater::t2dt($result['created'])}</small></span>
+      <div class="body">{if mb_strlen($result['text'])>0}
+        <div>{echo html_entity_decode($result['text'])}</div>{/if}
       </div>
     </article>{/foreach}
     {/if}{else}
     <div class="large-12 medium-12 small-12 columns">
       <h2>Pro hledaný výraz nebyl nalezen žádný odkaz</h2>
     </div>{/else}
-  </section><br/>{if  $pagecount > 1}
+  </section><br/>{if $pagecount > 1}
   <section class="pager row">
     {if $currentpage !=1}
     {if $currentpage !=2}<a href="{echo $pagerpathprefix}/p/1{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><<</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}"><</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage-2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 2}</a>{/if}<a href="{echo $pagerpathprefix}/p/{echo $currentpage-1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage - 1}</a>{/if}<a href="#" class="active">{echo $currentpage}</a>{if $currentpage != $pagecount}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 1}</a>{if $currentpage != $pagecount - 1}<a href="{echo $pagerpathprefix}/p/{echo $currentpage+2}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">{echo $currentpage + 2}</a><a href="{echo $pagerpathprefix}/p/{echo $currentpage+1}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">></a><a href="{echo $pagerpathprefix}/p/{echo $pagecount}{echo isset($pagerpathpostfix)? $pagerpathpostfix:""}">>></a>{/if}

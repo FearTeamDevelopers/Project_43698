@@ -12,14 +12,15 @@ use THCFrame\Core\Core;
  */
 class ModuleObserver implements SubscriberInterface
 {
+
     /**
      * @return type
      */
     public function getSubscribedEvents()
     {
-        return array(
+        return [
             'app.log' => 'appLog',
-        );
+        ];
     }
 
     /**
@@ -34,7 +35,7 @@ class ModuleObserver implements SubscriberInterface
         if ($user === null) {
             $userId = 'annonymous';
         } else {
-            $userId = $user->getWholeName().':'.$user->getId();
+            $userId = $user->getWholeName() . ':' . $user->getId();
         }
 
         $router = Registry::get('router');
@@ -56,7 +57,7 @@ class ModuleObserver implements SubscriberInterface
             $paramStr = '';
         }
 
-        $log = new \Admin\Model\AdminLogModel(array(
+        $log = new \Admin\Model\AdminLogModel([
             'userId' => $userId,
             'module' => $module,
             'controller' => $controller,
@@ -64,19 +65,20 @@ class ModuleObserver implements SubscriberInterface
             'result' => $result,
             'httpreferer' => RequestMethods::getHttpReferer(),
             'params' => $paramStr,
-        ));
-
-        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
-            'type' => 'appLog',
-            'result' => $result,
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'params' => $paramStr)
-        );
+        ]);
 
         if ($log->validate()) {
             $log->save();
+        } else {
+            Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', [
+                'type' => 'appLog',
+                'result' => $result,
+                'module' => $module,
+                'controller' => $controller,
+                'action' => $action,
+                'params' => $paramStr]
+            );
         }
     }
+
 }

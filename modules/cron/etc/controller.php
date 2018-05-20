@@ -16,12 +16,12 @@ class Controller extends BaseController
     /**
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
 
         // schedule disconnect from database
         Event::add('framework.controller.destruct.after', function ($name) {
@@ -67,7 +67,7 @@ class Controller extends BaseController
      *
      * @return type
      */
-    public function lang($key, $args = array())
+    public function lang($key, $args = [])
     {
         return $this->getLang()->_get($key, $args);
     }

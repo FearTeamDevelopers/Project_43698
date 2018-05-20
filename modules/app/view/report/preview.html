@@ -1,13 +1,15 @@
 
-<section class="wrapper report singlePage">
+<section class="wrapper report">
   <div class="row"><a href="/admin/report/{echo $act}/{echo $report->getId()}">Zpět do administrace</a><br/></div>
+  <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
   <header class="row">
-    <div class="imgWrapper"><img src="{echo $report->getImgMain()}"/></div>
-    <div class="reportInfo">
-      <h2>{echo $report->getTitle()}</h2><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}</span><br/><small><span>Autor:</span></small><span>{echo " ".$report->getUserAlias()}</span>
+    <div class="reportInfo large-12 column">
+      <h2>{echo $report->getTitle()}</h2><small><span>Autor:</span></small><span>{echo " ".$report->getUserAlias()}</span><a href="../../../../../../../../E:/InternetTemp/phpapp/facebook-auto-publish.1.4.1/facebook-auto-publish/facebook-auto-publish.php"></a><br/><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}</span>
     </div>
+    <div class="imgWrapper large-12 column"><img src="{echo $report->getImgMain()}" alt="{echo $report->getPhotoName()}" class="centerBlock"/></div>
   </header>
-  <div class="page row">
-    <div class="container">{echo html_entity_decode($report->getBody())}</div>
+  <div class="page row">{if $report->getImgMain() != ""}
+    <div class="container large-12 comlumn">{echo html_entity_decode($report->getBody())}</div>{/if}{else}
+    <div class="container top-padded large-12 comlumn">{echo html_entity_decode($report->getBody())}</div>{/else}
   </div>
 </section>

@@ -88,11 +88,11 @@ class Converter
         // check for existing comments
         if (preg_match('/(?:\<!-|-->|\/\*|\*\/|\/\/\W*\w+\s*$)|(?:--[^-]*-)/ms', $value)) {
 
-            $pattern = array(
+            $pattern = [
                 '/(?:(?:<!)(?:(?:--(?:[^-]*(?:-[^-]+)*)--\s*)*)(?:>))/ms',
                 '/(?:(?:\/\*\/*[^\/\*]*)+\*\/)/ms',
                 '/(?:--[^-]*-)/ms'
-            );
+            ];
 
             $converted = preg_replace($pattern, ';', $value);
             $value    .= "\n" . $converted;
@@ -119,7 +119,7 @@ class Converter
     public static function convertFromWhiteSpace($value)
     {
         //check for inline linebreaks
-        $search = array('\r', '\n', '\f', '\t', '\v');
+        $search = ['\r', '\n', '\f', '\t', '\v'];
         $value  = str_replace($search, ';', $value);
 
         // replace replacement characters regular spaces
@@ -139,7 +139,7 @@ class Converter
      */
     public static function convertFromJSCharcode($value)
     {
-        $matches = array();
+        $matches = [];
 
         // check if value matches typical charCode pattern
         if (preg_match_all('/(?:[\d+-=\/\* ]+(?:\s?,\s?[\d+-=\/\* ]+)){4,}/ms', $value, $matches)) {
@@ -251,7 +251,7 @@ class Converter
     public static function convertQuotes($value)
     {
         // normalize different quotes to "
-        $pattern = array('\'', '`', '´', '’', '‘');
+        $pattern = ['\'', '`', '´', '’', '‘'];
         $value   = str_replace($pattern, '"', $value);
 
         //make sure harmless quoted strings don't generate false alerts
@@ -270,7 +270,7 @@ class Converter
      */
     public static function convertFromSQLHex($value)
     {
-        $matches = array();
+        $matches = [];
         if (preg_match_all('/(?:(?:\A|[^\d])0x[a-f\d]{3,}[a-f\d]*)+/im', $value, $matches)) {
             foreach ($matches[0] as $match) {
                 $converted = '';
@@ -298,10 +298,10 @@ class Converter
      */
     public static function convertFromSQLKeywords($value)
     {
-        $pattern = array(
+        $pattern = [
             '/(?:is\s+null)|(like\s+null)|' .
             '(?:(?:^|\W)in[+\s]*\([\s\d"]+[^()]*\))/ims'
-        );
+        ];
         $value   = preg_replace($pattern, '"=0', $value);
 
         $value   = preg_replace('/[^\w\)]+\s*like\s*[^\w\s]+/ims', '1" OR "1"', $value);
@@ -312,12 +312,12 @@ class Converter
         $value   = preg_replace('/(?:and\s+\d+\.?\d*)/ims', '', $value);
         $value   = preg_replace('/(?:\s+and\s+)/ims', ' or ', $value);
 
-        $pattern = array(
+        $pattern = [
             '/(?:not\s+between)|(?:is\s+not)|(?:not\s+in)|' .
             '(?:xor|<>|rlike(?:\s+binary)?)|' .
             '(?:regexp\s+binary)|' .
             '(?:sounds\s+like)/ims'
-        );
+        ];
         $value   = preg_replace($pattern, '!', $value);
         $value   = preg_replace('/"\s+\d/', '"', $value);
         $value   = preg_replace('/(\W)div(\W)/ims', '$1 OR $2', $value);
@@ -337,12 +337,12 @@ class Converter
     public static function convertFromControlChars($value)
     {
         // critical ctrl values
-        $search = array(
+        $search = [
             chr(0), chr(1), chr(2), chr(3), chr(4), chr(5),
             chr(6), chr(7), chr(8), chr(11), chr(12), chr(14),
             chr(15), chr(16), chr(17), chr(18), chr(19), chr(24),
             chr(25), chr(192), chr(193), chr(238), chr(255), '\\0'
-        );
+        ];
 
         $value = str_replace($search, '%00', $value);
 
@@ -373,26 +373,26 @@ class Converter
         );
 
         $value = str_replace(
-            array(
+            [
                 '«',
                 '〈',
                 '＜',
                 '‹',
                 '〈',
                 '⟨'
-            ),
+            ],
             '<',
             $value
         );
         $value = str_replace(
-            array(
+            [
                 '»',
                 '〉',
                 '＞',
                 '›',
                 '〉',
                 '⟩'
-            ),
+            ],
             '>',
             $value
         );
@@ -411,7 +411,7 @@ class Converter
      */
     public static function convertFromNestedBase64($value)
     {
-        $matches = array();
+        $matches = [];
         preg_match_all('/(?:^|[,&?])\s*([a-z0-9]{50,}=*)(?:\W|$)/im', $value, $matches);
 
         foreach ($matches[1] as $item) {
@@ -473,7 +473,7 @@ class Converter
      */
     public static function convertFromJSUnicode($value)
     {
-        $matches = array();
+        $matches = [];
         preg_match_all('/\\\u[0-9a-f]{4}/ims', $value, $matches);
 
         if (!empty($matches[0])) {
@@ -511,7 +511,7 @@ class Converter
                 $value .= "\n" . mb_convert_encoding($value, 'UTF-8', 'UTF-7');
             } else {
                 //list of all critical UTF7 codepoints
-                $schemes = array(
+                $schemes = [
                     '+ACI-'      => '"',
                     '+ADw-'      => '<',
                     '+AD4-'      => '>',
@@ -535,7 +535,7 @@ class Converter
                     '+AF4-'      => '^',
                     '+ACIAPg-'   => '">',
                     '+ACIAPgA8-' => '">'
-                );
+                ];
 
                 $value = str_ireplace(
                     array_keys($schemes),
@@ -565,7 +565,7 @@ class Converter
 
         $compare = stripslashes($value);
 
-        $pattern = array(
+        $pattern = [
             '/(?:<\/\w+>\+<\w+>)/s',
             '/(?:":\d+[^"[]+")/s',
             '/(?:"?"\+\w+\+")/s',
@@ -584,7 +584,7 @@ class Converter
             '/(?:(this|self)\.)/',
             '/(?:undefined)/',
             '/(?:in\s+)/'
-        );
+        ];
 
         // strip out concatenations
         $converted = preg_replace($pattern, null, $compare);
@@ -740,7 +740,7 @@ class Converter
             asort($array);
 
             // Normalize certain tokens
-            $schemes = array(
+            $schemes = [
                 '~' => '+',
                 '^' => '+',
                 '|' => '+',
@@ -748,7 +748,7 @@ class Converter
                 '%' => '+',
                 '&' => '+',
                 '/' => '+'
-            );
+            ];
 
             $converted = implode($array);
 

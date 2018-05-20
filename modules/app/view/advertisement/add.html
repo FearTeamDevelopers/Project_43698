@@ -6,6 +6,8 @@
   <div class="row">
     <form method="post" action="#" enctype="multipart/form-data" class="large-8 medium-10 small-12 centerBlock uploadForm mv30">
       <input type="hidden" name="MAX_FILE_SIZE" value="15000000"/>
+      <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
+      <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>
       <table>
         <tr>
           <td><span>Název</span></td>
@@ -68,8 +70,6 @@
         </tr>
         <tr>
           <td colspan="2">
-            <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
-            <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>
             <input type="submit" name="submitAddAdvertisement" value="Přidat" class="more"/>
           </td>
         </tr>

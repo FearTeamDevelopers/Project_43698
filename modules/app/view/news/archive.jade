@@ -10,9 +10,6 @@ section.wrapper.novinky.singlePage
                     h3 {echo $new->getTitle()}
             .body
                 div {echo html_entity_decode($new->getShortBody())}
-                |{if $deviceType === 'computer'}
-                a.readMore(href!='/novinky/r/{echo $new->getUrlKey()}') čti více
-                |{/if}
         |{/foreach}
         |{/if}
         |{/if}{else}

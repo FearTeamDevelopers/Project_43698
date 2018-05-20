@@ -9,7 +9,7 @@ abstract class HTMLPurifier_Strategy_Composite extends HTMLPurifier_Strategy
     /**
      * List of strategies to run tokens through.
      */
-    protected $strategies = array();
+    protected $strategies = [];
 
     abstract public function __construct();
 

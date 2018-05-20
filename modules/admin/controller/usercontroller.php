@@ -5,26 +5,12 @@ namespace Admin\Controller;
 use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
-use THCFrame\Security\PasswordManager;
-use THCFrame\Core\Rand;
-use THCFrame\Core\StringMethods;
 
 /**
  *
  */
 class UserController extends Controller
 {
-
-    private function _checkEmailActToken($token)
-    {
-        $exists = \App\Model\UserModel::first(array('emailActivationToken = ?' => $token));
-
-        if ($exists === null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * Login into administration.
@@ -56,9 +42,9 @@ class UserController extends Controller
 
                     if ($daysToExpiration !== false) {
                         if ($daysToExpiration < 14 && $daysToExpiration > 1) {
-                            $view->infoMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
+                            $view->infoMessage($this->lang('PASS_EXPIRATION', [$daysToExpiration]));
                         } elseif ($daysToExpiration < 5 && $daysToExpiration > 1) {
-                            $view->warningMessage($this->lang('PASS_EXPIRATION', array($daysToExpiration)));
+                            $view->warningMessage($this->lang('PASS_EXPIRATION', [$daysToExpiration]));
                         } elseif ($daysToExpiration <= 1) {
                             $view->errorMessage($this->lang('PASS_EXPIRATION_TOMORROW'));
                         }
@@ -66,7 +52,7 @@ class UserController extends Controller
 
                     self::redirect('/admin/');
                 } catch (\Exception $e) {
-                    Event::fire('admin.log', array('fail', 'Exception: ' . get_class($e) . ' Message: ' . $e->getMessage()));
+                    Event::fire('admin.log', ['fail', 'Exception: ' . get_class($e) . ' Message: ' . $e->getMessage()]);
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                 }
             }
@@ -86,7 +72,6 @@ class UserController extends Controller
                     ->setForcePassChange(false)
                     ->update();
             self::redirect('/admin/user/profile/');
-            exit;
         }
 
         $this->disableView();
@@ -124,76 +109,22 @@ class UserController extends Controller
 
         if (RequestMethods::post('submitAddUser')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/user/');
             }
-
-            $errors = array();
-
-            if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
-                $errors['password2'] = array($this->lang('PASS_DOESNT_MATCH'));
-            }
-
-            $email = \App\Model\UserModel::first(array('email = ?' => RequestMethods::post('email')), array('email'));
-
-            if ($email) {
-                $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
-            }
-
-            if (RequestMethods::post('role', 'role_member') == 'role_member') {
-                $passStrenght = \App\Model\UserModel::MEMBER_PASS_STRENGHT;
-            } else {
-                $passStrenght = \App\Model\UserModel::ADMIN_PASS_STRENGHT;
-            }
-
-            if (PasswordManager::strength(RequestMethods::post('password')) <= $passStrenght) {
-                $errors['password'] = array($this->lang('PASS_WEAK'));
-            }
-
-            $salt = PasswordManager::createSalt();
-            $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
-            $cleanHash = StringMethods::getHash(RequestMethods::post('password'));
-
-            $actToken = Rand::randStr(50);
-            for ($i = 1; $i <= 75; $i+=1) {
-                if ($this->_checkEmailActToken($actToken)) {
-                    break;
-                } else {
-                    $actToken = Rand::randStr(50);
-                }
-
-                if ($i == 75) {
-                    $errors['email'] = array($this->lang('UNKNOW_ERROR'));
-                    break;
-                }
-            }
-
-            $user = new \App\Model\UserModel(array(
-                'firstname' => RequestMethods::post('firstname'),
-                'lastname' => RequestMethods::post('lastname'),
-                'email' => RequestMethods::post('email'),
-                'phoneNumber' => RequestMethods::post('phone'),
-                'getNewActionNotification' => RequestMethods::post('actionNotification'),
-                'getNewReportNotification' => RequestMethods::post('reportNotification'),
-                'emailActivationToken' => null,
-                'password' => $hash,
-                'passwordHistory1' => $cleanHash,
-                'salt' => $salt,
-                'active' => true,
-                'emailActivationToken' => $actToken,
-                'role' => RequestMethods::post('role', 'role_member'),
-            ));
+            
+            list($user, $errors) = \App\Model\UserModel::createUser(RequestMethods::getPostDataBag(), ['checkForRole' => true]);
 
             if (empty($errors) && $user->validate()) {
                 $userId = $user->save();
 
-                Event::fire('admin.log', array('success', 'User id: ' . $userId));
+                Event::fire('admin.log', ['success', 'User id: ' . $userId]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $user->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: ' . json_encode($errors + $user->getErrors())]);
                 $view->set('errors', $errors + $user->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('user', $user);
             }
         }
@@ -209,11 +140,11 @@ class UserController extends Controller
         $view = $this->getActionView();
 
         $user = \App\Model\UserModel::first(
-                        array('active = ?' => true, 'id = ?' => $this->getUser()->getId()));
+                        ['active = ?' => true, 'id = ?' => $this->getUser()->getId()]);
 
         if (null === $user) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/user/');
         }
 
@@ -224,54 +155,19 @@ class UserController extends Controller
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/user/');
             }
-            $errors = array();
-
-            if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
-                $errors['password2'] = array($this->lang('PASS_DOESNT_MATCH'));
-            }
-
-            if (RequestMethods::post('email') != $user->email) {
-                $email = \App\Model\UserModel::first(
-                                array('email = ?' => RequestMethods::post('email', $user->email)), array('email')
-                );
-
-                if ($email) {
-                    $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
-                }
-            }
-
-            $oldPassword = RequestMethods::post('oldpass');
-            if (!empty($oldPassword)) {
-                $newPass = RequestMethods::post('password');
-
-                try {
-                    $user = $user->changePassword($oldPassword, $newPass);
-                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
-                    $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
-                } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
-                    $errors['password'] = array($this->lang('PASS_WEAK'));
-                } catch (\THCFrame\Security\Exception\PasswordInHistory $ex) {
-                    $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
-                }
-            }
-
-            $user->firstname = RequestMethods::post('firstname');
-            $user->lastname = RequestMethods::post('lastname');
-            $user->email = RequestMethods::post('email');
-            $user->phoneNumber = RequestMethods::post('phone');
-            $user->getNewActionNotification = RequestMethods::post('actionNotification');
-            $user->getNewReportNotification = RequestMethods::post('reportNotification');
+            
+            list($user, $errors) = \App\Model\UserModel::editUserProfile(RequestMethods::getPostDataBag(), $user);
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
                 $this->getSecurity()->setUser($user);
 
-                Event::fire('admin.log', array('success', 'User id: ' . $user->getId()));
+                Event::fire('admin.log', ['success', 'User id: ' . $user->getId()]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/');
             } else {
-                Event::fire('admin.log', array('fail', 'User id: ' . $user->getId(),
-                    'Errors: ' . json_encode($errors + $user->getErrors()),));
+                Event::fire('admin.log', ['fail', 'User id: ' . $user->getId(),
+                    'Errors: ' . json_encode($errors + $user->getErrors()),]);
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -287,15 +183,19 @@ class UserController extends Controller
     public function edit($id)
     {
         $view = $this->getActionView();
-        $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
+        $user = \App\Model\UserModel::first(['id = ?' => (int) $id]);
 
         if (null === $user) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/user/');
         } elseif ($user->getRole() == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
             $view->warningMessage($this->lang('LOW_PERMISSIONS'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
+            self::redirect('/admin/user/');
+        } elseif ($user->pdLimitProcessing == 1) {
+            $view->warningMessage($this->lang('ACCOUNT_PROCESSING_DISABLED'));
+            $this->willRenderActionView = false;
             self::redirect('/admin/user/');
         }
 
@@ -307,19 +207,19 @@ class UserController extends Controller
                 self::redirect('/admin/user/');
             }
 
-            $errors = array();
+            $errors = [];
 
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
-                $errors['password2'] = array($this->lang('PASS_DOESNT_MATCH'));
+                $errors['password2'] = [$this->lang('PASS_DOESNT_MATCH')];
             }
 
             if (RequestMethods::post('email') != $user->email) {
                 $email = \App\Model\UserModel::first(
-                                array('email = ?' => RequestMethods::post('email', $user->email)), array('email')
+                                ['email = ?' => RequestMethods::post('email', $user->email)], ['email']
                 );
 
                 if ($email) {
-                    $errors['email'] = array($this->lang('EMAIL_IS_TAKEN'));
+                    $errors['email'] = [$this->lang('EMAIL_IS_TAKEN')];
                 }
             }
 
@@ -332,39 +232,42 @@ class UserController extends Controller
             $user->phoneNumber = RequestMethods::post('phone');
             $user->getNewActionNotification = RequestMethods::post('actionNotification');
             $user->getNewReportNotification = RequestMethods::post('reportNotification');
+            $user->getNewNewsNotification = RequestMethods::post('newsNotification');
             $user->role = RequestMethods::post('role', $user->getRole());
             $user->active = RequestMethods::post('active');
             $user->blocked = RequestMethods::post('blocked');
+            $user->pdLimitProcessing = RequestMethods::post('pdLimitProcessing', 0);
+
 
             if ($this->isSuperAdmin() && !empty($newPassword)) {
                 try {
                     $user = $user->forceResetPassword($newPassword);
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
-                    $errors['password'] = array($this->lang('PASS_WEAK'));
+                    $errors['password'] = [$this->lang('PASS_WEAK')];
                 }
             } elseif (!empty($oldPassword) && !empty($newPassword)) {
                 try {
                     $user = $user->changePassword($oldPassword, $newPassword);
                 } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
-                    $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
+                    $errors['oldpass'] = [$this->lang('PASS_ORIGINAL_NOT_CORRECT')];
                 } catch (\THCFrame\Security\Exception\WeakPassword $ex) {
-                    $errors['password'] = array($this->lang('PASS_WEAK'));
+                    $errors['password'] = [$this->lang('PASS_WEAK')];
                 } catch (\THCFrame\Security\Exception\PasswordInHistory $ex) {
-                    $errors['password'] = array($this->lang('PASS_IN_HISTORY'));
+                    $errors['password'] = [$this->lang('PASS_IN_HISTORY')];
                 }
             } elseif (empty($oldPassword) && !empty($newPassword)) {
-                $errors['oldpass'] = array($this->lang('PASS_ORIGINAL_NOT_CORRECT'));
+                $errors['oldpass'] = [$this->lang('PASS_ORIGINAL_NOT_CORRECT')];
             }
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
 
-                Event::fire('admin.log', array('success', 'User id: ' . $id));
+                Event::fire('admin.log', ['success', 'User id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail', 'User id: ' . $id,
-                    'Errors: ' . json_encode($errors + $user->getErrors()),));
+                Event::fire('admin.log', ['fail', 'User id: ' . $id,
+                    'Errors: ' . json_encode($errors + $user->getErrors()),]);
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -385,20 +288,16 @@ class UserController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
+        $user = \App\Model\UserModel::first(['id = ?' => (int) $id]);
 
         if (null === $user) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            $user->deleted = true;
-            $user->active = false;
-
-            if ($user->validate()) {
-                $user->save();
-                Event::fire('admin.log', array('success', 'User id: ' . $id));
+            if (\App\Model\UserModel::deleteUser($id)) {
+                Event::fire('admin.log', ['success', 'Delete user id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'User id: ' . $id));
+                Event::fire('admin.log', ['fail', 'Delete user id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -426,15 +325,15 @@ class UserController extends Controller
         $this->disableView();
         $view = $this->getActionView();
 
-        $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
+        $user = \App\Model\UserModel::first(['id = ?' => (int) $id]);
 
         if (null === $user) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/user/');
         } elseif ($user->getRole() == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
             $view->warningMessage($this->lang('LOW_PERMISSIONS'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/user/');
         }
 
@@ -444,30 +343,35 @@ class UserController extends Controller
             if ($user->validate()) {
                 $user->save();
 
-                $data = array('{NEWPASS}' => $user->getNewCleanPassword());
+                $data = ['{NEWPASS}' => $user->getNewCleanPassword()];
                 $user->setNewCleanPassword(null);
 
                 $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('password-reset', $data);
 
-                $mailer = new \THCFrame\Mailer\Mailer();
-                $mailer->setBody($emailTpl->getBody())
-                        ->setSubject($emailTpl->getSubject())
-                        ->setSendTo($user->getEmail())
-                        ->send();
+                if ($emailTpl !== null) {
+                    $mailer = new \THCFrame\Mailer\Mailer();
+                    $mailer->setBody($emailTpl->getBody())
+                            ->setSubject($emailTpl->getSubject())
+                            ->setSendTo($user->getEmail())
+                            ->send();
 
-                $view->successMessage($this->lang('PASS_RESET_EMAIL'));
-                Event::fire('admin.log', array('success', 'Force password change for user: ' . $user->getId()));
+                    $view->successMessage($this->lang('PASS_RESET_EMAIL'));
+                    Event::fire('admin.log', ['success', 'Force password change for user: ' . $user->getId()]);
+                } else {
+                    $view->errorMessage($this->lang('COMMON_FAIL'));
+                    Event::fire('admin.log', ['fail', 'Email template not found']);
+                }
                 self::redirect('/admin/user/');
             } else {
                 $view->errorMessage($this->lang('COMMON_FAIL'));
-                Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
-                    'Errors: ' . json_encode($user->getErrors()),));
+                Event::fire('admin.log', ['fail', 'Force password change for user: ' . $user->getId(),
+                    'Errors: ' . json_encode($user->getErrors()),]);
                 self::redirect('/admin/user/');
             }
         } catch (\Exception $ex) {
             $view->errorMessage($this->lang('UNKNOW_ERROR'));
-            Event::fire('admin.log', array('fail', 'Force password change for user: ' . $user->getId(),
-                'Exception: ' . $ex->getMessage(),));
+            Event::fire('admin.log', ['fail', 'Force password change for user: ' . $user->getId(),
+                'Exception: ' . $ex->getMessage(),]);
             self::redirect('/admin/user/');
         }
     }
@@ -484,11 +388,11 @@ class UserController extends Controller
         $this->disableView();
         $view = $this->getActionView();
 
-        $user = \App\Model\UserModel::first(array('id = ?' => (int) $id));
+        $user = \App\Model\UserModel::first(['id = ?' => (int) $id]);
 
         if (null === $user) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/user/');
         }
 
@@ -498,26 +402,31 @@ class UserController extends Controller
             if ($user->activateAccount()) {
                 $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('user-account-activation-notification');
 
-                $mailer = new \THCFrame\Mailer\Mailer();
-                $mailer->setBody($emailTpl->getBody())
-                        ->setSubject($emailTpl->getSubject())
-                        ->setSendTo($user->getEmail())
-                        ->setFrom('registrace@hastrman.cz')
-                        ->send();
+                if ($emailTpl !== null) {
+                    $mailer = new \THCFrame\Mailer\Mailer();
+                    $mailer->setBody($emailTpl->getBody())
+                            ->setSubject($emailTpl->getSubject())
+                            ->setSendTo($user->getEmail())
+                            ->setFrom('registrace@hastrman.cz')
+                            ->send();
 
-                Event::fire('admin.log', array('success', 'Activate User id: ' . $id));
-                $view->successMessage($this->lang('UPDATE_SUCCESS'));
+                    Event::fire('admin.log', ['success', 'Activate User id: ' . $id]);
+                    $view->successMessage($this->lang('UPDATE_SUCCESS'));
+                } else {
+                    $view->errorMessage($this->lang('COMMON_FAIL'));
+                    Event::fire('admin.log', ['fail', 'Email template not found']);
+                }
             } else {
-                Event::fire('admin.log', array('fail', 'Activate User id: ' . $id,
-                    'Validation Errors: ' . json_encode($user->getErrors()),));
+                Event::fire('admin.log', ['fail', 'Activate User id: ' . $id,
+                    'Validation Errors: ' . json_encode($user->getErrors()),]);
                 $view->errorMessage($this->lang('UNKNOW_ERROR'));
             }
 
             self::redirect('/admin/user/');
         } catch (\Exception $ex) {
             $view->errorMessage($this->lang('UNKNOW_ERROR'));
-            Event::fire('admin.log', array('fail', 'Activate User id: ' . $user->getId(),
-                'Send email Errors: ' . $ex->getMessage(),));
+            Event::fire('admin.log', ['fail', 'Activate User id: ' . $user->getId(),
+                'Send email Errors: ' . $ex->getMessage(),]);
             self::redirect('/admin/user/');
         }
     }
@@ -536,21 +445,97 @@ class UserController extends Controller
         }
 
         $view = $this->getActionView();
-        $user = \App\Model\UserModel::first(array('email = ?' => $email));
+        $user = \App\Model\UserModel::first(['email = ?' => $email]);
 
         if ($user !== null) {
-            if (\App\Model\UserModel::deleteAll(array('id = ?' => $user->getId())) != -1) {
-                Event::fire('admin.log', array('success', 'Delete User id: ' . $user->getId()));
+            if (\App\Model\UserModel::deleteAll(['id = ?' => $user->getId()]) != -1) {
+                Event::fire('admin.log', ['success', 'Delete User id: ' . $user->getId()]);
                 $view->successMessage('User ' . $email . ' has been deleted');
                 self::redirect('/admin/user/');
             } else {
-                Event::fire('admin.log', array('fail', 'Delete User id: ' . $user->getId()));
-                $view->successMessage('An error occured while deleting user ' . $email . ' from database');
+                Event::fire('admin.log', ['fail', 'Delete User id: ' . $user->getId()]);
+                $view->errorMessage('An error occured while deleting user ' . $email . ' from database');
                 self::redirect('/admin/user/');
             }
         } else {
-            Event::fire('admin.log', array('fail', 'Delete User id: ' . $user->getId()));
+            Event::fire('admin.log', ['fail', 'Delete User id: ' . $user->getId()]);
             $view->errorMessage('User ' . $email . ' not found');
+            self::redirect('/admin/user/');
+        }
+    }
+
+    /**
+     * Create api token for user
+     *
+     * @param type $userId
+     * @before _secured, _superadmin
+     */
+    public function generateApiToken($userId)
+    {
+        $this->disableView();
+        $view = $this->getActionView();
+        $user = \App\Model\UserModel::first(['id = ?' => (int) $userId]);
+
+        if ($user !== null) {
+            $userHasToken = \THCFrame\Security\Model\ApiTokenModel::first(['userId = ?' => $user->getId()]);
+
+            if ($userHasToken !== null) {
+                $view->warningMessage($this->lang('API_TOKEN_ALREADY_EXISTS'));
+                self::redirect('/admin/user/');
+            } else {
+                $token = \THCFrame\Security\Model\ApiTokenModel::generateToken();
+
+                $newToken = new \THCFrame\Security\Model\ApiTokenModel([
+                    'userId' => (int) $userId,
+                    'token' => $token
+                ]);
+
+                if ($newToken->validate()) {
+                    $newToken->save();
+
+                    Event::fire('admin.log', ['success', 'New token for user id: ' . $user->getId()]);
+                    $view->successMessage($this->lang('API_TOKEN_CREATED'));
+                    self::redirect('/admin/user/');
+                } else {
+                    Event::fire('admin.log', ['fail', 'New token for user id: ' . $user->getId(),
+                        'Validation Errors: ' . json_encode($newToken->getErrors())]);
+                    $view->errorMessage($this->lang('CREATE_FAIL'));
+                    self::redirect('/admin/user/');
+                }
+            }
+        } else {
+            Event::fire('admin.log', ['fail', 'User id: ' . (int) $userId . ' not found']);
+            $view->errorMessage($this->lang('NOT_FOUND'));
+            self::redirect('/admin/user/');
+        }
+    }
+
+    /**
+     * Delete user api token
+     *
+     * @param type $userId
+     * @before _secured, _superadmin
+     */
+    public function deleteApiToken($userId)
+    {
+        $this->disableView();
+        $view = $this->getActionView();
+        $token = \THCFrame\Security\Model\ApiTokenModel::first(['userId = ?' => (int) $userId]);
+
+        if ($token !== null) {
+            if ($token->delete()) {
+                Event::fire('admin.log', ['success', 'Delete token for user id: ' . (int) $userId]);
+                $view->successMessage($this->lang('API_TOKEN_DELETED'));
+                self::redirect('/admin/user/');
+            } else {
+                Event::fire('admin.log', ['fail', 'Delete token for user id: ' . (int) $userId,
+                    'Validation Errors: ' . json_encode($token->getErrors())]);
+                $view->errorMessage($this->lang('DELETE_FAIL'));
+                self::redirect('/admin/user/');
+            }
+        } else {
+            Event::fire('admin.log', ['fail', 'Token for user id: ' . (int) $userId . ' not found']);
+            $view->errorMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/user/');
         }
     }

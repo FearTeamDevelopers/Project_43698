@@ -4,6 +4,7 @@ namespace THCFrame\Logger\Driver;
 
 use THCFrame\Logger;
 use THCFrame\Registry\Registry;
+use THCFrame\Mailer\Mailer;
 
 /**
  * Email logger class
@@ -31,28 +32,24 @@ class Email extends Logger\Driver
 
     private function sendEmail($message)
     {
-        require_once APP_PATH . '/vendors/swiftmailer/swift_required.php';
-        $transport = \Swift_MailTransport::newInstance();
-        $mailer = \Swift_Mailer::newInstance($transport);
-
-        $email = \Swift_Message::newInstance(null)
-                ->setSubject($this->appName . ' ' . strtoupper($this->level))
+        $mailer = new Mailer();
+        $mailer->setSubject($this->appName . ' ' . strtoupper($this->level))
+                ->setBody($message)
                 ->setFrom('info@' . strtolower($this->appName) . '.cz')
-                ->setTo($this->sendTo)
-                ->setBody($message);
+                ->setSendTo($this->sendTo);
 
-        file_put_contents($this->path . date('Y-m-d') . '_mail.log', $email->toString());
+        file_put_contents(APP_PATH . '/application/logs/' . date('Y-m-d') . '_mail.log', $message, FILE_APPEND);
 
-        $result = $mailer->send($email);
+        $mailer->send();
     }
 
-    private function prepareEmailBody($message, array $context = array())
+    private function prepareEmailBody($message, array $context = [])
     {
-        $defaultContext = array('date' => '[' . date('Y-m-d H:i:s') . ']',
+        $defaultContext = ['date' => '[' . date('Y-m-d H:i:s') . ']',
             'level' => $this->level,
             'appname' => $this->appName,
             'message' => $this->interpolate($message, $context),
-        );
+        ];
 
         return $this->interpolate($this->emailBody, $defaultContext);
     }
@@ -61,7 +58,7 @@ class Email extends Logger\Driver
      *
      * @param type $message
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         switch ($level) {
             case self::EMERGENCY:
@@ -77,7 +74,7 @@ class Email extends Logger\Driver
                 $this->error($message, $context);
                 break;
             case self::WARNING:
-                $this->error($message, $context);
+                $this->warning($message, $context);
                 break;
             case self::NOTICE:
                 $this->notice($message, $context);
@@ -88,12 +85,15 @@ class Email extends Logger\Driver
             case self::DEBUG:
                 $this->debug($message, $context);
                 break;
+            default :
+                $this->info($message, $context);
+                break;
         }
 
         return $this;
     }
 
-    public function alert($message, array $context = array())
+    public function alert($message, array $context = [])
     {
         $this->level = self::ALERT;
         $body = $this->prepareEmailBody($message, $context);
@@ -102,7 +102,7 @@ class Email extends Logger\Driver
         return $this;
     }
 
-    public function critical($message, array $context = array())
+    public function critical($message, array $context = [])
     {
         $this->level = self::CRITICAL;
         $body = $this->prepareEmailBody($message, $context);
@@ -111,12 +111,12 @@ class Email extends Logger\Driver
         return $this;
     }
 
-    public function debug($message, array $context = array())
+    public function debug($message, array $context = [])
     {
         return $this;
     }
 
-    public function emergency($message, array $context = array())
+    public function emergency($message, array $context = [])
     {
         $this->level = self::EMERGENCY;
         $body = $this->prepareEmailBody($message, $context);
@@ -125,7 +125,7 @@ class Email extends Logger\Driver
         return $this;
     }
 
-    public function error($message, array $context = array())
+    public function error($message, array $context = [])
     {
         $this->level = self::ERROR;
         $body = $this->prepareEmailBody($message, $context);
@@ -134,17 +134,17 @@ class Email extends Logger\Driver
         return $this;
     }
 
-    public function info($message, array $context = array())
+    public function info($message, array $context = [])
     {
         return $this;
     }
 
-    public function notice($message, array $context = array())
+    public function notice($message, array $context = [])
     {
         return $this;
     }
 
-    public function warning($message, array $context = array())
+    public function warning($message, array $context = [])
     {
         return $this;
     }

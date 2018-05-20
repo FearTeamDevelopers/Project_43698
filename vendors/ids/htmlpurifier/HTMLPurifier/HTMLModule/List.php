@@ -17,7 +17,7 @@ class HTMLPurifier_HTMLModule_List extends HTMLPurifier_HTMLModule
     // we don't have support for such nested expressions without using
     // the incredibly inefficient and draconic Custom ChildDef.
 
-    public $content_sets = array('Flow' => 'List');
+    public $content_sets = ['Flow' => 'List'];
 
     public function setup($config) {
         $ol = $this->addElement('ol', 'List', 'Required: li', 'Common');

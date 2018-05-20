@@ -8,25 +8,25 @@ namespace THCFrame\Core;
 class Test
 {
 
-    private static $_tests = array();
+    private static $_tests = [];
 
     /**
-     * 
+     *
      * @param type $callback
      * @param type $title
      * @param type $set
      */
     public static function add($callback, $title = 'Unnamed Test', $set = 'General')
     {
-        self::$_tests[] = array(
+        self::$_tests[] = [
             'set' => $set,
             'title' => $title,
             'callback' => $callback
-        );
+        ];
     }
 
     /**
-     * 
+     *
      * @param type $before
      * @param type $after
      * @return type
@@ -37,32 +37,32 @@ class Test
             $before(self::$_tests);
         }
 
-        $passed = array();
-        $failed = array();
-        $exceptions = array();
+        $passed = [];
+        $failed = [];
+        $exceptions = [];
 
         foreach (self::$_tests as $test) {
             try {
                 $result = call_user_func($test['callback']);
 
                 if ($result) {
-                    $passed[] = array(
+                    $passed[] = [
                         'set' => $test['set'],
                         'title' => $test['title']
-                    );
+                    ];
                 } else {
-                    $failed[] = array(
+                    $failed[] = [
                         'set' => $test['set'],
                         'title' => $test['title']
-                    );
+                    ];
                 }
             } catch (\Exception $e) {
-                $exceptions[] = array(
+                $exceptions[] = [
                     'set' => $test['set'],
                     'title' => $test['title'],
                     'type' => get_class($e),
                     'message' => $e->getMessage()
-                );
+                ];
             }
         }
 
@@ -70,11 +70,11 @@ class Test
             $after(self::$_tests);
         }
 
-        return array(
+        return [
             'passed' => $passed,
             'failed' => $failed,
             'exceptions' => $exceptions
-        );
+        ];
     }
 
 }

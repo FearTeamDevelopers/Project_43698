@@ -12,80 +12,78 @@ section.wrapper.bazar.detail.singlePage
                 li
                     a.ajaxReload(href!="/bazar/prodano/{echo $ad->getUniqueKey()}").fi-dollar Prodáno
                 li
+                    a.ajaxReload(href!="/bazar/prodlouzit/{echo $ad->getUniqueKey()}").fi-refresh Prodloužit platnost
+                li
                     a(href!="/bazar/odstranit/{echo $ad->getUniqueKey()}").fi-trash Smazat
                 |{/if}
         article.large-12
             .row
                 |{script $images=$ad->getImages()}
                 |{if !empty($images)}
-                .large-7.medium-7.small-12.column
+                .large-6.medium-6.small-12.column
                     .images.large-12
                         |{foreach $image in $images}
                         |{if $image_i == 0}
                         .mainImage.large-12
-                            a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
-                                img(src!="{echo $image->getImgMain()}")
-                        |{if count($images)>1}
-                        a(href="#").fi-arrow-down.dropdown zobrazit více fotek
-                        |{/if}
+                            a(href!="{echo $image->getImgMain()}" data-lightbox!="adImage")
+                                img(src!="{echo $image->getImgMain()}" alt!="{echo $image->getPhotoName()}")
                         |{/if}{else}
-                        .thumbImage.large-6.small-6.medium-6.column.left
-                            a(href!="{echo $image->getImgMain()}" data-lightbox!="bla")
-                                img(src!="{echo $image->getImgThumb()}")
+                        .thumbImage.large-3.small-4.medium-3.column.left
+                            a(href!="{echo $image->getImgMain()}" data-lightbox!="adImage")
+                                img(src!="{echo $image->getImgThumb()}" alt!="{echo $image->getPhotoName()}")
                         |{/else}
                         |{/foreach}
                 |{/if}
                 |{if !empty($images)}
-                .large-5.medium-5.small-12.column
+                .large-6.medium-6.small-12.column
                     .info
                         span {echo $ad->getUserAlias()} <br/>
-                        small
-                            span sekce:
                         span {echo " ".$ad->getSectionTitle()}<br/>
-                        small
-                            span cena:
                         |{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}
                         span.price {echo " PRODÁNO"}
-                        br
                         |{/if}{elseif "" == $ad->getPrice()}
                         span.price {echo " Dohodou"}
-                        br
                         |{/elseif}{else}
                         span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
                         |{/else}
-                |{/if}{else}
-                .large-12.column
+                        br
                     .info
-                        span {echo $ad->getUserAlias()} <br/>
-                        small
-                            span sekce:
-                        span {echo " ".$ad->getSectionTitle()}<br/>
-                        small
-                            span cena:
-                        |{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}
-                        span.price {echo " PRODÁNO"}
-                        br
-                        |{/if}{elseif "" == $ad->getPrice()}
-                        span.price {echo " Dohodou"}
-                        br
-                        |{/elseif}{else}
-                        span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
-                        |{/else}
-                |{/else}
-            .row
-                .large-12.column
-                    .info.description
-                        div {echo $ad->content} <br/>
+                        div.description {echo $ad->content} <br/>
                         |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
-                        .large-4.medium-6.small-12.centerBlock.mv10
+                        .large-12.medium-12.small-12.centerBlock.mv10
                             a.sendEmail(href="#sendEmail")
                                 .more.blue
                                     span Odpovědět na Inzerát
                         |{/if}
+                |{/if}{else}
+                .large-12.column
+                    .info
+                        span {echo $ad->getUserAlias()} <br/>
+                        span {echo " ".$ad->getSectionTitle()}<br/>
+                        |{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}
+                        span.price {echo " PRODÁNO"}
+                        |{/if}{elseif "" == $ad->getPrice()}
+                        span.price {echo " Dohodou"}
+                        |{/elseif}{else}
+                        span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
+                        |{/else}
+                        br
+                    .info
+                        div.description {echo $ad->content} <br/>
+                        |{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+                        .large-12.medium-12.small-12.centerBlock.mv10
+                            a.sendEmail(href="#sendEmail")
+                                .more.blue
+                                    span Odpovědět na Inzerát
+                        |{/if}
+                |{/else}
         .row
             .large-6.medium-9.small-9.centerBlock
                 form#sendEmail.mv30(method="post", action="#")
                     input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+                    input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")
+                    p.adContFormUrl Toto pole nechte prázdné:
+                        input(type="text",name="url")
                     label Vaše jméno:
                         |{echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}
                         |{if isset($errors["msAuthor"])}

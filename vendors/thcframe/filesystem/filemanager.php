@@ -24,7 +24,7 @@ class FileManager extends Base
      * @read
      */
     protected $_lang;
-    
+
     /**
      * @read
      */
@@ -68,30 +68,30 @@ class FileManager extends Base
     /**
      * @readwrite
      */
-    protected $_uploadedFiles = array();
+    protected $_uploadedFiles = [];
 
     /**
      * @readwrite
      */
-    protected $_uploadErrors = array();
+    protected $_uploadErrors = [];
 
     /**
      * @read
      */
-    protected $_imageExtensions = array('gif', 'jpg', 'png', 'jpeg');
+    protected $_imageExtensions = ['gif', 'jpg', 'png', 'jpeg'];
 
     /**
      * @read
      */
-    protected $_fileExtensions = array('rtf', 'txt', 'doc', 'docx', 'xls', 'xlsx', 'pdf', 'ppt', 'pptx', 'zip', 'rar');
+    protected $_fileExtensions = ['rtf', 'txt', 'doc', 'docx', 'xls', 'xlsx', 'pdf', 'ppt', 'pptx', 'zip', 'rar'];
 
     /**
      * Class constructor
-     * 
+     *
      * @param array $options
      * @throws \Exception
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -105,12 +105,12 @@ class FileManager extends Base
 
             $this->_checkDirectories();
         } else {
-            throw new \Exception('Error in configuration file');
+            throw new Exception('Error in configuration file');
         }
     }
 
     /**
-     * Check for default directory structure. 
+     * Check for default directory structure.
      * Creates it if needed
      */
     private function _checkDirectories()
@@ -129,14 +129,14 @@ class FileManager extends Base
     }
 
     /**
-     * 
+     *
      * @param mixed $files
      * @return \ArrayObject
      */
     private function _toIterator($files)
     {
         if (!$files instanceof \Traversable) {
-            $files = new \ArrayObject(is_array($files) ? $files : array($files));
+            $files = new \ArrayObject(is_array($files) ? $files : [$files]);
         }
 
         return $files;
@@ -144,7 +144,7 @@ class FileManager extends Base
 
     /**
      * Create backup for specific file
-     * 
+     *
      * @param string $file
      */
     private function _backup($file)
@@ -162,7 +162,7 @@ class FileManager extends Base
 
     /**
      * Copy file
-     * 
+     *
      * @param string $originFile
      * @param string $targetFile
      * @param boolean $override
@@ -201,7 +201,7 @@ class FileManager extends Base
 
     /**
      * Remove files
-     * 
+     *
      * @param mixed $files
      * @return boolean
      * @throws Exception\IO
@@ -210,7 +210,7 @@ class FileManager extends Base
     {
         $files = iterator_to_array($this->_toIterator($files));
         $files = array_reverse($files);
-        
+
         foreach ($files as $file) {
             if (!file_exists($file) && !is_link($file)) {
                 continue;
@@ -240,7 +240,7 @@ class FileManager extends Base
 
     /**
      * Rename file
-     * 
+     *
      * @param string $origin
      * @param string $target
      * @param boolean $overwrite
@@ -262,7 +262,7 @@ class FileManager extends Base
 
     /**
      * Create directories
-     * 
+     *
      * @param mixed $dirs
      * @param umask $mode
      * @return boolean
@@ -273,7 +273,7 @@ class FileManager extends Base
         if($mode === null){
             $mode = self::DIR_CHMOD;
         }
-        
+
         foreach ($this->_toIterator($dirs) as $dir) {
             if (is_dir($dir)) {
                 continue;
@@ -288,7 +288,7 @@ class FileManager extends Base
 
     /**
      * Set permissions for file
-     * 
+     *
      * @param mixed $files
      * @param mixed $mode
      * @param mixed $umask
@@ -313,7 +313,7 @@ class FileManager extends Base
 
     /**
      * Get file extension
-     * 
+     *
      * @param string $path
      * @return null|string
      */
@@ -328,7 +328,7 @@ class FileManager extends Base
 
     /**
      * Get file size
-     * 
+     *
      * @param string $path
      * @return null|integer
      */
@@ -343,7 +343,7 @@ class FileManager extends Base
 
     /**
      * Get file name
-     * 
+     *
      * @param string $path
      * @return null|string
      */
@@ -358,7 +358,7 @@ class FileManager extends Base
 
     /**
      * Get cleaned file name
-     * 
+     *
      * @param string $path
      * @return null|string
      */
@@ -375,7 +375,7 @@ class FileManager extends Base
     }
 
     /**
-     * 
+     *
      * @param type $filename
      * @param type $content
      * @param type $mode
@@ -403,7 +403,7 @@ class FileManager extends Base
 
     /**
      * Get path to the image folder
-     * 
+     *
      * @return string
      */
     public function getPathToImages()
@@ -419,7 +419,7 @@ class FileManager extends Base
 
     /**
      * Get path to the image thumbs folder
-     * 
+     *
      * @return string
      */
     public function getPathToThumbs()
@@ -435,7 +435,7 @@ class FileManager extends Base
 
     /**
      * Get path to the documents folder
-     * 
+     *
      * @return string
      */
     public function getPathToDocuments()
@@ -451,7 +451,7 @@ class FileManager extends Base
 
     /**
      * Upload file
-     * 
+     *
      * @param string $postField
      * @param string $uploadto
      * @param string $namePrefix
@@ -476,13 +476,13 @@ class FileManager extends Base
                     //check for upload errors
                     switch ($error) {
                         case UPLOAD_ERR_INI_SIZE:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', [$name]);
                             break;
                         case UPLOAD_ERR_FORM_SIZE:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$name]);
                             break;
                         case UPLOAD_ERR_PARTIAL:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', [$name]);
                             break;
                         case UPLOAD_ERR_NO_FILE:
                             $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
@@ -491,14 +491,14 @@ class FileManager extends Base
                             $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                             break;
                         case UPLOAD_ERR_CANT_WRITE:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', [$name]);
                             break;
                         case UPLOAD_ERR_EXTENSION:
                             $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                             break;
 
                         default:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$name]);
                             break;
                     }
                     continue;
@@ -514,7 +514,7 @@ class FileManager extends Base
                     }
 
                     if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$filename]);
                         continue;
                     } else {
                         if (in_array($extension, $this->_fileExtensions)) {
@@ -528,7 +528,7 @@ class FileManager extends Base
                             $copy = move_uploaded_file($_FILES[$postField]['tmp_name'][$i], $fileLocName);
 
                             if (!$copy) {
-                                $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
+                                $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$filename]);
                                 continue;
                             } else {
                                 $file = new File($fileLocName);
@@ -539,12 +539,12 @@ class FileManager extends Base
                             }
                         } else {
                             $extStr = implode(',', $this->_fileExtensions);
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', [$extStr]);
                             continue;
                         }
                     }
                 } else {
-                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EMPTY_SOURCE', array($i));
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EMPTY_SOURCE', [$i]);
                     continue;
                 }
             }
@@ -555,13 +555,13 @@ class FileManager extends Base
 
                 switch ($error) {
                     case UPLOAD_ERR_INI_SIZE:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', [$name]);
                         break;
                     case UPLOAD_ERR_FORM_SIZE:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$name]);
                         break;
                     case UPLOAD_ERR_PARTIAL:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', [$name]);
                         break;
                     case UPLOAD_ERR_NO_FILE:
                         $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
@@ -570,14 +570,14 @@ class FileManager extends Base
                         $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                         break;
                     case UPLOAD_ERR_CANT_WRITE:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', [$name]);
                         break;
                     case UPLOAD_ERR_EXTENSION:
                         $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                         break;
 
                     default:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$name]);
                         break;
                 }
             }
@@ -588,7 +588,7 @@ class FileManager extends Base
                 $filename = $this->getNormalizedFileName($_FILES[$postField]['name']);
 
                 if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$filename]);
                 } else {
                     if (in_array($extension, $this->_fileExtensions)) {
                         $fileNameExt = $filename . '.' . $extension;
@@ -601,7 +601,7 @@ class FileManager extends Base
                         $copy = move_uploaded_file($_FILES[$postField]['tmp_name'], $fileLocName);
 
                         if (!$copy) {
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$filename]);
                         } else {
                             $file = new File($fileLocName);
 
@@ -610,7 +610,7 @@ class FileManager extends Base
                         }
                     } else {
                         $extStr = implode(',', $this->_fileExtensions);
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', [$extStr]);
                     }
                 }
             }
@@ -621,7 +621,7 @@ class FileManager extends Base
 
     /**
      * Upload image
-     * 
+     *
      * @param string $postField
      * @param string $uploadto
      * @param string $namePrefix
@@ -652,13 +652,13 @@ class FileManager extends Base
                     //check for upload errors
                     switch ($error) {
                         case UPLOAD_ERR_INI_SIZE:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', [$name]);
                             break;
                         case UPLOAD_ERR_FORM_SIZE:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$name]);
                             break;
                         case UPLOAD_ERR_PARTIAL:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', [$name]);
                             break;
                         case UPLOAD_ERR_NO_FILE:
                             $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
@@ -667,14 +667,14 @@ class FileManager extends Base
                             $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                             break;
                         case UPLOAD_ERR_CANT_WRITE:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', [$name]);
                             break;
                         case UPLOAD_ERR_EXTENSION:
                             $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                             break;
 
                         default:
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$name]);
                             break;
                     }
                     continue;
@@ -690,7 +690,7 @@ class FileManager extends Base
                     }
 
                     if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$filename]);
                         continue;
                     } else {
                         if (in_array($extension, $this->_imageExtensions)) {
@@ -710,7 +710,7 @@ class FileManager extends Base
                             $copy = move_uploaded_file($_FILES[$postField]['tmp_name'][$i], $imageLocName);
 
                             if (!$copy) {
-                                $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
+                                $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$filename]);
                                 continue;
                             } else {
                                 $img = new Image($imageLocName);
@@ -748,12 +748,12 @@ class FileManager extends Base
                             }
                         } else {
                             $extStr = implode(', ', $this->_imageExtensions);
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', [$extStr]);
                             continue;
                         }
                     }
                 } else {
-                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EMPTY_SOURCE', array($i));
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EMPTY_SOURCE', [$i]);
                     continue;
                 }
             }
@@ -764,13 +764,13 @@ class FileManager extends Base
 
                 switch ($error) {
                     case UPLOAD_ERR_INI_SIZE:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_INI_SIZE', [$name]);
                         break;
                     case UPLOAD_ERR_FORM_SIZE:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$name]);
                         break;
                     case UPLOAD_ERR_PARTIAL:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_PARTIAL', [$name]);
                         break;
                     case UPLOAD_ERR_NO_FILE:
                         $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_FILE');
@@ -779,14 +779,14 @@ class FileManager extends Base
                         $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_NO_TMP_DIR');
                         break;
                     case UPLOAD_ERR_CANT_WRITE:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_CANT_WRITE', [$name]);
                         break;
                     case UPLOAD_ERR_EXTENSION:
                         $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXTENSION');
                         break;
 
                     default:
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($name));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$name]);
                         break;
                 }
             }
@@ -797,7 +797,7 @@ class FileManager extends Base
                 $filename = $this->getNormalizedFileName($_FILES[$postField]['name']);
 
                 if ($size > self::MAX_FILE_UPLOAD_SIZE) {
-                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', array($filename));
+                    $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_FORM_SIZE', [$filename]);
                 } else {
                     if (in_array($extension, $this->_imageExtensions)) {
                         $imageName = $filename . '.' . $extension;
@@ -816,7 +816,7 @@ class FileManager extends Base
                         $copy = move_uploaded_file($_FILES[$postField]['tmp_name'], $imageLocName);
 
                         if (!$copy) {
-                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', array($filename));
+                            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_DEFAULT', [$filename]);
                         } else {
                             $img = new Image($imageLocName);
                             $img->setSize($size);
@@ -851,7 +851,7 @@ class FileManager extends Base
                         }
                     } else {
                         $extStr = implode(', ', $this->_imageExtensions);
-                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
+                        $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', [$extStr]);
                     }
                 }
             }
@@ -862,7 +862,7 @@ class FileManager extends Base
 
     /**
      * Upload image via base64 string
-     * 
+     *
      * @param string $base64string
      * @param string $filename
      * @param string $uploadTo
@@ -930,7 +930,7 @@ class FileManager extends Base
             }
         } else {
             $extStr = implode(', ', $this->_imageExtensions);
-            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', array($extStr));
+            $this->_uploadErrors[] = $this->getLang()->_get('UPLOAD_ERR_EXT', [$extStr]);
         }
 
         return $this;
@@ -942,14 +942,14 @@ class FileManager extends Base
      */
     public function newUpload()
     {
-        $this->_uploadedFiles = array();
-        $this->_uploadErrors = array();
-        
+        $this->_uploadedFiles = [];
+        $this->_uploadErrors = [];
+
         return $this;
     }
-    
+
     /**
-     * 
+     *
      * @param type $source
      * @param type $level
      * @return boolean|string
@@ -959,7 +959,7 @@ class FileManager extends Base
         $dest = $source . '.gz';
         $mode = 'wb' . $level;
         $error = false;
-        
+
         if ($fp_out = gzopen($dest, $mode)) {
             if ($fp_in = fopen($source, 'rb')) {
                 while (!feof($fp_in))
@@ -972,7 +972,7 @@ class FileManager extends Base
         } else {
             $error = true;
         }
-        
+
         if ($error)
             return false;
         else

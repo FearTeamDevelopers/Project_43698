@@ -20,35 +20,35 @@ class Scanner extends Base
     /**
      * Array for the baseline table
      * @readwrite
-     * @var array 
+     * @var array
      */
-    protected $_baseline = array();
+    protected $_baseline = [];
 
     /**
      * Array for the current file scan
      * @readwrite
-     * @var array 
+     * @var array
      */
-    protected $_current = array();
+    protected $_current = [];
 
     /**
      * Differences arrays
      * @readwrite
      * @var array
      */
-    protected $_added = array();
+    protected $_added = [];
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
-    protected $_altered = array();
+    protected $_altered = [];
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
-    protected $_deleted = array();
+    protected $_deleted = [];
 
     /**
      * @readwrite
@@ -61,27 +61,27 @@ class Scanner extends Base
      * @var string
      */
     private $_acct;
-    private $_errors = array();
+    private $_errors = [];
 
     /**
      *
-     * @var THCFrame\Security\FileHashScanner\Reporter 
+     * @var THCFrame\Security\FileHashScanner\Reporter
      */
     private $_reporter;
 
     /**
      *
-     * @var THCFrame\Configuration\Configuration 
+     * @var THCFrame\Configuration\Configuration
      */
     private $_configuration;
 
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
         $this->_configuration = Registry::get('configuration');
         $this->_acct = $this->_configuration->security->filescan->acct;
-        $this->_reporter = new Reporter(array('scanner' => $this));
+        $this->_reporter = new Reporter(['scanner' => $this]);
     }
 
     public function scan()
@@ -118,7 +118,7 @@ class Scanner extends Base
             $skip = explode(',', $this->_configuration->security->filescan->skipDir);
             $ext = explode(',', $this->_configuration->security->filescan->ext);
             $exclExt = explode(',', $this->_configuration->security->filescan->excludeExt);
-            
+
             if (!$iter->isDot() && StringMethods::striposArray($iter->getSubPath(), $skip) === false) {
                 // Select file extensions OR $ext empty AND not excluded ext
                 if ((!empty($ext)) || (empty($ext) && !in_array(pathinfo($iter->key(), PATHINFO_EXTENSION), $exclExt, true))) {
@@ -127,19 +127,19 @@ class Scanner extends Base
                     $filePath = str_replace(chr(92), chr(47), $filePath);
 
                     // Handle addition to $this->_current array
-                    $this->_current[$filePath] = array('hash' => hash_file("sha256", $filePath), 'lastMod' => date("Y-m-d H:i:s", filemtime($filePath)));
+                    $this->_current[$filePath] = ['hash' => hash_file("sha256", $filePath), 'lastMod' => date("Y-m-d H:i:s", filemtime($filePath))];
 
                     // IF new, file was ADDED
                     if (!array_key_exists($filePath, $this->_baseline)) {
-                        $this->_added[$filePath] = array('hash' => $this->_current[$filePath]['hash'], 'lastMod' => $this->_current[$filePath]['lastMod']);
+                        $this->_added[$filePath] = ['hash' => $this->_current[$filePath]['hash'], 'lastMod' => $this->_current[$filePath]['lastMod']];
 
                         // INSERT added record in baseline table
-                        $baselineNewRec = new \THCFrame\Security\Model\FhsBaselineModel(array(
+                        $baselineNewRec = new \THCFrame\Security\Model\FhsBaselineModel([
                             'path' => $filePath,
                             'hash' => $this->_added[$filePath]['hash'],
                             'lastMod' => $this->_added[$filePath]['lastMod'],
                             'acct' => $this->_acct
-                        ));
+                        ]);
 
                         if ($baselineNewRec->validate()) {
                             $baselineNewRec->save();
@@ -150,7 +150,7 @@ class Scanner extends Base
                         // INSERT added file record in history table
                         // EXCEPT if $this->getFirstScan() (to prevent unnecessary records)
                         if (!$this->getFirstScan()) {
-                            $historyNewRec = new \THCFrame\Security\Model\FhsHistoryModel(array(
+                            $historyNewRec = new \THCFrame\Security\Model\FhsHistoryModel([
                                 'timestamp' => date('Y-m-d h:i:s'),
                                 'status' => 'Added',
                                 'path' => $filePath,
@@ -158,7 +158,7 @@ class Scanner extends Base
                                 'hashNew' => $this->_added[$filePath]['hash'],
                                 'lastMod' => $this->_added[$filePath]['lastMod'],
                                 'acct' => $this->_acct
-                            ));
+                            ]);
 
                             if ($historyNewRec->validate()) {
                                 $historyNewRec->save();
@@ -167,18 +167,18 @@ class Scanner extends Base
                             }
                         }
                     } else {
-                        // IF file was ALTERED 
+                        // IF file was ALTERED
                         if ($this->_baseline[$filePath]['hash'] <> $this->_current[$filePath]['hash'] || $this->_baseline[$filePath]['lastMod'] <> $this->_current[$filePath]['lastMod']) {
-                            $this->_altered[$filePath] = array('hashOrig' => $this->_baseline[$filePath]['hash'], 'hashNew' => $this->_current[$filePath]['hash'], 'lastMod' => $this->_current[$filePath]['lastMod']);
+                            $this->_altered[$filePath] = ['hashOrig' => $this->_baseline[$filePath]['hash'], 'hashNew' => $this->_current[$filePath]['hash'], 'lastMod' => $this->_current[$filePath]['lastMod']];
 
                             // UPDATE altered record in baseline
-                            $baselineRec = \THCFrame\Security\Model\FhsBaselineModel::first(array('path = ?' => $filePath, 'acct = ?' => $this->_acct));
+                            $baselineRec = \THCFrame\Security\Model\FhsBaselineModel::first(['path = ?' => $filePath, 'acct = ?' => $this->_acct]);
                             $baselineRec->hash = $this->_altered[$filePath]['hashNew'];
                             $baselineRec->lastMod = $this->_altered[$filePath]['lastMod'];
                             $baselineRec->save();
 
                             // INSERT altered file info in history table
-                            $historyNewRec = new \THCFrame\Security\Model\FhsHistoryModel(array(
+                            $historyNewRec = new \THCFrame\Security\Model\FhsHistoryModel([
                                 'timestamp' => date('Y-m-d h:i:s'),
                                 'status' => 'Altered',
                                 'path' => $filePath,
@@ -186,7 +186,7 @@ class Scanner extends Base
                                 'hashNew' => $this->_altered[$filePath]['hashNew'],
                                 'lastMod' => $this->_altered[$filePath]['lastMod'],
                                 'acct' => $this->_acct
-                            ));
+                            ]);
 
                             if ($historyNewRec->validate()) {
                                 $historyNewRec->save();
@@ -208,10 +208,10 @@ class Scanner extends Base
 
         foreach ($this->_deleted as $key => $value) {
             // DELETE file from baseline table
-            \THCFrame\Security\Model\FhsBaselineModel::deleteAll(array('path = ?' => $key));
+            \THCFrame\Security\Model\FhsBaselineModel::deleteAll(['path = ?' => $key]);
 
             // Record deletion in history table
-            $historyNewRec = new \THCFrame\Security\Model\FhsHistoryModel(array(
+            $historyNewRec = new \THCFrame\Security\Model\FhsHistoryModel([
                 'timestamp' => date('Y-m-d h:i:s'),
                 'status' => 'Deleted',
                 'path' => $key,
@@ -219,7 +219,7 @@ class Scanner extends Base
                 'hashNew' => 'Not Applicable',
                 'lastMod' => $this->_deleted[$key]['lastMod'],
                 'acct' => $this->_acct
-            ));
+            ]);
 
             if ($historyNewRec->validate()) {
                 $historyNewRec->save();
@@ -235,11 +235,11 @@ class Scanner extends Base
 
         $totalChanges = count($this->_added) + count($this->_altered) + count($this->_deleted);
 
-        $scanned = new \THCFrame\Security\Model\FhsScannedModel(array(
+        $scanned = new \THCFrame\Security\Model\FhsScannedModel([
             'scanned' => date('Y-m-d h:i:s'),
             'changes' => $totalChanges,
             'acct' => $this->_acct
-        ));
+        ]);
 
         if ($scanned->validate()) {
             $scanned->save();
@@ -248,7 +248,7 @@ class Scanner extends Base
         }
 
         if (!empty($this->_errors)) {
-            Core::getLogger()->error('{fshr}', array('fshr', print_r($this->_errors, true)));
+            Core::getLogger()->error('{fshr}', ['fshr', print_r($this->_errors, true)]);
         }
 
         $this->_reporter->afterScanReport();
@@ -257,8 +257,8 @@ class Scanner extends Base
     protected function deleteOldRecords()
     {
         // Clean-up history table and scanned table by deleting entries over 30 days old
-        \THCFrame\Security\Model\FhsHistoryModel::deleteAll(array('timestamp < ?' => 'DATE_SUB(NOW(), INTERVAL 30 DAY)'));
-        \THCFrame\Security\Model\FhsScannedModel::deleteAll(array('scanned < ?' => 'DATE_SUB(NOW(), INTERVAL 30 DAY)'));
+        \THCFrame\Security\Model\FhsHistoryModel::deleteAll(['timestamp < ?' => 'DATE_SUB(NOW(), INTERVAL 30 DAY)']);
+        \THCFrame\Security\Model\FhsScannedModel::deleteAll(['scanned < ?' => 'DATE_SUB(NOW(), INTERVAL 30 DAY)']);
     }
 
 }

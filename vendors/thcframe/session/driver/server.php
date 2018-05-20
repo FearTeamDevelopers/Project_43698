@@ -29,7 +29,7 @@ class Server extends Session\Driver
      *
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
         $this->setName('session_server');
@@ -44,7 +44,7 @@ class Server extends Session\Driver
      */
     public function hashKey($key)
     {
-        if (ENV === 'live') {
+        if (ENV === \THCFrame\Core\Core::ENV_LIVE) {
             return hash_hmac('sha512', $key, $this->getSecret());
         } else {
             return $key;
@@ -100,7 +100,7 @@ class Server extends Session\Driver
      */
     public function clear()
     {
-        $_SESSION = array();
+        $_SESSION = [];
         return $this;
     }
 

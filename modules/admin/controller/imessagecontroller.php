@@ -34,11 +34,11 @@ class ImessageController extends Controller
 
         if (RequestMethods::post('submitAddImessage')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/imessage/');
             }
 
-            $imessage = new \Admin\Model\ImessageModel(array(
+            $imessage = new \Admin\Model\ImessageModel([
                 'userId' => $this->getUser()->getId(),
                 'messageType' => RequestMethods::post('mtype'),
                 'userAlias' => $this->getUser()->getWholeName(),
@@ -46,18 +46,18 @@ class ImessageController extends Controller
                 'body' => RequestMethods::post('text'),
                 'displayFrom' => RequestMethods::post('dfrom'),
                 'displayTo' => RequestMethods::post('dto'),
-            ));
+            ]);
 
             if ($imessage->validate()) {
                 $id = $imessage->save();
 
-                Event::fire('admin.log', array('success', 'Imessage id: '.$id));
+                Event::fire('admin.log', ['success', 'Imessage id: '.$id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/imessage/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($imessage->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: '.json_encode($imessage->getErrors())]);
                 $view->set('errors', $imessage->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('imessage', $imessage);
             }
         }
@@ -72,7 +72,7 @@ class ImessageController extends Controller
     {
         $view = $this->getActionView();
 
-        $imessage = \Admin\Model\ImessageModel::first(array('id = ?' => (int) $id));
+        $imessage = \Admin\Model\ImessageModel::first(['id = ?' => (int) $id]);
 
         if (null === $imessage) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -97,12 +97,12 @@ class ImessageController extends Controller
             if ($imessage->validate()) {
                 $imessage->save();
 
-                Event::fire('admin.log', array('success', 'Imessage id: '.$id));
+                Event::fire('admin.log', ['success', 'Imessage id: '.$id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/imessage/');
             } else {
-                Event::fire('admin.log', array('fail', 'Imessage id: '.$id,
-                    'Errors: '.json_encode($imessage->getErrors()), ));
+                Event::fire('admin.log', ['fail', 'Imessage id: '.$id,
+                    'Errors: '.json_encode($imessage->getErrors()), ]);
                 $view->set('errors', $imessage->getErrors());
             }
         }
@@ -121,16 +121,16 @@ class ImessageController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $imessage = \Admin\Model\ImessageModel::first(array('id = ?' => $id));
+        $imessage = \Admin\Model\ImessageModel::first(['id = ?' => $id]);
 
         if (null === $imessage) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($imessage->delete()) {
-                Event::fire('admin.log', array('success', 'Imessage id: '.$id));
+                Event::fire('admin.log', ['success', 'Imessage id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Imessage id: '.$id));
+                Event::fire('admin.log', ['fail', 'Imessage id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }

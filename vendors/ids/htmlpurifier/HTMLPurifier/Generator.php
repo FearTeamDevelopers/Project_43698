@@ -45,7 +45,7 @@ class HTMLPurifier_Generator
      * Stack for keeping track of object information when outputting IE
      * compatibility code.
      */
-    private $_flashStack = array();
+    private $_flashStack = [];
 
     /**
      * Configuration for the generator
@@ -92,13 +92,13 @@ class HTMLPurifier_Generator
         // Tidy cleanup
         if (extension_loaded('tidy') && $this->config->get('Output.TidyFormat')) {
             $tidy = new Tidy;
-            $tidy->parseString($html, array(
+            $tidy->parseString($html, [
                'indent'=> true,
                'output-xhtml' => $this->_xhtml,
                'show-body-only' => true,
                'indent-spaces' => 2,
                'wrap' => 68,
-            ), 'utf8');
+            ], 'utf8');
             $tidy->cleanRepair();
             $html = (string) $tidy; // explicit cast necessary
         }
@@ -128,7 +128,7 @@ class HTMLPurifier_Generator
                 if ($token->name == "object") {
                     $flash = new stdclass();
                     $flash->attr = $token->attr;
-                    $flash->param = array();
+                    $flash->param = [];
                     $this->_flashStack[] = $flash;
                 }
             }

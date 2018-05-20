@@ -5,7 +5,7 @@ namespace App\Model;
 use App\Model\Basic\BasicGalleryModel;
 
 /**
- * 
+ *
  */
 class GalleryModel extends BasicGalleryModel
 {
@@ -21,7 +21,12 @@ class GalleryModel extends BasicGalleryModel
     protected $_photos;
 
     /**
-     * 
+     * @readwrite
+     */
+    protected $_videos;
+
+    /**
+     *
      */
     public function preSave()
     {
@@ -40,8 +45,8 @@ class GalleryModel extends BasicGalleryModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('gl.*'))
-                ->join('tb_user', 'gl.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $query = self::getQuery(['gl.*'])
+                ->join('tb_user', 'gl.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -53,8 +58,8 @@ class GalleryModel extends BasicGalleryModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('gl.*'))
-                ->join('tb_user', 'gl.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['gl.*'])
+                ->join('tb_user', 'gl.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->order('gl.created', 'desc')
                 ->limit((int) $limit);
 
@@ -63,22 +68,23 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * Called from admin module.
-     * 
+     *
      * @param type $id
      *
      * @return type
      */
     public static function fetchGalleryById($id)
     {
-        $galleryQuery = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', array('ph.imgMain', 'ph.imgThumb'))
+        $galleryQuery = self::getQuery(['gl.*'])
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', ['ph.imgMain', 'ph.imgThumb'])
                 ->where('gl.id = ?', (int) $id);
         $galleryArr = self::initialize($galleryQuery);
 
         if (!empty($galleryArr)) {
             $gallery = array_shift($galleryArr);
 
-            return $gallery->getAllPhotosForGallery();
+            return $gallery->getAllPhotosForGallery()
+                    ->getAllVideosForGallery();
         } else {
             return null;
         }
@@ -86,15 +92,15 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * Called from app module.
-     * 
+     *
      * @param type $urlkey
      *
      * @return type
      */
     public static function fetchPublicActiveGalleryByUrlkey($urlkey)
     {
-        $galleryQuery = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', array('ph.imgMain', 'ph.imgThumb'))
+        $galleryQuery = self::getQuery(['gl.*'])
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', ['ph.imgMain', 'ph.imgThumb'])
                 ->where('gl.urlKey = ?', $urlkey)
                 ->where('gl.active = ?', true)
                 ->where('gl.isPublic = ?', true);
@@ -111,13 +117,13 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * Called from app module.
-     * 
+     *
      * @param type $year
      */
     public static function fetchPublicActiveGalleries($limit = 30, $page = 1)
     {
-        $query = self::getQuery(array('gl.*'))
-                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', array('ph.imgMain', 'ph.imgThumb'))
+        $query = self::getQuery(['gl.*'])
+                ->leftjoin('tb_photo', 'ph.id = gl.avatarPhotoId', 'ph', ['ph.imgMain', 'ph.imgThumb', 'ph.photoName'])
                 ->where('gl.active = ?', true)
                 ->where('gl.isPublic = ?', true)
                 ->order('gl.rank', 'desc')
@@ -128,11 +134,28 @@ class GalleryModel extends BasicGalleryModel
     }
 
     /**
+     * Check whether unique identifier already exist or not
+     *
+     * @param type $urlKey
+     * @return boolean
+     */
+    public static function checkUrlKey($urlKey)
+    {
+        $status = self::first(['urlKey = ?' => $urlKey]);
+
+        if (null === $status) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * @return \App\Model\GalleryModel
      */
     public function getAllPhotosForGallery()
     {
-        $photos = \App\Model\PhotoModel::all(array('galleryId = ?' => $this->getId()));
+        $photos = \App\Model\PhotoModel::all(['galleryId = ?' => $this->getId()]);
 
         $this->_photos = $photos;
 
@@ -145,12 +168,38 @@ class GalleryModel extends BasicGalleryModel
     public function getActPhotosForGallery()
     {
         $photos = \App\Model\PhotoModel::all(
-                    array('galleryId = ?' => $this->getId(), 'active = ?' => true), 
-                    array('*'), 
-                    array('rank' => 'desc', 'created' => 'desc')
+                        ['galleryId = ?' => $this->getId(), 'active = ?' => true], ['*'], ['rank' => 'desc', 'created' => 'desc']
         );
 
         $this->_photos = $photos;
+
+        return $this;
+    }
+
+    /**
+     * @return \App\Model\GalleryModel
+     */
+    public function getAllVideosForGallery()
+    {
+        $videos = \App\Model\VideoModel::all(
+                        ['galleryId = ?' => $this->getId()], ['*'], ['created' => 'desc']
+        );
+
+        $this->_videos = $videos;
+
+        return $this;
+    }
+
+    /**
+     * @return \App\Model\GalleryModel
+     */
+    public function getActVideosForGallery()
+    {
+        $videos = \App\Model\VideoModel::all(
+                        ['galleryId = ?' => $this->getId(), 'active = ?' => true], ['*'], ['created' => 'desc']
+        );
+
+        $this->_videos = $videos;
 
         return $this;
     }

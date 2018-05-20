@@ -281,7 +281,7 @@ class JSMin
         $recentOutput = substr($this->output, -10);
 
         // check if return/typeof directly precede a pattern without a space
-        foreach (array('return', 'typeof') as $keyword) {
+        foreach (['return', 'typeof'] as $keyword) {
             if ($this->a !== substr($keyword, -1)) {
                 // certainly wasn't keyword
                 continue;

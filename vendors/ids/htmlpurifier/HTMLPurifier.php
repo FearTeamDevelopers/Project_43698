@@ -64,7 +64,7 @@ class HTMLPurifier
     public $config;
 
     /** Array of extra HTMLPurifier_Filter objects to run on HTML, for backwards compatibility */
-    private $filters = array();
+    private $filters = [];
 
     /** Single instance of HTML Purifier */
     private static $instance;
@@ -149,7 +149,7 @@ class HTMLPurifier
         $filter_flags = $config->getBatch('Filter');
         $custom_filters = $filter_flags['Custom'];
         unset($filter_flags['Custom']);
-        $filters = array();
+        $filters = [];
         foreach ($filter_flags as $filter => $flag) {
             if (!$flag) continue;
             if (strpos($filter, '.') !== false) continue;
@@ -197,7 +197,7 @@ class HTMLPurifier
      * @return Array of purified HTML
      */
     public function purifyArray($array_of_html, $config = null) {
-        $context_array = array();
+        $context_array = [];
         foreach ($array_of_html as $key => $html) {
             $array_of_html[$key] = $this->purify($html, $config);
             $context_array[$key] = $this->context;

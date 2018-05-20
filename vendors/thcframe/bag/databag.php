@@ -12,7 +12,7 @@ use THCFrame\Bag\AbstractBag;
 class DataBag extends AbstractBag
 {
 
-    public function __construct(array $data = array())
+    public function __construct(array $data = [])
     {
         $this->initialize($data);
     }

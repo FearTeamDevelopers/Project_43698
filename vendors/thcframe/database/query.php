@@ -48,7 +48,7 @@ class Query extends Base
     /**
      * @read
      */
-    protected $_order = array();
+    protected $_order = [];
 
     /**
      * @read
@@ -58,12 +58,12 @@ class Query extends Base
     /**
      * @read
      */
-    protected $_join = array();
+    protected $_join = [];
 
     /**
      * @read
      */
-    protected $_where = array();
+    protected $_where = [];
 
     /**
      * @read
@@ -73,7 +73,7 @@ class Query extends Base
     /**
      * @read
      */
-    protected $_having = array();
+    protected $_having = [];
 
     /**
      *
@@ -93,7 +93,7 @@ class Query extends Base
     protected function _logError($error, $sql)
     {
         $errMessage = 'There was an error in the query {error} - SQL: {query}';
-        Core::getLogger()->error($errMessage, array('error' => $error, 'query' => $sql));
+        Core::getLogger()->error($errMessage, ['error' => $error, 'query' => $sql]);
     }
 
     /**
@@ -103,8 +103,16 @@ class Query extends Base
      */
     protected function _quote($value)
     {
+        if (is_null($value)) {
+            return 'NULL';
+        }
+
+        if (is_bool($value)) {
+            return (int) $value;
+        }
+
         $connector = $this->getConnector();
-        !is_array($value)? $value = trim($value): '';
+        !is_array($value) ? $value = trim($value): '';
 
         if (is_numeric($value)) {
             $escaped = $connector->escape($value);
@@ -117,7 +125,7 @@ class Query extends Base
         }
 
         if (is_array($value)) {
-            $buffer = array();
+            $buffer = [];
 
             foreach ($value as $i) {
                 array_push($buffer, $this->_quote($i));
@@ -127,14 +135,6 @@ class Query extends Base
             return "({$buffer})";
         }
 
-        if (is_null($value)) {
-            return 'NULL';
-        }
-
-        if (is_bool($value)) {
-            return (int) $value;
-        }
-
         return $connector->escape($value);
     }
 
@@ -142,9 +142,9 @@ class Query extends Base
      *
      * @return type
      */
-    protected function _buildSelect()
+    protected function buildSelect()
     {
-        $fields = array();
+        $fields = [];
         $where = $order = $limit = $join = '';
         $template = 'SELECT %s FROM %s %s %s %s %s %s %s %s';
 
@@ -209,7 +209,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
 
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->debug('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', ['sql' => $output]);
         }
 
         return $output;
@@ -222,8 +222,8 @@ class Query extends Base
      */
     protected function _buildInsert($data)
     {
-        $fields = array();
-        $values = array();
+        $fields = [];
+        $values = [];
         $template = 'INSERT INTO `%s` (`%s`) VALUES (%s)';
 
         foreach ($data as $field => $value) {
@@ -238,7 +238,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
 
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->debug('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', ['sql' => $output]);
         }
 
         return $output;
@@ -251,7 +251,7 @@ class Query extends Base
      */
     protected function _buildUpdate($data)
     {
-        $parts = array();
+        $parts = [];
         $where = $limit = '';
         $template = 'UPDATE %s SET %s %s %s';
 
@@ -282,7 +282,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
 
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->debug('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', ['sql' => $output]);
         }
 
         return $output;
@@ -318,7 +318,7 @@ class Query extends Base
         $output = mb_ereg_replace('\s+', ' ', $input);
 
         if(Registry::get('configuration')->profiler->logSql == 1){
-            Core::getLogger()->debug('{sql}', array('sql' => $output));
+            Core::getLogger()->debug('{sql}', ['sql' => $output]);
         }
 
         return $output;
@@ -408,7 +408,7 @@ class Query extends Base
             $err = $this->connector->getLastError();
             $this->_logError($err, $sql);
 
-            if (ENV == 'dev') {
+            if (ENV == Core::ENV_DEV) {
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
                 throw new Exception\Sql('There was an error');
@@ -436,7 +436,7 @@ class Query extends Base
             $err = $this->connector->getLastError();
             $this->_logError($err, $sql);
 
-            if (ENV == 'dev') {
+            if (ENV == Core::ENV_DEV) {
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
                 throw new Exception\Sql('There was an error');
@@ -460,7 +460,7 @@ class Query extends Base
             $err = $this->connector->getLastError();
             $this->_logError($err, $sql);
 
-            if (ENV == 'dev') {
+            if (ENV == Core::ENV_DEV) {
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
                 throw new Exception\Sql('There was an error');
@@ -477,7 +477,7 @@ class Query extends Base
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
      */
-    public function from($from, $fields = array('*'))
+    public function from($from, $fields = ['*'])
     {
         if (empty($from)) {
             throw new Exception\Argument('Invalid argument');
@@ -500,17 +500,17 @@ class Query extends Base
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
      */
-    public function join($join, $on, $alias = null, $fields = array('*'))
+    public function join($join, $on, $alias = null, $fields = ['*'])
     {
         if (empty($join) || empty($on)) {
             throw new Exception\Argument('Invalid argument');
         }
 
         if (NULL !== $alias) {
-            $this->_fields += array($alias => $fields);
+            $this->_fields += [$alias => $fields];
             $this->_join[] = "JOIN {$join} {$alias} ON {$on}";
         } else {
-            $this->_fields += array($join => $fields);
+            $this->_fields += [$join => $fields];
             $this->_join[] = "JOIN {$join} ON {$on}";
         }
 
@@ -525,17 +525,17 @@ class Query extends Base
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
      */
-    public function leftjoin($join, $on, $alias = null, $fields = array('*'))
+    public function leftjoin($join, $on, $alias = null, $fields = ['*'])
     {
         if (empty($join) || empty($on)) {
             throw new Exception\Argument('Invalid argument');
         }
 
         if (NULL !== $alias) {
-            $this->_fields += array($alias => $fields);
+            $this->_fields += [$alias => $fields];
             $this->_join[] = "LEFT JOIN {$join} {$alias} ON {$on}";
         } else {
-            $this->_fields += array($join => $fields);
+            $this->_fields += [$join => $fields];
             $this->_join[] = "LEFT JOIN {$join} ON {$on}";
         }
 
@@ -550,17 +550,17 @@ class Query extends Base
      * @return \THCFrame\Database\Query
      * @throws Exception\Argument
      */
-    public function rightjoin($join, $on, $alias = null, $fields = array('*'))
+    public function rightjoin($join, $on, $alias = null, $fields = ['*'])
     {
         if (empty($join) || empty($on)) {
             throw new Exception\Argument('Invalid argument');
         }
 
         if (NULL !== $alias) {
-            $this->_fields += array($alias => $fields);
+            $this->_fields += [$alias => $fields];
             $this->_join[] = "RIGHT JOIN {$join} {$alias} ON {$on}";
         } else {
-            $this->_fields += array($join => $fields);
+            $this->_fields += [$join => $fields];
             $this->_join[] = "RIGHT JOIN {$join} ON {$on}";
         }
 
@@ -742,7 +742,7 @@ class Query extends Base
         $offset = $this->offset;
         $fields = $this->fields;
 
-        $this->_fields = array($this->from => array('COUNT(1)' => 'rows'));
+        $this->_fields = [$this->from => ['COUNT(1)' => 'rows']];
 
         $this->limit(1);
         $row = $this->first();
@@ -768,7 +768,7 @@ class Query extends Base
      */
     public function assemble()
     {
-        $sql = $this->_buildSelect();
+        $sql = $this->buildSelect();
         return (string) $sql;
     }
 

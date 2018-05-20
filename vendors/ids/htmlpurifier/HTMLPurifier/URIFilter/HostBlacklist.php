@@ -3,7 +3,7 @@
 class HTMLPurifier_URIFilter_HostBlacklist extends HTMLPurifier_URIFilter
 {
     public $name = 'HostBlacklist';
-    protected $blacklist = array();
+    protected $blacklist = [];
     public function prepare($config) {
         $this->blacklist = $config->get('URI.HostBlacklist');
         return true;

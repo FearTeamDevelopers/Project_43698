@@ -25,7 +25,7 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
             $interchange->name = $info['name'];
         }
 
-        $files = array();
+        $files = [];
         $dh = opendir($dir);
         while (false !== ($file = readdir($dh))) {
             if (!$file || $file[0] == '.' || strrchr($file, '.') !== '.txt') {
@@ -148,7 +148,7 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
      * Converts an array list into a lookup array.
      */
     protected function lookup($array) {
-        $ret = array();
+        $ret = [];
         foreach ($array as $val) $ret[$val] = true;
         return $ret;
     }

@@ -13,10 +13,10 @@ class HTMLPurifier_AttrDef_HTML_LinkTypes extends HTMLPurifier_AttrDef
     protected $name;
 
     public function __construct($name) {
-        $configLookup = array(
+        $configLookup = [
             'rel' => 'AllowedRel',
             'rev' => 'AllowedRev'
-        );
+        ];
         if (!isset($configLookup[$name])) {
             trigger_error('Unrecognized attribute name for link '.
                 'relationship.', E_USER_ERROR);
@@ -34,7 +34,7 @@ class HTMLPurifier_AttrDef_HTML_LinkTypes extends HTMLPurifier_AttrDef
         $parts = explode(' ', $string);
 
         // lookup to prevent duplicates
-        $ret_lookup = array();
+        $ret_lookup = [];
         foreach ($parts as $part) {
             $part = strtolower(trim($part));
             if (!isset($allowed[$part])) continue;

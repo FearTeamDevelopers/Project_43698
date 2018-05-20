@@ -38,19 +38,19 @@ class PartnerController extends Controller
 
         if (RequestMethods::post('submitAddPartner')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/partner/');
             }
 
-            $errors = array();
+            $errors = [];
 
-            $fileManager = new FileManager(array(
+            $fileManager = new FileManager([
                 'thumbWidth' => $this->getConfig()->thumb_width,
                 'thumbHeight' => $this->getConfig()->thumb_height,
                 'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                 'maxImageWidth' => $this->getConfig()->photo_maxwidth,
                 'maxImageHeight' => $this->getConfig()->photo_maxheight,
-            ));
+            ]);
 
             $fileErrors = $fileManager->uploadImage('logo', 'partners', time().'_', false)->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
@@ -58,25 +58,25 @@ class PartnerController extends Controller
             if (!empty($files)) {
                 foreach ($files as $i => $file) {
                     if ($file instanceof \THCFrame\Filesystem\Image) {
-                        $partner = new \App\Model\PartnerModel(array(
+                        $partner = new \App\Model\PartnerModel([
                             'title' => RequestMethods::post('title'),
                             'web' => RequestMethods::post('web'),
                             'logo' => trim($file->getFilename(), '.'),
                             'section' => RequestMethods::post('section'),
                             'rank' => RequestMethods::post('rank', 1),
-                        ));
+                        ]);
 
                         if ($partner->validate()) {
                             $id = $partner->save();
                             $this->getCache()->erase('index-partners');
 
-                            Event::fire('admin.log', array('success', 'Partner id: '.$id));
+                            Event::fire('admin.log', ['success', 'Partner id: '.$id]);
                             $view->successMessage($this->lang('CREATE_SUCCESS'));
                             self::redirect('/admin/partner/');
                         } else {
-                            Event::fire('admin.log', array('fail', 'Errors: '.json_encode($partner->getErrors())));
+                            Event::fire('admin.log', ['fail', 'Errors: '.json_encode($partner->getErrors())]);
                             $view->set('errors', $partner->getErrors())
-                                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                                     ->set('partner', $partner);
                         }
 
@@ -85,9 +85,9 @@ class PartnerController extends Controller
                 }
             } else {
                 $errors['logo'] = $fileErrors;
-                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($errors + $partner->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: '.json_encode($errors + $partner->getErrors())]);
                 $view->set('errors', $errors)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken());
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken());
             }
         }
     }
@@ -102,13 +102,13 @@ class PartnerController extends Controller
     public function edit($id)
     {
         $view = $this->getActionView();
-        $errors = array();
+        $errors = [];
 
-        $partner = \App\Model\PartnerModel::first(array('id = ?' => (int) $id));
+        $partner = \App\Model\PartnerModel::first(['id = ?' => (int) $id]);
 
         if (null === $partner) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/partner/');
         }
 
@@ -120,13 +120,13 @@ class PartnerController extends Controller
             }
 
             if ($partner->logo == '') {
-                $fileManager = new FileManager(array(
+                $fileManager = new FileManager([
                     'thumbWidth' => $this->getConfig()->thumb_width,
                     'thumbHeight' => $this->getConfig()->thumb_height,
                     'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                     'maxImageWidth' => $this->getConfig()->photo_maxwidth,
                     'maxImageHeight' => $this->getConfig()->photo_maxheight,
-                ));
+                ]);
 
                 $fileErrors = $fileManager->uploadImage('logo', 'partners', time().'_', false)->getUploadErrors();
                 $files = $fileManager->getUploadedFiles();
@@ -158,12 +158,12 @@ class PartnerController extends Controller
                 $partner->save();
                 $this->getCache()->erase('index-partners');
 
-                Event::fire('admin.log', array('success', 'Partner id: '.$id));
+                Event::fire('admin.log', ['success', 'Partner id: '.$id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/partner/');
             } else {
-                Event::fire('admin.log', array('fail', 'Partner id: '.$id,
-                    'Errors: '.json_encode($errors + $partner->getErrors()), ));
+                Event::fire('admin.log', ['fail', 'Partner id: '.$id,
+                    'Errors: '.json_encode($errors + $partner->getErrors()), ]);
                 $view->set('errors', $errors + $partner->getErrors());
             }
         }
@@ -185,7 +185,7 @@ class PartnerController extends Controller
         }
 
         $partner = \App\Model\PartnerModel::first(
-                        array('id = ?' => (int) $id), array('id', 'logo')
+                        ['id = ?' => (int) $id], ['id', 'logo']
         );
 
         if (null === $partner) {
@@ -193,10 +193,10 @@ class PartnerController extends Controller
         } else {
             if ($partner->delete()) {
                 $this->getCache()->erase('index-partners');
-                Event::fire('admin.log', array('success', 'Partner id: '.$id));
+                Event::fire('admin.log', ['success', 'Partner id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Partner id: '.$id));
+                Event::fire('admin.log', ['fail', 'Partner id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -217,7 +217,7 @@ class PartnerController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $partner = \App\Model\PartnerModel::first(array('id = ?' => (int) $id));
+        $partner = \App\Model\PartnerModel::first(['id = ?' => (int) $id]);
 
         if (null !== $partner) {
             $path = $partner->getUnlinkLogoPath();
@@ -228,10 +228,10 @@ class PartnerController extends Controller
                 $partner->save();
                 $this->getCache()->erase('index-partners');
 
-                Event::fire('admin.log', array('success', 'Partner id: '.$id));
+                Event::fire('admin.log', ['success', 'Partner id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Partner id: '.$id));
+                Event::fire('admin.log', ['fail', 'Partner id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         } else {
@@ -247,7 +247,7 @@ class PartnerController extends Controller
     public function massAction()
     {
         $view = $this->getActionView();
-        $errors = array();
+        $errors = [];
 
         if (RequestMethods::post('performPartnerAction')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
@@ -259,9 +259,9 @@ class PartnerController extends Controller
 
             switch ($action) {
                 case 'delete':
-                    $partners = \App\Model\PartnerModel::all(array(
+                    $partners = \App\Model\PartnerModel::all([
                                 'id IN ?' => $ids,
-                    ));
+                    ]);
 
                     if (null !== $partners) {
                         foreach ($partners as $partner) {
@@ -277,10 +277,10 @@ class PartnerController extends Controller
 
                     if (empty($errors)) {
                         $this->getCache()->erase('index-partners');
-                        Event::fire('admin.log', array('delete success', 'Partner ids: '.implode(',', $ids)));
+                        Event::fire('admin.log', ['delete success', 'Partner ids: '.implode(',', $ids)]);
                         $view->successMessage($this->lang('DELETE_SUCCESS'));
                     } else {
-                        Event::fire('admin.log', array('delete fail', 'Errors:'.json_encode($errors)));
+                        Event::fire('admin.log', ['delete fail', 'Errors:'.json_encode($errors)]);
                         $message = implode('<br/>', $errors);
                         $view->longFlashMessage($message);
                     }
@@ -289,9 +289,9 @@ class PartnerController extends Controller
 
                     break;
                 case 'activate':
-                    $partners = \App\Model\PartnerModel::all(array(
+                    $partners = \App\Model\PartnerModel::all([
                                 'id IN ?' => $ids,
-                    ));
+                    ]);
 
                     if (null !== $partners) {
                         foreach ($partners as $partner) {
@@ -309,10 +309,10 @@ class PartnerController extends Controller
 
                     if (empty($errors)) {
                         $this->getCache()->erase('index-partners');
-                        Event::fire('admin.log', array('activate success', 'Partner ids: '.implode(',', $ids)));
+                        Event::fire('admin.log', ['activate success', 'Partner ids: '.implode(',', $ids)]);
                         $view->successMessage($this->lang('ACTIVATE_SUCCESS'));
                     } else {
-                        Event::fire('admin.log', array('activate fail', 'Errors:'.json_encode($errors)));
+                        Event::fire('admin.log', ['activate fail', 'Errors:'.json_encode($errors)]);
                         $message = implode('<br/>', $errors);
                         $view->longFlashMessage($message);
                     }
@@ -321,9 +321,9 @@ class PartnerController extends Controller
 
                     break;
                 case 'deactivate':
-                    $partners = \App\Model\PartnerModel::all(array(
+                    $partners = \App\Model\PartnerModel::all([
                                 'id IN ?' => $ids,
-                    ));
+                    ]);
 
                     if (null !== $partners) {
                         foreach ($partners as $partner) {
@@ -341,10 +341,10 @@ class PartnerController extends Controller
 
                     if (empty($errors)) {
                         $this->getCache()->erase('index-partners');
-                        Event::fire('admin.log', array('deactivate success', 'Partner ids: '.implode(',', $ids)));
+                        Event::fire('admin.log', ['deactivate success', 'Partner ids: '.implode(',', $ids)]);
                         $view->successMessage($this->lang('DEACTIVATE_SUCCESS'));
                     } else {
-                        Event::fire('admin.log', array('deactivate fail', 'Errors:'.json_encode($errors)));
+                        Event::fire('admin.log', ['deactivate fail', 'Errors:'.json_encode($errors)]);
                         $message = implode('<br/>', $errors);
                         $view->longFlashMessage($message);
                     }

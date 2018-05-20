@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 
 if(!isset($_SESSION['thc_authUser'])){
@@ -51,7 +51,7 @@ if(!isset($_SESSION['thc_authUser'])){
                 }).elfinder('instance');
             });
         </script>
-        
+
     </head>
     <body>
 

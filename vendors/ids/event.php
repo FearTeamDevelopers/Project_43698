@@ -72,7 +72,7 @@ class Event implements \Countable, \IteratorAggregate
      *
      * @var Filter[]|array
      */
-    protected $filters = array();
+    protected $filters = [];
 
     /**
      * Calculated impact
@@ -88,7 +88,7 @@ class Event implements \Countable, \IteratorAggregate
      *
      * @var string[]|array
      */
-    protected $tags = array();
+    protected $tags = [];
 
     /**
      * Constructor

@@ -1,14 +1,14 @@
 <?php
 
-$options = array(
+$options = [
     "type" => "mysql",
-    "options" => array(
+    "options" => [
         "host" => "localhost",
         "username" => "root",
         "password" => "",
         "schema" => "frametest"
-    )
-);
+    ]
+];
 
 THCFrame\Core\Test::add(
     function()
@@ -288,9 +288,9 @@ THCFrame\Core\Test::add(
         $database = $database->connect();
         
         $rows = $database->query()
-            ->from("tb_example", array(
+            ->from("tb_example", [
                 "id" => "foo"
-            ))
+            ])
             ->all();
         
         return (sizeof($rows) && isset($rows[0]["foo"]) && $rows[0]["foo"] == 1);
@@ -307,12 +307,12 @@ THCFrame\Core\Test::add(
         $database = $database->connect();
         
         $rows = $database->query()
-            ->from("tb_example", array(
+            ->from("tb_example", [
                 "tb_example.id" => "foo"
-            ))
-            ->join("tb_example AS baz", "tb_example.id = baz.id", array(
+            ])
+            ->join("tb_example AS baz", "tb_example.id = baz.id", [
                 "baz.id" => "bar"
-            ))
+            ])
             ->all();
         
         return (sizeof($rows) && $rows[0]["foo"] == $rows[0]["bar"]);
@@ -330,11 +330,11 @@ THCFrame\Core\Test::add(
         
         $result = $database->query()
             ->from("tb_example")
-            ->save(array(
+            ->save([
                 "number" => 3,
                 "text" => "foo",
                 "boolean" => true
-            ));
+            ]);
         
         return ($result == 5);
     },
@@ -352,11 +352,11 @@ THCFrame\Core\Test::add(
         $result = $database->query()
             ->from("tb_example")
             ->where("id = ?", 5)
-            ->save(array(
+            ->save([
                 "number" => 3,
                 "text" => "foo",
                 "boolean" => false
-            ));
+            ]);
         
         return ($result == 0);
     },

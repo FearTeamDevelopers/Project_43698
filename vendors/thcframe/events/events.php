@@ -2,50 +2,48 @@
 
 namespace THCFrame\Events;
 
-use THCFrame\Events\Exception;
-
 /**
  * Event listener
  */
 class Events
 {
 
-    private static $_callbacks = array();
+    private static $callbacks = [];
 
     private function __construct()
     {
-        
+
     }
 
     private function __clone()
     {
-        
+
     }
 
     /**
      * Add new event and callback function
-     * 
+     *
      * @param string $type
-     * @param function $callback
+     * @param callable $callback
      */
     public static function add($type, $callback)
     {
-        if (empty(self::$_callbacks[$type])) {
-            self::$_callbacks[$type] = array();
+        if (empty(self::$callbacks[$type])) {
+            self::$callbacks[$type] = [];
         }
-        self::$_callbacks[$type][] = $callback;
+        self::$callbacks[$type][] = $callback;
     }
 
     /**
      * Call specific event callback function with provided parameters
-     * 
+     *
      * @param string $type
      * @param mixed $parameters
      */
     public static function fire($type, $parameters = null)
     {
-        if (!empty(self::$_callbacks[$type])) {
-            foreach (self::$_callbacks[$type] as $callback) {
+        if (!empty(self::$callbacks[$type])) {
+            foreach (self::$callbacks[$type] as $callback) {
                 call_user_func_array($callback, $parameters);
             }
         }
@@ -53,16 +51,16 @@ class Events
 
     /**
      * Remove event from _callbacks array
-     * 
+     *
      * @param string $type
      * @param string $callback
      */
     public static function remove($type, $callback)
     {
-        if (!empty(self::$_callbacks[$type])) {
-            foreach (self::$_callbacks[$type] as $i => $found) {
+        if (!empty(self::$callbacks[$type])) {
+            foreach (self::$callbacks[$type] as $i => $found) {
                 if ($callback == $found) {
-                    unset(self::$_callbacks[$type][$i]);
+                    unset(self::$callbacks[$type][$i]);
                 }
             }
         }

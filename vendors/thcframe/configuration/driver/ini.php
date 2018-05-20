@@ -16,22 +16,22 @@ class Ini extends Configuration\Driver
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     private $_defaultConfig;
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     private $_configuration;
 
     /**
      * Class constructor
-     * 
+     *
      * @param array $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -56,9 +56,9 @@ class Ini extends Configuration\Driver
     }
 
     /**
-     * Method used to merge configuration of specific environment into 
+     * Method used to merge configuration of specific environment into
      * default configuration
-     * 
+     *
      * @return type
      */
     protected function _mergeConfiguration()
@@ -67,11 +67,11 @@ class Ini extends Configuration\Driver
     }
 
     /**
-     * The _pair() method deconstructs the dot notation, used in the configuration file’s keys, 
+     * The _pair() method deconstructs the dot notation, used in the configuration file’s keys,
      * into an associative array hierarchy. If the $key variable contains a dot character (.),
-     * the first part will be sliced off, used to create a new array, and 
+     * the first part will be sliced off, used to create a new array, and
      * assigned the value of another call to _pair().
-     * 
+     *
      * @param array $config
      * @param type $key
      * @param mixed $value
@@ -83,7 +83,7 @@ class Ini extends Configuration\Driver
             $parts = explode('.', $key, 2);
 
             if (empty($config[$parts[0]])) {
-                $config[$parts[0]] = array();
+                $config[$parts[0]] = [];
             }
 
             $config[$parts[0]] = $this->_pair($config[$parts[0]], $parts[1], $value);
@@ -95,17 +95,17 @@ class Ini extends Configuration\Driver
     }
 
     /**
-     * Method checks to see that the $path argument is not empty, 
-     * throwing a ConfigurationExceptionArgument exception if it is. 
-     * Next, it checks to see if the requested configuration 
+     * Method checks to see that the $path argument is not empty,
+     * throwing a ConfigurationExceptionArgument exception if it is.
+     * Next, it checks to see if the requested configuration
      * file has not already been parsed, and if it has it jumps right to where it
      * returns the configuration.
-     * 
-     * Method loop through the associative array returned by parse_ini_string, 
-     * generating the correct hierarchy (using the _pair() method), 
+     *
+     * Method loop through the associative array returned by parse_ini_string,
+     * generating the correct hierarchy (using the _pair() method),
      * finally converting the associative array to an object and caching/returning the configuration
      * file data.
-     * 
+     *
      * @param string $path
      * @return object
      * @throws Exception\Argument
@@ -118,7 +118,7 @@ class Ini extends Configuration\Driver
         }
 
         if (!isset($this->_configuration)) {
-            $config = array();
+            $config = [];
 
             ob_start();
             include($path);
@@ -149,7 +149,7 @@ class Ini extends Configuration\Driver
      */
     public function extendForDbConfig()
     {
-        $ca = ConfigModel::all(array(), array('xkey', 'value'));
+        $ca = ConfigModel::all([], ['xkey', 'value']);
 
         if ($ca !== null) {
             if ($this->_configuration instanceof \stdClass) {
@@ -168,7 +168,7 @@ class Ini extends Configuration\Driver
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function getConfiguration()

@@ -11,101 +11,104 @@ use THCFrame\Core\Core;
 /**
  * The Database\Connector\Mysql class defines a handful of adaptable
  * properties and methods used to perform MySQLi class-specific functions,
- * and return MySQLi class-specific properties. We want to isolate these from
- * the outside so that our system is essentially plug-and-play
+ * and return MySQLi class-specific properties.
  */
 class Mysql extends Database\Connector
 {
 
-    protected $_service;
+    /**
+     * @var null|MySQLi
+     */
+    protected $service;
 
     /**
      * @readwrite
      */
-    protected $_host;
+    protected $host;
 
     /**
      * @readwrite
      */
-    protected $_username;
+    protected $username;
 
     /**
      * @readwrite
      */
-    protected $_password;
+    protected $password;
 
     /**
      * @readwrite
      */
-    protected $_schema;
+    protected $schema;
 
     /**
      * @readwrite
      */
-    protected $_port = '3306';
+    protected $port = '3306';
 
     /**
      * @readwrite
      */
-    protected $_charset = 'utf8';
+    protected $charset = 'utf8';
 
     /**
      * @readwrite
      */
-    protected $_engine = 'InnoDB';
+    protected $engine = 'InnoDB';
 
     /**
      * @readwrite
      */
-    protected $_isConnected = false;
+    protected $isConnected = false;
 
     /**
      * @read
      */
-    protected $_magicQuotesActive;
+    protected $magicQuotesActive;
 
     /**
      * @read
      */
-    protected $_realEscapeStringExists;
+    protected $realEscapeStringExists;
 
     /**
      * Class constructor
      *
      * @param array $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
-        $this->_magicQuotesActive = get_magic_quotes_gpc();
-        $this->_realEscapeStringExists = function_exists('mysqli_real_escape_string');
+        $this->magicQuotesActive = get_magic_quotes_gpc();
+        $this->realEscapeStringExists = function_exists('mysqli_real_escape_string');
     }
 
     public function __destruct()
     {
         $this->disconnect();
-        unset($this->_service);
+        $this->service = null;
     }
 
     /**
-     *
-     * @param type $query
-     * @param type $runQuery
-     * @return type
+     * @param $query
+     * @param bool $runQuery
+     * @return array|null
+     * @throws Exception\Service
      * @throws Exception\Sql
+     * @throws \ReflectionException
      */
-    private function _runSyncQuery($query, $runQuery = true)
+    private function runSyncQuery($query, $runQuery = true)
     {
         if ($runQuery === false) {
-            return;
+            return null;
         }
 
         Core::getLogger()->log($query, 'sync', false, 'DbModelSync.log');
 
         $result = $this->execute($query);
         if ($result === false) {
-            $this->_logError($this->_service->error, $query);
+            $this->logError($this->service->error, $query);
             throw new Exception\Sql();
         }
         return $result;
@@ -113,10 +116,10 @@ class Mysql extends Database\Connector
 
     /**
      *
-     * @param type $error
-     * @param type $sql
+     * @param string $error
+     * @param string $sql
      */
-    protected function _logError($error, $sql)
+    protected function logError($error, $sql)
     {
         $errMessage = sprintf('There was an error in the query %s', $error) . PHP_EOL;
         $errMessage .= 'SQL: ' . $sql;
@@ -126,14 +129,14 @@ class Mysql extends Database\Connector
 
     /**
      * Method is used to ensure that the value of the
-     * $_service is a valid MySQLi instance
+     * $service is a valid MySQLi instance
      *
      * @return boolean
      */
-    protected function _isValidService()
+    protected function isValidService()
     {
-        $isEmpty = empty($this->_service);
-        $isInstance = $this->_service instanceof \MySQLi;
+        $isEmpty = empty($this->service);
+        $isInstance = $this->service instanceof \MySQLi;
 
         if ($this->isConnected && $isInstance && !$isEmpty) {
             return true;
@@ -149,34 +152,34 @@ class Mysql extends Database\Connector
      */
     public function connect()
     {
-        if (!$this->_isValidService()) {
-            $this->_service = new \MySQLi(
-                    $this->_host, $this->_username, $this->_password, $this->_schema, $this->_port
+        if (!$this->isValidService()) {
+            $this->service = new \MySQLi(
+                    $this->host, $this->username, $this->password, $this->schema, $this->port
             );
 
-            if ($this->_service->connect_error) {
+            if ($this->service->connect_error) {
                 throw new Exception\Service('Unable to connect to database service');
             }
 
-            $this->_service->set_charset('utf8');
+            $this->service->set_charset('utf8');
 
             $this->isConnected = true;
-            unset($this->_password);
+            unset($this->password);
         }
 
         return $this;
     }
 
     /**
-     * Method attempts to disconnect the $_service instance from the MySQL service
+     * Method attempts to disconnect the $service instance from the MySQL service
      *
      * @return \THCFrame\Database\Connector\Mysql
      */
     public function disconnect()
     {
-        if ($this->_isValidService()) {
+        if ($this->isValidService()) {
             $this->isConnected = false;
-            $this->_service->close();
+            $this->service->close();
         }
 
         return $this;
@@ -185,25 +188,28 @@ class Mysql extends Database\Connector
     /**
      * Return query object for specific connector
      *
-     * @return \THCFrame\Database\Database\Query\Mysql
+     * @return Database\Query\Mysql
      */
     public function query()
     {
-        return new Database\Query\Mysql(array(
+        return new Database\Query\Mysql([
             'connector' => $this
-        ));
+        ]);
     }
 
     /**
-     * Method execute sql query by using prepared statements
+     * Method execute sql query by using prepared statements or simple
+     * query method based on number of arguments
      *
      * @param string $sql
-     * @return mysqli_stmt
+     * @return array|null
      * @throws Exception\Service
+     * @throws Exception\Sql
+     * @throws \ReflectionException
      */
     public function execute($sql)
     {
-        if (!$this->_isValidService()) {
+        if (!$this->isValidService()) {
             throw new Exception\Service('Not connected to a valid database service');
         }
 
@@ -213,26 +219,26 @@ class Mysql extends Database\Connector
 
         if (count($args) == 1) {
             $profiler->dbQueryStart($sql);
-            $result = $this->_service->query($sql);
+            $result = $this->service->query($sql);
             $profiler->dbQueryStop($this->getAffectedRows());
 
             return $result;
         }
 
         //$profiler->dbQueryStart($sql);
-        if (!$stmt = $this->_service->prepare($sql)) {
-            $this->_logError($this->_service->error, $sql);
+        if (!$stmt = $this->service->prepare($sql)) {
+            $this->logError($this->service->error, $sql);
 
-            if (ENV == 'dev') {
-                throw new Exception\Sql(sprintf('There was an error in the query %s', $this->_service->error));
+            if (ENV == Core::ENV_DEV) {
+                throw new Exception\Sql(sprintf('There was an error in the query %s', $this->service->error));
             } else {
                 throw new Exception\Sql('There was an error in the query');
             }
         }
 
-        array_shift($args); //remove sql from args
+        array_shift($args); //remove query from args
 
-        $bindParamsReferences = array();
+        $bindParamsReferences = [];
 
         foreach ($args as $key => $value) {
             $bindParamsReferences[$key] = &$args[$key];
@@ -251,8 +257,8 @@ class Mysql extends Database\Connector
         unset($bindParamsMethod);
 
         if ($meta) {
-            $stmtRow = array();
-            $rowReferences = array();
+            $stmtRow = [];
+            $rowReferences = [];
 
             while ($field = $meta->fetch_field()) {
                 $rowReferences[] = &$stmtRow[$field->name];
@@ -261,7 +267,7 @@ class Mysql extends Database\Connector
             $bindResultMethod = new \ReflectionMethod('mysqli_stmt', 'bind_result');
             $bindResultMethod->invokeArgs($stmt, $rowReferences);
 
-            $result = array();
+            $result = [];
             while ($stmt->fetch()) {
                 foreach ($stmtRow as $key => $value) {
                     $row[$key] = $value;
@@ -290,7 +296,7 @@ class Mysql extends Database\Connector
      */
     public function escape($value)
     {
-        if (!$this->_isValidService()) {
+        if (!$this->isValidService()) {
             throw new Exception\Service('Not connected to a valid database service');
         }
 
@@ -298,7 +304,7 @@ class Mysql extends Database\Connector
             if ($this->magicQuotesActive) {
                 $value = stripslashes($value);
             }
-            $value = $this->_service->real_escape_string($value);
+            $value = $this->service->real_escape_string($value);
         } else {
             if (!$this->magicQuotesActive) {
                 $value = addslashes($value);
@@ -316,11 +322,11 @@ class Mysql extends Database\Connector
      */
     public function getLastInsertId()
     {
-        if (!$this->_isValidService()) {
+        if (!$this->isValidService()) {
             throw new Exception\Service('Not connected to a valid database service');
         }
 
-        return $this->_service->insert_id;
+        return $this->service->insert_id;
     }
 
     /**
@@ -331,11 +337,11 @@ class Mysql extends Database\Connector
      */
     public function getAffectedRows()
     {
-        if (!$this->_isValidService()) {
+        if (!$this->isValidService()) {
             throw new Exception\Service('Not connected to a valid database service');
         }
 
-        return $this->_service->affected_rows;
+        return $this->service->affected_rows;
     }
 
     /**
@@ -346,11 +352,11 @@ class Mysql extends Database\Connector
      */
     public function getLastError()
     {
-        if (!$this->_isValidService()) {
+        if (!$this->isValidService()) {
             throw new Exception\Service('Not connected to a valid database service');
         }
 
-        return $this->_service->error;
+        return $this->service->error;
     }
 
     /**
@@ -358,7 +364,7 @@ class Mysql extends Database\Connector
      */
     public function beginTransaction()
     {
-        $this->_service->autocommit(FALSE);
+        $this->service->autocommit(FALSE);
     }
 
     /**
@@ -366,8 +372,8 @@ class Mysql extends Database\Connector
      */
     public function commitTransaction()
     {
-        $this->_service->commit();
-        $this->_service->autocommit(TRUE);
+        $this->service->commit();
+        $this->service->autocommit(TRUE);
     }
 
     /**
@@ -375,8 +381,8 @@ class Mysql extends Database\Connector
      */
     public function rollbackTransaction()
     {
-        $this->_service->rollback();
-        $this->_service->autocommit(TRUE);
+        $this->service->rollback();
+        $this->service->autocommit(TRUE);
     }
 
     /**
@@ -384,11 +390,14 @@ class Mysql extends Database\Connector
      *
      * @param string $tableName
      * @return array
+     * @throws Exception\Service
+     * @throws Exception\Sql
+     * @throws \ReflectionException
      */
     public function getColumns($tableName)
     {
         $sqlResult = $this->execute('SHOW FULL COLUMNS FROM ' . $tableName);
-        $columns = array();
+        $columns = [];
 
         if (!empty($sqlResult)) {
             while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
@@ -402,14 +411,15 @@ class Mysql extends Database\Connector
     }
 
     /**
-     *
-     * @param type $modelColumns
-     * @param type $databaseColumns
+     * @param array $modelColumns
+     * @param array $databaseColumns
+     * @param $table
+     * @return array
      */
-    protected function _dropColumns($modelColumns, $databaseColumns, $table)
+    protected function dropColumns($modelColumns, $databaseColumns, $table)
     {
         $dropColumns = array_diff(array_keys($databaseColumns), array_keys($modelColumns));
-        $queries = array();
+        $queries = [];
 
         if (!empty($dropColumns)) {
             foreach ($dropColumns as $value) {
@@ -421,10 +431,13 @@ class Mysql extends Database\Connector
     }
 
     /**
-     *
-     * @param type $table
+     * @param $table
+     * @return array
+     * @throws Exception\Service
+     * @throws Exception\Sql
+     * @throws \ReflectionException
      */
-    protected function _dropForeignKeys($table)
+    protected function dropForeignKeys($table)
     {
         $fkResult = $this->execute(
                 "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME
@@ -432,7 +445,7 @@ class Mysql extends Database\Connector
                         where i.TABLE_SCHEMA = '{$this->getSchema()}' and i.TABLE_NAME = '{$table}'
                         and i.referenced_column_name is not NULL;");
 
-        $queries = array();
+        $queries = [];
 
         if (!empty($fkResult)) {
             while ($row = $fkResult->fetch_array(MYSQLI_ASSOC)) {
@@ -444,24 +457,25 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * Prepare queries to execute
+     * Prepare queries to execute based on model structure.
+     * Column definition is created by model variable annotations.
      *
      * @param Model $model
      * @param string $queryType
      * @param bool $dropIfExists
      * @return array
      */
-    protected function _prepareQueries(Model $model, $queryType = 'alter', $dropIfExists = true)
+    protected function prepareQueries(Model $model, $queryType = 'alter', $dropIfExists = true)
     {
-        $lines = $queries = array();
-        $createConstraints = array();
+        $lines = $queries = [];
+        $createConstraints = [];
 
         $columns = $model->getColumns();
         $table = $model->getTable();
         $databaseColumnList = $this->getColumns($table);
 
-        $queries += $this->_dropColumns($columns, $databaseColumnList, $table);
-        $queries += $this->_dropForeignKeys($table);
+        $queries += $this->dropColumns($columns, $databaseColumnList, $table);
+        $queries += $this->dropForeignKeys($table);
 
         preg_match('/^([a-zA-Z]*).*/i', get_class($model), $matches);
         $tableComment = strtolower($matches[1]);
@@ -477,7 +491,7 @@ class Mysql extends Database\Connector
             $length = $column['length'];
 
             if ($queryType == 'alter') {
-                $alterType = $this->_getTypeOfAlter($name, $databaseColumnList);
+                $alterType = $this->getTypeOfAlter($name, $databaseColumnList);
             } else {
                 $alterType = '';
             }
@@ -485,9 +499,9 @@ class Mysql extends Database\Connector
             if ($column['default'] !== false) {
                 if ($column['default'] == 'null') {
                     $default = "DEFAULT NULL";
-                } elseif ((int) $column['default'] === 0 && in_array($type, array('int', 'integer', 'tinyint', 'smallint', 'mediumint'))) {
+                } elseif ((int) $column['default'] === 0 && in_array($type, ['int', 'integer', 'tinyint', 'smallint', 'mediumint'])) {
                     $default = 'DEFAULT 0';
-                } elseif ((int) $column['default'] === 0 && in_array($type, array('float', 'double', 'decimal'))) {
+                } elseif ((int) $column['default'] === 0 && in_array($type, ['float', 'double', 'decimal'])) {
                     $default = 'DEFAULT 0.0';
                 } elseif (is_numeric($column['default'])) {
                     $default = "DEFAULT {$column['default']}";
@@ -502,7 +516,7 @@ class Mysql extends Database\Connector
             $unsigned = $column['unsigned'] === true ? 'UNSIGNED' : '';
 
             $cmStr = $column['validate'] !== false ? '@validate ' . implode(',', $column['validate']) . ';' : '';
-            $cmStr .=!empty($column['label']) ? '@label ' . $column['label'] . ';' : '';
+            $cmStr .= !empty($column['label']) ? '@label ' . $column['label'] . ';' : '';
             $comment = $cmStr === '' ? '' : "COMMENT '{$cmStr}'";
 
             switch ($type) {
@@ -550,7 +564,7 @@ class Mysql extends Database\Connector
                 $queries[] = "DROP TABLE IF EXISTS {$table};";
             }
             $queries[] = sprintf(
-                    $templateCreate, $table, implode(",\n", $lines), implode(",\n", $createConstraints), $this->_engine, $this->_charset, $tableComment
+                    $templateCreate, $table, implode(",\n", $lines), implode(",\n", $createConstraints), $this->engine, $this->charset, $tableComment
             );
         } elseif ($queryType == 'alter') {
             if (!empty($lines)) {
@@ -566,14 +580,14 @@ class Mysql extends Database\Connector
     }
 
     /**
-     * Get type of alter. If column exists in database retunr modify.
+     * Get type of alter. If column exists in database return modify.
      * If column does not exists in database return add.
      *
      * @param string $columnName
      * @param array $databaseColumns
      * @return string
      */
-    protected function _getTypeOfAlter($columnName, $databaseColumns)
+    protected function getTypeOfAlter($columnName, $databaseColumns)
     {
         if (array_key_exists($columnName, $databaseColumns)) {
             return 'MODIFY COLUMN';
@@ -584,7 +598,7 @@ class Mysql extends Database\Connector
 
     /**
      * Method converts the class/properties into a valid SQL query, and
-     * ultimately into a physical database table. It does this by first
+     * into a physical database table. It does this by first
      * getting a list of the columns, by calling the model’s getColumns() method.
      * Looping over the columns, it creates arrays of indices and field strings.
      * After all the field strings have been created, they are joined (along with the indices),
@@ -596,9 +610,9 @@ class Mysql extends Database\Connector
      */
     public function sync(Model $model, $runQuery = true, $queryType = 'alter', $dropIfExists = true)
     {
-        Core::getLogger()->log('---------- '.  get_class($model).' - Sync Start ----------', 'sync', true, 'DbModelSync.log');
+        Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync Start ----------', 'sync', true, 'DbModelSync.log');
 
-        $queries = $this->_prepareQueries($model, $queryType, $dropIfExists);
+        $queries = $this->prepareQueries($model, $queryType, $dropIfExists);
 
         try {
             $this->beginTransaction();
@@ -607,30 +621,30 @@ class Mysql extends Database\Connector
 
             if (!empty($queries)) {
                 foreach ($queries as $sql) {
-                    $this->_runSyncQuery($sql, $runQuery);
+                    $this->runSyncQuery($sql, $runQuery);
                 }
             }
 
             $this->execute('SET foreign_key_checks = 1;');
         } catch (\Exception $ex) {
             Core::getLogger()->log($ex->getMessage(), 'sync', true, 'DbModelSync.log');
-            Core::getLogger()->log('---------- '.  get_class($model).' - Sync was finished with errors ----------', 'sync', true, 'DbModelSync.log');
+            Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync was finished with errors ----------', 'sync', true, 'DbModelSync.log');
             $this->rollbackTransaction();
             return false;
         }
 
         $this->commitTransaction();
-        Core::getLogger()->log('---------- '.  get_class($model).' - Sync was finished without errors ----------', 'sync', true, 'DbModelSync.log');
+        Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync was finished without errors ----------', 'sync', true, 'DbModelSync.log');
 
         return true;
     }
 
     /**
-     *
+     * Returns table size in MB
      */
     public function getDatabaseSize()
     {
-        $sql = "SHOW TABLE STATUS FROM `" . $this->_schema . "`";
+        $sql = "SHOW TABLE STATUS FROM `" . $this->schema . "`";
         $result = $this->execute($sql);
 
         if ($result !== false) {
@@ -653,11 +667,132 @@ class Mysql extends Database\Connector
      */
     public function ping()
     {
-        if ($this->_isValidService()) {
-            return $this->_service->ping();
+        if ($this->isValidService()) {
+            return $this->service->ping();
         }
 
         return false;
+    }
+
+    public function getService()
+    {
+        return $this->service;
+    }
+
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    public function getSchema()
+    {
+        return $this->schema;
+    }
+
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+
+    public function getEngine()
+    {
+        return $this->engine;
+    }
+
+    public function getIsConnected()
+    {
+        return $this->isConnected;
+    }
+
+    public function getMagicQuotesActive()
+    {
+        return $this->magicQuotesActive;
+    }
+
+    public function getRealEscapeStringExists()
+    {
+        return $this->realEscapeStringExists;
+    }
+
+    public function setService($service)
+    {
+        $this->service = $service;
+        return $this;
+    }
+
+    public function setHost($host)
+    {
+        $this->host = $host;
+        return $this;
+    }
+
+    public function setUsername($username)
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    public function setPassword($password)
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    public function setSchema($schema)
+    {
+        $this->schema = $schema;
+        return $this;
+    }
+
+    public function setPort($port)
+    {
+        $this->port = $port;
+        return $this;
+    }
+
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+        return $this;
+    }
+
+    public function setEngine($engine)
+    {
+        $this->engine = $engine;
+        return $this;
+    }
+
+    public function setIsConnected($isConnected)
+    {
+        $this->isConnected = $isConnected;
+        return $this;
+    }
+
+    public function setMagicQuotesActive($magicQuotesActive)
+    {
+        $this->magicQuotesActive = $magicQuotesActive;
+        return $this;
+    }
+
+    public function setRealEscapeStringExists($realEscapeStringExists)
+    {
+        $this->realEscapeStringExists = $realEscapeStringExists;
+        return $this;
     }
 
 }

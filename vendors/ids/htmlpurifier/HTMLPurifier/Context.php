@@ -13,7 +13,7 @@ class HTMLPurifier_Context
     /**
      * Private array that stores the references.
      */
-    private $_storage = array();
+    private $_storage = [];
 
     /**
      * Registers a variable into the context.

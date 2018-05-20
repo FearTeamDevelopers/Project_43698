@@ -27,7 +27,7 @@ class FhsHistoryModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      * @label timestamp
@@ -39,7 +39,7 @@ class FhsHistoryModel extends Model
      * @readwrite
      * @type varchar
      * @length 15
-     * 
+     *
      * @validate alphanumeric, max(15)
      * @label status
      */
@@ -50,7 +50,7 @@ class FhsHistoryModel extends Model
      * @readwrite
      * @type varchar
      * @length 250
-     * 
+     *
      * @validate path, max(250)
      * @label path
      */
@@ -61,7 +61,7 @@ class FhsHistoryModel extends Model
      * @readwrite
      * @type varchar
      * @length 200
-     * 
+     *
      * @validate alphanumeric, max(200)
      * @label file hash orig
      */
@@ -72,7 +72,7 @@ class FhsHistoryModel extends Model
      * @readwrite
      * @type varchar
      * @length 200
-     * 
+     *
      * @validate alphanumeric, max(200)
      * @label file hash new
      */
@@ -84,7 +84,7 @@ class FhsHistoryModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      * @label last modification
@@ -96,7 +96,7 @@ class FhsHistoryModel extends Model
      * @readwrite
      * @type varchar
      * @length 20
-     * 
+     *
      * @validate alphanumeric, max(20)
      * @label account
      */
@@ -108,7 +108,7 @@ class FhsHistoryModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -120,14 +120,14 @@ class FhsHistoryModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {

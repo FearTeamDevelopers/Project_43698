@@ -7,23 +7,23 @@
 class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
 {
     public $name = 'SafeObject';
-    public $needed = array('object', 'param');
+    public $needed = ['object', 'param'];
 
-    protected $objectStack = array();
-    protected $paramStack  = array();
+    protected $objectStack = [];
+    protected $paramStack  = [];
 
     // Keep this synchronized with AttrTransform/SafeParam.php
-    protected $addParam = array(
+    protected $addParam = [
         'allowScriptAccess' => 'never',
         'allowNetworking' => 'internal',
-    );
-    protected $allowedParam = array(
+    ];
+    protected $allowedParam = [
         'wmode' => true,
         'movie' => true,
         'flashvars' => true,
         'src' => true,
         'allowFullScreen' => true, // if omitted, assume to be 'false'
-    );
+    ];
 
     public function prepare($config, $context) {
         parent::prepare($config, $context);
@@ -32,10 +32,10 @@ class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
     public function handleElement(&$token) {
         if ($token->name == 'object') {
             $this->objectStack[] = $token;
-            $this->paramStack[] = array();
-            $new = array($token);
+            $this->paramStack[] = [];
+            $new = [$token];
             foreach ($this->addParam as $name => $value) {
-                $new[] = new HTMLPurifier_Token_Empty('param', array('name' => $name, 'value' => $value));
+                $new[] = new HTMLPurifier_Token_Empty('param', ['name' => $name, 'value' => $value]);
             }
             $token = $new;
         } elseif ($token->name == 'param') {

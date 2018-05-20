@@ -1,17 +1,24 @@
-section.wrapper.report.singlePage
-   .row
-      a(href!="/admin/report/{echo $act}/{echo $report->getId()}") Zpět do administrace
-      br
-   header.row
-      .imgWrapper
-         img(src!='{echo $report->getImgMain()}')
-      .reportInfo
-         h2 {echo $report->getTitle()}
-         span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
-         br
-         small
-            span Autor:
-         span {echo " ".$report->getUserAlias()}
-   .page.row
-      .container
-         |{echo html_entity_decode($report->getBody())}
+section.wrapper.report
+    .row
+        a(href!="/admin/report/{echo $act}/{echo $report->getId()}") Zpět do administrace
+        br
+    input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+    header.row
+        .reportInfo.large-12.column
+            h2 {echo $report->getTitle()}
+            small
+                span Autor:
+            span {echo " ".$report->getUserAlias()}
+            <a href="../../../../../../../../E:/InternetTemp/phpapp/facebook-auto-publish.1.4.1/facebook-auto-publish/facebook-auto-publish.php"></a>
+            br
+            span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
+        .imgWrapper.large-12.column
+            img.centerBlock(src!='{echo $report->getImgMain()}' alt!='{echo $report->getPhotoName()}')
+    .page.row
+        |{if $report->getImgMain() != ""}
+        .container.large-12.comlumn
+            |{echo html_entity_decode($report->getBody())}
+        |{/if}{else}
+        .container.top-padded.large-12.comlumn
+            |{echo html_entity_decode($report->getBody())}
+        |{/else}

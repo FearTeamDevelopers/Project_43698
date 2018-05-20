@@ -1,5 +1,6 @@
 include filter-template
 section.wrapper.bazar
+	input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
 	header.row
 		h2 Výsledky filtru
 	.row.container
@@ -15,11 +16,9 @@ section.wrapper.bazar
 		|{foreach $ad in $ads}
 		article.large-6.small-12.medium-6.column.left
 			.imgWrapper
-				|{script $images=$ad->getImages()}
-				|{if !empty($images)}
-				|{script $image=array_shift($images)}
-				a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $image->getPhotoName()}" href!="{echo $image->getImgMain()}")
-					img(src!="{echo $image->getImgThumb()}")
+				|{if !empty($ad->getImgMain())}
+				a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $ad->getPhotoName()}" href!="{echo $ad->getImgMain()}")
+					img(src!="{echo $ad->getImgThumb()}" alt!="{echo $ad->getPhotoName()}")
 				|{/if}
 			.nazev
 				.nazevWrapper
@@ -28,10 +27,10 @@ section.wrapper.bazar
 			.infoWrapper
 				.info
 					|{if $ad->getAdType() =='tender'}
-					center
+					.center
 						span.nabidka Nabídka <br/>
 					|{/if}{else}
-					center
+					.center
 						span.poptavka Poptávka <br/>
 					|{/else}
 					span {echo " ".$ad->getUserAlias()}<br/>

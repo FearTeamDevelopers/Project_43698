@@ -1,5 +1,4 @@
 <?php
-
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
@@ -41,7 +40,7 @@ class SystemController extends Controller
         }
 
         if (RequestMethods::post('clearCache')) {
-            Event::fire('admin.log', array('success'));
+            Event::fire('admin.log', ['success']);
             $this->getCache()->clearCache();
 
             $view->successMessage($this->lang('SYSTEM_DELETE_CACHE'));
@@ -55,8 +54,7 @@ class SystemController extends Controller
                 $content = file_get_contents($file);
                 $fileName = basename($file, '.js');
                 $minified = \PHPWee\Minify::js($content);
-                file_put_contents($jsPath . '/build/' . $fileName . '.js',
-                        $minified);
+                file_put_contents($jsPath . '/build/' . $fileName . '.js', $minified);
             }
 
             $view->successMessage('JS resources have been sucessfully minified');
@@ -81,15 +79,15 @@ class SystemController extends Controller
         try {
             if ($dump->create()) {
                 $view->successMessage($this->lang('SYSTEM_DB_BACKUP'));
-                Event::fire('admin.log', array('success', 'Database backup'));
+                Event::fire('admin.log', ['success', 'Database backup']);
             } else {
                 $view->errorMessage($this->lang('SYSTEM_DB_BACKUP_FAIL'));
-                Event::fire('admin.log', array('fail', 'Database backup'));
+                Event::fire('admin.log', ['fail', 'Database backup']);
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             $view->errorMessage($ex->getMessage());
-            Event::fire('admin.log', array('fail', 'Database backup',
-                'Error: ' . $ex->getMessage(),));
+            Event::fire('admin.log', ['fail', 'Database backup',
+                'Error: ' . $ex->getMessage(),]);
         }
 
         self::redirect('/admin/system/');
@@ -103,7 +101,7 @@ class SystemController extends Controller
     public function showLog()
     {
         $view = $this->getActionView();
-        $log = \Admin\Model\AdminLogModel::all(array(), array('*'), array('created' => 'DESC'), 250);
+        $log = \Admin\Model\AdminLogModel::all([], ['*'], ['created' => 'DESC'], 500);
         $view->set('adminlog', $log);
     }
 
@@ -116,7 +114,7 @@ class SystemController extends Controller
     {
         $this->disableView();
 
-        $log = \Admin\Model\AdminLogModel::first(array('id = ?' => (int) $id));
+        $log = \Admin\Model\AdminLogModel::first(['id = ?' => (int) $id]);
 
         if (!empty($log)) {
             $params = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
@@ -140,24 +138,24 @@ class SystemController extends Controller
     public function settings()
     {
         $view = $this->getActionView();
-        $config = ConfigModel::all(array(), array('*'), array('title' => 'ASC'));
+        $config = ConfigModel::all([], ['*'], ['title' => 'ASC']);
         $view->set('config', $config);
 
         if (RequestMethods::post('submitEditSet')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
                 self::redirect('/admin/');
             }
-            $errors = array();
+            $errors = [];
 
             foreach ($config as $conf) {
                 $oldVal = $conf->getValue();
                 $conf->value = RequestMethods::post($conf->getXkey());
 
                 if ($conf->validate()) {
-                    Event::fire('admin.log', array('success', $conf->getXkey() . ': ' . $oldVal . ' - ' . $conf->getValue()));
+                    Event::fire('admin.log', ['success', $conf->getXkey() . ': ' . $oldVal . ' - ' . $conf->getValue()]);
                     $conf->save();
                 } else {
-                    Event::fire('admin.log', array('fail', $conf->getXkey() . ': ' . json_encode($conf->getErrors())));
+                    Event::fire('admin.log', ['fail', $conf->getXkey() . ': ' . json_encode($conf->getErrors())]);
                     $error = $conf->getErrors();
                     $errors[$conf->xkey] = array_shift($error);
                 }
@@ -193,79 +191,9 @@ class SystemController extends Controller
     {
         $view = $this->getActionView();
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>
-        <urlset
-            xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">' . PHP_EOL;
+        \Admin\Model\SitemapModel::generateSitemap();
 
-        $xmlEnd = '</urlset>';
-
-        $host = RequestMethods::server('HTTP_HOST');
-
-        $pageContent = \App\Model\PageContentModel::all(array('active = ?' => true));
-        $redirects = RedirectModel::all(array('module = ?' => 'app'));
-        $news = \App\Model\NewsModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
-        $reports = \App\Model\ReportModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
-        $actions = \App\Model\ActionModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
-
-        $redirectArr = array();
-        if (null !== $redirects) {
-            foreach ($redirects as $redirect) {
-                $redirectArr[$redirect->getToPath()] = $redirect->getFromPath();
-            }
-        }
-
-        $articlesXml = '';
-        $pageContentXml = "<url><loc>http://{$host}</loc></url>" . PHP_EOL
-                . "<url><loc>http://{$host}/akce</loc></url>"
-                . "<url><loc>http://{$host}/probehle-akce</loc></url>"
-                . "<url><loc>http://{$host}/archiv-akci</loc></url>"
-                . "<url><loc>http://{$host}/archiv-novinek</loc></url>"
-                . "<url><loc>http://{$host}/archiv-reportazi</loc></url>"
-                . "<url><loc>http://{$host}/reportaze</loc></url>"
-                . "<url><loc>http://{$host}/novinky</loc></url>"
-                . "<url><loc>http://{$host}/galerie</loc></url>"
-                . "<url><loc>http://{$host}/bazar</loc></url>" . PHP_EOL;
-
-        $linkCounter = 10;
-
-        if (null !== $pageContent) {
-            foreach ($pageContent as $content) {
-                $pageUrl = '/page/' . $content->getUrlKey();
-                if (array_key_exists($pageUrl, $redirectArr)) {
-                    $pageUrl = $redirectArr[$pageUrl];
-                }
-                $pageContentXml .= "<url><loc>http://{$host}{$pageUrl}</loc></url>" . PHP_EOL;
-                $linkCounter+=1;
-            }
-        }
-
-        if (null !== $news) {
-            foreach ($news as $_news) {
-                $articlesXml .= "<url><loc>http://{$host}/novinky/r/{$_news->getUrlKey()}</loc></url>" . PHP_EOL;
-                $linkCounter+=1;
-            }
-        }
-
-        if (null !== $actions) {
-            foreach ($actions as $action) {
-                $articlesXml .= "<url><loc>http://{$host}/akce/r/{$action->getUrlKey()}</loc></url>" . PHP_EOL;
-                $linkCounter+=1;
-            }
-        }
-
-        if (null !== $reports) {
-            foreach ($reports as $report) {
-                $articlesXml .= "<url><loc>http://{$host}/reportaze/r/{$report->getUrlKey()}</loc></url>" . PHP_EOL;
-                $linkCounter+=1;
-            }
-        }
-
-        file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml . $xmlEnd);
-
-        Event::fire('admin.log', array('success', 'Links count: ' . $linkCounter));
+        Event::fire('admin.log', ['success', 'Links count: ' . $linkCounter]);
         $view->successMessage('Soubor sitemap.xml byl aktualizován');
         self::redirect('/admin/system/');
     }
@@ -286,7 +214,7 @@ class SystemController extends Controller
         $fileCounter = $counter->getFileCounter();
 
         $view->set('totallines', $totalLines)
-                ->set('filecounter', $fileCounter);
+            ->set('filecounter', $fileCounter);
     }
 
     /**
@@ -298,14 +226,14 @@ class SystemController extends Controller
         $view = $this->getActionView();
 
         try {
-            $generator = new \THCFrame\Model\Generator(array('dbIdent' => $dbIdent));
+            $generator = new \THCFrame\Model\Generator(['dbIdent' => $dbIdent]);
             $generator->createModels();
 
-            Event::fire('admin.log', array('success', 'Generate model classes'));
+            Event::fire('admin.log', ['success', 'Generate model classes']);
             $view->successMessage('New models were generated');
             self::redirect('/admin/system/');
         } catch (\Exception $ex) {
-            Event::fire('admin.log', array('fail', 'An error occured while creating model classes: ' . $ex->getMessage()));
+            Event::fire('admin.log', ['fail', 'An error occured while creating model classes: ' . $ex->getMessage()]);
             $view->errorMessage('An error occured while creating model classes: ' . $ex->getMessage());
             self::redirect('/admin/system/');
         }
@@ -320,7 +248,7 @@ class SystemController extends Controller
         $this->disableView();
         $view = $this->getActionView();
 
-        $models = array(
+        $models = [
             '\App\Model\Basic\BasicActionModel',
             '\App\Model\Basic\BasicAdimageModel',
             '\App\Model\Basic\BasicAdmessageModel',
@@ -344,7 +272,7 @@ class SystemController extends Controller
             '\Admin\Model\Basic\BasicNewshistoryModel',
             '\Admin\Model\Basic\BasicPagecontentHistoryModel',
             '\Admin\Model\Basic\BasicReporthistoryModel',
-        );
+        ];
 
         $db = \THCFrame\Registry\Registry::get('database')->get();
         $error = false;
@@ -372,15 +300,14 @@ class SystemController extends Controller
         }
 
         if ($error === true) {
-            Event::fire('admin.log', array('fail', $errMsg));
+            Event::fire('admin.log', ['fail', $errMsg]);
             Core::getLogger()->error($errMsg);
             $view->errorMessage('An error occured while executing db sync. Check error log');
             self::redirect('/admin/system/');
         } else {
-            Event::fire('admin.log', array('success', 'Model -> DB sync'));
+            Event::fire('admin.log', ['success', 'Model -> DB sync']);
             $view->successMessage('Model -> DB sync done');
             self::redirect('/admin/system/');
         }
     }
-
 }

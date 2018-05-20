@@ -23,7 +23,7 @@ class FormPrinter
      *
      * @return type
      */
-    public static function input($type, $name, $value = array(), $options = array())
+    public static function input($type, $name, $value = [], $options = [])
     {
         $htmlTag = '<input type="%s" name="%s"';
         $htmlTagEnd = '/>';

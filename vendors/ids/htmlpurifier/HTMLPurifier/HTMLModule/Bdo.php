@@ -8,18 +8,18 @@ class HTMLPurifier_HTMLModule_Bdo extends HTMLPurifier_HTMLModule
 {
 
     public $name = 'Bdo';
-    public $attr_collections = array(
-        'I18N' => array('dir' => false)
-    );
+    public $attr_collections = [
+        'I18N' => ['dir' => false]
+    ];
 
     public function setup($config) {
         $bdo = $this->addElement(
-            'bdo', 'Inline', 'Inline', array('Core', 'Lang'),
-            array(
+            'bdo', 'Inline', 'Inline', ['Core', 'Lang'],
+            [
                 'dir' => 'Enum#ltr,rtl', // required
                 // The Abstract Module specification has the attribute
                 // inclusions wrong for bdo: bdo allows Lang
-            )
+            ]
         );
         $bdo->attr_transform_post['required-dir'] = new HTMLPurifier_AttrTransform_BdoDir();
 

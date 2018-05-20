@@ -57,7 +57,7 @@ class IDS_Log_Email implements IDS_Log_Interface
      *
      * @var array
      */
-    protected $recipients    = array();
+    protected $recipients    = [];
 
     /**
      * Mail subject
@@ -134,7 +134,7 @@ class IDS_Log_Email implements IDS_Log_Interface
      *
      * @var array
      */
-    protected static $instance = array();
+    protected static $instance = [];
 
     /**
      * Constructor

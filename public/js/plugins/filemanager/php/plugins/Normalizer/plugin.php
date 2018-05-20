@@ -50,14 +50,14 @@
  */
 class elFinderPluginNormalizer
 {
-	private $opts = array();
+	private $opts = [];
 	
 	public function __construct($opts) {
-		$defaults = array(
+		$defaults = [
 			'enable' => true, // For control by volume driver
 			'nfc'    => true, // Canonical Decomposition followed by Canonical Composition
 			'nfkc'   => true  // Compatibility Decomposition followed by Canonical
-		);
+		];
 	
 		$this->opts = array_merge($defaults, $opts);
 	}

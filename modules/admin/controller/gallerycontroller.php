@@ -8,6 +8,7 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Registry\Registry;
 use THCFrame\Core\StringMethods;
+use App\Model\GalleryModel;
 
 /**
  *
@@ -16,34 +17,16 @@ class GalleryController extends Controller
 {
 
     /**
-     * Check whether gallery unique identifier already exist or not.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function _checkUrlKey($key)
-    {
-        $status = \App\Model\GalleryModel::first(array('urlKey = ?' => $key));
-
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Check whether user has access to gallery or not.
      *
-     * @param \App\Model\GalleryModel $gallery
+     * @param GalleryModel $gallery
      *
      * @return bool
      */
-    private function _checkAccess(\App\Model\GalleryModel $gallery)
+    private function _checkAccess(GalleryModel $gallery)
     {
         if ($this->isAdmin() === true ||
-                $gallery->getUserId() == $this->getUser()->getId()) {
+            $gallery->getUserId() == $this->getUser()->getId()) {
             return true;
         } else {
             return false;
@@ -59,7 +42,7 @@ class GalleryController extends Controller
     {
         $view = $this->getActionView();
 
-        $galleries = \App\Model\GalleryModel::all();
+        $galleries = GalleryModel::all();
 
         $view->set('galleries', $galleries);
     }
@@ -77,18 +60,18 @@ class GalleryController extends Controller
 
         if (RequestMethods::post('submitAddGallery')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/gallery/');
             }
 
-            $errors = array();
+            $errors = [];
             $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
-            if (!$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            if (!GalleryModel::checkUrlKey($urlKey)) {
+                $errors['title'] = [$this->lang('ARTICLE_TITLE_IS_USED')];
             }
 
-            $gallery = new \App\Model\GalleryModel(array(
+            $gallery = new GalleryModel([
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
                 'userAlias' => $this->getUser()->getWholeName(),
@@ -97,20 +80,20 @@ class GalleryController extends Controller
                 'avatarPhotoId' => 0,
                 'description' => RequestMethods::post('description'),
                 'rank' => RequestMethods::post('rank', 1),
-            ));
+            ]);
 
             if (empty($errors) && $gallery->validate()) {
                 $id = $gallery->save();
                 $this->getCache()->erase('gallery');
 
-                Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
+                Event::fire('admin.log', ['success', 'Gallery id: ' . $id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/' . $id);
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $gallery->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: ' . json_encode($errors + $gallery->getErrors())]);
                 $view->set('gallery', $gallery)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                        ->set('errors', $errors + $gallery->getErrors());
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
+                    ->set('errors', $errors + $gallery->getErrors());
             }
         }
     }
@@ -126,11 +109,11 @@ class GalleryController extends Controller
     {
         $view = $this->getActionView();
 
-        $gallery = \App\Model\GalleryModel::fetchGalleryById((int) $id);
+        $gallery = GalleryModel::fetchGalleryById((int)$id);
 
         if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
@@ -148,17 +131,17 @@ class GalleryController extends Controller
     {
         $view = $this->getActionView();
 
-        $gallery = \App\Model\GalleryModel::fetchGalleryById((int) $id);
+        $gallery = GalleryModel::fetchGalleryById((int)$id);
 
         if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
         if (!$this->_checkAccess($gallery)) {
             $view->warningMessage($this->lang('LOW_PERMISSIONS'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/gallery/');
         }
 
@@ -169,11 +152,11 @@ class GalleryController extends Controller
                 self::redirect('/admin/gallery/');
             }
 
-            $errors = array();
+            $errors = [];
             $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
-            if ($gallery->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            if ($gallery->getUrlKey() !== $urlKey && !GalleryModel::checkUrlKey($urlKey)) {
+                $errors['title'] = [$this->lang('ARTICLE_TITLE_IS_USED')];
             }
 
             if (null === $gallery->userId) {
@@ -193,12 +176,15 @@ class GalleryController extends Controller
                 $gallery->save();
                 $this->getCache()->erase('gallery');
 
-                Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
+                Event::fire('admin.log', ['success', 'Gallery id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/gallery/detail/' . $id);
             } else {
-                Event::fire('admin.log', array('fail', 'Gallery id: ' . $id,
-                    'Errors: ' . json_encode($errors + $gallery->getErrors())));
+                Event::fire('admin.log', [
+                    'fail',
+                    'Gallery id: ' . $id,
+                    'Errors: ' . json_encode($errors + $gallery->getErrors())
+                ]);
                 $view->set('errors', $gallery->getErrors());
             }
         }
@@ -218,8 +204,8 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $gallery = \App\Model\GalleryModel::first(
-                        array('id = ?' => (int) $id), array('id', 'title', 'created', 'userId', 'urlKey')
+        $gallery = GalleryModel::first(
+            ['id = ?' => (int)$id], ['id', 'title', 'created', 'userId', 'urlKey']
         );
 
         if (null === $gallery) {
@@ -237,15 +223,15 @@ class GalleryController extends Controller
                     $pathToThumbs = 'public/uploads/images';
                 }
 
-                $photos = \App\Model\PhotoModel::all(array('galleryId = ?' => (int) $id), array('id'));
+                $photos = \App\Model\PhotoModel::all(['galleryId = ?' => (int)$id], ['id']);
 
                 if (!empty($photos)) {
-                    $ids = array();
+                    $ids = [];
                     foreach ($photos as $colPhoto) {
                         $ids[] = $colPhoto->getId();
                     }
 
-                    \App\Model\PhotoModel::deleteAll(array('id IN ?' => $ids));
+                    \App\Model\PhotoModel::deleteAll(['id IN ?' => $ids]);
 
                     $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getUrlKey();
                     $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getUrlKey();
@@ -260,11 +246,14 @@ class GalleryController extends Controller
 
                 if ($gallery->delete()) {
                     $this->getCache()->erase('gallery');
-                    Event::fire('admin.log', array('success', 'Gallery id: ' . $id));
+                    Event::fire('admin.log', ['success', 'Gallery id: ' . $id]);
                     $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('fail', 'Gallery id: ' . $id,
-                        'Errors: ' . json_encode($gallery->getErrors())));
+                    Event::fire('admin.log', [
+                        'fail',
+                        'Gallery id: ' . $id,
+                        'Errors: ' . json_encode($gallery->getErrors())
+                    ]);
                     $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
             } else {
@@ -283,7 +272,7 @@ class GalleryController extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $galleries = \App\Model\GalleryModel::all(array(), array('urlKey', 'title'));
+        $galleries = GalleryModel::all([], ['urlKey', 'title']);
 
         $view->set('galleries', $galleries);
     }
@@ -301,11 +290,11 @@ class GalleryController extends Controller
 
         if (RequestMethods::post('submitUpload')) {
             $galleryId = RequestMethods::post('galleryid');
-            $gallery = \App\Model\GalleryModel::first(
-                            array(
-                        'id = ?' => (int) $galleryId,
-                        'active = ?' => true,
-                            ), array('id', 'title', 'userId', 'urlKey')
+            $gallery = GalleryModel::first(
+                [
+                    'id = ?' => (int)$galleryId,
+                    'active = ?' => true,
+                ], ['id', 'title', 'userId', 'urlKey']
             );
 
             if (null === $gallery) {
@@ -320,22 +309,22 @@ class GalleryController extends Controller
                 exit;
             }
 
-            $errors = $uploadErrors = array();
+            $errors = $uploadErrors = [];
 
-            $fileManager = new FileManager(array(
+            $fileManager = new FileManager([
                 'thumbWidth' => $this->getConfig()->thumb_width,
                 'thumbHeight' => $this->getConfig()->thumb_height,
                 'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                 'maxImageWidth' => $this->getConfig()->photo_maxwidth,
                 'maxImageHeight' => $this->getConfig()->photo_maxheight,
-            ));
+            ]);
 
             $fileErrors = $fileManager->uploadImage('file', 'gallery/' . $gallery->getUrlKey(), time() . '_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
                 header('HTTP/1.0 400 Bad Request');
-                Core::getLogger()->error('Gallery image upload fail: {error}', array('error' => print_r($fileErrors, true)));
+                Core::getLogger()->error('Gallery image upload fail: {error}', ['error' => print_r($fileErrors, true)]);
                 echo implode('<br/>', $fileErrors);
                 exit;
             }
@@ -345,7 +334,7 @@ class GalleryController extends Controller
                     if ($file instanceof \THCFrame\Filesystem\Image) {
                         $info = $file->getOriginalInfo();
 
-                        $photo = new \App\Model\PhotoModel(array(
+                        $photo = new \App\Model\PhotoModel([
                             'galleryId' => $gallery->getId(),
                             'imgMain' => trim($file->getFilename(), '.'),
                             'imgThumb' => trim($file->getThumbname(), '.'),
@@ -357,16 +346,19 @@ class GalleryController extends Controller
                             'width' => $file->getWidth(),
                             'height' => $file->getHeight(),
                             'size' => $file->getSize(),
-                        ));
+                        ]);
 
                         if ($photo->validate()) {
                             $aid = $photo->save();
 
-                            Event::fire('admin.log', array('success', 'Photo id: ' . $aid . ' in gallery ' . $gallery->getUrlKey()));
+                            Event::fire('admin.log', ['success', 'Photo id: ' . $aid . ' in gallery ' . $gallery->getUrlKey()]);
                         } else {
-                            Event::fire('admin.log', array('fail', 'Photo in gallery ' . $gallery->getUrlKey(),
-                                'Errors: ' . json_encode($photo->getErrors())));
-                            Core::getLogger()->error('Gallery image create db record fail: {error}', array('error' => print_r($photo->getErrors(), true)));
+                            Event::fire('admin.log', [
+                                'fail',
+                                'Photo in gallery ' . $gallery->getUrlKey(),
+                                'Errors: ' . json_encode($photo->getErrors())
+                            ]);
+                            Core::getLogger()->error('Gallery image create db record fail: {error}', ['error' => print_r($photo->getErrors(), true)]);
                             $error = \THCFrame\Core\ArrayMethods::flatten($photo->getErrors());
 
                             header('HTTP/1.0 400 Bad Request');
@@ -408,14 +400,14 @@ class GalleryController extends Controller
         }
 
         $photo = \App\Model\PhotoModel::first(
-                        array('id = ?' => $id), array('id', 'imgMain', 'imgThumb', 'galleryId')
+            ['id = ?' => $id], ['id', 'imgMain', 'imgThumb', 'galleryId']
         );
 
         if (null === $photo) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            $gallery = \App\Model\GalleryModel::first(
-                            array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
+            $gallery = GalleryModel::first(
+                ['id = ?' => (int)$photo->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
@@ -424,11 +416,14 @@ class GalleryController extends Controller
                 if ($this->_checkAccess($gallery)) {
                     if ($photo->delete()) {
                         $this->getCache()->erase('gallery');
-                        Event::fire('admin.log', array('success', 'Photo id: ' . $id));
+                        Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
                         $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                     } else {
-                        Event::fire('admin.log', array('fail', 'Photo id: ' . $id,
-                            'Errors: ' . json_encode($photo->getErrors())));
+                        Event::fire('admin.log', [
+                            'fail',
+                            'Photo id: ' . $id,
+                            'Errors: ' . json_encode($photo->getErrors())
+                        ]);
                         $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                     }
                 } else {
@@ -453,13 +448,13 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $photo = \App\Model\PhotoModel::first(array('id = ?' => (int) $id));
+        $photo = \App\Model\PhotoModel::first(['id = ?' => (int)$id]);
 
         if (null === $photo) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            $gallery = \App\Model\GalleryModel::first(
-                            array('id = ?' => (int) $photo->getGalleryId()), array('id', 'userId')
+            $gallery = GalleryModel::first(
+                ['id = ?' => (int)$photo->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
@@ -473,8 +468,8 @@ class GalleryController extends Controller
                             $photo->save();
                             $this->getCache()->erase('gallery');
 
-                            Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, array('status' => 'active'));
+                            Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
+                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'active']);
                         } else {
                             $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
                         }
@@ -485,13 +480,179 @@ class GalleryController extends Controller
                             $photo->save();
                             $this->getCache()->erase('gallery');
 
-                            Event::fire('admin.log', array('success', 'Photo id: ' . $id));
-                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, array('status' => 'inactive'));
+                            Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
+                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'inactive']);
                         } else {
-                            Event::fire('admin.log', array('fail', 'Photo id: ' . $id,
-                                'Errors: ' . json_encode($photo->getErrors())));
+                            Event::fire('admin.log', [
+                                'fail',
+                                'Photo id: ' . $id,
+                                'Errors: ' . json_encode($photo->getErrors())
+                            ]);
                             $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
                         }
+                    }
+                } else {
+                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                }
+            }
+        }
+    }
+
+    /**
+     * @before _secured, _participant
+     *
+     * @param int $id photo id
+     */
+    public function changePhotoPosition($id)
+    {
+
+    }
+
+    /**
+     * Connect video from youtube.com to gallery
+     *
+     * @before _secured, _participant
+     */
+    public function connectVideo()
+    {
+        $view = $this->getActionView();
+
+        if (RequestMethods::post('submitUploadVideo')) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
+                $this->checkMultiSubmissionProtectionToken() !== true) {
+                self::redirect('/admin/gallery/');
+            }
+
+            $galleryId = RequestMethods::post('galleryid');
+
+            if (empty($galleryId)) {
+                $view->errorMessage('Galerie nebyla nalezena');
+                self::redirect('/admin/gallery/');
+            }
+
+            list($video, $errors) = \App\Model\VideoModel::createFromPost(
+                RequestMethods::getPostDataBag(), ['user' => $this->getUser()]
+            );
+
+            if (empty($errors) && $video->validate()) {
+                $id = $video->save();
+                $this->getCache()->erase('gallery');
+
+                Event::fire('admin.log', ['success', 'Video id: ' . $id . ' into gallery id: ' . $galleryId]);
+                $view->successMessage('Video bylo úspěšně připojeno');
+            } else {
+                Event::fire('admin.log', ['fail', 'Errors: ' . json_encode($errors + $video->getErrors())]);
+                $view->errorMessage('Během připojování videa do galerie se vyskytla chyba');
+            }
+
+            self::redirect('/admin/gallery/detail/' . $galleryId);
+        }
+    }
+
+    /**
+     * Change photo state (active/inactive).
+     *
+     * @before _secured, _participant
+     *
+     * @param int $id photo id
+     */
+    public function changeVideoStatus($id)
+    {
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
+
+        $video = \App\Model\VideoModel::first(['id = ?' => (int)$id]);
+
+        if (null === $video) {
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
+        } else {
+            $gallery = GalleryModel::first(
+                ['id = ?' => (int)$video->getGalleryId()], ['id', 'userId']
+            );
+
+            if (null === $gallery) {
+                $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
+            } else {
+                if ($this->_checkAccess($gallery)) {
+                    if (!$video->active) {
+                        $video->active = true;
+
+                        if ($video->validate()) {
+                            $video->save();
+                            $this->getCache()->erase('gallery');
+
+                            Event::fire('admin.log', ['success', 'Video id: ' . $id]);
+                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'active']);
+                        } else {
+                            $this->ajaxResponse(implode('<br/>', $video->getErrors()), true);
+                        }
+                    } elseif ($video->active) {
+                        $video->active = false;
+
+                        if ($video->validate()) {
+                            $video->save();
+                            $this->getCache()->erase('gallery');
+
+                            Event::fire('admin.log', ['success', 'Video id: ' . $id]);
+                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'inactive']);
+                        } else {
+                            Event::fire('admin.log', [
+                                'fail',
+                                'Video id: ' . $id,
+                                'Errors: ' . json_encode($video->getErrors())
+                            ]);
+                            $this->ajaxResponse(implode('<br/>', $video->getErrors()), true);
+                        }
+                    }
+                } else {
+                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                }
+            }
+        }
+    }
+
+    /**
+     * Delete photo.
+     *
+     * @before _secured, _participant
+     *
+     * @param int $id video id
+     */
+    public function deleteVideo($id)
+    {
+        $this->disableView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
+
+        $video = \App\Model\VideoModel::first(['id = ?' => (int)$id]);
+
+        if (null === $video) {
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
+        } else {
+            $gallery = GalleryModel::first(
+                ['id = ?' => (int)$video->getGalleryId()], ['id', 'userId']
+            );
+
+            if (null === $gallery) {
+                $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
+            } else {
+                if ($this->_checkAccess($gallery)) {
+                    if ($video->delete()) {
+                        $this->getCache()->erase('gallery');
+                        Event::fire('admin.log', ['success', 'Video id: ' . $id]);
+                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
+                    } else {
+                        Event::fire('admin.log', [
+                            'fail',
+                            'Video id: ' . $id,
+                            'Errors: ' . json_encode($video->getErrors())
+                        ]);
+                        $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                     }
                 } else {
                     $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);

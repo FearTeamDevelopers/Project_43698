@@ -10,9 +10,6 @@ section.wrapper.reports.singlePage
                     h3 {echo $report->getTitle()}
             .body
                 div {echo html_entity_decode($report->getShortBody())}
-                |{if $deviceType === 'computer'}
-                a.readMore(href!='/reportaze/r/{echo $report->getUrlKey()}') čti více
-                |{/if}
         |{/foreach}
         |{/if}{else}
         .large-12.medium-12.small-12.columns

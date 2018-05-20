@@ -27,7 +27,7 @@ class FhsScannedModel extends Model
      * @type integer
      * @length 10
      * @unsigned
-     * 
+     *
      * @validate numeric, max(10)
      * @label changes
      */
@@ -39,7 +39,7 @@ class FhsScannedModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      * @label scanned
@@ -51,7 +51,7 @@ class FhsScannedModel extends Model
      * @readwrite
      * @type varchar
      * @length 20
-     * 
+     *
      * @validate alphanumeric, max(20)
      * @label account
      */
@@ -63,7 +63,7 @@ class FhsScannedModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -75,14 +75,14 @@ class FhsScannedModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -95,10 +95,10 @@ class FhsScannedModel extends Model
 
         $this->setModified(date('Y-m-d H:i:s'));
     }
-    
+
     public static function getLastScann()
     {
-        return self::first(array(),array('*'), array('created' => 'desc'));
+        return self::first([],['*'], ['created' => 'desc']);
     }
 
 }

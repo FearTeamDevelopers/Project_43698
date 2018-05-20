@@ -5,8 +5,8 @@ namespace THCFrame\Configuration\Model;
 use THCFrame\Model\Model;
 
 /**
- * ORM Config model 
- * 
+ * ORM Config model
+ *
  * SQL code:
  * CREATE TABLE `tb_config` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -35,7 +35,7 @@ class ConfigModel extends Model
      * @readwrite
      * @type varchar
      * @length 200
-     * 
+     *
      * @validate required, alphanumeric, max(200)
      * @label title
      */
@@ -46,7 +46,7 @@ class ConfigModel extends Model
      * @readwrite
      * @type varchar
      * @length 200
-     * 
+     *
      * @validate required, alphanumeric, max(200)
      * @label key
      */
@@ -57,7 +57,7 @@ class ConfigModel extends Model
      * @readwrite
      * @type text
      * @null
-     * 
+     *
      * @validate required, alphanumeric, max(2048)
      * @label value
      */
@@ -69,7 +69,7 @@ class ConfigModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @validate datetime, max(19)
      */
     protected $_created;
@@ -80,13 +80,13 @@ class ConfigModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {

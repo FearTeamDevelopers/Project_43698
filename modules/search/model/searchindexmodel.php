@@ -2,13 +2,18 @@
 
 namespace Search\Model;
 
-use THCFrame\Model\Model;
+use Search\Model\Basic\BasicSearchIndexModel;
+use Search\Model\Sources\SourceInterface;
+use THCFrame\Core\StringMethods;
 
 /**
- * 
+ *
  */
-class SearchIndexModel extends Model
+class SearchIndexModel extends BasicSearchIndexModel
 {
+
+    private $dataSources;
+
     /**
      * @readwrite
      */
@@ -20,129 +25,18 @@ class SearchIndexModel extends Model
     protected $_databaseIdent = 'search';
 
     /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     * @unsigned
+     * Object constructor
+     *
+     * @param array $options
      */
-    protected $_id;
+    public function __construct($options = [])
+    {
+        parent::__construct($options);
+        $this->registerSources();
+    }
 
     /**
-     * @column
-     * @readwrite
-     * @type varchar
-     * @length 100
-     * 
-     * @validate alpha, max(100)
-     * @label source model
-     */
-    protected $_sourceModel;
-
-    /**
-     * @column
-     * @readwrite
-     * @type varchar
-     * @length 100
-     * 
-     * @validate required, alphanumeric, max(100)
-     * @label word
-     */
-    protected $_sword;
-
-    /**
-     * @column
-     * @readwrite
-     * @type varchar
-     * @length 350
-     * 
-     * @validate path, max(350)
-     * @label path to source
-     */
-    protected $_pathToSource;
-
-    /**
-     * @column
-     * @readwrite
-     * @type varchar
-     * @length 150
-     * 
-     * @validate path, max(150)
-     * @label source title
-     */
-    protected $_sourceTitle;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @null
-     * 
-     * @validate alphanumeric
-     * @label source meta description
-     */
-    protected $_sourceMetaDescription;
-
-    /**
-     * @column
-     * @readwrite
-     * @type char
-     * @length 19
-     * @null
-     * 
-     * @default null
-     * @validate datetime, max(19)
-     */
-    protected $_sourceCreated;
-
-    /**
-     * @column
-     * @readwrite
-     * @type smallint
-     * @unsigned
-     * 
-     * @validate numeric, max(5)
-     * @label occurence
-     */
-    protected $_occurence;
-
-    /**
-     * @column
-     * @readwrite
-     * @type smallint
-     * @unsigned
-     * 
-     * @validate numeric, max(5)
-     * @label weight
-     */
-    protected $_weight;
-
-    /**
-     * @column
-     * @readwrite
-     * @type char
-     * @length 19
-     * @null
-     * 
-     * @default null
-     * @validate datetime, max(19)
-     */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type char
-     * @length 19
-     * @null
-     * 
-     * @default null
-     * @validate datetime, max(19)
-     */
-    protected $_modified;
-
-    /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -154,4 +48,152 @@ class SearchIndexModel extends Model
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
+
+    /**
+     *
+     */
+    private function registerSources()
+    {
+        $this->dataSources = [
+            new Sources\Source\Action(),
+            new Sources\Source\Report(),
+            new Sources\Source\News(),
+            new Sources\Source\PageContent(),
+            new Sources\Source\Advertisement(),
+        ];
+    }
+
+    /**
+     *
+     * @param type $complete
+     * @param type $runByUser
+     */
+    public function indexAllDataSources($complete, $runByUser)
+    {
+        if (count($this->dataSources)) {
+            /* @var $source Search\Model\Sources\SourceInterface */
+            foreach ($this->dataSources as $source) {
+                try {
+                    $source->buildIndex($complete, $runByUser);
+                } catch (\Exception $ex) {
+                    Event::fire('search.log', 'fail', $ex->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param SourceInterface $source
+     * @param type $complete
+     * @param type $runByUser
+     */
+    public function indexDataSource(SourceInterface $source, $complete, $runByUser)
+    {
+        try {
+            $source->buildIndex($complete, $runByUser);
+        } catch (\Exception $ex) {
+            Event::fire('search.log', 'fail', $ex->getMessage());
+        }
+    }
+
+    /**
+     *
+     * @param string $text
+     * @param int $page
+     * @param int $limit
+     * @return array
+     */
+    public function search($text, $page = 1, $limit = 10, $bazarOnly = false)
+    {
+        $cleanStr = StringMethods::cleanString($text);
+        $body = [];
+
+        $words = explode(' ', $cleanStr);
+        $searchQuery = self::getQuery(
+                        ['DISTINCT (si.pathToSource)', 'si.sourceModel', 'si.sourceId', 'si.additionalData',
+                            'si.sourceTitle', 'si.sourceMetaDescription', 'si.sourceCreated']
+        );
+
+        foreach ($words as $key => $word) {
+            if (strlen($word) < 3) {
+                unset($words[$key]);
+                continue;
+            }
+
+            $paramArr[] = $word;
+        }
+
+        if (count($words) > 0) {
+            if ($bazarOnly === true) {
+                $whereCond = "si.sourceModel = 'Bazar' AND ";
+            }
+            $whereCondArr = array_fill(0, count($words), "si.sword LIKE '%%?%%'");
+            $whereCond .= '(' . implode(' OR ', $whereCondArr) . ')';
+
+            array_unshift($paramArr, $whereCond);
+        } else {
+            unset($searchQuery);
+        }
+
+        if ($paramArr === null) {
+            unset($searchQuery);
+        } else {
+            call_user_func_array([$searchQuery, 'wheresql'], $paramArr);
+
+            $searchQuery->order('si.weight', 'DESC')
+                    ->order('si.occurence', 'DESC')
+                    ->order('si.sourceCreated', 'DESC')
+                    ->limit(100);
+            $searchResult = self::initialize($searchQuery);
+
+            $searchReturnArr = [];
+            if (null !== $searchResult) {
+                $totalCount = count($searchResult);
+
+                /* @var $model \Search\Model\SearchIndexModel */
+                foreach ($searchResult as $model) {
+                    $searchReturnArr[] = [
+                        'title' => strval($model->getSourceTitle()),
+                        'model' => $model->getSourceModel(),
+                        'path' => $model->getPathToSource(),
+                        'text' => $model->getSourceMetaDescription(),
+                        'created' => $model->getSourceCreated(),
+                        'additionalData' => json_decode($model->getAdditionalData(), true),
+                    ];
+                }
+            }
+
+            $body = array_slice($searchReturnArr, (int) $limit * ((int) $page - 1), $limit);
+            array_unshift($body, $totalCount);
+        }
+
+        return $body;
+    }
+
+    public function getDataSourceAliases()
+    {
+        $return = [];
+
+        if (count($this->dataSources)) {
+            /* @var $source \Search\Model\Sources\SourceInterface */
+            foreach ($this->dataSources as $source) {
+                $return[$source->getTable()] = $source->getAlias();
+            }
+        }
+
+        return $return;
+    }
+
+    public function getDataSources()
+    {
+        return $this->dataSources;
+    }
+
+    public function setDataSources($dataSources)
+    {
+        $this->dataSources = $dataSources;
+        return $this;
+    }
+
 }

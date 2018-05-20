@@ -7,7 +7,8 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li
 
 .singlePage
 	min-height calc(100% - 379px)
-
+.center
+	text-align center
 .centerBlock
 	display block
 	margin 0 auto
@@ -24,6 +25,7 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li
 @import "/stylus/default/dimensions"
 @import "/stylus/default/wrappers"
 @import "/stylus/default/loader"
+@import "/stylus/default/buttons"
 
 //layout
 @import "/stylus/layout/header"
@@ -32,17 +34,21 @@ h1, h2, h3, h4, h5, h6, a, span, p, ul, li
 //content - content
 @import "/stylus/content/index/homepage/index"
 @import "/stylus/content/index/loadcontent"
+@import "/stylus/content/index/search"
 @import "/stylus/content/report/index"
 @import "/stylus/content/report/detail"
 @import "/stylus/content/advertisement/index"
 @import "/stylus/content/advertisement/filter"
 @import "/stylus/content/gallery/index"
 @import "/stylus/content/user/login"
+@import "/stylus/content/user/registration"
 @import "/stylus/content/user/profil"
 @import "/stylus/content/action/index"
+@import "/stylus/content/privacypolicy/index"
 
 
 //components
+@import "/stylus/components/cookies"
 @import "/stylus/components/pager"
 @import "/stylus/components/notification"
 
@@ -65,24 +71,4 @@ body
 			color white
 		&:before
 			margin-right .5em
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

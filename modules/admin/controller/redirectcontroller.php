@@ -39,27 +39,27 @@ class RedirectController extends Controller
 
         if (RequestMethods::post('submitAddRedirect')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/redirect/');
             }
 
-            $redirect = new RedirectModel(array(
+            $redirect = new RedirectModel([
                 'module' => RequestMethods::post('module'),
                 'fromPath' => RequestMethods::post('fromurl'),
                 'toPath' => RequestMethods::post('tourl'),
-            ));
+            ]);
 
             if ($redirect->validate()) {
                 $id = $redirect->save();
-                $this->getCache()->invalidate();
+                $this->getCache()->clearCache();
 
-                Event::fire('admin.log', array('success', 'Redirect id: '.$id));
+                Event::fire('admin.log', ['success', 'Redirect id: '.$id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/redirect/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($redirect->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: '.json_encode($redirect->getErrors())]);
                 $view->set('errors', $redirect->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('redirect', $redirect);
             }
         }
@@ -76,11 +76,11 @@ class RedirectController extends Controller
     {
         $view = $this->getActionView();
 
-        $redirect = RedirectModel::first(array('id = ?' => (int) $id));
+        $redirect = RedirectModel::first(['id = ?' => (int) $id]);
 
         if (null === $redirect) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/redirect/');
         }
 
@@ -99,14 +99,14 @@ class RedirectController extends Controller
 
             if ($redirect->validate()) {
                 $redirect->save();
-                $this->getCache()->invalidate();
+                $this->getCache()->clearCache();
 
-                Event::fire('admin.log', array('success', 'Redirect id: '.$id));
+                Event::fire('admin.log', ['success', 'Redirect id: '.$id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/redirect/');
             } else {
-                Event::fire('admin.log', array('fail', 'Redirect id: '.$id,
-                    'Errors: '.json_encode($redirect->getErrors()), ));
+                Event::fire('admin.log', ['fail', 'Redirect id: '.$id,
+                    'Errors: '.json_encode($redirect->getErrors()), ]);
                 $view->set('errors', $redirect->getErrors());
             }
         }
@@ -128,18 +128,18 @@ class RedirectController extends Controller
         }
 
         $redirect = RedirectModel::first(
-                        array('id = ?' => (int) $id), array('id')
+                        ['id = ?' => (int) $id], ['id']
         );
 
         if (null === $redirect) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($redirect->delete()) {
-                $this->getCache()->invalidate();
-                Event::fire('admin.log', array('success', 'Redirect id: '.$id));
+                $this->getCache()->clearCache();
+                Event::fire('admin.log', ['success', 'Redirect id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Redirect id: '.$id));
+                Event::fire('admin.log', ['fail', 'Redirect id: '.$id]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }

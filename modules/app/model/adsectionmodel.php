@@ -5,7 +5,7 @@ namespace App\Model;
 use App\Model\Basic\BasicAdsectionModel;
 
 /**
- * 
+ *
  */
 class AdSectionModel extends BasicAdsectionModel
 {
@@ -30,7 +30,7 @@ class AdSectionModel extends BasicAdsectionModel
     protected $_adDemandCount;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -50,9 +50,9 @@ class AdSectionModel extends BasicAdsectionModel
     public static function fetchAll()
     {
         $sections = self::all(
-                        array(), array('ads.*',
+                        [], ['ads.*',
                     '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="tender")' => 'adTenderCount',
-                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand")' => 'adDemandCount',)
+                    '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand")' => 'adDemandCount',]
         );
 
         return $sections;
@@ -64,13 +64,30 @@ class AdSectionModel extends BasicAdsectionModel
     public static function fetchAllActive()
     {
         $sections = self::all(
-                        array('ads.active = ?' => true), array('ads.*',
+                        ['ads.active = ?' => true], ['ads.*',
                     '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="tender" AND adv.active=1)' => 'adTenderCount',
                     '(SELECT COUNT(adv.id) FROM `tb_advertisement` adv WHERE adv.sectionId = ads.id AND adv.adtype="demand" AND adv.active=1)' => 'adDemandCount',
-                        )
+                        ]
         );
 
         return $sections;
     }
 
+    /**
+     * Check whether unique ad section identifier already exist or not.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public static function checkUrlKey($key)
+    {
+        $status = self::first(['urlKey = ?' => $key]);
+
+        if (null === $status) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

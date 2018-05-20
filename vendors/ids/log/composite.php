@@ -57,7 +57,7 @@ class IDS_Log_Composite
      *
      * @var array
      */
-    public $loggers = array();
+    public $loggers = [];
 
     /**
      * Iterates through registered loggers and executes them

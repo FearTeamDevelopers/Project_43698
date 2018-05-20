@@ -3,15 +3,17 @@
 namespace App\Controller;
 
 use App\Etc\Controller;
+use THCFrame\View\View;
 
 /**
- * 
+ *
  */
 class GalleryController extends Controller
 {
+
     /**
      * Get list of galleries.
-     * 
+     *
      * @param int $page
      */
     public function index($page = 1)
@@ -24,24 +26,24 @@ class GalleryController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/galerie';
+            $canonical = $this->getServerHost() . '/galerie';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/galerie/p/'.$page;
+            $canonical = $this->getServerHost() . '/galerie/p/' . $page;
         }
 
-        $content = $this->getCache()->get('gallery-'.$page);
+        $content = $this->getCache()->get('gallery-' . $page);
 
         if (null !== $content) {
             $galleries = $content;
             unset($content);
         } else {
             $galleries = \App\Model\GalleryModel::fetchPublicActiveGalleries(30, $page);
-            $this->getCache()->set('gallery-'.$page, $galleries);
+            $this->getCache()->set('gallery-' . $page, $galleries);
         }
 
         $galleryCount = \App\Model\GalleryModel::count(
-                        array('active = ?' => true,
-                            'isPublic = ?' => true, )
+                        ['active = ?' => true,
+                            'isPublic = ?' => true,]
         );
         $galleryPageCount = ceil($galleryCount / 30);
 
@@ -52,13 +54,13 @@ class GalleryController extends Controller
                 ->set('pagerpathprefix', '/galerie')
                 ->set('pagecount', $galleryPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Galerie');
+        $layoutView->set(View::META_CANONICAL, $canonical)
+                ->set(View::META_TITLE, 'Hastrman - Galerie');
     }
 
     /**
      * Show gallery detail with photos displayed in grid.
-     * 
+     *
      * @param string $urlKey
      */
     public function detail($urlKey, $page = 1)
@@ -74,26 +76,28 @@ class GalleryController extends Controller
         }
 
         $photos = \App\Model\PhotoModel::fetchPhotosByGalleryIdPaged($gallery->getId(), $limit, $page);
+        $videos = \App\Model\VideoModel::fetchActiveByGalleryId($gallery->getId());
 
-        $photosCount = \App\Model\PhotoModel::count(array('active = ?' => true, 'galleryId = ?' => $gallery->getId()));
+        $photosCount = \App\Model\PhotoModel::count(['active = ?' => true, 'galleryId = ?' => $gallery->getId()]);
         $photosPageCount = ceil($photosCount / 30);
 
-        $this->pagerMetaLinks($photosPageCount, $page, '/galerie/'.$gallery->getUrlKey().'/p/');
-        $canonical = 'http://'.$this->getServerHost().'/galerie/r/'.$gallery->getUrlKey();
+        $this->pagerMetaLinks($photosPageCount, $page, '/galerie/' . $gallery->getUrlKey() . '/p/');
+        $canonical = $this->getServerHost() . '/galerie/r/' . $gallery->getUrlKey();
 
         $view->set('gallery', $gallery)
                 ->set('photos', $photos)
+                ->set('videos', $videos)
                 ->set('currentpage', $page)
-                ->set('pagerpathprefix', '/galerie/'.$gallery->getUrlKey())
+                ->set('pagerpathprefix', '/galerie/' . $gallery->getUrlKey())
                 ->set('pagecount', $photosPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Galerie - '.$gallery->getTitle());
+        $layoutView->set(View::META_CANONICAL, $canonical)
+                ->set(View::META_TITLE, 'Hastrman - Galerie - ' . $gallery->getTitle());
     }
 
     /**
      * Show gallery detail as slide show.
-     * 
+     *
      * @param string $urlKey
      */
     public function slideShow($urlKey)
@@ -109,12 +113,13 @@ class GalleryController extends Controller
 
         $gallery = $galleryNoPhotos->getActPhotosForGallery();
 
-        $canonical = 'http://'.$this->getServerHost().'/galerie/r/'.$gallery->getUrlKey();
+        $canonical = $this->getServerHost() . '/galerie/r/' . $gallery->getUrlKey();
 
         $view->set('gallery', $gallery);
 
-        $layoutView->set('canonical', $canonical)
+        $layoutView->set(View::META_CANONICAL, $canonical)
                 ->set('includejssorslider', 1)
-                ->set('metatitle', 'Hastrman - Galerie - '.$gallery->getTitle());
+                ->set(View::META_TITLE, 'Hastrman - Galerie - ' . $gallery->getTitle());
     }
+
 }

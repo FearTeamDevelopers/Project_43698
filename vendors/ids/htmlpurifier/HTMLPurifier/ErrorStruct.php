@@ -34,14 +34,14 @@ class HTMLPurifier_ErrorStruct
     /**
      * Errors registered for this structure.
      */
-    public $errors = array();
+    public $errors = [];
 
     /**
      * Child ErrorStructs that are from this structure. For example, a TOKEN
      * ErrorStruct would contain ATTR ErrorStructs. This is a multi-dimensional
      * array in structure: [TYPE]['identifier']
      */
-    public $children = array();
+    public $children = [];
 
     public function getChild($type, $id) {
         if (!isset($this->children[$type][$id])) {
@@ -52,7 +52,7 @@ class HTMLPurifier_ErrorStruct
     }
 
     public function addError($severity, $message) {
-        $this->errors[] = array($severity, $message);
+        $this->errors[] = [$severity, $message];
     }
 
 }

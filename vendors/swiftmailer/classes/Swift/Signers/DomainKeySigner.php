@@ -55,7 +55,7 @@ class Swift_Signers_DomainKeySigner implements Swift_Signers_HeaderSigner
      *
      * @var array
      */
-    protected $_ignoredHeaders = array();
+    protected $_ignoredHeaders = [];
 
     /**
      * Signer identity
@@ -77,7 +77,7 @@ class Swift_Signers_DomainKeySigner implements Swift_Signers_HeaderSigner
      *
      * @var array
      */
-    private $_signedHeaders = array();
+    private $_signedHeaders = [];
 
     /**
      * Stores the signature header
@@ -107,7 +107,7 @@ class Swift_Signers_DomainKeySigner implements Swift_Signers_HeaderSigner
 
     private $_bodyCanonLine = '';
 
-    private $_bound = array();
+    private $_bound = [];
 
     /**
      * Constructor
@@ -326,9 +326,9 @@ class Swift_Signers_DomainKeySigner implements Swift_Signers_HeaderSigner
     public function getAlteredHeaders()
     {
         if ($this->_debugHeaders) {
-            return array('DomainKey-Signature', 'X-DebugHash');
+            return ['DomainKey-Signature', 'X-DebugHash'];
         } else {
-            return array('DomainKey-Signature');
+            return ['DomainKey-Signature'];
         }
     }
 
@@ -385,7 +385,7 @@ class Swift_Signers_DomainKeySigner implements Swift_Signers_HeaderSigner
     public function addSignature(Swift_Mime_HeaderSet $headers)
     {
         // Prepare the DomainKey-Signature Header
-        $params = array('a' => $this->_hashAlgorithm, 'b' => chunk_split(base64_encode($this->_getEncryptedHash()), 73, " "), 'c' => $this->_canon, 'd' => $this->_domainName, 'h' => implode(': ', $this->_signedHeaders), 'q' => 'dns', 's' => $this->_selector);
+        $params = ['a' => $this->_hashAlgorithm, 'b' => chunk_split(base64_encode($this->_getEncryptedHash()), 73, " "), 'c' => $this->_canon, 'd' => $this->_domainName, 'h' => implode(': ', $this->_signedHeaders), 'q' => 'dns', 's' => $this->_selector];
         $string = '';
         foreach ($params as $k => $v) {
             $string .= $k.'='.$v.'; ';

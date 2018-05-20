@@ -16,11 +16,11 @@ class ImessageModel extends BasicImessageModel
     /**
      * @var array
      */
-    private static $_typesConv = array(
+    private static $_typesConv = [
         self::TYPE_INFO => 'Info',
         self::TYPE_WARNING => 'Warning',
         self::TYPE_ERROR => 'Error',
-    );
+    ];
 
     /**
      * @readwrite
@@ -47,8 +47,8 @@ class ImessageModel extends BasicImessageModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('ims.*'))
-                ->join('tb_user', 'ims.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $query = self::getQuery(['ims.*'])
+                ->join('tb_user', 'ims.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -58,7 +58,7 @@ class ImessageModel extends BasicImessageModel
      */
     public static function fetchActive()
     {
-        return self::all(array('displayFrom <= ?' => date('Y-m-d', time()), 'displayTo >= ?' => date('Y-m-d', time()), 'active = ?' => true));
+        return self::all(['displayFrom <= ?' => date('Y-m-d', time()), 'displayTo >= ?' => date('Y-m-d', time()), 'active = ?' => true]);
     }
 
     /**

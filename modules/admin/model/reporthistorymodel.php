@@ -36,8 +36,8 @@ class ReportHistoryModel extends BasicReporthistoryModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('rph.*'))
-                ->join('tb_user', 'rph.editedBy = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $query = self::getQuery(['rph.*'])
+                ->join('tb_user', 'rph.editedBy = us.id', 'us', ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -49,8 +49,8 @@ class ReportHistoryModel extends BasicReporthistoryModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('rph.*'))
-                ->join('tb_user', 'rph.editedBy = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['rph.*'])
+                ->join('tb_user', 'rph.editedBy = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->order('rph.created', 'desc')
                 ->limit((int) $limit);
 
@@ -70,7 +70,7 @@ class ReportHistoryModel extends BasicReporthistoryModel
 
         $remoteAddr = RequestMethods::getClientIpAddress();
         $referer = RequestMethods::server('HTTP_REFERER');
-        $changes = array();
+        $changes = [];
 
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
@@ -94,19 +94,19 @@ class ReportHistoryModel extends BasicReporthistoryModel
             }
         }
 
-        $historyRecord = new self(array(
+        $historyRecord = new self([
             'originId' => $original->getId(),
             'editedBy' => $user->getId(),
             'remoteAddr' => $remoteAddr,
             'referer' => $referer,
             'changedData' => json_encode($changes),
-        ));
+        ]);
 
         if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'Report ' . $original->getId() . ' changes saved'));
+            Event::fire('admin.log', ['success', 'Report ' . $original->getId() . ' changes saved']);
         } else {
-            Event::fire('admin.log', array('fail', 'Report history errors: ' . json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', ['fail', 'Report history errors: ' . json_encode($historyRecord->getErrors())]);
         }
     }
 

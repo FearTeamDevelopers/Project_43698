@@ -8,24 +8,24 @@ class HTMLPurifier_HTMLModule_Forms extends HTMLPurifier_HTMLModule
     public $name = 'Forms';
     public $safe = false;
 
-    public $content_sets = array(
+    public $content_sets = [
         'Block' => 'Form',
         'Inline' => 'Formctrl',
-    );
+    ];
 
     public function setup($config) {
         $form = $this->addElement('form', 'Form',
-          'Required: Heading | List | Block | fieldset', 'Common', array(
+          'Required: Heading | List | Block | fieldset', 'Common', [
             'accept' => 'ContentTypes',
             'accept-charset' => 'Charsets',
             'action*' => 'URI',
             'method' => 'Enum#get,post',
             // really ContentType, but these two are the only ones used today
             'enctype' => 'Enum#application/x-www-form-urlencoded,multipart/form-data',
-        ));
-        $form->excludes = array('form' => true);
+        ]);
+        $form->excludes = ['form' => true];
 
-        $input = $this->addElement('input', 'Formctrl', 'Empty', 'Common', array(
+        $input = $this->addElement('input', 'Formctrl', 'Empty', 'Common', [
             'accept' => 'ContentTypes',
             'accesskey' => 'Character',
             'alt' => 'Text',
@@ -39,28 +39,28 @@ class HTMLPurifier_HTMLModule_Forms extends HTMLPurifier_HTMLModule
             'tabindex' => 'Number',
             'type' => 'Enum#text,password,checkbox,button,radio,submit,reset,file,hidden,image',
             'value' => 'CDATA',
-        ));
+        ]);
         $input->attr_transform_post[] = new HTMLPurifier_AttrTransform_Input();
 
-        $this->addElement('select', 'Formctrl', 'Required: optgroup | option', 'Common', array(
+        $this->addElement('select', 'Formctrl', 'Required: optgroup | option', 'Common', [
             'disabled' => 'Bool#disabled',
             'multiple' => 'Bool#multiple',
             'name' => 'CDATA',
             'size' => 'Number',
             'tabindex' => 'Number',
-        ));
+        ]);
 
-        $this->addElement('option', false, 'Optional: #PCDATA', 'Common', array(
+        $this->addElement('option', false, 'Optional: #PCDATA', 'Common', [
             'disabled' => 'Bool#disabled',
             'label' => 'Text',
             'selected' => 'Bool#selected',
             'value' => 'CDATA',
-        ));
+        ]);
         // It's illegal for there to be more than one selected, but not
         // be multiple. Also, no selected means undefined behavior. This might
         // be difficult to implement; perhaps an injector, or a context variable.
 
-        $textarea = $this->addElement('textarea', 'Formctrl', 'Optional: #PCDATA', 'Common', array(
+        $textarea = $this->addElement('textarea', 'Formctrl', 'Optional: #PCDATA', 'Common', [
             'accesskey' => 'Character',
             'cols*' => 'Number',
             'disabled' => 'Bool#disabled',
@@ -68,17 +68,17 @@ class HTMLPurifier_HTMLModule_Forms extends HTMLPurifier_HTMLModule
             'readonly' => 'Bool#readonly',
             'rows*' => 'Number',
             'tabindex' => 'Number',
-        ));
+        ]);
         $textarea->attr_transform_pre[] = new HTMLPurifier_AttrTransform_Textarea();
 
-        $button = $this->addElement('button', 'Formctrl', 'Optional: #PCDATA | Heading | List | Block | Inline', 'Common', array(
+        $button = $this->addElement('button', 'Formctrl', 'Optional: #PCDATA | Heading | List | Block | Inline', 'Common', [
             'accesskey' => 'Character',
             'disabled' => 'Bool#disabled',
             'name' => 'CDATA',
             'tabindex' => 'Number',
             'type' => 'Enum#button,submit,reset',
             'value' => 'CDATA',
-        ));
+        ]);
 
         // For exclusions, ideally we'd specify content sets, not literal elements
         $button->excludes = $this->makeLookup(
@@ -94,20 +94,20 @@ class HTMLPurifier_HTMLModule_Forms extends HTMLPurifier_HTMLModule
         // This is HIGHLY user-unfriendly; we need a custom child-def for this
         $this->addElement('fieldset', 'Form', 'Custom: (#WS?,legend,(Flow|#PCDATA)*)', 'Common');
 
-        $label = $this->addElement('label', 'Formctrl', 'Optional: #PCDATA | Inline', 'Common', array(
+        $label = $this->addElement('label', 'Formctrl', 'Optional: #PCDATA | Inline', 'Common', [
             'accesskey' => 'Character',
             // 'for' => 'IDREF', // IDREF not implemented, cannot allow
-        ));
-        $label->excludes = array('label' => true);
+        ]);
+        $label->excludes = ['label' => true];
 
-        $this->addElement('legend', false, 'Optional: #PCDATA | Inline', 'Common', array(
+        $this->addElement('legend', false, 'Optional: #PCDATA | Inline', 'Common', [
             'accesskey' => 'Character',
-        ));
+        ]);
 
-        $this->addElement('optgroup', false, 'Required: option', 'Common', array(
+        $this->addElement('optgroup', false, 'Required: option', 'Common', [
             'disabled' => 'Bool#disabled',
             'label*' => 'Text',
-        ));
+        ]);
 
         // Don't forget an injector for <isindex>. This one's a little complex
         // because it maps to multiple elements.

@@ -1,5 +1,6 @@
 include filter-template
 section.wrapper.bazar.singlePage
+    input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
     header.row
         h2 Bazar
     .row.container
@@ -13,47 +14,23 @@ section.wrapper.bazar.singlePage
                 |{/if}
         |{if !empty($ads)}
         |{foreach $ad in $ads}
-        article.large-6.small-12.medium-6.column.left
-            .imgWrapper
-                |{if !empty($ad->getImgMain())}
-                a(data-lightbox!="{echo $ad->getId()}" data-title!="{echo $ad->getPhotoName()}" href!="{echo $ad->getImgMain()}")
-                    img(src!="{echo $ad->getImgThumb()}")
-                |{/if}
-            .nazev
-                .nazevWrapper
-                    a(href!='/bazar/r/{echo $ad->getUniqueKey()}')
-                        h4 {if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}PRODÁNO - {/if}{echo $ad->getTitle()}
-            .infoWrapper
-                .info
-                    |{if $ad->getAdType() =='tender'}
-                    center
-                        span.nabidka Nabídka <br/>
-                    |{/if}{else}
-                    center
-                        span.poptavka Poptávka <br/>
-                    |{/else}
-                    span {echo " ".$ad->getUserAlias()}<br/>
-                    small
-                        span sekce:
-                    span {echo " ".$ad->getSectionTitle()}<br/>
-                    small
-                        span cena:
-                    |{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}
-                    span.price {echo " PRODÁNO"}
-                    br
-                    |{/if}{elseif "" == $ad->getPrice()}
-                    span.price {echo " Dohodou"}
-                    br
-                    |{/elseif}{else}
-                    span.price {echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/>
-                    |{/else}
-            a.showDetail(href!='/bazar/r/{echo $ad->getUniqueKey()}') zobrazit podrobnosti
-            |{if isset($authUser) && $authUser->getId() == $ad->getUserId() && $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
-            a.buttonTab.sell.ajaxReload.fi-dollar(href!='/bazar/prodano/{echo $ad->getUniqueKey()}', title='Prodáno')
-            a.buttonTab.edit.fi-pencil(href!='/bazar/upravit/{echo $ad->getUniqueKey()}', title='Upravit')
-            a.buttonTab.reload.ajaxReload.fi-refresh(href!='/bazar/prodlouzit/{echo $ad->getUniqueKey()}', title='Požádat o prodloužení')
-            a.buttonTab.delete.ajaxReload.fi-trash(href!='/bazar/smazat/{echo $ad->getUniqueKey()}', title='Smazat')
-            |{/if}
+        a(href!='/bazar/r/{echo $ad->getUniqueKey()}')
+            article.large-4.small-12.medium-6.column.left
+                .imgWrapper
+                    |{if !empty($ad->getImgMain())}
+                    img(src!="{echo $ad->getImgThumb()}" alt!="{echo $ad->getPhotoName()}")
+                    |{/if}
+                .infoWrapper
+                    .info
+                        span.name {echo $ad->getUserAlias()}
+                        |{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}
+                        span.price {echo "PRODÁNO"}
+                        |{/if}{elseif "" == $ad->getPrice()}
+                        span.price {echo "Dohodou"}
+                        |{/elseif}{else}
+                        span.price {echo number_format($ad->getPrice(), 0, ",", " ")." Kč"}
+                        |{/else}
+                        p.content {echo $ad->getContent()}
         |{/foreach}
         |{/if}{else}
         article.large-12.small-12.medium-12.column.left

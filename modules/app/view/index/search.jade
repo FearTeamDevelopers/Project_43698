@@ -2,16 +2,30 @@ section.wrapper.pageSearch.singlePage
     header.row
         h2 Výsledky hledání
     section.row.container
-        |{if !empty($urls)}
-        |{foreach $url in $urls}
+        |{if !empty($results)}
+        |{foreach $result in $results}
         article
+            |{if stripos($result['model'], 'akce') !== false}
+            |{if $result['additionalData']['startDate'] !== null}
+            .date
+                .den {echo \App\Helper\DateFormater::g2dn($result['additionalData']['startDate'])}
+                .mesic {echo \App\Helper\DateFormater::g2mn($result['additionalData']['startDate'])}
+            |{/if}
+            |{/if}{elseif stripos($result['model'], 'bazar') !== false || stripos($result['model'], 'reportáž') !== false}
+            |{if !empty($result['additionalData']['imgThumb'])}
+            .imgThumb
+                img(src!="{echo $result['additionalData']['imgThumb']}",alt='')
+            |{/if}
+            |{/elseif}
             header
-                a(href!="{echo $url['path']}")
-                    h3 {echo $url_i}
+                a(href!="{echo $result['path']}")
+                    h3 {echo $result['title']}
             span
-                small {echo \App\Helper\DateFormater::t2dt($url['created'])}
+                small {echo \App\Helper\DateFormater::t2dt($result['created'])}
             .body
-                div {echo html_entity_decode($url['meta'])}
+                |{if mb_strlen($result['text'])>0}
+                div {echo html_entity_decode($result['text'])}
+                |{/if}
         |{/foreach}
         |{/if}{else}
         .large-12.medium-12.small-12.columns

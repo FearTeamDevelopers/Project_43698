@@ -9,7 +9,7 @@ class HTMLPurifier_ChildDef_Required extends HTMLPurifier_ChildDef
      * Lookup table of allowed elements.
      * @public
      */
-    public $elements = array();
+    public $elements = [];
     /**
      * Whether or not the last passed node was all whitespace.
      */
@@ -42,7 +42,7 @@ class HTMLPurifier_ChildDef_Required extends HTMLPurifier_ChildDef
         if (empty($tokens_of_children)) return false;
 
         // the new set of children
-        $result = array();
+        $result = [];
 
         // current depth into the nest
         $nesting = 0;

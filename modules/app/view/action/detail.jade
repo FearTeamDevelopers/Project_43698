@@ -1,5 +1,6 @@
 section.wrapper.singlePage
     .row.container
+        input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
         header
             h1 {echo $action->getTitle()}
             |{if $isMember && $action->getStartDate() > date("Y-m-d")}
@@ -21,10 +22,10 @@ section.wrapper.singlePage
             span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
             |{if $isMember && !empty($attendance)}
             br
-            strong Zúčastní se: 
+            strong Zúčastní se:
             |{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}
             br
-            strong Ještě neví: 
+            strong Ještě neví:
             |{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
             |{/if}
             hr
@@ -35,4 +36,5 @@ section.wrapper.singlePage
             |{if !empty($action->getStartTime())}
             span Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/>
             |{/if}
+            br
         |{echo html_entity_decode($action->getBody())}

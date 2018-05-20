@@ -6,7 +6,7 @@ section.wrapper.reports.singlePage
       |{foreach $report in $reports}
       a(href!='/reportaze/r/{echo $report->getUrlKey()}')
          article.report.medium-4.left
-            img(src!='{echo $report->getImgThumb()}')
+            img(src!='{echo $report->getImgThumb()}' alt!='{echo $report->getPhotoName()}')
             .info
                h2 {echo $report->getTitle()}
                div {echo html_entity_decode($report->getShortBody())}

@@ -8,8 +8,8 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
 
 /**
- * Memcached stores data in memory, in hash lookup tables so the data is 
- * quickly accessible without reading it from disk. Memcached is an open source 
+ * Memcached stores data in memory, in hash lookup tables so the data is
+ * quickly accessible without reading it from disk. Memcached is an open source
  * HTTP caching system that can store huge amounts of key/value data.
  */
 class Memcached extends Cache\Driver
@@ -40,7 +40,7 @@ class Memcached extends Cache\Driver
     /**
      * Method is used to ensure that the value of the
      * $_service is a valid Memcached instance
-     * 
+     *
      * @return boolean
      */
     protected function _isValidService()
@@ -56,24 +56,25 @@ class Memcached extends Cache\Driver
     }
 
     /**
-     * 
-     * @param type $options
+     * Memcached constructor.
+     * @param array $options
+     * @throws Exception\Service
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
-        
+
         $this->connect();
-        
+
         Event::add('framework.controller.destruct.after', function($name) {
             $cache = Registry::get('cache');
             $cache->disconnect();
         });
     }
-    
+
     /**
      * Method attempts to connect to the Memcached server at the specified host/port
-     * 
+     *
      * @return \THCFrame\Cache\Driver\Memcached
      * @throws Exception\Service
      */
@@ -95,7 +96,7 @@ class Memcached extends Cache\Driver
 
     /**
      * Method attempts to disconnect the $_service instance from the Memcached service
-     * 
+     *
      * @return \THCFrame\Cache\Driver\Memcached
      */
     public function disconnect()
@@ -110,7 +111,7 @@ class Memcached extends Cache\Driver
 
     /**
      * Get cached values
-     * 
+     *
      * @param string $key
      * @param mixed $default
      * @return mixed
@@ -133,7 +134,7 @@ class Memcached extends Cache\Driver
 
     /**
      * Set values to keys
-     * 
+     *
      * @param string $key
      * @param mixed $value
      * @return \THCFrame\Cache\Driver\Memcached
@@ -151,7 +152,7 @@ class Memcached extends Cache\Driver
 
     /**
      * Erase value based on key param
-     * 
+     *
      * @param string $key
      * @return \THCFrame\Cache\Driver\Memcached
      * @throws Exception\Service
@@ -168,7 +169,7 @@ class Memcached extends Cache\Driver
 
     /**
      * Flush memcached
-     * 
+     *
      * @return \THCFrame\Cache\Driver\Memcached
      * @throws Exception\Service
      */

@@ -268,7 +268,7 @@ class HTMLPurifier_Encoder
         if ($encoding === 'utf-8') return $str;
         static $iconv = null;
         if ($iconv === null) $iconv = function_exists('iconv');
-        set_error_handler(array('HTMLPurifier_Encoder', 'muteErrorHandler'));
+        set_error_handler(['HTMLPurifier_Encoder', 'muteErrorHandler']);
         if ($iconv && !$config->get('Test.ForceNoIconv')) {
             $str = iconv($encoding, 'utf-8//IGNORE', $str);
             if ($str === false) {
@@ -304,12 +304,12 @@ class HTMLPurifier_Encoder
         if ($escape = $config->get('Core.EscapeNonASCIICharacters')) {
             $str = HTMLPurifier_Encoder::convertToASCIIDumbLossless($str);
         }
-        set_error_handler(array('HTMLPurifier_Encoder', 'muteErrorHandler'));
+        set_error_handler(['HTMLPurifier_Encoder', 'muteErrorHandler']);
         if ($iconv && !$config->get('Test.ForceNoIconv')) {
             // Undo our previous fix in convertToUTF8, otherwise iconv will barf
             $ascii_fix = HTMLPurifier_Encoder::testEncodingSupportsASCII($encoding);
             if (!$escape && !empty($ascii_fix)) {
-                $clear_fix = array();
+                $clear_fix = [];
                 foreach ($ascii_fix as $utf8 => $native) $clear_fix[$utf8] = '';
                 $str = strtr($str, $clear_fix);
             }
@@ -385,20 +385,20 @@ class HTMLPurifier_Encoder
      *      which can be used to "undo" any overzealous iconv action.
      */
     public static function testEncodingSupportsASCII($encoding, $bypass = false) {
-        static $encodings = array();
+        static $encodings = [];
         if (!$bypass) {
             if (isset($encodings[$encoding])) return $encodings[$encoding];
             $lenc = strtolower($encoding);
             switch ($lenc) {
                 case 'shift_jis':
-                    return array("\xC2\xA5" => '\\', "\xE2\x80\xBE" => '~');
+                    return ["\xC2\xA5" => '\\', "\xE2\x80\xBE" => '~'];
                 case 'johab':
-                    return array("\xE2\x82\xA9" => '\\');
+                    return ["\xE2\x82\xA9" => '\\'];
             }
-            if (strpos($lenc, 'iso-8859-') === 0) return array();
+            if (strpos($lenc, 'iso-8859-') === 0) return [];
         }
-        $ret = array();
-        set_error_handler(array('HTMLPurifier_Encoder', 'muteErrorHandler'));
+        $ret = [];
+        set_error_handler(['HTMLPurifier_Encoder', 'muteErrorHandler']);
         if (iconv('UTF-8', $encoding, 'a') === false) return false;
         for ($i = 0x20; $i <= 0x7E; $i++) { // all printable ASCII chars
             $c = chr($i); // UTF-8 char

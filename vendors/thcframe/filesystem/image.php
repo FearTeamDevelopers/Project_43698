@@ -7,7 +7,7 @@ use THCFrame\Filesystem\Exception as Exception;
 use THCFrame\Core\StringMethods as StringMethods;
 
 /**
- * 
+ *
  */
 class Image extends Base
 {
@@ -26,7 +26,7 @@ class Image extends Base
      * @readwrite
      */
     protected $_filename;
-    
+
     /**
      * @readwrite
      */
@@ -46,17 +46,17 @@ class Image extends Base
      * @readwrite
      */
     protected $_height;
-    
+
     /**
      * @readwrite
      */
     protected $_size;
-    
+
     /**
      * @readwrite
      */
     protected $_format;
-    
+
     /**
      * @readwrite
      */
@@ -80,7 +80,7 @@ class Image extends Base
 
         if ($filename) {
             $this->load($filename);
-        }elseif ($base64){
+        } elseif ($base64) {
             $this->loadBase64($base64);
         } elseif ($width) {
             $this->create($width, $height, $color);
@@ -159,6 +159,8 @@ class Image extends Base
             case 8:
                 // Rotate 90 counterclockwise
                 $this->rotate(-90);
+                break;
+            default:
                 break;
         }
 
@@ -460,7 +462,7 @@ class Image extends Base
         imagecopy($copy, $this->_image, 0, 0, 0, 0, $this->_width, $this->_height);
 
         // Create transparent layer
-        $this->create($this->_width, $this->_height, array(0, 0, 0, 127));
+        $this->create($this->_width, $this->_height, [0, 0, 0, 127]);
 
         // Merge with specified opacity
         $this->_imagecopymergealpha($this->_image, $copy, 0, 0, 0, 0, $this->_width, $this->_height, $opacity);
@@ -546,18 +548,18 @@ class Image extends Base
      */
     public function create($width, $height = null, $color = null)
     {
-        $height = $height ? : $width;
+        $height = $height ?: $width;
         $this->_width = $width;
         $this->_height = $height;
         $this->_image = imagecreatetruecolor($width, $height);
-        $this->_originalInfo = array(
+        $this->_originalInfo = [
             'width' => $width,
             'height' => $height,
             'orientation' => $this->getOrientation(),
             'exif' => null,
             'format' => 'png',
             'mime' => 'image/png'
-        );
+        ];
 
         if ($color) {
             $this->fill($color);
@@ -580,10 +582,10 @@ class Image extends Base
     {
         // Determine crop size
         if ($x2 < $x1) {
-            list($x1, $x2) = array($x2, $x1);
+            list($x1, $x2) = [$x2, $x1];
         }
         if ($y2 < $y1) {
-            list($y1, $y2) = array($y2, $y1);
+            list($y1, $y2) = [$y2, $y1];
         }
         $crop_width = $x2 - $x1;
         $crop_height = $y2 - $y1;
@@ -625,7 +627,7 @@ class Image extends Base
      *
      * @param string	$filename   base64 string
      * @return Image
-     * 
+     *
      */
     public function loadBase64($base64string)
     {
@@ -649,7 +651,7 @@ class Image extends Base
     public function output($format = null, $quality = null)
     {
         // Determine quality
-        $quality = $quality ? : $this->_quality;
+        $quality = $quality ?: $this->_quality;
 
         // Determine mimetype
         switch (strtolower($format)) {
@@ -685,7 +687,6 @@ class Image extends Base
                 break;
             default:
                 throw new Exception\Type(sprintf('Unsupported image format: %s', $this->_filename));
-                break;
         }
 
         $this->__destruct();
@@ -702,7 +703,7 @@ class Image extends Base
     public function outputBase64($format = null, $quality = null)
     {
         // Determine quality
-        $quality = $quality ? : $this->_quality;
+        $quality = $quality ?: $this->_quality;
 
         // Determine mimetype
         switch (strtolower($format)) {
@@ -738,7 +739,6 @@ class Image extends Base
                 break;
             default:
                 throw new Exception\Type(sprintf('Unsupported image format: %s', $this->_filename));
-                break;
         }
         $image_data = ob_get_contents();
         ob_end_clean();
@@ -759,10 +759,10 @@ class Image extends Base
     public function save($filename = null, $quality = null)
     {
         // Determine quality, filename, and format
-        $quality = $quality ? : $this->_quality;
+        $quality = $quality ?: $this->_quality;
         $filename = $filename ? StringMethods::removeDiacriticalMarks(str_replace(' ', '_', $filename)) : $this->_filename;
         $info = $this->getOriginalInfo();
-        $format = $this->_fileExt($filename) ? : $info['format'];
+        $format = $this->_fileExt($filename) ?: $info['format'];
 
         // Create the image
         switch (strtolower($format)) {
@@ -945,7 +945,7 @@ class Image extends Base
     public function thumbnail($width, $height = null)
     {
         // Determine height
-        $height = $height ? : $width;
+        $height = $height ?: $width;
 
         // Determine aspect ratios
         $current_aspect_ratio = $this->_height / $this->_width;
@@ -1000,7 +1000,6 @@ class Image extends Base
                     break;
                 default:
                     throw new Exception\IO(sprintf('Invalid image: %s', $this->_filename));
-                    break;
             }
         } elseif (function_exists('getimagesizefromstring')) {
             $info = getimagesizefromstring($this->_imagestring);
@@ -1008,14 +1007,14 @@ class Image extends Base
             throw new Exception\Version('PHP 5.4 is required to use method getimagesizefromstring');
         }
 
-        $this->_originalInfo = array(
+        $this->_originalInfo = [
             'width' => $info[0],
             'height' => $info[1],
             'orientation' => $this->getOrientation(),
             'exif' => function_exists('exif_read_data') && $info['mime'] === 'image/jpeg' && $this->_imagestring === null ? $this->exif = @exif_read_data($this->_filename) : null,
             'format' => preg_replace('/^image\//', '', $info['mime']),
             'mime' => $info['mime']
-        );
+        ];
 
         $this->_width = $info[0];
         $this->_height = $info[1];
@@ -1127,42 +1126,42 @@ class Image extends Base
             $color = trim($color, '#');
 
             if (mb_strlen($color) == 6) {
-                list($r, $g, $b) = array(
+                list($r, $g, $b) = [
                     $color[0] . $color[1],
                     $color[2] . $color[3],
                     $color[4] . $color[5]
-                );
+                ];
             } elseif (mb_strlen($color) == 3) {
-                list($r, $g, $b) = array(
+                list($r, $g, $b) = [
                     $color[0] . $color[0],
                     $color[1] . $color[1],
                     $color[2] . $color[2]
-                );
+                ];
             } else {
                 return false;
             }
-            return array(
+            return [
                 'r' => hexdec($r),
                 'g' => hexdec($g),
                 'b' => hexdec($b),
                 'a' => 0
-            );
+            ];
         } elseif (is_array($color) && (count($color) == 3 || count($color) == 4)) {
 
             if (isset($color['r'], $color['g'], $color['b'])) {
-                return array(
+                return [
                     'r' => $this->_inRange($color['r'], 0, 255),
                     'g' => $this->_inRange($color['g'], 0, 255),
                     'b' => $this->_inRange($color['b'], 0, 255),
                     'a' => $this->_inRange(isset($color['a']) ? $color['a'] : 0, 0, 127)
-                );
+                ];
             } elseif (isset($color[0], $color[1], $color[2])) {
-                return array(
+                return [
                     'r' => $this->_inRange($color[0], 0, 255),
                     'g' => $this->_inRange($color[1], 0, 255),
                     'b' => $this->_inRange($color[2], 0, 255),
                     'a' => $this->_inRange(isset($color[3]) ? $color[3] : 0, 0, 127)
-                );
+                ];
             }
         }
         return false;

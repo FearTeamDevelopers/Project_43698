@@ -44,7 +44,7 @@ class Model extends Base
     /**
      * @read
      */
-    protected $_types = array(
+    protected $_types = [
         'auto_increment',
         'binary',
         'char',
@@ -67,83 +67,88 @@ class Model extends Base
         'date',
         'time',
         'datetime',
-    );
+    ];
 
     /**
      * @read
      */
-    protected $_validators = array(
-        'required' => array(
+    protected $_validators = [
+        'required' => [
             'handler' => '_validateRequired',
             'message_en' => 'The {0} field is required',
             'message_cs' => 'Pole {0} je povinné'
-        ),
-        'alpha' => array(
+        ],
+        'alpha' => [
             'handler' => '_validateAlpha',
             'message_en' => 'The {0} field can only contain letters',
             'message_cs' => 'Pole {0} může obsahovat pouze písmena'
-        ),
-        'numeric' => array(
+        ],
+        'numeric' => [
             'handler' => '_validateNumeric',
             'message_en' => 'The {0} field can only contain numbers',
             'message_cs' => 'Pole {0} může obsahovat pouze číslice'
-        ),
-        'alphanumeric' => array(
+        ],
+        'alphanumeric' => [
             'handler' => '_validateAlphaNumeric',
             'message_en' => 'The {0} field can only contain letters and numbers',
             'message_cs' => 'Pole {0} může obsahovat pouze písmena a čísla'
-        ),
-        'max' => array(
+        ],
+        'max' => [
             'handler' => '_validateMax',
             'message_en' => 'The {0} field must contain less than {2} characters',
             'message_cs' => 'Pole {0} musí obsahovat méně než {2} znaků'
-        ),
-        'min' => array(
+        ],
+        'min' => [
             'handler' => '_validateMin',
             'message_en' => 'The {0} field must contain more than {2} characters',
             'message_cs' => 'Pole {0} musí obsahovat více než {2} znaků'
-        ),
-        'email' => array(
+        ],
+        'email' => [
             'handler' => '_validateEmail',
             'message_en' => 'The {0} field must contain valid email address',
             'message_cs' => 'Pole {0} musí obsahovat validní emailovou adresu'
-        ),
-        'url' => array(
+        ],
+        'url' => [
             'handler' => '_validateUrl',
             'message_en' => 'The {0} field must contain valid url',
             'message_cs' => 'Pole {0} musí obsahovat validní url adresu'
-        ),
-        'datetime' => array(
+        ],
+        'datetime' => [
             'handler' => '_validateDatetime',
             'message_en' => 'The {0} field must contain valid date and time (yyyy-mm-dd hh:mm)',
             'message_cs' => 'Pole {0} musí obsahovat datum a čas ve formátu (yyyy-mm-dd hh:mm)'
-        ),
-        'date' => array(
+        ],
+        'date' => [
             'handler' => '_validateDate',
             'message_en' => 'The {0} field must contain valid date (yyyy-mm-dd)',
             'message_cs' => 'Pole {0} musí obsahovat datum ve formátu (yyyy-mm-dd)'
-        ),
-        'time' => array(
+        ],
+        'time' => [
             'handler' => '_validateTime',
             'message_en' => 'The {0} field must contain valid time (hh:mm / hh:mm:ss)',
             'message_cs' => 'Pole {0} musí obsahovat čas ve formátu (hh:mm / hh:mm:ss)'
-        ),
-        'html' => array(
+        ],
+        'html' => [
             'handler' => '_validateHtml',
             'message_en' => 'The {0} field can contain these tags only (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td,br,hr)',
             'message_cs' => 'Pole {0} může obsahovat následující html tagy (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td,br,hr)'
-        ),
-        'path' => array(
+        ],
+        'json' => [
+            'handler' => '_validateJson',
+            'message_en' => 'The {0} must contain valid JSON string',
+            'message_cs' => 'Pole {0} musí obsahovat řetězec v JSON formátu'
+        ],
+        'path' => [
             'handler' => '_validatePath',
             'message_en' => 'The {0} field must contain filesystem path',
             'message_cs' => 'Pole {0} musí obsahovat validní cestu',
-        )
-    );
+        ]
+    ];
 
     /**
      * @read
      */
-    protected $_errors = array();
+    protected $_errors = [];
     protected $_columns;
     protected $_primary;
 
@@ -208,6 +213,21 @@ class Model extends Base
             return true;
         } else {
             $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
+            return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž0-9{$pattern}]+)#");
+        }
+    }
+
+    /**
+     *
+     * @param type $value
+     * @return type
+     */
+    protected function _validateJson($value)
+    {
+        if ($value == '') {
+            return true;
+        } else {
+            $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_{}', '#');
             return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž0-9{$pattern}]+)#");
         }
     }
@@ -333,7 +353,7 @@ class Model extends Base
 
         if (strlen($value) >= 6 && strlen($format) == 10) {
 
-            $separator_only = str_replace(array('m', 'd', 'y'), '', $format);
+            $separator_only = str_replace(['m', 'd', 'y'], '', $format);
             $separator = $separator_only[0]; // separator is first character
 
             if ($separator && strlen($separator_only) == 2) {
@@ -375,7 +395,7 @@ class Model extends Base
      *
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
         //$this->load();
@@ -478,7 +498,7 @@ class Model extends Base
      * @param type $where
      * @return type
      */
-    public static function deleteAll($where = array())
+    public static function deleteAll($where = [])
     {
         $instance = new static();
 
@@ -511,7 +531,7 @@ class Model extends Base
      * @param type $data
      * @return type
      */
-    public static function updateAll($where = array(), $data = array())
+    public static function updateAll($where = [], $data = [])
     {
         $instance = new static();
 
@@ -584,7 +604,7 @@ class Model extends Base
             $query->where("{$name} = ?", $this->$raw);
         }
 
-        $data = array();
+        $data = [];
         foreach ($this->columns as $key => $column) {
             if (!$column['read']) {
                 $prop = $column['raw'];
@@ -659,7 +679,7 @@ class Model extends Base
             throw new Exception\Primary('Primary key is not set');
         }
 
-        $data = array();
+        $data = [];
         foreach ($this->columns as $key => $column) {
             if (!$column['read']) {
                 $prop = $column['raw'];
@@ -706,7 +726,7 @@ class Model extends Base
 
             if (preg_match('#model#i', get_class($this))) {
                 $parts = array_reverse(explode('\\', get_class($this)));
-                $this->_table = str_replace(array('Basic', 'basic'), '', strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0])));
+                $this->_table = str_replace(['Basic', 'basic'], '', strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0])));
             } else {
                 throw new Exception\Implementation('Model has not valid name used for THCFrame\Model\Model');
             }
@@ -772,7 +792,7 @@ class Model extends Base
     {
         if (empty($this->_columns)) {
             $primaries = 0;
-            $columns = array();
+            $columns = [];
             $class = get_class($this);
             $types = $this->_types;
 
@@ -780,6 +800,9 @@ class Model extends Base
             $properties = $inspector->getClassProperties();
 
             $first = function($array, $key) {
+                if(!empty($array[$key]) && !is_array($array[$key])){
+                    return $array[$key];
+                }
                 if (!empty($array[$key]) && count($array[$key]) == 1) {
                     return $array[$key][0];
                 }
@@ -805,7 +828,7 @@ class Model extends Base
 
                     $validate = !empty($propertyMeta['@validate']) ? $propertyMeta['@validate'] : false;
                     $label = $first($propertyMeta, '@label');
-                    $foreign = $first($propertyMeta, '@foreign');
+                    $foreign = !empty($propertyMeta['@foreign']) ? $first($propertyMeta, '@foreign') : false;
 
                     if (!in_array($type, $types)) {
                         throw new Exception\Type(sprintf('%s is not a valid type', $type));
@@ -815,7 +838,7 @@ class Model extends Base
                         $primaries++;
                     }
 
-                    $columns[$name] = array(
+                    $columns[$name] = [
                         'raw' => $property,
                         'name' => $name,
                         'primary' => $primary,
@@ -831,7 +854,7 @@ class Model extends Base
                         'write' => $write,
                         'validate' => $validate,
                         'label' => $label
-                    );
+                    ];
 
                 }
             }
@@ -896,7 +919,7 @@ class Model extends Base
      * @param type $order
      * @return type
      */
-    public static function first($where = array(), $fields = array('*'), $order = array())
+    public static function first($where = [], $fields = ['*'], $order = [])
     {
         $model = new static();
         return $model->_first($where, $fields, $order);
@@ -910,7 +933,7 @@ class Model extends Base
      * @param type $order
      * @return \THCFrame\class|null
      */
-    protected function _first($where = array(), $fields = array('*'), $order = array())
+    protected function _first($where = [], $fields = ['*'], $order = [])
     {
         $query = $this->connector
                 ->query()
@@ -950,7 +973,7 @@ class Model extends Base
      * @param type $page
      * @return type
      */
-    public static function all($where = array(), $fields = array('*'), $order = array(), $limit = null, $page = null, $group = null, $having = array())
+    public static function all($where = [], $fields = ['*'], $order = [], $limit = null, $page = null, $group = null, $having = [])
     {
         $model = new static();
         return $model->_all($where, $fields, $order, $limit, $page, $group, $having);
@@ -971,7 +994,7 @@ class Model extends Base
      * @param type $page
      * @return \THCFrame\class
      */
-    protected function _all($where = array(), $fields = array('*'), $order = array(), $limit = null, $page = null, $group = null, $having = array())
+    protected function _all($where = [], $fields = ['*'], $order = [], $limit = null, $page = null, $group = null, $having = [])
     {
         $query = $this->connector
                 ->query()
@@ -1002,7 +1025,7 @@ class Model extends Base
             $query->limit($limit, $page);
         }
 
-        $rows = array();
+        $rows = [];
         $class = get_class($this);
 
         foreach ($query->all() as $row) {
@@ -1050,7 +1073,7 @@ class Model extends Base
     public static function initialize(\THCFrame\Database\Query $query)
     {
         $model = new static();
-        $rows = array();
+        $rows = [];
         $class = get_class($model);
 
         foreach ($query->all() as $row) {
@@ -1072,7 +1095,7 @@ class Model extends Base
      * @param type $where
      * @return type
      */
-    public static function count($where = array())
+    public static function count($where = [])
     {
         $model = new static();
         return $model->_count($where);
@@ -1084,7 +1107,7 @@ class Model extends Base
      * @param type $where
      * @return type
      */
-    protected function _count($where = array())
+    protected function _count($where = [])
     {
         $query = $this
                 ->connector
@@ -1112,7 +1135,7 @@ class Model extends Base
      */
     public function validate()
     {
-        $this->_errors = array();
+        $this->_errors = [];
         $config = Registry::get('configuration');
         $errLang = $config->system->lang;
 
@@ -1129,9 +1152,9 @@ class Model extends Base
 
                 foreach ($validators as $validator) {
                     $function = $validator;
-                    $arguments = array(
+                    $arguments = [
                         $this->$raw
-                    );
+                    ];
 
                     $match = StringMethods::match($validator, $pattern);
 
@@ -1148,10 +1171,10 @@ class Model extends Base
 
                     $template = $defined[$function];
 
-                    if (!call_user_func_array(array($this, $template['handler']), $arguments)) {
-                        $replacements = array_merge(array(
+                    if (!call_user_func_array([$this, $template['handler']], $arguments)) {
+                        $replacements = array_merge([
                             $label ? $label : $raw
-                                ), $arguments);
+                                ], $arguments);
 
                         $message = $template['message_' . $errLang];
 
@@ -1160,7 +1183,7 @@ class Model extends Base
                         }
 
                         if (!isset($this->_errors[$name])) {
-                            $this->_errors[$name] = array();
+                            $this->_errors[$name] = [];
                         }
 
                         $this->_errors[$name][] = $message;

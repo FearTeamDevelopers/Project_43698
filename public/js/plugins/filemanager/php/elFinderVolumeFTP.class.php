@@ -1,7 +1,7 @@
 <?php
 
 function chmodnum($chmod) {
-    $trans = array('-' => '0', 'r' => '4', 'w' => '2', 'x' => '1');
+    $trans = ['-' => '0', 'r' => '4', 'w' => '2', 'x' => '1'];
     $chmod = substr(strtr($chmod, $trans), 1);
     $array = str_split($chmod, 3);
     return array_sum(str_split($array[0])) . array_sum(str_split($array[1])) . array_sum(str_split($array[2]));
@@ -78,7 +78,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 	 * @author Cem (DiscoFever)
 	 **/
 	public function __construct() {
-		$opts = array(
+		$opts = [
 			'host'          => 'localhost',
 			'user'          => '',
 			'pass'          => '',
@@ -93,7 +93,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 			'fileMode'      => 0644,
 			'icon'          => (defined('ELFINDER_IMG_PARENT_URL')? (rtrim(ELFINDER_IMG_PARENT_URL, '/').'/') : '').'img/volume_icon_ftp.png'
 			
-		);
+		];
 		$this->options = array_merge($this->options, $opts); 
 		$this->options['mimeDetect'] = 'internal';
 	}
@@ -119,7 +119,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 		}
 		
 		// make ney mount key
-		$this->netMountKey = md5(join('-', array('ftp', $this->options['host'], $this->options['port'], $this->options['path'], $this->options['user'])));
+		$this->netMountKey = md5(join('-', ['ftp', $this->options['host'], $this->options['port'], $this->options['path'], $this->options['user']]));
 
 		if (!function_exists('ftp_connect')) {
 			return $this->setError('FTP extension not loaded.');
@@ -256,7 +256,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 	 **/
 	protected function parseRaw($raw) {
 		$info = preg_split("/\s+/", $raw, 9);
-		$stat = array();
+		$stat = [];
 
 		if (count($info) < 9 || $info[8] == '.' || $info[8] == '..') {
 			return false;
@@ -324,8 +324,8 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function parsePermissions($perm) {
-		$res   = array();
-		$parts = array();
+		$res   = [];
+		$parts = [];
 		$owner = $this->options['owner'];
 		for ($i = 0, $l = strlen($perm); $i < $l; $i++) {
 			$parts[] = substr($perm, $i, 1);
@@ -333,10 +333,10 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 
 		$read = ($owner && $parts[0] == 'r') || $parts[4] == 'r' || $parts[7] == 'r';
 		
-		return array(
+		return [
 			'read'  => $parts[0] == 'd' ? $read && (($owner && $parts[3] == 'x') || $parts[6] == 'x' || $parts[9] == 'x') : $read,
 			'write' => ($owner && $parts[2] == 'w') || $parts[5] == 'w' || $parts[8] == 'w'
-		);
+		];
 	}
 	
 	/**
@@ -347,9 +347,9 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 	 * @author Dmitry Levashov
 	 **/
  	protected function cacheDir($path) {
- 		$this->dirsCache[$path] = array();
+ 		$this->dirsCache[$path] = [];
 
-		$list = array();
+		$list = [];
 		foreach (ftp_rawlist($this->connect, $this->convEncIn($path)) as $raw) {
 			if (($stat = $this->parseRaw($raw))) {
 				$list[] = $stat;
@@ -443,9 +443,9 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 		$initial_slashes = (int) $initial_slashes;
 
 		$comps = explode('/', $path);
-		$new_comps = array();
+		$new_comps = [];
 		foreach ($comps as $comp) {
-			if (in_array($comp, array('', '.'))) {
+			if (in_array($comp, ['', '.'])) {
 				continue;
 			}
 				
@@ -538,7 +538,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 			$parts = explode(';', trim($raw[1]));
 			array_pop($parts);
 			$parts = array_map('strtolower', $parts);
-			$stat  = array();
+			$stat  = [];
 			// debug($parts);
 			foreach ($parts as $part) {
 
@@ -574,7 +574,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 				}
 			}
 			if (empty($stat['mime'])) {
-				return array();
+				return [];
 			}
 			if ($stat['mime'] == 'directory') {
 				$stat['size'] = 0;
@@ -587,7 +587,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 				}
 
 				for ($i = 0; $i <= 2; $i++) {
-					$perm[$i] = array(false, false, false);
+					$perm[$i] = [false, false, false];
 					$n = isset($stat['chmod'][$i]) ? $stat['chmod'][$i] : 0;
 					
 					if ($n - 4 >= 0) {
@@ -631,7 +631,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 			
 		}
 		
-		return array();
+		return [];
 	}
 	
 	/**
@@ -675,7 +675,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 	 * @author Cem (DiscoFever)
 	 **/
 	protected function _scandir($path) {
-		$files = array();
+		$files = [];
 
  		foreach (ftp_rawlist($this->connect, $path) as $str) {
  			if (($stat = $this->parseRaw($str))) {
@@ -905,7 +905,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 	 **/
 	protected function _checkArchivers() {
 		// die('Not yet implemented. (_checkArchivers)');
-		return array();
+		return [];
 	}
 
 	/**
@@ -987,11 +987,11 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 		$remoteDirectory = dirname($path);
 		chdir($tmpDir);
 		$command = escapeshellcmd($arc['cmd'] . ' ' . $arc['argc'] . ' "' . $basename . '"');
-		$descriptorspec = array(
-			0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-			1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-			2 => array("pipe", "w") // stderr is a file to write to
-		);
+		$descriptorspec = [
+			0 => ["pipe", "r"],  // stdin is a pipe that the child will read from
+			1 => ["pipe", "w"],  // stdout is a pipe that the child will write to
+			2 => ["pipe", "w"] // stderr is a file to write to
+		];
 
 			
 		$process = proc_open($command, $descriptorspec, $pipes, $cwd);
@@ -1107,11 +1107,11 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 		}
 		$command = escapeshellcmd($arc['cmd'] . ' ' . $arc['argc'] . ' "' . $name . '" ' . $file_names_string);
 		
-		$descriptorspec = array(
-			0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-			1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-			2 => array("pipe", "w") // stderr is a file to write to
-		);
+		$descriptorspec = [
+			0 => ["pipe", "r"],  // stdin is a pipe that the child will read from
+			1 => ["pipe", "w"],  // stdout is a pipe that the child will write to
+			2 => ["pipe", "w"] // stderr is a file to write to
+		];
 
 			
 		$process = proc_open($command, $descriptorspec, $pipes, $cwd);
@@ -1180,7 +1180,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 	{
 		$buff = ftp_rawlist($this->connect, $remote_directory, true);
 		$next_folder = false;
-		$items = array();
+		$items = [];
 		foreach ($buff as $str) {
 			if ('' == $str) {
 				$next_folder = true;
@@ -1189,7 +1189,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 			if ($next_folder) {
 				$remote_directory = preg_replace('/\:/', '', $str);
 				$next_folder = false;
-				$item = array();
+				$item = [];
 				$item['path'] = $remote_directory;
 				$item['type'] = 'd'; // directory
 				$items[] = $item;
@@ -1203,7 +1203,7 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 					break;
 				default:
 					$remote_file_path = $remote_directory . DIRECTORY_SEPARATOR . $info[8];
-					$item = array();
+					$item = [];
 					$item['path'] = $remote_file_path;
 					$item['type'] = 'f'; // normal file
 					$items[] = $item;
@@ -1306,11 +1306,11 @@ class elFinderVolumeFTP extends elFinderVolumeDriver {
 		if (!is_dir($dir)) {
 			return false;
 		}
-		$excludes = array(".","..");
-		$result = array();
+		$excludes = [".",".."];
+		$result = [];
 		$files = scandir($dir);
 		if(!$files) {
-			return array();
+			return [];
 		}
 		foreach($files as $file) {
 			if(!in_array($file, $excludes)) {

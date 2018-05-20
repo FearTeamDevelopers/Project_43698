@@ -23,163 +23,78 @@
 
 
 
-
 .bazar
 	.container
 		article
 			position relative
 			display block
-			margin 0 auto
-			height 300px
-			margin-top 1.875rem
-			margin-bottom 1.875rem
-			min-width 350px
+			height 320px
+			margin-top 1.5rem
+			margin-bottom 1.5rem
+			min-width 300px
+			padding 0
 			&:last-child
 				margin-bottom 60px
-
-			.buttonTab
-				position absolute
-				overflow hidden
-				top 16px
-				text-align center
-				width 35px
-				height 35px
-				background defaultBLue
-				border-radius 5px
-				color #ffffff
-				z-index 2
-				font-size 15pt
-				&:hover
-					color defaultGreen
-					top 17px
-
-				&.delete
-					right 20px
-					color #CC1100
-					&:hover
-						color red
-				&.edit
-					right 60px
-				&.reload
-					right 100px
-				&.sell
-					right 140px
-
+			&.searchResult
+				height auto
 
 			.imgWrapper
-				width 60%
-				height 300px
-				line-height 300px
-				float left
-				margin 0
+				width 96%
+				height 220px
+				line-height 220px
+				margin 0 auto
 				padding 0
+				padding-top 5px
 				text-align center
 				background defaultBLue
 				img
 					width auto
 					max-width 100%
-					max-height 98%
-
-			a.showDetail
-				position absolute
-				bottom 0.6em
-				left 3em
-				text-decoration underline
-				color #ffffff
-				width 100%
-				&:hover
-					color default green
-					text-decoration underline
-
-
-			.nazev
-				a
-					&:hover
-						text-decoration underline
-				position absolute
-				top 0
-				width 100%
-				height 40px
-				padding-right 1.875rem
-				z-index 1
-				.nazevWrapper
-					background rgba(0,0,0,0.6)
-					width 100%
-					height 40px
-
-				h4
-					width 74%
-					color #ffffff
-					white-space nowrap
-					overflow hidden
-					text-overflow ellipsis
-					padding-left 0.875rem
-					height 40px
-					line-height 40px
-					margin 0
-
-
-
-
+					max-height 99%
 
 			.infoWrapper
-				width:40%;
+				margin 0 auto;
+				width:96%;
 				overflow:hidden;
-				height:300px;
+				height:100px;
 
 
 			.info
 				background defaultBLue ;
-				padding-top 60px;
-				padding-left 10px
-				padding-right 5px
-				border-left 1px dotted defaultGreen
+				padding 8px 12px
 				width 100%
 				height 100%
-				float left
 				position relative
-				line-height 2em
 				span, p
 					color white
+					line-height 1.5em
+					font-size 1em
 					&.price
 						color defaultGreen
 						font-weight bold
-						font-size 1.6  em
-
-
-				small
-					font-size 80%
-
-				center
-					margin-bottom 1em
-
-				.nabidka
-					text-transform uppercase
-					font-weight bold
-					color greenyellow
-					margin-bottom 1em
-
-				.poptavka
-					text-transform uppercase
-					font-weight bold
-					color orangered
-					margin-bottom 1em
-
-
-
-
+						font-size 1.1em
+						float left
+					&.name
+						float right
+					&.content
+						height 3em
+						font-size 1em
+						text-overflow ellipsis
+						-o-text-overflow ellipsis
+						overflow hidden
+						white-space pre-line
+						word-wrap normal
+						width 100%
 
 
 	&.detail
 		form
 			display:none
-
-
 		article
-			height:auto;
-			min-height:300px;
-			min-width:auto;
-			position:relative;
+			height auto
+			min-height 400px
+			min-width auto
+			position relative
 			background defaultBLue
 			.images
 				a.fi-arrow-down
@@ -197,23 +112,20 @@
 
 
 				.mainImage
-					padding-bottom 10px;
+					padding 15px
 					position relative
 					overflow hidden
 					width 100%
-					background-color rgba(0,0,0,0.6)
-
 					img
 						width 100%
 						display block
 
 				.thumbImage
-					display none
-					height 100px
-					background rgba(0,0,0,0.6)
-					text-align center
+					padding-bottom 10px
+					height auto
+					position relative
 					img
-						height 100%
+						height auto
 						width auto
 
 
@@ -246,13 +158,14 @@
 
 
 			.info
-				padding:30px 20px
+				padding:20px 20px
+				font-size 1.05rem
 				border 0
 				min-width:170px
-				&.description
-					padding:30px 25px 10px;
+				.description
+					font-size 1.05rem
+					padding-bottom 20px
 					color white
-					font-size 1rem
 
 		.submitEmail
 			position relative
@@ -268,5 +181,3 @@
 				background headerColor
 				span
 					color white
-
-

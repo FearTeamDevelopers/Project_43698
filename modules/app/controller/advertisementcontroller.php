@@ -8,6 +8,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Request\Request;
+use THCFrame\View\View;
 
 /**
  *
@@ -16,63 +17,25 @@ class AdvertisementController extends Controller
 {
 
     /**
-     * Clean string. Cleaned string contains only [a-z0-9\s].
-     *
-     * @param string $str
-     *
-     * @return string
-     */
-    private function _cleanString($str)
-    {
-        $cleanStr = StringMethods::removeDiacriticalMarks($str);
-        $cleanStr = strtolower(trim($cleanStr));
-        $cleanStr = preg_replace('/[^a-z0-9\s]+/', ' ', $cleanStr);
-        $cleanStr2 = preg_replace('/\s+/', ' ', $cleanStr);
-
-        unset($cleanStr);
-
-        return $cleanStr2;
-    }
-
-    /**
-     * Check whether ad unique identifier already exist or not.
-     *
-     * @param string $str
-     *
-     * @return bool
-     */
-    private function _checkAdKey($str)
-    {
-        $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $str));
-
-        if ($ad === null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Check if are set specific metadata or leave their default values.
      */
-    private function _checkMetaData($layoutView,
-            \App\Model\AdvertisementModel $object)
+    private function _checkMetaData($layoutView, \App\Model\AdvertisementModel $object)
     {
         $uri = RequestMethods::server('REQUEST_URI');
 
         if ($object->getMetaTitle() == '') {
-            $layoutView->set('metatitle', 'Hastrman - Bazar - ' . $object->getTitle());
+            $layoutView->set(View::META_TITLE, 'Hastrman - Bazar - ' . $object->getTitle());
         } else {
-            $layoutView->set('metatitle', 'Hastrman - Bazar - ' . $object->getMetaTitle());
+            $layoutView->set(View::META_TITLE, 'Hastrman - Bazar - ' . $object->getMetaTitle());
         }
 
-        $canonical = 'http://' . $this->getServerHost() . '/bazar/r/' . $object->getUniqueKey();
+        $canonical = $this->getServerHost() . '/bazar/r/' . $object->getUniqueKey();
 
-        $layoutView->set('canonical', $canonical)
+        $layoutView->set(View::META_CANONICAL, $canonical)
                 ->set('article', 1)
                 ->set('articlecreated', $object->getCreated())
                 ->set('articlemodified', $object->getModified())
-                ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
+                ->set('metaogurl', "{$this->getServerHost()}{$uri}")
                 ->set('metaogtype', 'article');
     }
 
@@ -85,7 +48,7 @@ class AdvertisementController extends Controller
         $layoutView = $this->getLayoutView();
         $adsPerPage = 10;
 
-        $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
+        $adSections = \App\Model\AdSectionModel::all(['active = ?' => true]);
 
         $view->set('adsections', $adSections);
 
@@ -94,9 +57,9 @@ class AdvertisementController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar';
+            $canonical = $this->getServerHost() . '/bazar';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/p/' . $page;
+            $canonical = $this->getServerHost() . '/bazar/p/' . $page;
         }
 
         $content = $this->getCache()->get('bazar-' . $page);
@@ -110,8 +73,8 @@ class AdvertisementController extends Controller
         }
 
         $adsCount = \App\Model\AdvertisementModel::count(
-                        array('active = ?' => true,
-                            'expirationDate >= ?' => date('Y-m-d H:i:s'),)
+                        ['active = ?' => true,
+                            'expirationDate >= ?' => date('Y-m-d H:i:s'),]
         );
 
         $adsPageCount = ceil($adsCount / $adsPerPage);
@@ -123,8 +86,7 @@ class AdvertisementController extends Controller
                 ->set('pagerpathprefix', '/bazar')
                 ->set('pagecount', $adsPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Bazar');
+        $layoutView->setBasicMeta('Hastrman - Bazar', $canonical);
     }
 
     /**
@@ -138,26 +100,26 @@ class AdvertisementController extends Controller
         $layoutView = $this->getLayoutView();
         $adsPerPage = 10;
 
-        $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
+        $adSections = \App\Model\AdSectionModel::all(['active = ?' => true]);
         $view->set('adsections', $adSections);
 
         $type = RequestMethods::get('bftype', '0');
         $section = RequestMethods::get('bfsection', '0');
 
-        $httpQuery = '?' . http_build_query(array('bftype' => $type, 'bfsection' => $section));
+        $httpQuery = '?' . http_build_query(['bftype' => $type, 'bfsection' => $section]);
 
         if ($page <= 0) {
             $page = 1;
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/filtr';
+            $canonical = $this->getServerHost() . '/bazar/filtr';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/filtr/p/' . $page;
+            $canonical = $this->getServerHost() . '/bazar/filtr/p/' . $page;
         }
 
         if ($type == '0' && $section == '0') {
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/bazar');
         }
 
@@ -169,7 +131,7 @@ class AdvertisementController extends Controller
                 $ads = \App\Model\AdvertisementModel::fetchActiveByType('demand', $adsPerPage, $page);
                 $adsCount = \App\Model\AdvertisementModel::countActiveByType('demand');
             } else {
-                $this->_willRenderActionView = false;
+                $this->willRenderActionView = false;
                 self::redirect('/bazar/nenalezeno');
             }
         } else {
@@ -197,8 +159,7 @@ class AdvertisementController extends Controller
                 ->set('bftype', $type)
                 ->set('bfsection', $section);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Bazar');
+        $layoutView->setBasicMeta('Hastrman - Bazar', $canonical);
     }
 
     /**
@@ -214,7 +175,7 @@ class AdvertisementController extends Controller
 
         if ($ad === null) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/nenalezeno');
         }
 
@@ -224,66 +185,75 @@ class AdvertisementController extends Controller
                 ->set('admessage', null);
 
         if (RequestMethods::post('submitAdReply')) {
-            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true ||
+                    $this->checkMultiSubmissionProtectionToken() !== true ||
+                    $this->checkBrowserAgentAndReferer()) {
                 self::redirect('/bazar/r/' . $ad->getUniqueKey());
             }
 
-            $message = new \App\Model\AdMessageModel(array(
+            if (RequestMethods::post('url') !== '') {
+                return;
+            }
+
+            $message = new \App\Model\AdMessageModel([
                 'adId' => $ad->getId(),
                 'msAuthor' => RequestMethods::post('name'),
                 'msEmail' => RequestMethods::post('email'),
                 'message' => RequestMethods::post('message'),
                 'sendEmailCopy' => RequestMethods::post('getemailcopy', 0),
                 'messageSent' => 0,
-            ));
+            ]);
 
             if ($message->validate()) {
                 try {
-                    $data = array(
-                        '{ADLINK}' => '<a href="http://' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a>',
+                    $data = [
+                        '{ADLINK}' => '<a href="' . $this->getServerHost() . '/bazar/r/' . $ad->getUniqueKey() . '">' . $ad->getTitle() . '</a>',
                         '{AUTHOR}' => $message->getMsAuthor(),
                         '{AUTHOREMAIL}' => $message->getMsEmail(),
                         '{MESSAGE}' => StringMethods::prepareEmailText($message->getMessage()),
-                    );
+                    ];
                     $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('add-query', $data);
 
-                    $mailer = new \THCFrame\Mailer\Mailer();
-                    $mailer->setBody($emailTpl->getBody())
-                            ->setSubject($emailTpl->getSubject())
-                            ->setFrom('bazar@hastrman.cz');
+                    if ($emailTpl !== null) {
+                        $mailer = new \THCFrame\Mailer\Mailer();
+                        $mailer->setBody($emailTpl->getBody())
+                                ->setSubject($emailTpl->getSubject())
+                                ->setFrom('bazar@hastrman.cz');
 
-                    if ($message->getSendEmailCopy() == 1) {
-                        $mailer->setSendTo(array($message->getMsEmail(), $ad->getEmail()));
+                        if ($message->getSendEmailCopy() == 1) {
+                            $mailer->setSendTo([$message->getMsEmail(), $ad->getEmail()]);
+                        } else {
+                            $mailer->setSendTo($ad->getEmail());
+                        }
+
+                        if ($mailer->send(true)) {
+                            $message->messageSent = 1;
+                            $messageId = $message->save();
+
+                            Event::fire('app.log', ['success', 'Message with Id: ' . $messageId . ' send for Ad Id: ' . $ad->getId()]);
+                            $view->successMessage('Dotaz byl úspěšně odeslán');
+                        } else {
+                            Event::fire('app.log', ['fail', 'Email not send for Ad Id: ' . $ad->getId(),
+                                'Error: ' . $message->getMessage(),]);
+                            $view->errorMessage('Chyba při odesílání emailu, opakujte akci později');
+                        }
                     } else {
-                        $mailer->setSendTo($ad->getEmail());
-                    }
-
-                    if ($mailer->send(true)) {
-                        $message->messageSent = 1;
-                        $messageId = $message->save();
-
-                        Event::fire('app.log', array('success', 'Message with Id: ' . $messageId . ' send for Ad Id: ' . $ad->getId()));
-                        $view->successMessage('Dotaz byl úspěšně odeslán');
-                        self::redirect('/bazar/r/' . $ad->getUniqueKey());
-                    } else {
-                        Event::fire('app.log', array('fail', 'Email not send for Ad Id: ' . $ad->getId(),
-                            'Error: ' . $message->getMessage(),));
+                        Event::fire('app.log', ['fail', 'Email template not found']);
                         $view->errorMessage('Chyba při odesílání emailu, opakujte akci později');
-                        self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     }
+                    self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 } catch (\Exception $ex) {
                     \THCFrame\Core\Core::getLogger()->error($ex->getMessage());
 
-                    Event::fire('app.log', array('fail', 'Email not send for Ad Id: ' . $ad->getId(),
-                        'Error: ' . $ex->getMessage(),));
+                    Event::fire('app.log', ['fail', 'Email not send for Ad Id: ' . $ad->getId(),
+                        'Error: ' . $ex->getMessage(),]);
                     $view->errorMessage('Nepodařilo se odeslat dotaz k inzerátu, opakujte akci později');
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
-                Event::fire('app.log', array('fail', 'Errors: ' . json_encode($message->getErrors())));
+                Event::fire('app.log', ['fail', 'Errors: ' . json_encode($message->getErrors())]);
                 $view->set('errors', $message->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('admessage', $message);
             }
         }
@@ -304,8 +274,15 @@ class AdvertisementController extends Controller
             $page = 1;
         }
 
-        $requestUrl = 'http://' . $this->getServerHost() . '/doadsearch/' . $page;
-        $parameters = array('adstr' => RequestMethods::get('adstr'));
+        $searchString = RequestMethods::get('adstr');
+
+        if (empty($searchString)) {
+            $view->warningMessage('Musíte zadate text, který chcete v bazaru vyhledat');
+            self::redirect('/bazar');
+        }
+
+        $requestUrl = $this->getServerHost() . '/doadsearch/' . $page;
+        $parameters = ['adstr' => $searchString];
 
         $request = new Request();
         $response = $request->request('post', $requestUrl, $parameters);
@@ -316,7 +293,7 @@ class AdvertisementController extends Controller
 
         $this->pagerMetaLinks($searchPageCount, $page, '/bazar/hledat/p/');
 
-        $canonical = 'http://' . $this->getServerHost() . '/bazar/hledat';
+        $canonical = $this->getServerHost() . '/bazar/hledat';
 
         $view->set('result', $urls)
                 ->set('currentpage', $page)
@@ -324,8 +301,7 @@ class AdvertisementController extends Controller
                 ->set('pagerpathprefix', '/bazar/hledat')
                 ->set('pagerpathpostfix', '?' . http_build_query($parameters));
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Bazar - Hledat');
+        $layoutView->setBasicMeta('Hastrman - Bazar - Hledat', $canonical);
     }
 
     /**
@@ -338,26 +314,25 @@ class AdvertisementController extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
 
-        $canonical = 'http://' . $this->getServerHost() . '/bazar/pridat';
-        $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
+        $canonical = $this->getServerHost() . '/bazar/pridat';
+        $adSections = \App\Model\AdSectionModel::all(['active = ?' => true]);
 
         $view->set('adsections', $adSections)
                 ->set('ad', null);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Bazar - Nový inzerát');
+        $layoutView->setBasicMeta('Hastrman - Bazar - Nový inzerát', $canonical);
 
         if (RequestMethods::post('submitAddAdvertisement')) {
-            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true ||
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/bazar');
             }
 
-            $errors = $uploadErrors = array();
+            $errors = $uploadErrors = [];
             $uniqueKey = sha1(RequestMethods::post('title') . RequestMethods::post('content') . $this->getUser()->getId());
 
-            if (!$this->_checkAdKey($uniqueKey)) {
-                $errors['title'] = array('Takovýto inzerát už nejspíše existuje');
+            if (!\App\Model\AdvertisementModel::checkAdKey($uniqueKey)) {
+                $errors['title'] = ['Takovýto inzerát už nejspíše existuje'];
             }
 
             $adTtl = $this->getConfig()->bazar_ad_ttl;
@@ -367,7 +342,7 @@ class AdvertisementController extends Controller
 
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
-            $ad = new \App\Model\AdvertisementModel(array(
+            $ad = new \App\Model\AdvertisementModel([
                 'title' => RequestMethods::post('title'),
                 'userId' => $this->getUser()->getId(),
                 'sectionId' => RequestMethods::post('section'),
@@ -380,18 +355,18 @@ class AdvertisementController extends Controller
                 'keywords' => $keywords,
                 'state' => 0,
                 'availabilityRequestToken' => '',
-            ));
+            ]);
 
             if (empty($errors) && $ad->validate()) {
                 $id = $ad->save();
 
-                $fileManager = new FileManager(array(
+                $fileManager = new FileManager([
                     'thumbWidth' => 230,
                     'thumbHeight' => 230,
                     'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                     'maxImageWidth' => $this->getConfig()->photo_maxwidth,
                     'maxImageHeight' => $this->getConfig()->photo_maxheight,
-                ));
+                ]);
 
                 $userFolderName = $this->getUser()->getId() . '-' . StringMethods::createUrlKey($this->getUser()->getWholeName());
                 $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $userFolderName, time() . '_', true)->getUploadErrors();
@@ -406,13 +381,13 @@ class AdvertisementController extends Controller
 
                     foreach ($files as $i => $file) {
                         if ($file instanceof \THCFrame\Filesystem\Image) {
-                            $adImage = new \App\Model\AdImageModel(array(
+                            $adImage = new \App\Model\AdImageModel([
                                 'adId' => $id,
                                 'userId' => $this->getUser()->getId(),
                                 'photoName' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
                                 'imgMain' => trim($file->getFilename(), '.'),
                                 'imgThumb' => trim($file->getThumbname(), '.'),
-                            ));
+                            ]);
 
                             if ($adImage->validate()) {
                                 $adImageId = $adImage->save();
@@ -424,10 +399,10 @@ class AdvertisementController extends Controller
                                     }
                                 }
 
-                                Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $id));
+                                Event::fire('app.log', ['success', 'Photo id: ' . $adImageId . ' in ad ' . $id]);
                             } else {
-                                Event::fire('app.log', array('fail', 'Upload photo for ad ' . $id,
-                                    'Errors: ' . json_encode($adImage->getErrors()),));
+                                Event::fire('app.log', ['fail', 'Upload photo for ad ' . $id,
+                                    'Errors: ' . json_encode($adImage->getErrors()),]);
                                 $uploadErrors += $adImage->getErrors();
                             }
                         }
@@ -436,26 +411,26 @@ class AdvertisementController extends Controller
                     $errors['uploadfile'] = $uploadErrors;
 
                     if (empty($errors['uploadfile'])) {
-                        Event::fire('app.log', array('success', 'Ad id: ' . $id));
+                        Event::fire('app.log', ['success', 'Ad id: ' . $id]);
                         $this->getCache()->erase('bazar');
                         $view->successMessage($this->lang('CREATE_SUCCESS'));
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     } else {
-                        Event::fire('app.log', array('fail', 'Errors: ' . json_encode($errors + $ad->getErrors())));
+                        Event::fire('app.log', ['fail', 'Errors: ' . json_encode($errors + $ad->getErrors())]);
                         $view->set('ad', $ad)
-                                ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                                ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                                 ->set('errors', $errors + $ad->getErrors());
                     }
                 } else {
-                    Event::fire('app.log', array('success', 'Ad id: ' . $id));
+                    Event::fire('app.log', ['success', 'Ad id: ' . $id]);
                     $this->getCache()->erase('bazar');
                     $view->successMessage('Inzerát' . $this->lang('CREATE_SUCCESS'));
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
-                Event::fire('app.log', array('fail', 'Errors: ' . json_encode($errors + $ad->getErrors())));
+                Event::fire('app.log', ['fail', 'Errors: ' . json_encode($errors + $ad->getErrors())]);
                 $view->set('ad', $ad)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('errors', $errors + $ad->getErrors());
             }
         }
@@ -473,40 +448,40 @@ class AdvertisementController extends Controller
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
 
-        $canonical = 'http://' . $this->getServerHost() . '/bazar/upravit';
+        $canonical = $this->getServerHost() . '/bazar/upravit';
         $ad = \App\Model\AdvertisementModel::fetchAdByKeyUserId($uniqueKey, $this->getUser()->getId());
 
         if (null === $ad) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/bazar');
         }
 
         if ($ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD) {
             $view->warningMessage($this->lang('AD_ALREADY_SOLD'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/bazar');
         }
 
-        $adSections = \App\Model\AdSectionModel::all(array('active = ?' => true));
+        $adSections = \App\Model\AdSectionModel::all(['active = ?' => true]);
 
         $view->set('adsections', $adSections)
                 ->set('ad', $ad);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Bazar - Upravit inzerát');
+        $layoutView->setBasicMeta('Hastrman - Bazar - Upravit inzerát', $canonical);
 
         if (RequestMethods::post('submitEditAdvertisement')) {
-            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true ||
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/bazar');
             }
 
             $originalAd = clone $ad;
-            $errors = $uploadErrors = array();
+            $errors = $uploadErrors = [];
             $uniqueKey = sha1(RequestMethods::post('title') . RequestMethods::post('content') . $this->getUser()->getId());
 
-            if ($ad->getUniqueKey() !== $uniqueKey && !$this->_checkAdKey($uniqueKey)) {
-                $errors['title'] = array($this->lang('AD_ALREADY_EXISTS'));
+            if ($ad->getUniqueKey() !== $uniqueKey && !\App\Model\AdvertisementModel::checkAdKey($uniqueKey)) {
+                $errors['title'] = [$this->lang('AD_ALREADY_EXISTS')];
             }
 
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
@@ -522,13 +497,13 @@ class AdvertisementController extends Controller
             if (empty($errors) && $ad->validate()) {
                 $ad->save();
 
-                $fileManager = new FileManager(array(
+                $fileManager = new FileManager([
                     'thumbWidth' => 230,
                     'thumbHeight' => 230,
                     'thumbResizeBy' => $this->getConfig()->thumb_resizeby,
                     'maxImageWidth' => $this->getConfig()->photo_maxwidth,
                     'maxImageHeight' => $this->getConfig()->photo_maxheight,
-                ));
+                ]);
 
                 $userFolderName = $this->getUser()->getId() . '-' . StringMethods::createUrlKey($this->getUser()->getWholeName());
                 $fileErrors = $fileManager->uploadImage('uploadfile', 'bazar/' . $userFolderName, time() . '_', true)->getUploadErrors();
@@ -539,19 +514,19 @@ class AdvertisementController extends Controller
                 }
 
                 if (!empty($files)) {
-                    $currentPhotoCount = \App\Model\AdImageModel::count(array('adId = ?' => $ad->getId()), array('id'));
+                    $currentPhotoCount = \App\Model\AdImageModel::count(['adId = ?' => $ad->getId()], ['id']);
                     $files = array_slice($files, 0, 3 - $currentPhotoCount);
 
                     if (!empty($files)) {
                         foreach ($files as $i => $file) {
                             if ($file instanceof \THCFrame\Filesystem\Image) {
-                                $adImage = new \App\Model\AdImageModel(array(
+                                $adImage = new \App\Model\AdImageModel([
                                     'adId' => $ad->getId(),
                                     'userId' => $this->getUser()->getId(),
                                     'photoName' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
                                     'imgMain' => trim($file->getFilename(), '.'),
                                     'imgThumb' => trim($file->getThumbname(), '.'),
-                                ));
+                                ]);
 
                                 if ($adImage->validate()) {
                                     $adImageId = $adImage->save();
@@ -563,10 +538,10 @@ class AdvertisementController extends Controller
                                         }
                                     }
 
-                                    Event::fire('app.log', array('success', 'Photo id: ' . $adImageId . ' in ad ' . $ad->getId()));
+                                    Event::fire('app.log', ['success', 'Photo id: ' . $adImageId . ' in ad ' . $ad->getId()]);
                                 } else {
-                                    Event::fire('app.log', array('fail', 'Upload photo for ad ' . $ad->getId(),
-                                        'Errors: ' . json_encode($adImage->getErrors()),));
+                                    Event::fire('app.log', ['fail', 'Upload photo for ad ' . $ad->getId(),
+                                        'Errors: ' . json_encode($adImage->getErrors()),]);
                                     $uploadErrors += $adImage->getErrors();
                                 }
                             }
@@ -576,32 +551,32 @@ class AdvertisementController extends Controller
 
                         if (empty($errors['uploadfile'])) {
                             \App\Model\AdvertisementHistoryModel::logChanges($originalAd, $ad);
-                            Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
+                            Event::fire('app.log', ['success', 'Ad id: ' . $ad->getId()]);
                             $this->getCache()->erase('bazar');
                             $view->successMessage($this->lang('UPDATE_SUCCESS'));
                             self::redirect('/bazar/r/' . $ad->getUniqueKey());
                         } else {
-                            Event::fire('app.log', array('fail',
-                                'Errors: ' . json_encode($errors + $ad->getErrors()),));
+                            Event::fire('app.log', ['fail',
+                                'Errors: ' . json_encode($errors + $ad->getErrors()),]);
                             $view->set('errors', $errors + $ad->getErrors());
                         }
                     } else {
                         \App\Model\AdvertisementHistoryModel::logChanges($originalAd, $ad);
-                        Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
+                        Event::fire('app.log', ['success', 'Ad id: ' . $ad->getId()]);
                         $this->getCache()->erase('bazar');
                         $view->successMessage($this->lang('UPDATE_SUCCESS') . ', ale více fotek už není možné nahrát');
                         self::redirect('/bazar/r/' . $ad->getUniqueKey());
                     }
                 } else {
                     \App\Model\AdvertisementHistoryModel::logChanges($originalAd, $ad);
-                    Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
+                    Event::fire('app.log', ['success', 'Ad id: ' . $ad->getId()]);
                     $this->getCache()->erase('bazar');
                     $view->successMessage($this->lang('UPDATE_SUCCESS'));
                     self::redirect('/bazar/r/' . $ad->getUniqueKey());
                 }
             } else {
-                Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId(),
-                    'Errors: ' . json_encode($errors + $ad->getErrors()),));
+                Event::fire('app.log', ['fail', 'Ad id: ' . $ad->getId(),
+                    'Errors: ' . json_encode($errors + $ad->getErrors()),]);
                 $view->set('errors', $errors + $ad->getErrors());
             }
         }
@@ -622,14 +597,14 @@ class AdvertisementController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
+        $ad = \App\Model\AdvertisementModel::first(['uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()]);
 
         if (null === $ad) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $adId = $ad->getId();
 
-            $adImages = \App\Model\AdImageModel::all(array('adId = ?' => $adId));
+            $adImages = \App\Model\AdImageModel::all(['adId = ?' => $adId]);
 
             if ($adImages !== null) {
                 foreach ($adImages as $image) {
@@ -638,11 +613,11 @@ class AdvertisementController extends Controller
             }
 
             if ($ad->delete()) {
-                Event::fire('app.log', array('success', 'Ad id: ' . $adId));
+                Event::fire('app.log', ['success', 'Ad id: ' . $adId]);
                 $this->getCache()->erase('bazar');
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('app.log', array('fail', 'Ad id: ' . $adId));
+                Event::fire('app.log', ['fail', 'Ad id: ' . $adId]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -660,7 +635,7 @@ class AdvertisementController extends Controller
         $this->willRenderLayoutView = false;
         $view = $this->getActionView();
 
-        $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
+        $ad = \App\Model\AdvertisementModel::first(['uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()]);
 
         if (null === $ad) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -669,7 +644,7 @@ class AdvertisementController extends Controller
 
         $adId = $ad->getId();
 
-        $adImages = \App\Model\AdImageModel::all(array('adId = ?' => $adId));
+        $adImages = \App\Model\AdImageModel::all(['adId = ?' => $adId]);
 
         if ($adImages !== null) {
             foreach ($adImages as $image) {
@@ -678,12 +653,12 @@ class AdvertisementController extends Controller
         }
 
         if ($ad->delete()) {
-            Event::fire('app.log', array('success', 'Ad id: ' . $adId));
+            Event::fire('app.log', ['success', 'Ad id: ' . $adId]);
             $this->getCache()->erase('bazar');
             $view->successMessage($this->lang('DELETE_SUCCESS'));
             self::redirect('/bazar');
         } else {
-            Event::fire('app.log', array('fail', 'Ad id: ' . $adId));
+            Event::fire('app.log', ['fail', 'Ad id: ' . $adId]);
             $view->warningMessage($this->lang('COMMON_FAIL'));
         }
     }
@@ -703,8 +678,8 @@ class AdvertisementController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
-        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => $adImage->getAdId()));
+        $adImage = \App\Model\AdImageModel::first(['id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()]);
+        $ad = \App\Model\AdvertisementModel::first(['id = ?' => $adImage->getAdId()]);
 
         if ($adImage->getId() === $ad->getMainPhotoId()) {
             $ad->mainPhotoId = null;
@@ -716,10 +691,10 @@ class AdvertisementController extends Controller
             if ($adImage->delete()) {
                 $ad->save();
                 $this->getCache()->erase('bazar');
-                Event::fire('app.log', array('success', 'AdImage id: ' . $adImage->getId()));
+                Event::fire('app.log', ['success', 'AdImage id: ' . $adImage->getId()]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('app.log', array('fail', 'AdImage id: ' . $adImage->getId()));
+                Event::fire('app.log', ['fail', 'AdImage id: ' . $adImage->getId()]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -743,9 +718,9 @@ class AdvertisementController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeraty';
+            $canonical = $this->getServerHost() . '/bazar/moje-inzeraty';
         } else {
-            $canonical = 'http://' . $this->getServerHost() . '/bazar/moje-inzeraty/p/' . $page;
+            $canonical = $this->getServerHost() . '/bazar/moje-inzeraty/p/' . $page;
         }
 
         $ads = \App\Model\AdvertisementModel::fetchActiveByUser($userId, $adsPerPage, $page);
@@ -760,8 +735,7 @@ class AdvertisementController extends Controller
                 ->set('pagerpathprefix', '/bazar/moje-inzeraty')
                 ->set('pagecount', $adsPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Bazar - Moje inzeráty');
+        $layoutView->setBasicMeta('Hastrman - Bazar - Moje inzeráty', $canonical);
     }
 
     /**
@@ -791,12 +765,12 @@ class AdvertisementController extends Controller
             if ($ad->validate()) {
                 $ad->save();
                 $view->successMessage($this->lang('AD_AVAILABILITY_REQUEST_SUCCESS'));
-                Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
+                Event::fire('app.log', ['success', 'Ad id: ' . $ad->getId()]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
                 $view->errorMessage($this->lang('COMMON_FAIL'));
-                Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId(),
-                    'Errors: ' . json_encode($ad->getErrors()),));
+                Event::fire('app.log', ['fail', 'Ad id: ' . $ad->getId(),
+                    'Errors: ' . json_encode($ad->getErrors()),]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -814,9 +788,9 @@ class AdvertisementController extends Controller
         $this->disableView();
 
         $ad = \App\Model\AdvertisementModel::first(
-                        array('uniqueKey = ?' => $uniqueKey,
+                        ['uniqueKey = ?' => $uniqueKey,
                             'availabilityRequestToken = ?' => $token,
-                            'availabilityRequestTokenExpiration >= ?' => date('Y-m-d H:i:s')));
+                            'availabilityRequestTokenExpiration >= ?' => date('Y-m-d H:i:s')]);
 
         if (null === $ad) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -827,11 +801,11 @@ class AdvertisementController extends Controller
 
             if ($ad->validate()) {
                 $ad->save();
-                Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId()));
+                Event::fire('app.log', ['success', 'Ad id: ' . $ad->getId()]);
                 $view->successMessage($this->lang('AD_AVAILABILITY_REQUEST_SUCCESS'));
             } else {
-                Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId(),
-                    'Errors: ' . json_encode($ad->getErrors()),));
+                Event::fire('app.log', ['fail', 'Ad id: ' . $ad->getId(),
+                    'Errors: ' . json_encode($ad->getErrors()),]);
                 $view->errorMessage($this->lang('COMMON_FAIL'));
             }
         }
@@ -857,12 +831,12 @@ class AdvertisementController extends Controller
 
         $view = $this->getActionView();
 
-        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $adId));
+        $ad = \App\Model\AdvertisementModel::first(['id = ?' => (int) $adId]);
 
         if (null === $ad) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            $adPhoto = \App\Model\AdImageModel::first(array('adId = ?' => (int) $adId, 'id = ?' => (int) $photoId));
+            $adPhoto = \App\Model\AdImageModel::first(['adId = ?' => (int) $adId, 'id = ?' => (int) $photoId]);
 
             if (null === $adPhoto) {
                 $this->ajaxResponse($this->lang('AD_PHOTO_NOT_FOUND'), true, 404);
@@ -873,11 +847,11 @@ class AdvertisementController extends Controller
                     $ad->save();
                     $this->getCache()->erase('bazar');
                     $view->successMessage($this->lang('UPDATE_SUCCESS'));
-                    Event::fire('app.log', array('success', 'Ad id: ' . $ad->getId() . ' new main photo: ' . $photoId));
-                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, array('status' => 'active'));
+                    Event::fire('app.log', ['success', 'Ad id: ' . $ad->getId() . ' new main photo: ' . $photoId]);
+                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'active']);
                 } else {
-                    Event::fire('app.log', array('fail', 'Ad id: ' . $ad->getId() . ' new main photo: ' . $photoId,
-                        'Errors: ' . json_encode($ad->getErrors()),));
+                    Event::fire('app.log', ['fail', 'Ad id: ' . $ad->getId() . ' new main photo: ' . $photoId,
+                        'Errors: ' . json_encode($ad->getErrors()),]);
                     $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
             }
@@ -900,22 +874,23 @@ class AdvertisementController extends Controller
 
         $view = $this->getActionView();
 
-        $ad = \App\Model\AdvertisementModel::first(array('uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()));
+        $ad = \App\Model\AdvertisementModel::first(['uniqueKey = ?' => $uniqueKey, 'userId = ?' => $this->getUser()->getId()]);
 
         if (null === $ad) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $ad->state = \App\Model\AdvertisementModel::STATE_SOLD;
+            $ad->active = 0;
 
             if ($ad->validate()) {
                 $ad->save();
                 $this->getCache()->erase('bazar');
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
-                Event::fire('app.log', array('success', 'Set state to sold for Ad id: ' . $ad->getId()));
+                Event::fire('app.log', ['success', 'Set state to sold for Ad id: ' . $ad->getId()]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('app.log', array('fail', 'Set state to sold for Ad id: ' . $ad->getId(),
-                    'Errors: ' . json_encode($ad->getErrors()),));
+                Event::fire('app.log', ['fail', 'Set state to sold for Ad id: ' . $ad->getId(),
+                    'Errors: ' . json_encode($ad->getErrors()),]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }

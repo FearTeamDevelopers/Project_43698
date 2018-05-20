@@ -2,12 +2,17 @@
 
 namespace THCFrame\Controller;
 
+use THCFrame\Cache\Cache;
+use THCFrame\Configuration\Configuration;
+use THCFrame\Controller\Exception\Model;
+use THCFrame\Profiler\Profiler;
+use THCFrame\Security\Security;
+use THCFrame\Session\Driver;
+use THCFrame\View\Exception as ViewException;
 use THCFrame\Core\Base;
 use THCFrame\View\View;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
-use THCFrame\Controller\Exception;
-use THCFrame\View\Exception as ViewException;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Request\Response;
 use THCFrame\Core\Lang;
@@ -24,62 +29,62 @@ class Controller extends Base
      * @read
      * @var string
      */
-    protected $_name;
+    protected $name;
 
     /**
      * @readwrite
      */
-    protected $_parameters;
+    protected $parameters;
 
     /**
      * @readwrite
      */
-    protected $_layoutView;
+    protected $layoutView;
 
     /**
      * @readwrite
      */
-    protected $_actionView;
+    protected $actionView;
 
     /**
      * @readwrite
      */
-    protected $_willRenderLayoutView = true;
+    protected $willRenderLayoutView = true;
 
     /**
      * @readwrite
      */
-    protected $_willRenderActionView = true;
+    protected $willRenderActionView = true;
 
     /**
      * @readwrite
      */
-    protected $_defaultPath = 'modules/%s/view';
+    protected $defaultPath = 'modules/%s/view';
 
     /**
      * @readwrite
      */
-    protected $_defaultLayout = 'layouts/basic';
+    protected $defaultLayout = 'layouts/basic';
 
     /**
      * @readwrite
      */
-    protected $_mobileLayout;
+    protected $mobileLayout;
 
     /**
      * @readwrite
      */
-    protected $_tabletLayout;
+    protected $tabletLayout;
 
     /**
      * @readwrite
      */
-    protected $_defaultExtension = array('phtml', 'html');
+    protected $defaultExtension = ['phtml', 'html'];
 
     /**
      * @readwrite
      */
-    protected $_defaultContentType = 'text/html';
+    protected $defaultContentType = 'text/html';
 
     /**
      * Store device type from Mobile Detect class
@@ -87,47 +92,47 @@ class Controller extends Base
      * @var string
      * @read
      */
-    protected $_deviceType;
+    protected $deviceType;
 
     /**
      * Response object
      *
      * @read
-     * @var THCFrame\Request\Response
+     * @var Response
      */
-    protected $_response;
+    protected $response;
 
     /**
      * Store security context object.
      *
-     * @var THCFrame\Security\Security
+     * @var Security
      * @read
      */
-    protected $_security;
+    protected $security;
 
     /**
      * Store initialized cache object.
      *
-     * @var THCFrame\Cache\Cache
+     * @var Cache
      * @read
      */
-    protected $_cache;
+    protected $cache;
 
     /**
      * Store configuration.
      *
-     * @var THCFrame\Configuration\Configuration
+     * @var Configuration
      * @read
      */
-    protected $_config;
+    protected $config;
 
     /**
      * Store language extension.
      *
-     * @var THCFrame\Core\Lang
+     * @var Lang
      * @read
      */
-    protected $_lang;
+    protected $lang;
 
     /**
      * Store server host name.
@@ -135,20 +140,20 @@ class Controller extends Base
      * @var string
      * @read
      */
-    protected $_serverHost;
+    protected $serverHost;
 
     /**
      * Session object
      *
      * @read
-     * @var THCFrame\Session\Driver
+     * @var Driver
      */
-    protected $_session;
+    protected $session;
+    protected $sessionToken;
 
     /**
-     *
-     * @param type $method
-     * @return \THCFrame\Session\Exception\Implementation
+     * @param string $method
+     * @return \THCFrame\Core\Exception\Implementation
      */
     protected function _getImplementationException($method)
     {
@@ -160,11 +165,11 @@ class Controller extends Base
      */
     protected function mutliSubmissionProtectionToken()
     {
-        $token = $this->_session->get('submissionprotection');
+        $token = $this->session->get('submissionprotection');
 
         if ($token === null) {
             $token = md5(microtime());
-            $this->_session->set('submissionprotection', $token);
+            $this->session->set('submissionprotection', $token);
         }
 
         return $token;
@@ -172,29 +177,28 @@ class Controller extends Base
 
     /**
      *
-     * @return type
+     * @return string
      */
-    protected function revalidateMutliSubmissionProtectionToken()
+    protected function revalidateMultiSubmissionProtectionToken()
     {
-        $this->_session->remove('submissionprotection');
+        $this->session->remove('submissionprotection');
         $token = md5(microtime());
-        $this->_session->set('submissionprotection', $token);
+        $this->session->set('submissionprotection', $token);
 
         return $token;
     }
 
     /**
-     *
-     * @param type $token
+     * @return bool
      */
-    protected function checkMutliSubmissionProtectionToken()
+    protected function checkMultiSubmissionProtectionToken()
     {
-        $this->_sessionToken = $this->_session->get('submissionprotection');
+        $this->sessionToken = $this->session->get('submissionprotection');
 
         $token = RequestMethods::post('submstoken');
 
-        if ($token == $this->_sessionToken) {
-            $this->_session->remove('submissionprotection');
+        if ($token == $this->sessionToken) {
+            $this->session->remove('submissionprotection');
             return true;
         } else {
             return false;
@@ -202,25 +206,35 @@ class Controller extends Base
     }
 
     /**
+     * Dodatecna ochrana pred spambotama
      *
-     * @param type $message
-     * @param type $status
-     * @param type $error
+     * @return bool
      */
-    protected function ajaxResponse($message, $error = false, $status = 200, array $additionalData = array())
+    protected function checkBrowserAgentAndReferer()
     {
-        $data = array(
-            'message' => $message,
-            'error' => (bool) $error,
-            'csrf' => $this->getSecurity()->getCsrf()->getToken(),
-                ) + $additionalData;
+        return RequestMethods::server('HTTP_USER_AGENT') == '' || RequestMethods::server('HTTP_REFERER') == '';
+    }
 
-        $this->_response->setHttpVersionStatusHeader('HTTP/1.1 ' . (int) $status . ' ' . $this->_response->getStatusMessageByCode($status))
-                ->setHeader('Content-type', 'application/json')
-                ->setData($data);
+    /**
+     * @param string $message
+     * @param bool $error
+     * @param int $status
+     * @param array $additionalData
+     */
+    protected function ajaxResponse($message, $error = false, $status = 200, array $additionalData = [])
+    {
+        $data = [
+                'message' => $message,
+                'error' => (bool)$error,
+                'csrf' => $this->getSecurity()->getCsrf()->getToken(),
+            ] + $additionalData;
 
-        $this->_response->sendHeaders();
-        $this->_response->send();
+        $this->response->setHttpVersionStatusHeader('HTTP/1.1 ' . (int)$status . ' ' . $this->response->getStatusMessageByCode($status))
+            ->setHeader('Content-type', 'application/json')
+            ->setData($data);
+
+        $this->response->sendHeaders();
+        $this->response->send();
     }
 
     /**
@@ -243,34 +257,34 @@ class Controller extends Base
     }
 
     /**
-     * Object constructor
-     *
+     * Controller constructor.
      * @param array $options
+     * @throws \Exception
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
-        Event::fire('framework.controller.construct.before', array($this->name));
+        Event::fire('framework.controller.construct.before', [$this->name]);
 
         //get resources
         $configuration = Registry::get('configuration');
         $router = Registry::get('router');
 
-        $this->_response = new Response();
-        $this->_session = Registry::get('session');
-        $this->_security = Registry::get('security');
-        $this->_serverHost = RequestMethods::server('HTTP_HOST');
-        $this->_cache = Registry::get('cache');
-        $this->_config = Registry::get('configuration');
-        $this->_lang = Lang::getInstance();
+        $this->response = new Response();
+        $this->session = Registry::get('session');
+        $this->security = Registry::get('security');
+        $this->serverHost = RequestMethods::server('HTTP_HOST');
+        $this->cache = Registry::get('cache');
+        $this->config = Registry::get('configuration');
+        $this->lang = Lang::getInstance();
 
         if (!empty($configuration->view)) {
-            $this->_defaultExtension = explode(',', $configuration->view->extension);
-            $this->_defaultLayout = $configuration->view->layout;
-            $this->_mobileLayout = $configuration->view->mobileLayout;
-            $this->_tabletLayout = $configuration->view->tabletLayout;
-            $this->_defaultPath = $configuration->view->path;
+            $this->defaultExtension = explode(',', $configuration->view->extension);
+            $this->defaultLayout = $configuration->view->layout;
+            $this->mobileLayout = $configuration->view->mobileLayout;
+            $this->tabletLayout = $configuration->view->tabletLayout;
+            $this->defaultPath = $configuration->view->path;
         } else {
             throw new \Exception('Error in configuration file');
         }
@@ -282,60 +296,63 @@ class Controller extends Base
 
         $deviceType = $this->getDeviceType();
 
-        if ($deviceType == 'phone' && $this->_mobileLayout != '') {
-            $defaultLayout = $this->_mobileLayout;
-        } elseif ($deviceType == 'tablet' && $this->_tabletLayout != '') {
-            $defaultLayout = $this->_tabletLayout;
+        if ($deviceType == 'phone' && $this->mobileLayout != '') {
+            $defaultLayout = $this->mobileLayout;
+        } elseif ($deviceType == 'tablet' && $this->tabletLayout != '') {
+            $defaultLayout = $this->tabletLayout;
         } else {
-            $defaultLayout = $this->_defaultLayout;
+            $defaultLayout = $this->defaultLayout;
         }
 
-        $defaultPath = sprintf($this->_defaultPath, $module);
+        $defaultPath = sprintf($this->defaultPath, $module);
 
         //create view instances
-        if ($this->_willRenderLayoutView) {
-            foreach ($this->_defaultExtension as $ext) {
+        if ($this->willRenderLayoutView) {
+            foreach ($this->defaultExtension as $ext) {
                 if (file_exists(APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}")) {
                     $viewFile = APP_PATH . "/{$defaultPath}/{$defaultLayout}.{$ext}";
                     break;
                 }
             }
 
-            $view = new View(array(
+            $view = new View([
                 'file' => $viewFile
-            ));
+            ]);
 
-            $this->_layoutView = $view;
+            $this->layoutView = $view;
         }
 
-        if ($this->_willRenderActionView) {
-            foreach ($this->_defaultExtension as $ext) {
+        if ($this->willRenderActionView) {
+            foreach ($this->defaultExtension as $ext) {
                 if (file_exists(APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}")) {
                     $viewFile = APP_PATH . "/{$defaultPath}/{$controller}/{$action}.{$ext}";
                     break;
                 }
             }
 
-            $view = new View(array(
+            $view = new View([
                 'file' => $viewFile
-            ));
+            ]);
 
-            $this->_actionView = $view;
+            $this->actionView = $view;
         }
 
-        Event::fire('framework.controller.construct.after', array($this->name));
+        Event::fire('framework.controller.construct.after', [$this->name]);
     }
 
     /**
      * Object destruct
      */
+    /**
+     * @throws ViewException\Renderer
+     */
     public function __destruct()
     {
-        Event::fire('framework.controller.destruct.before', array($this->_name));
+        Event::fire('framework.controller.destruct.before', [$this->name]);
 
         $this->render();
 
-        Event::fire('framework.controller.destruct.after', array($this->_name));
+        Event::fire('framework.controller.destruct.after', [$this->name]);
     }
 
     /**
@@ -345,7 +362,7 @@ class Controller extends Base
      */
     public function getActionView()
     {
-        return $this->_actionView;
+        return $this->actionView;
     }
 
     /**
@@ -355,27 +372,39 @@ class Controller extends Base
      */
     public function getLayoutView()
     {
-        return $this->_layoutView;
+        return $this->layoutView;
+    }
+
+    /**
+     * Return server url with http schema
+     *
+     * @return string
+     */
+    public function getServerHost()
+    {
+        return RequestMethods::getServerHost();
     }
 
     /**
      * Return model instance
      *
      * @param string $model Format: module/model_name
-     * @param null|array $options
+     * @param null $options
+     * @return mixed
+     * @throws Model
      */
-    public function getModel($model, $options = NULL)
+    public function getModel($model, $options = null)
     {
         list($module, $modelName) = explode('/', $model);
 
         if ($module == '' || $modelName == '') {
-            throw new Exception\Model(sprintf('%s is not valid model name', $model));
+            throw new Model(sprintf('%s is not valid model name', $model));
         } else {
             $fileName = APP_PATH . strtolower("/modules/{$module}/model/{$modelName}.php");
             $className = ucfirst($module) . '_Model_' . ucfirst($modelName);
 
             if (file_exists($fileName)) {
-                if (NULL !== $options) {
+                if (null !== $options) {
                     return new $className($options);
                 } else {
                     return new $className();
@@ -393,7 +422,7 @@ class Controller extends Base
     {
         $detect = Registry::get('mobiledetect');
 
-        $deviceType = $this->_session->get('deviceType');
+        $deviceType = $this->session->get('deviceType');
 
         if ($deviceType === null) {
             if ($detect->isMobile() && !$detect->isTablet()) {
@@ -404,7 +433,7 @@ class Controller extends Base
                 $deviceType = 'computer';
             }
 
-            $this->_session->set('deviceType', $deviceType);
+            $this->session->set('deviceType', $deviceType);
         }
 
         return $deviceType;
@@ -413,61 +442,250 @@ class Controller extends Base
     /**
      * Main render method
      *
-     * @throws View\Exception\Renderer
+     * @throws ViewException\Renderer
      */
     public function render()
     {
-        Event::fire('framework.controller.render.before', array($this->_name));
+        Event::fire('framework.controller.render.before', [$this->name]);
 
-        $defaultContentType = $this->_defaultContentType;
+        session_write_close();
+
+        $defaultContentType = $this->defaultContentType;
         $results = null;
 
-        $doAction = $this->_willRenderActionView && $this->_actionView;
-        $doLayout = $this->_willRenderLayoutView && $this->_layoutView;
-        $profiler = \THCFrame\Profiler\Profiler::getInstance();
+        $doAction = $this->willRenderActionView && $this->actionView;
+        $doLayout = $this->willRenderLayoutView && $this->layoutView;
+        $profiler = Profiler::getInstance();
 
         try {
             if ($doAction) {
-                $results = $this->_actionView->render();
+                $results = $this->actionView->render();
 
-                $this->_actionView
-                        ->template
-                        ->implementation
-                        ->set('action', $results);
+                $this->actionView
+                    ->template
+                    ->implementation
+                    ->set('action', $results);
             }
 
             if ($doLayout) {
-                $results = $this->_layoutView->render();
-                $profiler->stop();
+                $results = $this->layoutView->render();
 
                 //protection against clickjacking and xss
-                $this->_response->setHeader('X-Frame-Options', 'deny')
-                        ->setHeader('X-XSS-Protection', '1; mode=block')
-                        ->setHeader('Content-type', $defaultContentType)
-                        ->setBody($results);
+                $this->response->setHeader('X-Frame-Options', 'deny')
+                    ->setHeader('X-XSS-Protection', '1; mode=block')
+                    ->setHeader('Content-type', $defaultContentType)
+                    ->setBody($results);
 
-                $this->_response->sendHeaders()
-                        ->send(false);
+                $profiler->stop();
+                $this->response->sendHeaders()
+                    ->send(false);
             } elseif ($doAction) {
-                $profiler->stop();
 
                 //protection against clickjacking and xss
-                $this->_response->setHeader('X-Frame-Options', 'deny')
-                        ->setHeader('X-XSS-Protection', '1; mode=block')
-                        ->setHeader('Content-type', $defaultContentType)
-                        ->setBody($results);
+                $this->response->setHeader('X-Frame-Options', 'deny')
+                    ->setHeader('X-XSS-Protection', '1; mode=block')
+                    ->setHeader('Content-type', $defaultContentType)
+                    ->setBody($results);
 
-                $this->_response->sendHeaders()
-                        ->send(false);
+                $profiler->stop();
+                $this->response->sendHeaders()
+                    ->send(false);
             }
 
-            $this->_willRenderLayoutView = false;
-            $this->_willRenderActionView = false;
+            $this->willRenderLayoutView = false;
+            $this->willRenderActionView = false;
         } catch (\Exception $e) {
             throw new ViewException\Renderer('Invalid layout/template syntax');
         }
 
-        Event::fire('framework.controller.render.after', array($this->_name));
+        Event::fire('framework.controller.render.after', [$this->name]);
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    public function getWillRenderLayoutView()
+    {
+        return $this->willRenderLayoutView;
+    }
+
+    public function getWillRenderActionView()
+    {
+        return $this->willRenderActionView;
+    }
+
+    public function getDefaultPath()
+    {
+        return $this->defaultPath;
+    }
+
+    public function getDefaultLayout()
+    {
+        return $this->defaultLayout;
+    }
+
+    public function getMobileLayout()
+    {
+        return $this->mobileLayout;
+    }
+
+    public function getTabletLayout()
+    {
+        return $this->tabletLayout;
+    }
+
+    public function getDefaultExtension()
+    {
+        return $this->defaultExtension;
+    }
+
+    public function getDefaultContentType()
+    {
+        return $this->defaultContentType;
+    }
+
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function getSecurity()
+    {
+        return $this->security;
+    }
+
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    public function getLang()
+    {
+        return $this->lang;
+    }
+
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function setParameters($parameters)
+    {
+        $this->parameters = $parameters;
+        return $this;
+    }
+
+    public function setWillRenderLayoutView($willRenderLayoutView)
+    {
+        $this->willRenderLayoutView = $willRenderLayoutView;
+        return $this;
+    }
+
+    public function setWillRenderActionView($willRenderActionView)
+    {
+        $this->willRenderActionView = $willRenderActionView;
+        return $this;
+    }
+
+    public function setDefaultPath($defaultPath)
+    {
+        $this->defaultPath = $defaultPath;
+        return $this;
+    }
+
+    public function setDefaultLayout($defaultLayout)
+    {
+        $this->defaultLayout = $defaultLayout;
+        return $this;
+    }
+
+    public function setMobileLayout($mobileLayout)
+    {
+        $this->mobileLayout = $mobileLayout;
+        return $this;
+    }
+
+    public function setTabletLayout($tabletLayout)
+    {
+        $this->tabletLayout = $tabletLayout;
+        return $this;
+    }
+
+    public function setDefaultExtension($defaultExtension)
+    {
+        $this->defaultExtension = $defaultExtension;
+        return $this;
+    }
+
+    public function setDefaultContentType($defaultContentType)
+    {
+        $this->defaultContentType = $defaultContentType;
+        return $this;
+    }
+
+    public function setResponse(Response $response)
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+    public function setSecurity(Security $security)
+    {
+        $this->security = $security;
+        return $this;
+    }
+
+    public function setCache(Cache $cache)
+    {
+        $this->cache = $cache;
+        return $this;
+    }
+
+    public function setConfig(Configuration $config)
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    public function setLang(Lang $lang)
+    {
+        $this->lang = $lang;
+        return $this;
+    }
+
+    public function setSession(Driver $session)
+    {
+        $this->session = $session;
+        return $this;
+    }
+
+    public function getSessionToken()
+    {
+        return $this->sessionToken;
+    }
+
+    public function setSessionToken($sessionToken)
+    {
+        $this->sessionToken = $sessionToken;
+        return $this;
     }
 
 }

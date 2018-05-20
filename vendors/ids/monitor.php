@@ -87,7 +87,7 @@ class Monitor
      *
      * @var array
      */
-    private $exceptions = array();
+    private $exceptions = [];
 
     /**
      * Html container
@@ -98,7 +98,7 @@ class Monitor
      *
      * @var array
      */
-    private $html = array();
+    private $html = [];
 
     /**
      * JSON container
@@ -108,7 +108,7 @@ class Monitor
      *
      * @var array
      */
-    private $json = array();
+    private $json = [];
 
     /**
      * Holds HTMLPurifier object
@@ -145,9 +145,9 @@ class Monitor
         $this->storage    = new Storage($init);
         $this->tags       = $tags;
         $this->scanKeys   = $init->config['General']['scan_keys'];
-        $this->exceptions = isset($init->config['General']['exceptions']) ? $init->config['General']['exceptions'] : array();
-        $this->html       = isset($init->config['General']['html'])       ? $init->config['General']['html'] : array();
-        $this->json       = isset($init->config['General']['json'])       ? $init->config['General']['json'] : array();
+        $this->exceptions = isset($init->config['General']['exceptions']) ? $init->config['General']['exceptions'] : [];
+        $this->html       = isset($init->config['General']['html'])       ? $init->config['General']['html'] : [];
+        $this->json       = isset($init->config['General']['json'])       ? $init->config['General']['json'] : [];
 
         if (isset($init->config['General']['HTML_Purifier_Cache'])) {
             $this->HTMLPurifierCache  = $init->getBasePath() . $init->config['General']['HTML_Purifier_Cache'];
@@ -213,14 +213,14 @@ class Monitor
 
         // to increase performance, only start detection if value isn't alphanumeric
         if ((!$this->scanKeys || !$key || !preg_match($preFilter, $key)) && (!$value || !preg_match($preFilter, $value))) {
-            return array();
+            return [];
         }
 
         // check if this field is part of the exceptions
         foreach ($this->exceptions as $exception) {
-            $matches = array();
+            $matches = [];
             if (($exception === $key) || preg_match('((/.*/[^eE]*)$)', $exception, $matches) && isset($matches[1]) && preg_match($matches[1], $key)) {
-                return array();
+                return [];
             }
         }
 
@@ -313,7 +313,7 @@ class Monitor
             $value = $value != $purifiedValue || $plainValue ? $this->diff($value, $purifiedValue, $plainValue) : null;
             $key = $key != $purifiedKey ? $this->diff($key, $purifiedKey, $plainKey) : null;
         }
-        return array($key, $value);
+        return [$key, $value];
     }
 
     /**
@@ -421,20 +421,20 @@ class Monitor
         $decodedValue = json_decode($value);
 
         if ($decodedValue && is_array($decodedValue) || is_object($decodedValue)) {
-            array_walk_recursive($decodedValue, array($this, 'jsonConcatContents'));
+            array_walk_recursive($decodedValue, [$this, 'jsonConcatContents']);
             $value = $this->tmpJsonString;
         } else {
             $this->tmpJsonString .=  " " . $decodedValue . "\n";
         }
 
         if ($decodedKey && is_array($decodedKey) || is_object($decodedKey)) {
-            array_walk_recursive($decodedKey, array($this, 'jsonConcatContents'));
+            array_walk_recursive($decodedKey, [$this, 'jsonConcatContents']);
             $key = $this->tmpJsonString;
         } else {
             $this->tmpJsonString .=  " " . $decodedKey . "\n";
         }
 
-        return array($key, $value);
+        return [$key, $value];
     }
 
     /**

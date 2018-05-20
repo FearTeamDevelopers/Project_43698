@@ -1,14 +1,14 @@
 <?php
 
-$database = new THCFrame\Database\Database(array(
+$database = new THCFrame\Database\Database([
     "type" => "mysql",
-    "options" => array(
+    "options" => [
         "host" => "localhost",
         "username" => "root",
         "password" => "",
         "schema" => "frametest"
-    )
-));
+    ]
+]);
 $database = $database->initialize();
 $database = $database->connect();
 
@@ -53,10 +53,10 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function() use ($database)
     {
-        $example = new Example(array(
+        $example = new Example([
             "name" => "foo",
             "created" => date("Y-m-d H:i:s")
-        ));
+        ]);
         
         return ($example->save() > 0);
     },
@@ -76,10 +76,10 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function() use ($database)
     {
-        $example = new Example(array(
+        $example = new Example([
             "name" => "foo",
             "created" => date("Y-m-d H:i:s")
-        ));
+        ]);
         
         $example->save();
         $example->save();
@@ -94,11 +94,11 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function() use ($database)
     {
-        $example = new Example(array(
+        $example = new Example([
             "id" => 1,
             "name" => "hello",
             "created" => date("Y-m-d H:i:s")
-        ));
+        ]);
         $example->save();
         
         return (Example::first()->name == "hello");
@@ -110,9 +110,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function() use ($database)
     {
-        $example = new Example(array(
+        $example = new Example([
             "id" => 2
-        ));
+        ]);
         $example->delete();
         
         return (Example::count() == 1);

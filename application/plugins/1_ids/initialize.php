@@ -23,10 +23,10 @@ use IDS\Monitor;
 
 try {
 
-    $request = array(
+    $request = [
         'GET' => $_GET,
         'POST' => $_POST
-    );
+    ];
 
     $init = Init::init(APP_PATH . '/vendors/ids/config/config.ini');
 

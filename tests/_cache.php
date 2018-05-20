@@ -13,9 +13,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         return ($cache instanceof THCFrame\Cache\Driver\Memcached);
@@ -27,9 +27,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         return ($cache->connect() instanceof THCFrame\Cache\Driver\Memcached);
@@ -41,9 +41,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         $cache = $cache->connect();
@@ -67,9 +67,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         $cache = $cache->connect();
@@ -83,9 +83,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         $cache = $cache->connect();
@@ -99,9 +99,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         $cache = $cache->connect();
@@ -115,9 +115,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         $cache = $cache->connect();
@@ -134,9 +134,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $cache = new THCFrame\Cache\Cache(array(
+        $cache = new THCFrame\Cache\Cache([
             "type" => "memcached"
-        ));
+        ]);
         
         $cache = $cache->initialize();
         $cache = $cache->connect();

@@ -29,58 +29,58 @@ class Extended extends Standard
      */
     protected $_index = 0;
 
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
-        $this->_map = array(
-            "partial" => array(
+        $this->_map = [
+            "partial" => [
                 "opener" => "{partial",
                 "closer" => "}",
                 "handler" => "_partial"
-            ),
-            "include" => array(
+            ],
+            "include" => [
                 "opener" => "{include",
                 "closer" => "}",
                 "handler" => "_include"
-            ),
-            "yield" => array(
+            ],
+            "yield" => [
                 "opener" => "{yield",
                 "closer" => "}",
                 "handler" => "_yield"
-            )
-                ) + $this->_map;
+            ]
+                ] + $this->_map;
 
-        $this->_map["statement"]["tags"] = array(
-            "set" => array(
+        $this->_map["statement"]["tags"] = [
+            "set" => [
                 "isolated" => false,
                 "arguments" => "{key}",
                 "handler" => "set"
-            ),
-            "append" => array(
+            ],
+            "append" => [
                 "isolated" => false,
                 "arguments" => "{key}",
                 "handler" => "append"
-            ),
-            "prepend" => array(
+            ],
+            "prepend" => [
                 "isolated" => false,
                 "arguments" => "{key}",
                 "handler" => "prepend"
-            )
-                ) + $this->_map["statement"]["tags"];
+            ]
+                ] + $this->_map["statement"]["tags"];
     }
 
     /**
-     * 
+     *
      * @param type $tree
      * @param type $content
      * @return type
      */
     protected function _include($tree, $content)
     {
-        $template = new Template(array(
+        $template = new Template([
             "implementation" => new self()
-        ));
+        ]);
 
         $router = Registry::get("router");
         $module = $router->getLastRoute()->module;
@@ -99,7 +99,7 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $tree
      * @param type $content
      * @return type
@@ -120,7 +120,7 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $tree
      * @return null
      */
@@ -134,7 +134,7 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $tree
      * @param type $content
      * @return type
@@ -147,14 +147,14 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $value
      */
     protected function _setValue($key, $value)
     {
         if (!empty($key)) {
-            $data = Registry::get($this->defaultKey, array());
+            $data = Registry::get($this->defaultKey, []);
             $data[$key] = $value;
 
             Registry::set($this->defaultKey, $data);
@@ -162,7 +162,7 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @return string
      */
@@ -178,7 +178,7 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $value
      */
@@ -198,7 +198,7 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $value
      */
@@ -213,7 +213,7 @@ class Extended extends Standard
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $value
      */

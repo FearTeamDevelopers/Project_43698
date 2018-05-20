@@ -6,6 +6,8 @@
   <div class="row">
     <form method="post" action="#" enctype="multipart/form-data" class="large-8 medium-10 small-12 centerBlock uploadForm mv30">
       <input type="hidden" name="MAX_FILE_SIZE" value="18000000"/>
+      <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
+      <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>
       <table>
         <tr>
           <td><span>Platnost do</span></td>
@@ -75,12 +77,11 @@
           <td><span class="field">
               {script $images = $ad->getImages()}
               {if $images !== null}
-              {foreach $image in $images}<span class="imageWrapper"><img src="{echo $image->getImgThumb()}"/><br/><a href="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage fi-trash"></a>{if $ad->getMainPhotoId() != $image->getId()}<a href="/bazar/nastavitfoto/{echo $ad->getId()}/{echo $image->getId()}" title="Nastavit jako hlavní fotku" class="ajaxChangestate fi-arrow-up"></a>{/if}</span>{/foreach}
+              {foreach $image in $images}<span class="imageWrapper"><img src="{echo $image->getImgThumb()}" alt="{echo $image->getPhotoName()}"/><br/><a href="/bazar/smazatfoto/{echo $image->getId()}" title="Smazat fotku" class="ajaxDeleteImage fi-trash"></a>{if $ad->getMainPhotoId() != $image->getId()}<a href="/bazar/nastavitfoto/{echo $ad->getId()}/{echo $image->getId()}" title="Nastavit jako hlavní fotku" class="ajaxChangestate fi-arrow-up"></a>{/if}</span>{/foreach}
               {/if}</span></td>
         </tr>
         <tr>
           <td colspan="2">
-            <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
             <input type="submit" name="submitEditAdvertisement" value="Uložit" class="more"/>
           </td>
         </tr>

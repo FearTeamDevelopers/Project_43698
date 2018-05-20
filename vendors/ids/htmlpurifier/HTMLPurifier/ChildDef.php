@@ -22,7 +22,7 @@ abstract class HTMLPurifier_ChildDef
     /**
      * Lookup array of all elements that this definition could possibly allow
      */
-    public $elements = array();
+    public $elements = [];
 
     /**
      * Get lookup of tag names that should not close this element automatically.

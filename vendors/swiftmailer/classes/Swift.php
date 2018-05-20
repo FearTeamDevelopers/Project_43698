@@ -20,7 +20,7 @@ abstract class Swift
     const VERSION = '@SWIFT_VERSION_NUMBER@';
     
     public static $initialized = false;
-    public static $inits = array();
+    public static $inits = [];
 
     /**
      * Registers an initializer callable that will be called the first time
@@ -75,6 +75,6 @@ abstract class Swift
         if (null !== $callable) {
             self::$inits[] = $callable;
         }
-        spl_autoload_register(array('Swift', 'autoload'));
+        spl_autoload_register(['Swift', 'autoload']);
     }
 }

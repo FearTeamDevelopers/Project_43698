@@ -6,7 +6,7 @@
 class HTMLPurifier_Injector_RemoveSpansWithoutAttributes extends HTMLPurifier_Injector
 {
     public $name = 'RemoveSpansWithoutAttributes';
-    public $needed = array('span');
+    public $needed = ['span'];
 
     private $attrValidator;
 
@@ -39,7 +39,7 @@ class HTMLPurifier_Injector_RemoveSpansWithoutAttributes extends HTMLPurifier_In
         }
 
         $nesting = 0;
-        $spanContentTokens = array();
+        $spanContentTokens = [];
         while ($this->forwardUntilEndToken($i, $current, $nesting)) {}
 
         if ($current instanceof HTMLPurifier_Token_End && $current->name === 'span') {

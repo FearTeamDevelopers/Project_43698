@@ -35,9 +35,9 @@ class ActionHistoryModel extends BasicActionhistoryModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('ach.*'))
+        $query = self::getQuery(['ach.*'])
                 ->join('tb_user', 'ach.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                        ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -49,9 +49,9 @@ class ActionHistoryModel extends BasicActionhistoryModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('ach.*'))
+        $query = self::getQuery(['ach.*'])
                 ->join('tb_user', 'ach.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                        ['us.firstname', 'us.lastname'])
                 ->order('ach.created', 'desc')
                 ->limit((int) $limit);
 
@@ -71,7 +71,7 @@ class ActionHistoryModel extends BasicActionhistoryModel
 
         $remoteAddr = RequestMethods::getClientIpAddress();
         $referer = RequestMethods::server('HTTP_REFERER');
-        $changes = array();
+        $changes = [];
 
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
@@ -95,19 +95,19 @@ class ActionHistoryModel extends BasicActionhistoryModel
             }
         }
 
-        $historyRecord = new self(array(
+        $historyRecord = new self([
             'originId' => $original->getId(),
             'editedBy' => $user->getId(),
             'remoteAddr' => $remoteAddr,
             'referer' => $referer,
             'changedData' => json_encode($changes),
-        ));
+        ]);
 
         if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'Action '.$original->getId().' changes saved'));
+            Event::fire('admin.log', ['success', 'Action '.$original->getId().' changes saved']);
         } else {
-            Event::fire('admin.log', array('fail', 'Action history errors: '.json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', ['fail', 'Action history errors: '.json_encode($historyRecord->getErrors())]);
         }
     }
 }

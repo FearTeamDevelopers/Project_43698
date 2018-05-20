@@ -27,13 +27,37 @@
         <br/>
         <div>
             {if $gallery->getImgThumb() == ""}
-                Zatím není nastavený žádný avatar galerie
+            Zatím není nastavený žádný avatar galerie
             {/if}{else}
-                <img src="{echo $gallery->getImgThumb()}" height="180px"/>
+            <img src="{echo $gallery->getImgThumb()}" height="180px"/>
             {/else}
         </div>
     </div>
-    <div class="grid_8">
+    <div class="clear"></div>
+    <div class="grid_7">
+        <div class="contenttitle radiusbottom0">
+            <h2 class="table"><span>Připojit video z youtube.com</span></h2>
+        </div><!--contenttitle-->
+        <form class="stdform stdform2" method="post" action="/admin/gallery/connectvideo/">
+            <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+            <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
+            <input type="hidden" name="galleryid"  value="{echo $gallery->getId()}"/>
+            <p>
+                <label>Url*</label>
+                <span class="field">
+                    {echo \Admin\Helper\FormPrinter::input('text', 'url', array($video,'url'), array('required'=>true))}
+                    {if isset($errors["url"])}
+                    <label class="error">{echo implode("<br/>", $errors["url"])}</label>
+                    {/if}
+                </span>
+            </p>
+            <p class="stdformbutton">
+                <input name="submitUploadVideo" type="submit" value="Uložit" class="submit radius2" />
+                <input type="reset" class="reset radius2" value="Reset" />
+            </p>
+        </form>
+    </div>
+    <div class="grid_9">
         <div class="contenttitle radiusbottom0">
             <h2 class="table"><span>Nahrát fotky<button class="stdbtn marginleft15" id="dropzoneProcess">Nahrát</button></span></h2>
         </div><!--contenttitle-->
@@ -56,26 +80,57 @@
         <div style="overflow:hidden;">
             <ul class="imagelist">
                 {foreach $photo in $photos}
-                    {if $photo->active}
-                        <li class="photoactive">
+                {if $photo->active}
+                <li class="active">
                     {/if}{else}
-                        <li class="photoinactive">
+                <li class="inactive">
                     {/else}
-                        <a href="{echo $photo->imgMain}" data-lightbox="gallery" rel="lightbox">
-                            <img src="{echo $photo->imgThumb}" alt="" height="120px" />
-                        </a>
-                        <span>
-                            <a href="{echo $photo->imgMain}" class="view" title="Zobrazit" target="_blank"></a>
-                            <a href="/admin/gallery/changephotostatus/{echo $photo->id}" class="activate" title="Aktivovat/Deaktivovat"></a>
-                            <a href="/admin/gallery/deletephoto/{echo $photo->id}" class="delete" title="Smazat"></a>
-                        </span>
-                    </li>
+                    <a href="{echo $photo->imgMain}" data-lightbox="gallery" rel="lightbox">
+                        <img src="{echo $photo->imgThumb}" alt="" height="120px" />
+                    </a>
+                    <span>
+                        <input type="number" min="1" max="99" value="{echo $photo->rank}" class="photoRank" data-photoid="{echo $photo->id}" />
+                        <a href="{echo $photo->imgMain}" class="view" title="Zobrazit" target="_blank"></a>
+                        <a href="/admin/gallery/changephotostatus/{echo $photo->id}" class="activate" title="Aktivovat/Deaktivovat"></a>
+                        <a href="/admin/gallery/deletephoto/{echo $photo->id}" class="delete" title="Smazat"></a>
+                    </span>
+                </li>
                 {/foreach}
             </ul>
         </div>
         {/if}{else}
-        <div class="notification msginfo"><a class="close"></a><p>Žádné foto v galerii</p></div>
+        <div class="notification msginfo"><a class="close"></a><p>V galerii nejsou fotografie</p></div>
         {/else}
+    </div>
+    <div class="clear"></div>
+    <hr/>
+    <div class="grid_16 margintop10" id="tabs-2">
+        {script $videos = $gallery->getVideos()}
+        {if !empty($videos)}
+        <div style="overflow:hidden;">
+            <ul class="imagelist">
+                {foreach $video in $videos}
+                {if $video->active}
+                <li class="active">
+                    {/if}{else}
+                <li class="inactive">
+                    {/else}
+
+                    <iframe width="100%" src="https://www.youtube.com/embed/{echo $video->videoCode}" frameborder="0" allowfullscreen></iframe>
+
+                    <span>
+                        <a href="{echo $video->url}" class="view" title="Zobrazit" target="_blank"></a>
+                        <a href="/admin/gallery/changevideostatus/{echo $video->id}" class="activate" title="Aktivovat/Deaktivovat"></a>
+                        <a href="/admin/gallery/deletevideo/{echo $video->id}" class="delete" title="Smazat"></a>
+                    </span>
+                </li>
+                {/foreach}
+            </ul>
+        </div>
+        {/if}{else}
+        <div class="notification msginfo"><a class="close"></a><p>V galerii nejsou videa</p></div>
+        {/else}
+
     </div>
 </div>
 {/if}

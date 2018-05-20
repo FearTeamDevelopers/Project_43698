@@ -2,6 +2,20 @@
 jQuery.noConflict();
 
 jQuery(document).ready(function () {
+    var simpleDialog = jQuery('#dialog').dialog({
+        autoOpen: false,
+        resizable: false,
+        width: 320,
+        modal: true,
+        title: 'Chyba',
+        buttons: {
+            "Zavřít": function () {
+                jQuery('#dialog p').text('');
+                jQuery(this).dialog("close");
+            }
+        }
+    });
+
     jQuery('#dropzoneProcess').addClass('nodisplay');
     dropzoneError = false;
 
@@ -17,28 +31,29 @@ jQuery(document).ready(function () {
         createImageThumbnails: true,
         autoProcessQueue: false,
         init: function () {
-            this.on('addedfile', function(){
+            this.on('addedfile', function () {
                 jQuery('#dropzoneProcess').removeClass('nodisplay');
             });
-            this.on('removedfile', function(){
+            this.on('removedfile', function () {
                 var queuedFiles = dropzone.getQueuedFiles();
-                
-                if (queuedFiles.length === 0){
+
+                if (queuedFiles.length === 0) {
                     jQuery('#dropzoneProcess').addClass('nodisplay');
                 }
             });
             this.on('maxfilesexceeded', function (file) {
-                alert('Maximalni pocet souboru je 6');
+                simpleDialog.text('Maximalni pocet souboru je 10');
+                simpleDialog.dialog('open');
             });
             this.on('sending', function () {
                 jQuery("#loader, .loader").show();
             });
-            this.on('error', function(){
+            this.on('error', function () {
                 dropzoneError = true;
             });
             this.on('success', function (file, response) {
                 var queuedFiles = dropzone.getQueuedFiles();
-                
+
                 if (queuedFiles.length === 0 && dropzoneError === false) {
                     location.reload();
                 } else {
@@ -47,11 +62,12 @@ jQuery(document).ready(function () {
 
                 this.removeFile(file);
             });
-            this.on('queuecomplete', function(file, response) {
+            this.on('queuecomplete', function (file, response) {
                 var queuedFiles = dropzone.getQueuedFiles();
-                
+
                 if (queuedFiles.length === 0 && dropzoneError === true) {
-                    alert('Během nahrávání fotek se vyskytla chyba. Pokud se nezobrazují nahrané fotky stiskněte F5.')
+                    simpleDialog.text('Během nahrávání fotek se vyskytla chyba. Pokud se nezobrazují nahrané fotky stiskněte F5.');
+                    simpleDialog.dialog('open');
                     jQuery("#loader, .loader").hide();
                 }
             });

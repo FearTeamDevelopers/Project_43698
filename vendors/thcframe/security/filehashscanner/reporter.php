@@ -15,15 +15,15 @@ class Reporter extends Base
 {
 
     private $_acct;
-    protected $_text = array();
+    protected $_text = [];
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_scanner;
 
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -45,7 +45,7 @@ class Reporter extends Base
 
         $report .= "SuperScan log report for " . $this->_acct . " file changes since " . $yesterday . ":\r\n\r\n";
 
-        $result = \THCFrame\Security\Model\FhsHistoryModel::all(array('timestamp > ?' => $yesterday, 'acct = ?' => $this->_acct));
+        $result = \THCFrame\Security\Model\FhsHistoryModel::all(['timestamp > ?' => $yesterday, 'acct = ?' => $this->_acct]);
 
         if (!empty($result)) {
             foreach ($result as $row) {
@@ -58,7 +58,7 @@ class Reporter extends Base
         }
 
         if ($this->_configuration->security->filescan->textOutput) {
-            Core::getLogger()->info('{fshr}', array('fshr', print_r($report, true)));
+            Core::getLogger()->info('{fshr}', ['fshr', print_r($report, true)]);
         }
     }
 
@@ -103,7 +103,7 @@ class Reporter extends Base
         }
 
         if ($this->_configuration->security->filescan->textOutput) {
-            Core::getLogger()->info('{fshr}', array('fshr', print_r($report, true)));
+            Core::getLogger()->info('{fshr}', ['fshr', print_r($report, true)]);
         }
     }
 

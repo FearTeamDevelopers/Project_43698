@@ -6,23 +6,23 @@ use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
-use THCFrame\Core\StringMethods;
+use Admin\Model\Notifications\Email\News as NewsNotification;
+use App\Model\NewsModel;
 
 /**
  *
  */
 class NewsController extends Controller
 {
-    private $_errors = array();
 
     /**
      * Check whether user has access to news or not.
      *
-     * @param \App\Model\NewsModel $news
+     * @param NewsModel $news
      *
      * @return bool
      */
-    private function _checkAccess(\App\Model\NewsModel $news)
+    private function checkAccess(NewsModel $news)
     {
         if ($this->isAdmin() === true ||
                 $news->getUserId() == $this->getUser()->getId()) {
@@ -33,128 +33,11 @@ class NewsController extends Controller
     }
 
     /**
-     * Check whether news unique identifier already exist or not.
-     *
-     * @param type $key
-     *
-     * @return bool
-     */
-    private function _checkUrlKey($key)
-    {
-        $status = \App\Model\NewsModel::first(array('urlKey = ?' => $key));
-
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Create and return new news object.
-     *
-     * @return \App\Model\NewsModel
-     */
-    private function _createObject()
-    {
-        $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
-
-        for ($i = 1; $i <= 100; $i+=1) {
-            if ($this->_checkUrlKey($urlKeyCh)) {
-                break;
-            } else {
-                $urlKeyCh = $urlKey.'-'.$i;
-            }
-
-            if ($i == 100) {
-                $this->_errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
-                break;
-            }
-        }
-
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/novinky/r/'.$urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
-
-        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-        $news = new \App\Model\NewsModel(array(
-            'title' => RequestMethods::post('title'),
-            'userId' => $this->getUser()->getId(),
-            'userAlias' => $this->getUser()->getWholeName(),
-            'urlKey' => $urlKeyCh,
-            'approved' => $this->getConfig()->news_autopublish,
-            'archive' => 0,
-            'shortBody' => $shortText,
-            'body' => RequestMethods::post('text'),
-            'rank' => RequestMethods::post('rank', 1),
-            'keywords' => $keywords,
-            'metaTitle' => RequestMethods::post('metatitle', RequestMethods::post('title')),
-            'metaDescription' => strip_tags(RequestMethods::post('metadescription', $shortText)),
-        ));
-
-        return $news;
-    }
-
-    /**
-     * Edit existing news object.
-     *
-     * @param \App\Model\NewsModel $object
-     *
-     * @return \App\Model\NewsModel
-     */
-    private function _editObject(\App\Model\NewsModel $object)
-    {
-        $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
-
-        if ($object->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
-            for ($i = 1; $i <= 100; $i+=1) {
-                if ($this->_checkUrlKey($urlKeyCh)) {
-                    break;
-                } else {
-                    $urlKeyCh = $urlKey . '-' . $i;
-                }
-
-                if ($i == 100) {
-                    $this->_errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
-                    break;
-                }
-            }
-        }
-
-        if (null === $object->userId) {
-            $object->userId = $this->getUser()->getId();
-            $object->userAlias = $this->getUser()->getWholeName();
-        }
-
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/novinky/r/'.$urlKey, '[Celý článek]'), RequestMethods::post('shorttext'));
-
-        $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
-
-        if(!$this->isAdmin()){
-            $object->approved = $this->getConfig()->news_autopublish;
-        }else{
-            $object->approved = RequestMethods::post('approve');
-        }
-
-        $object->title = RequestMethods::post('title');
-        $object->urlKey = $urlKeyCh;
-        $object->body = RequestMethods::post('text');
-        $object->shortBody = $shortText;
-        $object->rank = RequestMethods::post('rank', 1);
-        $object->active = RequestMethods::post('active');
-        $object->archive = RequestMethods::post('archive');
-        $object->keywords = $keywords;
-        $object->metaTitle = RequestMethods::post('metatitle', RequestMethods::post('title'));
-        $object->metaDescription = strip_tags(RequestMethods::post('metadescription',$shortText));
-
-        return $object;
-    }
-
-    /**
      * Check if there is object used for preview saved in session.
      *
-     * @return \App\Model\NewsModel
+     * @return NewsModel
      */
-    private function _checkForObject()
+    private function checkForObject()
     {
         $session = Registry::get('session');
         $news = $session->get('newsPreview');
@@ -164,13 +47,14 @@ class NewsController extends Controller
     }
 
     /**
-     * Get list of all actions. Loaded via datatables ajax.
+     * Get list of all news. Loaded via datatables ajax.
      * For more check load function.
      *
      * @before _secured, _participant
      */
     public function index()
     {
+
     }
 
     /**
@@ -181,37 +65,41 @@ class NewsController extends Controller
     public function add()
     {
         $view = $this->getActionView();
-        $news = $this->_checkForObject();
+        $news = $this->checkForObject();
 
-        $newsConcepts = \Admin\Model\ConceptModel::all(array(
+        $newsConcepts = \Admin\Model\ConceptModel::all([
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS, ),
-                array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS,], ['id', 'created', 'modified'], ['created' => 'DESC'], 10);
 
         $view->set('news', $news)
                 ->set('concepts', $newsConcepts);
 
         if (RequestMethods::post('submitAddNews')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
-            $news = $this->_createObject();
+            list($news, $errors) = NewsModel::createFromPost(
+                            RequestMethods::getPostDataBag(), ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->news_autopublish]
+            );
 
-            if (empty($this->_errors) && $news->validate()) {
+            if (empty($errors) && $news->validate()) {
                 $id = $news->save();
+                
+//                NewsNotification::getInstance()->onCreate($news);
+                
                 $this->getCache()->erase('news');
-                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
 
-                Event::fire('admin.log', array('success', 'News id: '.$id));
+                Event::fire('admin.log', ['success', 'News id: ' . $id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/news/');
             } else {
-                Event::fire('admin.log', array('fail',
-                    'Errors: '.json_encode($this->_errors + $news->getErrors()), ));
-                $view->set('errors', $this->_errors + $news->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                Event::fire('admin.log', ['fail',
+                    'Errors: ' . json_encode($errors + $news->getErrors()),]);
+                $view->set('errors', $errors + $news->getErrors())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('news', $news)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -219,21 +107,23 @@ class NewsController extends Controller
 
         if (RequestMethods::post('submitPreviewNews')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/news/');
             }
 
-            $news = $this->_createObject();
+            list($news, $errors) = NewsModel::createFromPost(
+                            RequestMethods::getPostDataBag(), ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->news_autopublish]
+            );
 
-            if (empty($this->_errors) && $news->validate()) {
+            if (empty($errors) && $news->validate()) {
                 $session = Registry::get('session');
                 $session->set('newsPreview', $news);
-                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
 
                 self::redirect('/news/preview?action=add');
             } else {
-                $view->set('errors', $this->_errors + $news->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                $view->set('errors', $errors + $news->getErrors())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('news', $news)
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
@@ -251,28 +141,27 @@ class NewsController extends Controller
     {
         $view = $this->getActionView();
 
-        $news = $this->_checkForObject();
+        $news = $this->checkForObject();
 
         if (null === $news) {
-            $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
+            $news = NewsModel::first(['id = ?' => (int) $id]);
 
             if (null === $news) {
                 $view->warningMessage($this->lang('NOT_FOUND'));
-                $this->_willRenderActionView = false;
+                $this->willRenderActionView = false;
                 self::redirect('/admin/news/');
             }
 
-            if (!$this->_checkAccess($news)) {
+            if (!$this->checkAccess($news)) {
                 $view->warningMessage($this->lang('LOW_PERMISSIONS'));
-                $this->_willRenderActionView = false;
+                $this->willRenderActionView = false;
                 self::redirect('/admin/news/');
             }
         }
 
-        $newsConcepts = \Admin\Model\ConceptModel::all(array(
+        $newsConcepts = \Admin\Model\ConceptModel::all([
                     'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS, ),
-                array('id', 'created', 'modified'), array('created' => 'DESC'), 10);
+                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS,], ['id', 'created', 'modified'], ['created' => 'DESC'], 10);
 
         $view->set('news', $news)
                 ->set('concepts', $newsConcepts);
@@ -283,21 +172,31 @@ class NewsController extends Controller
             }
 
             $originalNews = clone $news;
-            $news = $this->_editObject($news);
 
-            if (empty($this->_errors) && $news->validate()) {
+            list($news, $errors) = NewsModel::editFromPost(
+                            RequestMethods::getPostDataBag(), $news, [
+                        'user' => $this->getUser(),
+                        'isAdmin' => $this->isAdmin(),
+                        'autoPublish' => $this->getConfig()->news_autopublish
+                            ]
+            );
+
+            if (empty($errors) && $news->validate()) {
                 $news->save();
+                
+//                NewsNotification::getInstance()->onUpdate($news);
+                
                 \Admin\Model\NewsHistoryModel::logChanges($originalNews, $news);
                 $this->getCache()->erase('news');
-                \Admin\Model\ConceptModel::deleteAll(array('id = ?' => RequestMethods::post('conceptid')));
+                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
 
-                Event::fire('admin.log', array('success', 'News id: '.$id));
+                Event::fire('admin.log', ['success', 'News id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/news/');
             } else {
-                Event::fire('admin.log', array('fail', 'News id: '.$id,
-                    'Errors: '.json_encode($this->_errors + $news->getErrors()), ));
-                $view->set('errors', $this->_errors + $news->getErrors())
+                Event::fire('admin.log', ['fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($errors + $news->getErrors()),]);
+                $view->set('errors', $errors + $news->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
@@ -307,15 +206,21 @@ class NewsController extends Controller
                 self::redirect('/admin/news/');
             }
 
-            $action = $this->_editObject($news);
+            list($news, $errors) = NewsModel::editFromPost(
+                            RequestMethods::getPostDataBag(), $news, [
+                        'user' => $this->getUser(),
+                        'isAdmin' => $this->isAdmin(),
+                        'autoPublish' => $this->getConfig()->news_autopublish
+                            ]
+            );
 
-            if (empty($this->_errors) && $action->validate()) {
+            if (empty($errors) && $news->validate()) {
                 $session = Registry::get('session');
                 $session->set('newsPreview', $news);
 
                 self::redirect('/news/preview?action=edit');
             } else {
-                $view->set('errors', $this->_errors + $news->getErrors())
+                $view->set('errors', $errors + $news->getErrors())
                         ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
@@ -336,20 +241,22 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $news = \App\Model\NewsModel::first(
-                        array('id = ?' => (int) $id), array('id', 'userId')
+        $news = NewsModel::first(
+                        ['id = ?' => (int) $id], ['id', 'userId']
         );
 
         if (null === $news) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            if ($this->_checkAccess($news)) {
+            if ($this->checkAccess($news)) {
                 if ($news->delete()) {
+//                    NewsNotification::getInstance()->onDelete($news);
+                    
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('success', 'News id: ' . $id));
+                    Event::fire('admin.log', ['success', 'News id: ' . $id]);
                     $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('fail', 'News id: ' . $id));
+                    Event::fire('admin.log', ['fail', 'News id: ' . $id]);
                     $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
             } else {
@@ -373,7 +280,7 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
+        $news = NewsModel::first(['id = ?' => (int) $id]);
 
         if (null === $news) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -387,13 +294,16 @@ class NewsController extends Controller
 
             if ($news->validate()) {
                 $news->save();
+                
+//                NewsNotification::getInstance()->onCreate($news);
+                
                 $this->getCache()->erase('news');
 
-                Event::fire('admin.log', array('success', 'News id: ' . $id));
+                Event::fire('admin.log', ['success', 'News id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id,
-                    'Errors: ' . json_encode($news->getErrors()),));
+                Event::fire('admin.log', ['fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors()),]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -414,7 +324,7 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $news = \App\Model\NewsModel::first(array('id = ?' => (int) $id));
+        $news = NewsModel::first(['id = ?' => (int) $id]);
 
         if (null === $news) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -429,11 +339,11 @@ class NewsController extends Controller
             if ($news->validate()) {
                 $news->save();
 
-                Event::fire('admin.log', array('success', 'News id: ' . $id));
+                Event::fire('admin.log', ['success', 'News id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'News id: ' . $id,
-                    'Errors: ' . json_encode($news->getErrors()),));
+                Event::fire('admin.log', ['fail', 'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors()),]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -449,7 +359,7 @@ class NewsController extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $news = \App\Model\NewsModel::all(array(), array('urlKey', 'title'));
+        $news = NewsModel::all([], ['urlKey', 'title']);
 
         $view->set('news', $news);
     }
@@ -467,7 +377,7 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $errors = array();
+        $errors = [];
 
         $ids = RequestMethods::post('ids');
         $action = RequestMethods::post('action');
@@ -478,12 +388,14 @@ class NewsController extends Controller
 
         switch ($action) {
             case 'delete':
-                $news = \App\Model\NewsModel::all(array(
+                $news = NewsModel::all([
                             'id IN ?' => $ids,
-                ));
+                ]);
                 if (null !== $news) {
                     foreach ($news as $_news) {
-                        if (!$_news->delete()) {
+                        if ($_news->delete()) {
+//                            NewsNotification::getInstance()->onDelete($news);
+                        } else {
                             $errors[] = $this->lang('DELETE_FAIL') . ' - ' . $_news->getTitle();
                         }
                     }
@@ -491,20 +403,20 @@ class NewsController extends Controller
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('delete success', 'News ids: ' . implode(',', $ids)));
+                    Event::fire('admin.log', ['delete news success', 'News ids: ' . implode(',', $ids)]);
                     $this->ajaxResponse($this->lang('DELETE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('delete fail', 'Errors:' . json_encode($errors)));
+                    Event::fire('admin.log', ['delete news fail', 'Errors:' . json_encode($errors)]);
                     $message = implode(PHP_EOL, $errors);
                     $this->ajaxResponse($message, true);
                 }
 
                 break;
             case 'activate':
-                $news = \App\Model\NewsModel::all(array(
+                $news = NewsModel::all([
                             'id IN ?' => $ids,
                             'active = ?' => false,
-                ));
+                ]);
                 if (null !== $news) {
                     foreach ($news as $_news) {
                         $_news->active = true;
@@ -525,20 +437,20 @@ class NewsController extends Controller
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('activate success', 'News ids: ' . implode(',', $ids)));
+                    Event::fire('admin.log', ['activate news success', 'News ids: ' . implode(',', $ids)]);
                     $this->ajaxResponse($this->lang('ACTIVATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('activate fail', 'Errors:' . json_encode($errors)));
+                    Event::fire('admin.log', ['activate news fail', 'Errors:' . json_encode($errors)]);
                     $message = implode(PHP_EOL, $errors);
                     $this->ajaxResponse($message, true);
                 }
 
                 break;
             case 'deactivate':
-                $news = \App\Model\NewsModel::all(array(
+                $news = NewsModel::all([
                             'id IN ?' => $ids,
                             'active = ?' => true,
-                ));
+                ]);
                 if (null !== $news) {
                     foreach ($news as $_news) {
                         $_news->active = false;
@@ -559,20 +471,20 @@ class NewsController extends Controller
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('deactivate success', 'News ids: ' . implode(',', $ids)));
+                    Event::fire('admin.log', ['deactivate news success', 'News ids: ' . implode(',', $ids)]);
                     $this->ajaxResponse($this->lang('DEACTIVATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('deactivate fail', 'Errors:' . json_encode($errors)));
+                    Event::fire('admin.log', ['deactivate news fail', 'Errors:' . json_encode($errors)]);
                     $message = implode(PHP_EOL, $errors);
                     $this->ajaxResponse($message, true);
                 }
 
                 break;
             case 'approve':
-                $news = \App\Model\NewsModel::all(array(
+                $news = NewsModel::all([
                             'id IN ?' => $ids,
-                            'approved IN ?' => array(0, 2),
-                ));
+                            'approved IN ?' => [0, 2],
+                ]);
 
                 if (null !== $news) {
                     foreach ($news as $_news) {
@@ -585,8 +497,9 @@ class NewsController extends Controller
 
                         if ($_news->validate()) {
                             $_news->save();
+//                            NewsNotification::getInstance()->onCreate($news);
                         } else {
-                            $errors[] = "Action id {$_news->getId()} - {$_news->getTitle()} errors: "
+                            $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
                                     . implode(', ', $_news->getErrors());
                         }
                     }
@@ -594,20 +507,20 @@ class NewsController extends Controller
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('approve success', 'Action ids: ' . implode(',', $ids)));
+                    Event::fire('admin.log', ['approve news success', 'News ids: ' . implode(',', $ids)]);
                     $this->ajaxResponse($this->lang('UPDATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('approve fail', 'Errors:' . json_encode($errors)));
+                    Event::fire('admin.log', ['approve news fail', 'Errors:' . json_encode($errors)]);
                     $message = implode(PHP_EOL, $errors);
                     $this->ajaxResponse($message, true);
                 }
 
                 break;
             case 'reject':
-                $news = \App\Model\NewsModel::all(array(
+                $news = NewsModel::all([
                             'id IN ?' => $ids,
-                            'approved IN ?' => array(0, 1),
-                ));
+                            'approved IN ?' => [0, 1],
+                ]);
 
                 if (null !== $news) {
                     foreach ($news as $_news) {
@@ -621,7 +534,7 @@ class NewsController extends Controller
                         if ($_news->validate()) {
                             $_news->save();
                         } else {
-                            $errors[] = "Action id {$_news->getId()} - {$_news->getTitle()} errors: "
+                            $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
                                     . implode(', ', $_news->getErrors());
                         }
                     }
@@ -629,10 +542,10 @@ class NewsController extends Controller
 
                 if (empty($errors)) {
                     $this->getCache()->erase('news');
-                    Event::fire('admin.log', array('reject success', 'Action ids: ' . implode(',', $ids)));
+                    Event::fire('admin.log', ['reject news success', 'News ids: ' . implode(',', $ids)]);
                     $this->ajaxResponse($this->lang('UPDATE_SUCCESS'));
                 } else {
-                    Event::fire('admin.log', array('reject fail', 'Errors:' . json_encode($errors)));
+                    Event::fire('admin.log', ['reject news fail', 'Errors:' . json_encode($errors)]);
                     $message = implode(PHP_EOL, $errors);
                     $this->ajaxResponse($message, true);
                 }
@@ -659,10 +572,10 @@ class NewsController extends Controller
         if ($search != '') {
             $whereCond = "nw.created LIKE '%%?%%' OR nw.userAlias LIKE '%%?%%' OR nw.title LIKE '%%?%%'";
 
-            $query = \App\Model\NewsModel::getQuery(
-                            array('nw.id', 'nw.userId', 'nw.userAlias', 'nw.title',
-                                'nw.active', 'nw.approved', 'nw.archive', 'nw.created', ))
-                    ->join('tb_user', 'nw.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+            $query = NewsModel::getQuery(
+                            ['nw.id', 'nw.userId', 'nw.userAlias', 'nw.title',
+                                'nw.active', 'nw.approved', 'nw.archive', 'nw.created', 'nw.modified'])
+                    ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                     ->wheresql($whereCond, $search, $search, $search);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
@@ -677,6 +590,8 @@ class NewsController extends Controller
                     $query->order('nw.userAlias', $dir);
                 } elseif ($column == 3) {
                     $query->order('nw.created', $dir);
+                } elseif ($column == 4) {
+                    $query->order('nw.modified', $dir);
                 }
             } else {
                 $query->order('nw.id', 'desc');
@@ -684,21 +599,21 @@ class NewsController extends Controller
 
             $limit = (int) RequestMethods::post('iDisplayLength');
             $query->limit($limit, $page + 1);
-            $news = \App\Model\NewsModel::initialize($query);
+            $news = NewsModel::initialize($query);
 
-            $countQuery = \App\Model\NewsModel::getQuery(array('nw.id'))
-                    ->join('tb_user', 'nw.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+            $countQuery = NewsModel::getQuery(['nw.id'])
+                    ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                     ->wheresql($whereCond, $search, $search, $search);
 
-            $newsCount = \App\Model\NewsModel::initialize($countQuery);
+            $newsCount = NewsModel::initialize($countQuery);
             unset($countQuery);
             $count = count($newsCount);
             unset($newsCount);
         } else {
-            $query = \App\Model\NewsModel::getQuery(
-                            array('nw.id', 'nw.userId', 'nw.userAlias', 'nw.title',
-                                'nw.active', 'nw.approved', 'nw.archive', 'nw.created', ))
-                    ->join('tb_user', 'nw.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+            $query = NewsModel::getQuery(
+                            ['nw.id', 'nw.userId', 'nw.userAlias', 'nw.title',
+                                'nw.active', 'nw.approved', 'nw.archive', 'nw.created', 'nw.modified'])
+                    ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -712,6 +627,8 @@ class NewsController extends Controller
                     $query->order('nw.userAlias', $dir);
                 } elseif ($column == 3) {
                     $query->order('nw.created', $dir);
+                } elseif ($column == 4) {
+                    $query->order('nw.modified', $dir);
                 }
             } else {
                 $query->order('nw.id', 'desc');
@@ -719,16 +636,16 @@ class NewsController extends Controller
 
             $limit = (int) RequestMethods::post('iDisplayLength');
             $query->limit($limit, $page + 1);
-            $news = \App\Model\NewsModel::initialize($query);
+            $news = NewsModel::initialize($query);
 
-            $count = \App\Model\NewsModel::count();
+            $count = NewsModel::count();
         }
 
         $draw = $page + 1 + time();
 
-        $str = '{ "draw": '.$draw.', "recordsTotal": '.$count.', "recordsFiltered": '.$count.', "data": [';
+        $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
 
-        $returnArr = array();
+        $returnArr = [];
         if (null !== $news) {
             foreach ($news as $_news) {
                 $label = '';
@@ -738,9 +655,9 @@ class NewsController extends Controller
                     $label .= "<span class='infoLabel infoLabelRed'>Neaktivní</span>";
                 }
 
-                if ($_news->approved == \App\Model\NewsModel::STATE_APPROVED) {
+                if ($_news->approved == NewsModel::STATE_APPROVED) {
                     $label .= "<span class='infoLabel infoLabelGreen'>Schváleno</span>";
-                } elseif ($_news->approved == \App\Model\NewsModel::STATE_REJECTED) {
+                } elseif ($_news->approved == NewsModel::STATE_REJECTED) {
                     $label .= "<span class='infoLabel infoLabelRed'>Zamítnuto</span>";
                 } else {
                     $label .= "<span class='infoLabel infoLabelOrange'>Čeká na schválení</span>";
@@ -751,35 +668,33 @@ class NewsController extends Controller
                 }
 
                 if ($_news->archive) {
-                    $archiveLabel = "<span class='infoLabel infoLabelGreen'>Ano</span>";
-                } else {
-                    $archiveLabel = "<span class='infoLabel infoLabelGray'>Ne</span>";
+                    $label .= "<span class='infoLabel infoLabelGray'>Archivováno</span>";
                 }
 
-                $arr = array();
-                $arr [] = '[ "'.$_news->getId().'"';
-                $arr [] = '"'.htmlentities($_news->getTitle()).'"';
-                $arr [] = '"'.$_news->getUserAlias().'"';
-                $arr [] = '"'.$_news->getCreated().'"';
-                $arr [] = '"'.$label.'"';
-                $arr [] = '"'.$archiveLabel.'"';
+                $arr = [];
+                $arr [] = '[ "' . $_news->getId() . '"';
+                $arr [] = '"' . htmlentities($_news->getTitle()) . '"';
+                $arr [] = '"' . $_news->getUserAlias() . '"';
+                $arr [] = '"' . $_news->getCreated() . '"';
+                $arr [] = '"' . $_news->getModified() . '"';
+                $arr [] = '"' . $label . '"';
 
                 $tempStr = '"';
                 if ($this->isAdmin() || $_news->userId == $this->getUser()->getId()) {
-                    $tempStr .= "<a href='/admin/news/edit/".$_news->id."' class='btn btn3 btn_pencil' title='Upravit'></a>";
-                    $tempStr .= "<a href='/admin/news/delete/".$_news->id."' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
+                    $tempStr .= "<a href='/admin/news/edit/" . $_news->id . "' class='btn btn3 btn_pencil' title='Upravit'></a>";
+                    $tempStr .= "<a href='/admin/news/delete/" . $_news->id . "' class='btn btn3 btn_trash ajaxDelete' title='Smazat'></a>";
                 }
 
                 if ($this->isAdmin() && $_news->approved == 0) {
-                    $tempStr .= "<a href='/admin/news/approvenews/".$_news->id."' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
-                    $tempStr .= "<a href='/admin/news/rejectnews/".$_news->id."' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
+                    $tempStr .= "<a href='/admin/news/approvenews/" . $_news->id . "' class='btn btn3 btn_info ajaxReload' title='Schválit'></a>";
+                    $tempStr .= "<a href='/admin/news/rejectnews/" . $_news->id . "' class='btn btn3 btn_stop ajaxReload' title='Zamítnout'></a>";
                 }
 
-                $arr [] = $tempStr.'"]';
+                $arr [] = $tempStr . '"]';
                 $returnArr[] = implode(',', $arr);
             }
 
-            $str .= implode(',', $returnArr).']}';
+            $str .= implode(',', $returnArr) . ']}';
 
             echo $str;
         } else {
@@ -796,6 +711,7 @@ class NewsController extends Controller
      */
     public function help()
     {
+
     }
 
     /**
@@ -811,10 +727,10 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $concept = \Admin\Model\ConceptModel::first(array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
+        $concept = \Admin\Model\ConceptModel::first(['id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()]);
 
         if (null !== $concept) {
-            $conceptArr = array(
+            $conceptArr = [
                 'conceptid' => $concept->getId(),
                 'title' => $concept->getTitle(),
                 'shortbody' => $concept->getShortBody(),
@@ -822,11 +738,12 @@ class NewsController extends Controller
                 'keywords' => $concept->getKeywords(),
                 'metatitle' => $concept->getMetaTitle(),
                 'metadescription' => $concept->getMetaDescription(),
-            );
+            ];
 
             $this->ajaxResponse(json_encode($conceptArr));
         } else {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         }
     }
+
 }

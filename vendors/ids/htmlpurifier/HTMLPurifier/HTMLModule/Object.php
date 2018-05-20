@@ -14,7 +14,7 @@ class HTMLPurifier_HTMLModule_Object extends HTMLPurifier_HTMLModule
     public function setup($config) {
 
         $this->addElement('object', 'Inline', 'Optional: #PCDATA | Flow | param', 'Common',
-            array(
+            [
                 'archive' => 'URI',
                 'classid' => 'URI',
                 'codebase' => 'URI',
@@ -27,17 +27,17 @@ class HTMLPurifier_HTMLModule_Object extends HTMLPurifier_HTMLModule
                 'tabindex' => 'Number',
                 'type' => 'ContentType',
                 'width' => 'Length'
-            )
+            ]
         );
 
         $this->addElement('param', false, 'Empty', false,
-            array(
+            [
                 'id' => 'ID',
                 'name*' => 'Text',
                 'type' => 'Text',
                 'value' => 'Text',
                 'valuetype' => 'Enum#data,ref,object'
-           )
+           ]
         );
 
     }

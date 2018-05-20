@@ -42,7 +42,7 @@ class Logger {
         }
 
         $this->_file = $options['file'];
-        $this->_entries = array();
+        $this->_entries = [];
         $this->_start = microtime(true);
     }
 
@@ -51,10 +51,10 @@ class Logger {
      * @param type $message
      */
     public function log($message) {
-        $this->_entries[] = array(
+        $this->_entries[] = [
             'message' => '[' . date('Y-m-d H:i:s') . ']' . $message,
             'time' => microtime(true)
-        );
+        ];
     }
 
     /**
@@ -63,7 +63,7 @@ class Logger {
     public function __destruct() {
         $messages = '';
         $last = $this->_start;
-        $times = array();
+        $times = [];
 
         foreach ($this->_entries as $entry) {
             $messages .= $entry['message'] . PHP_EOL;

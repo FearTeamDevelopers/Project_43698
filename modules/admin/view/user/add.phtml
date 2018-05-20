@@ -46,13 +46,21 @@
             </span>
         </p>
         <p>
-            <label>Notifikace</label>
+            <label>Souhlas se zpracováním*</label>
             <span class="field">
-                <input type="checkbox" name="actionNotification" value="1" /><span>Chci dostávat emailové oznámení o nových akcích</span><br/>
-                <input type="checkbox" name="reportNotification" value="1"/><span>Chci dostávat emailové oznámení o nových reportážích</span>
+                <input type="checkbox" name="pdConsentToProcessing" value="1" />
+                <span>Souhlasím se zpracováváním osobních údajů podle <a href="/ochrana-soukromi" target="_blank">Zásad ochrany soukromí</a></span><br/>
             </span>
         </p>
-        
+        <p>
+            <label>Notifikace</label>
+            <span class="field">
+                <input type="checkbox" name="actionNotification" value="1" /><span>Souhlasím se zasíláním informací o akcích na e-mail</span><br/>
+                <input type="checkbox" name="reportNotification" value="1"/><span>Souhlasím se zasíláním informací o reportážích na e-mail</span><br/>
+                <input type="checkbox" name="newsNotification" value="1"/><span>Souhlasím se zasíláním informací o novinkách na e-mail</span>
+            </span>
+        </p>
+
         <br/>
         <div class="contenttitle radiusbottom0">
             <h2 class="form"><span>Přihlašovací údaje</span></h2>
@@ -111,7 +119,7 @@
             <label>Role</label>
             <span class="field">
                 <select name="role" class="width80">
-                    <option value="role_member">Člen</option>
+                    <option value="role_member" selected="selected">Člen</option>
                     <option value="role_participant">Člen s přístupem do administrace</option>
                     <option value="role_admin">Admin</option>
                 </select>

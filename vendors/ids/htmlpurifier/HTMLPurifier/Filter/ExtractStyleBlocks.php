@@ -18,7 +18,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
 {
 
     public $name = 'ExtractStyleBlocks';
-    private $_styleMatches = array();
+    private $_styleMatches = [];
     private $_tidy;
 
     public function __construct() {
@@ -40,9 +40,9 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
     public function preFilter($html, $config, $context) {
         $tidy = $config->get('Filter.ExtractStyleBlocks.TidyImpl');
         if ($tidy !== null) $this->_tidy = $tidy;
-        $html = preg_replace_callback('#<style(?:\s.*)?>(.+)</style>#isU', array($this, 'styleCallback'), $html);
+        $html = preg_replace_callback('#<style(?:\s.*)?>(.+)</style>#isU', [$this, 'styleCallback'], $html);
         $style_blocks = $this->_styleMatches;
-        $this->_styleMatches = array(); // reset
+        $this->_styleMatches = []; // reset
         $context->register('StyleBlocks', $style_blocks); // $context must not be reused
         if ($this->_tidy) {
             foreach ($style_blocks as &$style) {
@@ -66,7 +66,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
         if ($scope !== null) {
             $scopes = array_map('trim', explode(',', $scope));
         } else {
-            $scopes = array();
+            $scopes = [];
         }
         // remove comments from CSS
         $css = trim($css);
@@ -81,7 +81,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
         $css_definition = $config->getDefinition('CSS');
         foreach ($this->_tidy->css as $k => $decls) {
             // $decls are all CSS declarations inside an @ selector
-            $new_decls = array();
+            $new_decls = [];
             foreach ($decls as $selector => $style) {
                 $selector = trim($selector);
                 if ($selector === '') continue; // should not happen
@@ -89,7 +89,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
                     if ($selector !== '' && $selector[0] === '+') continue;
                 }
                 if (!empty($scopes)) {
-                    $new_selector = array(); // because multiple ones are possible
+                    $new_selector = []; // because multiple ones are possible
                     $selectors = array_map('trim', explode(',', $selector));
                     foreach ($scopes as $s1) {
                         foreach ($selectors as $s2) {
@@ -114,7 +114,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
         }
         // remove stuff that shouldn't be used, could be reenabled
         // after security risks are analyzed
-        $this->_tidy->import = array();
+        $this->_tidy->import = [];
         $this->_tidy->charset = null;
         $this->_tidy->namespace = null;
         $css = $this->_tidy->print->plain();
@@ -122,8 +122,8 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
         // that no funny business occurs (i.e. </style> in a font-family prop).
         if ($config->get('Filter.ExtractStyleBlocks.Escaping')) {
             $css = str_replace(
-                array('<',    '>',    '&'),
-                array('\3C ', '\3E ', '\26 '),
+                ['<',    '>',    '&'],
+                ['\3C ', '\3E ', '\26 '],
                 $css
             );
         }

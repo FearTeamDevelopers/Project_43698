@@ -1,4 +1,4 @@
-﻿
+
 CKEDITOR.plugins.setLang( 'lightbox', 'pl', {
     label: 'Wstaw/edytuj galerię Lightbox',
 	url: 'Obraz do wyświetlenia w oknie Lightbox',

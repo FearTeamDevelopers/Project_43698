@@ -24,7 +24,7 @@ class IndexController extends Controller
         $latestReports = \App\Model\ReportModel::fetchWithLimit(10);
         $latestComments = \App\Model\CommentModel::fetchWithLimit(10);
 
-        $latestUsers = $latestErrors = array();
+        $latestUsers = $latestErrors = [];
 
         if($this->isSuperAdmin()){
             $latestErrors = \Admin\Model\AdminLogModel::fetchErrorsFromLastWeek();

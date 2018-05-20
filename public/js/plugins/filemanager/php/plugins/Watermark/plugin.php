@@ -52,11 +52,11 @@
  */
 class elFinderPluginWatermark {
 
-	private $opts = array();
+	private $opts = [];
 	private $watermarkImgInfo = null;
 
 	public function __construct($opts) {
-		$defaults = array(
+		$defaults = [
 			'enable'         => true,       // For control by volume driver
 			'source'         => 'logo.png', // Path to Water mark image
 			'marginRight'    => 5,          // Margin right pixel
@@ -65,7 +65,7 @@ class elFinderPluginWatermark {
 			'transparency'   => 70,         // Water mark image transparency ( other than PNG )
 			'targetType'     => IMG_GIF|IMG_JPG|IMG_PNG|IMG_WBMP, // Target image formats ( bit-field )
 			'targetMinPixel' => 200         // Target image minimum pixel size
-		);
+		];
 
 		$this->opts = array_merge($defaults, $opts);
 
@@ -108,12 +108,12 @@ class elFinderPluginWatermark {
 		$transparency = $opts['transparency'];
 
 		// check target image type
-		$imgTypes = array(
+		$imgTypes = [
 			IMAGETYPE_GIF => IMG_GIF,
 			IMAGETYPE_JPEG => IMG_JPEG,
 			IMAGETYPE_PNG => IMG_PNG,
 			IMAGETYPE_WBMP => IMG_WBMP,
-		);
+		];
 		if (! ($opts['targetType'] & $imgTypes[$srcImgInfo[2]])) {
 			return false;
 		}

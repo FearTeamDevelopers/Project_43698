@@ -5,13 +5,14 @@ namespace App\Controller;
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Registry\Registry;
+use THCFrame\View\View;
 
 /**
  *
  */
 class NewsController extends Controller
 {
-    
+
     /**
      * Check if are set specific metadata or leave their default values.
      */
@@ -20,20 +21,20 @@ class NewsController extends Controller
         $uri = RequestMethods::server('REQUEST_URI');
 
         if ($object->getMetaTitle() != '') {
-            $layoutView->set('metatitle', 'Novinky - '.$object->getMetaTitle());
+            $layoutView->set(View::META_TITLE, 'Novinky - ' . $object->getMetaTitle());
         }
 
         if ($object->getMetaDescription() != '') {
-            $layoutView->set('metadescription', $object->getMetaDescription());
+            $layoutView->set(View::META_DESCRIPTION, $object->getMetaDescription());
         }
 
-        $canonical = 'http://'.$this->getServerHost().'/novinky/r/'.$object->getUrlKey();
+        $canonical = $this->getServerHost() . '/novinky/r/' . $object->getUrlKey();
 
-        $layoutView->set('canonical', $canonical)
+        $layoutView->set(View::META_CANONICAL, $canonical)
                 ->set('article', 1)
                 ->set('articlecreated', $object->getCreated())
                 ->set('articlemodified', $object->getModified())
-                ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
+                ->set('metaogurl', "{$this->getServerHost()}{$uri}")
                 ->set('metaogtype', 'article');
     }
 
@@ -54,25 +55,25 @@ class NewsController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/novinky';
+            $canonical = $this->getServerHost() . '/novinky';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/novinky/p/'.$page;
+            $canonical = $this->getServerHost() . '/novinky/p/' . $page;
         }
 
-        $content = $this->getCache()->get('news-'.$page);
+        $content = $this->getCache()->get('news-' . $page);
 
         if (null !== $content) {
             $news = $content;
         } else {
             $news = \App\Model\NewsModel::fetchActiveWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('news-'.$page, $news);
+            $this->getCache()->set('news-' . $page, $news);
         }
 
         $newsCount = \App\Model\NewsModel::count(
-                        array('active = ?' => true,
+                        ['active = ?' => true,
                             'archive = ?' => false,
-                            'approved = ?' => 1, )
+                            'approved = ?' => 1,]
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
@@ -83,8 +84,8 @@ class NewsController extends Controller
                 ->set('pagerpathprefix', '/novinky')
                 ->set('pagecount', $newsPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Novinky');
+        $layoutView->set(View::META_CANONICAL, $canonical)
+                ->set(View::META_TITLE, 'Hastrman - Novinky');
     }
 
     /**
@@ -104,25 +105,25 @@ class NewsController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/archiv-novinek';
+            $canonical = $this->getServerHost() . '/archiv-novinek';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/archiv-novinek/p/'.$page;
+            $canonical = $this->getServerHost() . '/archiv-novinek/p/' . $page;
         }
 
-        $content = $this->getCache()->get('news-arch-'.$page);
+        $content = $this->getCache()->get('news-arch-' . $page);
 
         if (null !== $content) {
             $news = $content;
         } else {
             $news = \App\Model\NewsModel::fetchArchivatedWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('news-arch-'.$page, $news);
+            $this->getCache()->set('news-arch-' . $page, $news);
         }
 
         $newsCount = \App\Model\NewsModel::count(
-                        array('active = ?' => true,
+                        ['active = ?' => true,
                             'archive = ?' => true,
-                            'approved = ?' => 1, )
+                            'approved = ?' => 1,]
         );
         $newsPageCount = ceil($newsCount / $articlesPerPage);
 
@@ -133,8 +134,8 @@ class NewsController extends Controller
                 ->set('pagerpathprefix', '/archiv-novinek')
                 ->set('pagecount', $newsPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Novinky - Archiv');
+        $layoutView->set(View::META_CANONICAL, $canonical)
+                ->set(View::META_TITLE, 'Hastrman - Novinky - Archiv');
     }
 
     /**
@@ -170,7 +171,7 @@ class NewsController extends Controller
         $news = $session->get('newsPreview');
 
         if (null === $news) {
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/news/');
         }
@@ -178,6 +179,7 @@ class NewsController extends Controller
         $act = RequestMethods::get('action');
 
         $view->set('news', $news)
-            ->set('act', $act);
+                ->set('act', $act);
     }
+
 }

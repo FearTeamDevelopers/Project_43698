@@ -9,22 +9,22 @@ class HTMLPurifier_ContentSets
     /**
      * List of content set strings (pipe seperators) indexed by name.
      */
-    public $info = array();
+    public $info = [];
 
     /**
      * List of content set lookups (element => true) indexed by name.
      * @note This is in HTMLPurifier_HTMLDefinition->info_content_sets
      */
-    public $lookup = array();
+    public $lookup = [];
 
     /**
      * Synchronized list of defined content sets (keys of info)
      */
-    protected $keys = array();
+    protected $keys = [];
     /**
      * Synchronized list of defined content values (values of info)
      */
-    protected $values = array();
+    protected $values = [];
 
     /**
      * Merges in module's content sets, expands identifiers in the content
@@ -32,7 +32,7 @@ class HTMLPurifier_ContentSets
      * @param $modules List of HTMLPurifier_HTMLModule
      */
     public function __construct($modules) {
-        if (!is_array($modules)) $modules = array($modules);
+        if (!is_array($modules)) $modules = [$modules];
         // populate content_sets based on module hints
         // sorry, no way of overloading
         foreach ($modules as $module_i => $module) {
@@ -50,7 +50,7 @@ class HTMLPurifier_ContentSets
         while ($old_lookup !== $this->lookup) {
             $old_lookup = $this->lookup;
             foreach ($this->lookup as $i => $set) {
-                $add = array();
+                $add = [];
                 foreach ($set as $element => $x) {
                     if (isset($this->lookup[$element])) {
                         $add += $this->lookup[$element];
@@ -80,7 +80,7 @@ class HTMLPurifier_ContentSets
             // Assume that $this->keys is alphanumeric
             $def->content_model = preg_replace_callback(
                 '/\b(' . implode('|', $this->keys) . ')\b/',
-                array($this, 'generateChildDefCallback'),
+                [$this, 'generateChildDefCallback'],
                 $content_model
             );
             //$def->content_model = str_replace(
@@ -143,7 +143,7 @@ class HTMLPurifier_ContentSets
      */
     protected function convertToLookup($string) {
         $array = explode('|', str_replace(' ', '', $string));
-        $ret = array();
+        $ret = [];
         foreach ($array as $i => $k) {
             $ret[$k] = true;
         }

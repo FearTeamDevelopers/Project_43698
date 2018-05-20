@@ -10,8 +10,8 @@ use THCFrame\Security\Exception;
 class Rbac
 {
 
-    private $_permissionList = array();
-    private $_roleList = array();
+    private $_permissionList = [];
+    private $_roleList = [];
     private $_graph;
     private static $_instance = null;
 
@@ -22,21 +22,21 @@ class Rbac
 
     private function isValidPermission($permission)
     {
-        
+
     }
 
     private function isValidResource($module, $controller, $action)
     {
-        
+
     }
 
     private function generateGraph()
     {
-        
+
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public static function getInstance()
@@ -53,7 +53,7 @@ class Rbac
          * userroles
          * result = false
          * foreach userroles
-         * 
+         *
          *  role getpermissions
          *  foreach permissions
          *      permission is allowed or is denied

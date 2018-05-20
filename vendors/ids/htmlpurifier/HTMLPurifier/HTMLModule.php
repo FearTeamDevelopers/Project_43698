@@ -29,14 +29,14 @@ class HTMLPurifier_HTMLModule
      * Informally, a list of elements this module changes. Not used in
      * any significant way.
      */
-    public $elements = array();
+    public $elements = [];
 
     /**
      * Associative array of element names to element definitions.
      * Some definitions may be incomplete, to be merged in later
      * with the full definition.
      */
-    public $info = array();
+    public $info = [];
 
     /**
      * Associative array of content set names to content set additions.
@@ -44,7 +44,7 @@ class HTMLPurifier_HTMLModule
      * content set. This corresponds to an internal variable $content_sets
      * and NOT info_content_sets member variable of HTMLDefinition.
      */
-    public $content_sets = array();
+    public $content_sets = [];
 
     /**
      * Associative array of attribute collection names to attribute
@@ -54,22 +54,22 @@ class HTMLPurifier_HTMLModule
      * attr_collections->info, since the object's data is only info,
      * with extra behavior associated with it.
      */
-    public $attr_collections = array();
+    public $attr_collections = [];
 
     /**
      * Associative array of deprecated tag name to HTMLPurifier_TagTransform
      */
-    public $info_tag_transform = array();
+    public $info_tag_transform = [];
 
     /**
      * List of HTMLPurifier_AttrTransform to be performed before validation.
      */
-    public $info_attr_transform_pre = array();
+    public $info_attr_transform_pre = [];
 
     /**
      * List of HTMLPurifier_AttrTransform to be performed after validation.
      */
-    public $info_attr_transform_post = array();
+    public $info_attr_transform_post = [];
 
     /**
      * List of HTMLPurifier_Injector to be performed during well-formedness fixing.
@@ -77,7 +77,7 @@ class HTMLPurifier_HTMLModule
      * if an injector fails setup, there will be no error; it will simply be
      * silently disabled.
      */
-    public $info_injector = array();
+    public $info_injector = [];
 
     /**
      * Boolean flag that indicates whether or not getChildDef is implemented.
@@ -127,7 +127,7 @@ class HTMLPurifier_HTMLModule
      * @return Created element definition object, so you
      *         can set advanced parameters
      */
-    public function addElement($element, $type, $contents, $attr_includes = array(), $attr = array()) {
+    public function addElement($element, $type, $contents, $attr_includes = [], $attr = []) {
         $this->elements[] = $element;
         // parse content_model
         list($content_model_type, $content_model) = $this->parseContents($contents);
@@ -183,20 +183,20 @@ class HTMLPurifier_HTMLModule
      *       and use it directly.
      */
     public function parseContents($contents) {
-        if (!is_string($contents)) return array(null, null); // defer
+        if (!is_string($contents)) return [null, null]; // defer
         switch ($contents) {
             // check for shorthand content model forms
             case 'Empty':
-                return array('empty', '');
+                return ['empty', ''];
             case 'Inline':
-                return array('optional', 'Inline | #PCDATA');
+                return ['optional', 'Inline | #PCDATA'];
             case 'Flow':
-                return array('optional', 'Flow | #PCDATA');
+                return ['optional', 'Flow | #PCDATA'];
         }
         list($content_model_type, $content_model) = explode(':', $contents);
         $content_model_type = strtolower(trim($content_model_type));
         $content_model = trim($content_model);
-        return array($content_model_type, $content_model);
+        return [$content_model_type, $content_model];
     }
 
     /**
@@ -207,8 +207,8 @@ class HTMLPurifier_HTMLModule
      */
     public function mergeInAttrIncludes(&$attr, $attr_includes) {
         if (!is_array($attr_includes)) {
-            if (empty($attr_includes)) $attr_includes = array();
-            else $attr_includes = array($attr_includes);
+            if (empty($attr_includes)) $attr_includes = [];
+            else $attr_includes = [$attr_includes];
         }
         $attr[0] = $attr_includes;
     }
@@ -223,7 +223,7 @@ class HTMLPurifier_HTMLModule
      */
     public function makeLookup($list) {
         if (is_string($list)) $list = func_get_args();
-        $ret = array();
+        $ret = [];
         foreach ($list as $value) {
             if (is_null($value)) continue;
             $ret[$value] = true;

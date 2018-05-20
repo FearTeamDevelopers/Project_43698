@@ -16,33 +16,34 @@ class Filecache extends Cache\Driver
      * @readwrite
      */
     protected $_duration;
-    
+
     /**
      * @readwrite
      */
     protected $_path;
-    
+
     /**
      * @readwrite
      */
     protected $_suffix;
-    
+
     /**
      * @readwrite
      */
     protected $_mode;
-    
+
     /**
-     * @var THCFrame\Filesystem\FileManager 
+     * @var FileManager
      */
     private $_fileManager;
 
     /**
-     * Class constructor
-     * 
+     * Filecache constructor.
      * @param array $options
+     * @throws \Exception
+     * @throws \THCFrame\Filesystem\Exception\IO
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -57,13 +58,13 @@ class Filecache extends Cache\Driver
 
     /**
      * Method checks if cache file is not expired
-     * 
+     *
      * @param string $key
      * @return boolean
      */
     public function isFresh($key)
     {
-        if ($this->_mode == 'active' && ENV == 'dev') {
+        if ($this->_mode == 'active' && ENV == \THCFrame\Core\Core::ENV_DEV) {
             return false;
         }
 
@@ -80,7 +81,7 @@ class Filecache extends Cache\Driver
 
     /**
      * Loads cache file content
-     * 
+     *
      * @param string $key
      * @param string $default
      * @return string
@@ -97,23 +98,18 @@ class Filecache extends Cache\Driver
 
     /**
      * Save data into file named by key
-     * 
+     *
      * @param string $key
      * @param mixed $value
-     * @return type
      * @throws Exception\Service
+     * @throws \THCFrame\Filesystem\Exception\IO
      */
     public function set($key, $value)
     {
         $file = $this->_path . $key . $this->_suffix;
-        $tmpFile = tempnam($this->_path, basename($key . $this->_suffix));
 
-        if (false !== @file_put_contents($tmpFile, serialize($value)) && $this->_fileManager->rename($tmpFile, $file, true)) {
-            $this->_fileManager->chmod($file, 0666, umask());
-
-            if (file_exists($tmpFile)) {
-                @unlink($tmpFile);
-            }
+        if (false !== @file_put_contents($file, serialize($value))) {
+            $this->_fileManager->chmod($file, 0755, umask());
 
             return;
         }
@@ -123,21 +119,20 @@ class Filecache extends Cache\Driver
 
     /**
      * Removes file with specific name
-     * 
+     *
      * @param string $key
+     * @throws \THCFrame\Filesystem\Exception\IO
      */
     public function erase($key)
     {
         $matches = glob($this->_path.'*'.$key.'*');
-        foreach ($matches as $file){
-            if (file_exists($file)) {
-                $this->_fileManager->remove($file);
-            }
-        }
+        $this->_fileManager->remove($matches);
     }
 
     /**
      * Removes all files and folders from cache folder
+     *
+     * @throws \THCFrame\Filesystem\Exception\IO
      */
     public function clearCache()
     {

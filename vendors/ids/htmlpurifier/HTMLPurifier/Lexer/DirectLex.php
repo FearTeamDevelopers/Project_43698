@@ -35,14 +35,14 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
         // the first script tag
         if ($config->get('HTML.Trusted')) {
             $html = preg_replace_callback('#(<script[^>]*>)(\s*[^<].+?)(</script>)#si',
-                array($this, 'scriptCallback'), $html);
+                [$this, 'scriptCallback'], $html);
         }
 
         $html = $this->normalize($html, $config, $context);
 
         $cursor = 0; // our location in the text
         $inside_tag = false; // whether or not we're parsing the inside of a tag
-        $array = array(); // result array
+        $array = []; // result array
 
         // This is also treated to mean maintain *column* numbers too
         $maintain_line_numbers = $config->get('Core.MaintainLineNumbers');
@@ -278,7 +278,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                                   , $config, $context
                               );
                 } else {
-                    $attr = array();
+                    $attr = [];
                 }
 
                 if ($is_self_closing) {
@@ -342,7 +342,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
     public function parseAttributeString($string, $config, $context) {
         $string = (string) $string; // quick typecast
 
-        if ($string == '') return array(); // no attributes
+        if ($string == '') return []; // no attributes
 
         $e = false;
         if ($config->get('Core.CollectErrors')) {
@@ -355,16 +355,16 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
         $has_space = strpos($string, ' ');
         if ($num_equal === 0 && !$has_space) {
             // bool attribute
-            return array($string => $string);
+            return [$string => $string];
         } elseif ($num_equal === 1 && !$has_space) {
             // only one attribute
             list($key, $quoted_value) = explode('=', $string);
             $quoted_value = trim($quoted_value);
             if (!$key) {
                 if ($e) $e->send(E_ERROR, 'Lexer: Missing attribute key');
-                return array();
+                return [];
             }
-            if (!$quoted_value) return array($key => '');
+            if (!$quoted_value) return [$key => ''];
             $first_char = @$quoted_value[0];
             $last_char  = @$quoted_value[strlen($quoted_value)-1];
 
@@ -384,11 +384,11 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                 }
             }
             if ($value === false) $value = '';
-            return array($key => $this->parseData($value));
+            return [$key => $this->parseData($value)];
         }
 
         // setup loop environment
-        $array  = array(); // return assoc array of attributes
+        $array  = []; // return assoc array of attributes
         $cursor = 0; // current position in string (moves forward)
         $size   = strlen($string); // size of the string (stays the same)
 

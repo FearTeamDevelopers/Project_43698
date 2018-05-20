@@ -5,7 +5,6 @@ namespace Search\Etc;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry as Registry;
 use THCFrame\Controller\Controller as BaseController;
-use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
 
 /**
@@ -15,60 +14,9 @@ class Controller extends BaseController
 {
 
     /**
-     * @read
-     *
-     * @var type
-     */
-    protected $_stopwords_en = array('a', 'able', 'about', 'across', 'after', 'all', 'almost', 'also', 'am', 'among', 'an', 'and', 'any', 'are', 'as', 'at',
-        'be', 'because', 'been', 'but', 'by', 'can', 'cannot', 'could', 'dear', 'did', 'do', 'does', 'either', 'else', 'ever', 'every', 'for', 'from', 'get', 'got',
-        'had', 'has', 'have', 'he', 'her', 'hers', 'him', 'his', 'how', 'however', 'i', 'if', 'in', 'into', 'is', 'it', 'its', 'just', 'least', 'let', 'like', 'likely',
-        'may', 'me', 'might', 'most', 'must', 'my', 'neither', 'no', 'nor', 'not', 'of', 'off', 'often', 'on', 'only', 'or', 'other', 'our', 'own', 'rather',
-        'said', 'say', 'says', 'she', 'should', 'since', 'so', 'some', 'than', 'that', 'the', 'their', 'them', 'then', 'there', 'these', 'they', 'this', 'tis', 'to', 'too', 'twas',
-        'us', 'wants', 'was', 'we', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'whom', 'why', 'will', 'with', 'would', 'yet', 'you', 'your',
-        "ain't", "aren't", "can't", "could've", "couldn't", "didn't", "doesn't", "don't", "hasn't", "he'd", "he'll", "he's", "how'd", "how'll", "how's",
-        "i'd", "i'll", "i'm", "i've", "isn't", "it's", "might've", "mightn't", "must've", "mustn't", "shan't", "she'd", "she'll", "she's", "should've",
-        "shouldn't", "that'll", "that's", "there's", "they'd", "they'll", "they're", "they've", "wasn't", "we'd", "we'll", "we're", "weren't", "what'd",
-        "what's", "when'd", "when'll", "when's", "where'd", "where'll", "where's", "who'd", "who'll", "who's", "why'd", "why'll", "why's", "won't", "would've",
-        "wouldn't", "you'd", "you'll", "you're", "you've", );
-
-    /**
-     * @read
-     *
-     * @var type
-     */
-    protected $_stopwords_cs = array(
-        'com', 'net', 'org', 'div', 'nbsp', 'http', 'jeden', 'jedna', 'dva', 'tri', 'ctyri', 'pet', 'sest', 'sedm', 'osm',
-        'devet', 'deset', 'dny', 'den', 'dne', 'dni', 'dnes', 'timto', 'budes', 'budem', 'byli', 'jses', 'muj', 'svym',
-        'tomto', 'tam', 'tohle', 'tuto', 'tyto', 'jej', 'zda', 'proc', 'mate', 'tato', 'kam', 'tohoto', 'kdo', 'kteri',
-        'nam', 'tom', 'tomuto', 'mit', 'nic', 'proto', 'kterou', 'byla', 'toho', 'protoze', 'asi', 'nasi', 'napiste',
-        'coz', 'tim', 'takze', 'svych', 'jeji', 'svymi', 'jste', 'tedy', 'teto', 'bylo', 'kde', 'prave', 'nad', 'nejsou',
-        'pod', 'tema', 'mezi', 'pres', 'pak', 'vam', 'ani', 'kdyz', 'vsak', 'jsem', 'tento', 'clanku', 'clanky', 'aby',
-        'jsme', 'pred', 'pta', 'jejich', 'byl', 'jeste', 'bez', 'take', 'pouze', 'prvni', 'vase', 'ktera', 'nas', 'novy',
-        'tipy', 'pokud', 'muze', 'design', 'strana', 'jeho', 'sve', 'jine', 'zpravy', 'nove', 'neni', 'vas', 'jen', 'podle',
-        'zde', 'clanek', 'email', 'byt', 'vice', 'bude', 'jiz', 'nez', 'ktery', 'ktere', 'nebo', 'ten', 'tak', 'pri', 'jsou',
-        'jak', 'dalsi', 'ale', 'jako', 'zpet', 'pro', 'www', 'atd', 'cca', 'cili', 'dal', 'der', 'des', 'det', 'druh', 'faq',
-        'hot', 'for', 'info', 'ing',
-    );
-
-    /**
-     * @param type $string
-     *
-     * @return type
-     */
-    protected function _createUrlKey($string)
-    {
-        $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
-        $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
-        $cleaned = StringMethods::fastClean($preCleaned);
-        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
-
-        return strtolower($return);
-    }
-
-    /**
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -83,9 +31,8 @@ class Controller extends BaseController
      */
     protected function disableView()
     {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
-        header('Content-Type: text/html; charset=utf-8');
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
     }
 
     /**
@@ -194,7 +141,7 @@ class Controller extends BaseController
      *
      * @return type
      */
-    public function lang($key, $args = array())
+    public function lang($key, $args = [])
     {
         return $this->getLang()->_get($key, $args);
     }

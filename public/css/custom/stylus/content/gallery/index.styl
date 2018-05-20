@@ -1,13 +1,11 @@
 .gallery
 	.galleryWrapper
-		height:300px;
+		height 280px
 
 	article
-		height:280px;
-		background #ffffff
-		border-radius 5px;
-		border 1px solid defaultBLue
+		height 280px
 		transition: all 400ms ease;
+		position relative
 		h3
 			text-align center
 			overflow hidden
@@ -15,29 +13,39 @@
 			white-space nowrap
 
 		.imgWrapper
-			height 222px
+			height 280px
 			overflow hidden
 			img
-				border-top-left-radius 5px;
-				border-top-right-radius 5px;
 				height 100%
 				width 100%
+			.small
+				margin 2rem 3.7rem
+				width 60% !important
+				height 60%
 		.info
+			position absolute
+			bottom 0
+			text-align center
+			background rgba(0, 0, 0, 0.7)
+			transition top 0.8s ease;
+			width 100%
 			h3
-				padding 5px 10px
+				padding 10px 20px
+				color white
 		&:hover
 			background defaultBLue
 			transition: all 400ms ease;
 			.info
 				h3
-					color white
+					color defaultGreen
 .galleryDetail
+	.videoContainer
+		margin-bottom 2rem
+		.video
+			height 300px
 	.image
 		text-align center
 		height 170px
 		img
 			height 170px
 			width auto
-
-
-

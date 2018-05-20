@@ -35,9 +35,9 @@ class NewsHistoryModel extends BasicNewshistoryModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('nwh.*'))
+        $query = self::getQuery(['nwh.*'])
                 ->join('tb_user', 'nwh.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'));
+                        ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -49,9 +49,9 @@ class NewsHistoryModel extends BasicNewshistoryModel
      */
     public static function fetchWithLimit($limit = 10, $page = 1)
     {
-        $query = self::getQuery(array('nwh.*'))
+        $query = self::getQuery(['nwh.*'])
                 ->join('tb_user', 'nwh.editedBy = us.id', 'us',
-                        array('us.firstname', 'us.lastname'))
+                        ['us.firstname', 'us.lastname'])
                 ->order('nwh.created', 'desc')
                 ->limit((int) $limit, $page);
 
@@ -71,7 +71,7 @@ class NewsHistoryModel extends BasicNewshistoryModel
 
         $remoteAddr = RequestMethods::getClientIpAddress();
         $referer = RequestMethods::server('HTTP_REFERER');
-        $changes = array();
+        $changes = [];
 
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
@@ -95,19 +95,19 @@ class NewsHistoryModel extends BasicNewshistoryModel
             }
         }
 
-        $historyRecord = new self(array(
+        $historyRecord = new self([
             'originId' => $original->getId(),
             'editedBy' => $user->getId(),
             'remoteAddr' => $remoteAddr,
             'referer' => $referer,
             'changedData' => json_encode($changes),
-        ));
+        ]);
 
         if ($historyRecord->validate()) {
             $historyRecord->save();
-            Event::fire('admin.log', array('success', 'News '.$original->getId().' changes saved'));
+            Event::fire('admin.log', ['success', 'News '.$original->getId().' changes saved']);
         } else {
-            Event::fire('admin.log', array('fail', 'News history errors: '.json_encode($historyRecord->getErrors())));
+            Event::fire('admin.log', ['fail', 'News history errors: '.json_encode($historyRecord->getErrors())]);
         }
     }
 }

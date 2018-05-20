@@ -14,7 +14,7 @@ class HTMLPurifier_HTMLModule_Image extends HTMLPurifier_HTMLModule
         $max = $config->get('HTML.MaxImgLength');
         $img = $this->addElement(
             'img', 'Inline', 'Empty', 'Common',
-            array(
+            [
                 'alt*' => 'Text',
                 // According to the spec, it's Length, but percents can
                 // be abused, so we allow only Pixels.
@@ -22,7 +22,7 @@ class HTMLPurifier_HTMLModule_Image extends HTMLPurifier_HTMLModule
                 'width'  => 'Pixels#' . $max,
                 'longdesc' => 'URI',
                 'src*' => new HTMLPurifier_AttrDef_URI(true), // embedded
-            )
+            ]
         );
         if ($max === null || $config->get('HTML.Trusted')) {
             $img->attr['height'] =

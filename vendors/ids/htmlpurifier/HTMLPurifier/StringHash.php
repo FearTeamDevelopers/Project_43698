@@ -10,7 +10,7 @@
  */
 class HTMLPurifier_StringHash extends ArrayObject
 {
-    protected $accessed = array();
+    protected $accessed = [];
 
     /**
      * Retrieves a value, and logs the access.
@@ -32,7 +32,7 @@ class HTMLPurifier_StringHash extends ArrayObject
      * Resets the access array.
      */
     public function resetAccessed() {
-        $this->accessed = array();
+        $this->accessed = [];
     }
 }
 

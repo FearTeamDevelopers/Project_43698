@@ -91,11 +91,27 @@ class ApiTokenModel extends Model
 
     /**
      * Generates api token
-     * 
+     *
      * @return string
      */
     public static function generateToken($length = 128)
     {
-        return Rand::randStr($length);
+        $token = Rand::randStr($length);
+
+        $tokenExists = self::first(['token = ?' => $token]);
+
+        if ($tokenExists !== null) {
+            for ($i = 0; $i <= 100; $i+=1) {
+                $token = Rand::randStr($length);
+                $tokenExists = self::first(['token = ?' => $token]);
+
+                if ($tokenExists === null) {
+                    break;
+                }
+            }
+        }
+
+        return $token;
     }
+
 }

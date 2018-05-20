@@ -57,7 +57,7 @@ html
         include ../components/notification
         .content
             #loader
-                img(src="/public/images/loaders/loader6.gif")
+                img(src="/public/images/loaders/loader6.gif" alt="Loader")
                 | Nahrávám...
             |{yield action}
             footer.wrapper.blue#kontakty
@@ -70,6 +70,7 @@ html
                         p Klub sportovních potápěčů HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: klub@hastrman.cz<br/>Jiří Nový - 603 482 708<br/>novy@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 606
                     .large-4.columns
                         p HASTRMAN APNEA tým<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: apnea@hastrman.cz<br/>Jan Tichý - 721 863 728
+        include ../components/cookies
         #dialog(title='Chcete pokračovat?')
             p
         |{if $showfeedback}
@@ -80,6 +81,8 @@ html
         script(type='text/javascript', src='/public/js/plugins/jquery-ui-1.10.4.custom.min.js')
         script(type='text/javascript', src='/public/js/plugins/modernizr.js')
         script(type='text/javascript', src='/public/js/foundation.min.js')
+        script(type='text/javascript', src='/public/js/custom/build/system.js')
+        script(type='text/javascript', src='/public/js/custom/build/cookies.js')
         |{if isset($includecarousel)}
         script(type='text/javascript', src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
         script(type='text/javascript', src='/public/js/custom/build/homeCarousel.js')
@@ -90,19 +93,30 @@ html
         script(type='text/javascript', src='/public/js/custom/build/jssor.slider.init.js')
         |{/if}
         script(type='text/javascript', src='/public/js/custom/build/generalApp.js')
+
         |{if $env == "live"}
-        // Piwik
-        script(type="text/javascript").
-          var _paq = _paq || [];
-          _paq.push(["trackPageView"]);
-          _paq.push(["enableLinkTracking"]);
-          (function() {
-            var u="//piwik.hastrman.cz/";
-            _paq.push(["setTrackerUrl", u+"piwik.php"]);
-            _paq.push(["setSiteId", 1]);
-            var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0];
-            g.type="text/javascript"; g.async=true; g.defer=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-          })();
+        // Matomo
+        script(type='text/javascript').
+            if(navigator.doNotTrack != 1){
+                var _paq = _paq || [];
+                var consent = getCookie("cookies-consent");
+
+                if(consent === ""){
+                    _paq.push(["requireConsent"]);
+                }
+
+                _paq.push(["setDoNotTrack", true]);
+                _paq.push(["trackPageView"]);
+                _paq.push(["enableLinkTracking"]);
+
+                (function() {
+                    var u="//piwik.hastrman.cz/";
+                    _paq.push(["setTrackerUrl", u+"piwik.php"]);
+                    _paq.push(["setSiteId", "1"]);
+                    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0];
+                    g.type="text/javascript"; g.async=true; g.defer=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+                })();
+            }
         noscript
             p: img( src="//piwik.hastrman.cz/piwik.php?idsite=1" style="border:0;" alt="")
         // End Piwik Code

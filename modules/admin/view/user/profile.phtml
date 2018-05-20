@@ -44,10 +44,28 @@
             </span>
         </p>
         <p>
+            <label>Souhlas se zpracováním*</label>
+            <span class="field">
+                <input type="checkbox" name="pdConsentToProcessing" value="1" {if $user->pdConsentToProcessing == 1}checked="checked"{/if} disabled="disabled"/>
+                <span>Souhlasím se zpracováváním osobních údajů podle <a href="/ochrana-soukromi" target="_blank">Zásad ochrany soukromí</a></span><br/>
+            </span>
+        </p>
+        <p>
+            <label>Omezení zpracování*</label>
+            <span class="field">
+                <input type="checkbox" name="pdLimitProcessing" value="1" {if $user->pdLimitProcessing == 1}checked="checked"{/if}/>
+                <span>Omezení zpracovávat osobní údaje podle <a href="/ochrana-soukromi" target="_blank">Zásad ochrany soukromí</a></span><br/>
+            </span>
+        </p>
+        <p>
             <label>Notifikace</label>
             <span class="field">
-                <input type="checkbox" name="actionNotification" value="1" {if $user->getNewActionNotification}checked="checked"{/if}/><span>Chci dostávat emailové oznámení o nových akcích</span><br/>
-                <input type="checkbox" name="reportNotification" value="1" {if $user->getNewReportNotification}checked="checked"{/if}/><span>Chci dostávat emailové oznámení o nových reportážích</span>
+                <input type="checkbox" name="actionNotification" value="1" {if $user->getNewActionNotification == 1}checked="checked"{/if}/>
+                <span>Souhlasím se zasíláním informací o akcích na e-mail</span><br/>
+                <input type="checkbox" name="reportNotification" value="1" {if $user->getNewReportNotification == 1}checked="checked"{/if}/>
+                <span>Souhlasím se zasíláním informací o reportážích na e-mail</span><br/>
+                <input type="checkbox" name="newsNotification" value="1" {if $user->getNewNewsNotification == 1}checked="checked"{/if}/>
+                <span>Souhlasím se zasíláním informací o novinkách na e-mail</span>
             </span>
         </p>
 

@@ -14,7 +14,7 @@ class HTMLPurifier_AttrTransform_EnumToCSS extends HTMLPurifier_AttrTransform {
     /**
      * Lookup array of attribute values to CSS
      */
-    protected $enumToCSS = array();
+    protected $enumToCSS = [];
 
     /**
      * Case sensitivity of the matching

@@ -23,7 +23,7 @@ class FormPrinter
      *
      * @return type
      */
-    public static function textInput($name, $value = array(), $required = false, $class = 'width80', $placeholder = '')
+    public static function textInput($name, $value = [], $required = false, $class = 'width80', $placeholder = '')
     {
         $htmlTag = '<input type="text" name="'.$name.'"';
         $htmlTagEnd = '/>';
@@ -58,7 +58,7 @@ class FormPrinter
      *
      * @return type
      */
-    public static function timeInput($name, $value = array(), $required = false, $class = 'width80', $placeholder = '')
+    public static function timeInput($name, $value = [], $required = false, $class = 'width80', $placeholder = '')
     {
         $htmlTag = '<input type="time" name="'.$name.'"';
         $htmlTagEnd = '/>';
@@ -92,7 +92,7 @@ class FormPrinter
      *
      * @return type
      */
-    public static function input($type, $name, $value = array(), $options = array())
+    public static function input($type, $name, $value = [], $options = [])
     {
         $htmlTag = '<input type="%s" name="%s"';
         $htmlTagEnd = '/>';

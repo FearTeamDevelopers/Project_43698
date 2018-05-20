@@ -6,6 +6,8 @@ use THCFrame\Core\Base;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Controller\Exception;
 use THCFrame\Request\Response;
+use THCFrame\Registry\Registry;
+use THCFrame\Core\Lang;
 
 /**
  * Base controller for REST Api
@@ -18,18 +20,18 @@ class RestController extends Base
     /**
      * @readwrite
      */
-    protected $_defaultContentType = 'application/json';
+    protected $defaultContentType = 'application/json';
 
     /**
      * @readwrite
      */
-    protected $_method;
+    protected $method;
 
     /**
      * @read
      * @var THCFrame\Request\Response
      */
-    protected $_response;
+    protected $response;
 
     /**
      * Store initialized cache object.
@@ -37,7 +39,7 @@ class RestController extends Base
      * @var THCFrame\Cache\Cache
      * @read
      */
-    protected $_cache;
+    protected $cache;
 
     /**
      * Store configuration.
@@ -45,7 +47,7 @@ class RestController extends Base
      * @var THCFrame\Configuration\Configuration
      * @read
      */
-    protected $_config;
+    protected $config;
 
     /**
      * Store language extension.
@@ -53,7 +55,7 @@ class RestController extends Base
      * @var THCFrame\Core\Lang
      * @read
      */
-    protected $_lang;
+    protected $lang;
 
     /**
      * Store server host name.
@@ -61,7 +63,7 @@ class RestController extends Base
      * @var string
      * @read
      */
-    protected $_serverHost;
+    protected $serverHost;
 
     /**
      * Session object
@@ -69,7 +71,7 @@ class RestController extends Base
      * @read
      * @var THCFrame\Session\Driver
      */
-    protected $_session;
+    protected $session;
 
     /**
      *
@@ -78,14 +80,14 @@ class RestController extends Base
      */
     private function _cleanInputs($data)
     {
-        $cleanInput = array();
+        $cleanInput = [];
 
         if (is_array($data)) {
             foreach ($data as $k => $v) {
                 $cleanInput[$k] = $this->_cleanInputs($v);
             }
         } else {
-            $cleanInput = trim(strip_tags($data));
+            $cleanInput = trim(htmlentities(strip_tags($data), ENT_QUOTES, 'UTF-8'));
         }
         return $cleanInput;
     }
@@ -95,30 +97,36 @@ class RestController extends Base
      * @param type $options
      * @throws Exception\Header
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
-        $this->_response = new Response();
-        $this->_session = Registry::get('session');
-        $this->_serverHost = RequestMethods::server('HTTP_HOST');
-        $this->_cache = Registry::get('cache');
-        $this->_config = Registry::get('configuration');
-        $this->_lang = Lang::getInstance();
+        $this->response = new Response();
+        $this->session = Registry::get('session');
+        $this->serverHost = RequestMethods::server('HTTP_HOST');
+        $this->cache = Registry::get('cache');
+        $this->config = Registry::get('configuration');
+        $this->lang = Lang::getInstance();
 
-        $this->_response->setHeader('Access-Control-Allow-Orgin', '*')
+        $this->response->setHeader('Access-Control-Allow-Orgin', '*')
                 ->setHeader('Access-Control-Allow-Methods', '*');
+    }
 
-        $this->_method = RequestMethods::server('REQUEST_METHOD');
-        if ($this->_method == 'POST' && RequestMethods::issetserver('HTTP_X_HTTP_METHOD')) {
-            if (RequestMethods::server('HTTP_X_HTTP_METHOD') == 'DELETE') {
-                $this->_method = 'DELETE';
-            } else if (RequestMethods::server('HTTP_X_HTTP_METHOD') == 'PUT') {
-                $this->_method = 'PUT';
-            } else {
-                throw new Exception\Header("Unexpected Header");
-            }
+    /**
+     * Return server url with http schema
+     *
+     * @return type
+     */
+    public function getServerHost()
+    {
+        if ((!empty(RequestMethods::server('REQUEST_SCHEME')) && RequestMethods::server('REQUEST_SCHEME') == 'https')
+                || (!empty(RequestMethods::server('HTTPS')) && RequestMethods::server('HTTPS') == 'on')
+                || (!empty(RequestMethods::server('SERVER_PORT')) && RequestMethods::server('SERVER_PORT') == '443')) {
+            $serverRequestScheme = 'https://';
+        } else {
+            $serverRequestScheme = 'http://';
         }
+        return $serverRequestScheme . RequestMethods::server('HTTP_HOST');
     }
 
     /**
@@ -128,19 +136,21 @@ class RestController extends Base
      * @param type $error
      */
     protected function ajaxResponse($message, $error = false, $status = 200,
-            array $additionalData = array())
+            array $additionalData = [])
     {
-        $data = array(
+        $data = [
             'message' => $message,
             'error' => (bool) $error,
-                ) + $additionalData;
+                ] + $additionalData;
 
-        $this->_response->setHttpVersionStatusHeader('HTTP/1.1 ' . (int) $status . ' ' . $this->_response->getStatusMessageByCode($status))
-                ->setHeader('Content-type', $this->_defaultContentType)
+        session_write_close();
+
+        $this->response->setHttpVersionStatusHeader('HTTP/1.1 ' . (int) $status . ' ' . $this->response->getStatusMessageByCode($status))
+                ->setHeader('Content-Type', $this->defaultContentType)
                 ->setData($data);
 
-        $this->_response->sendHeaders();
-        $this->_response->send();
+        $this->response->sendHeaders();
+        $this->response->send();
     }
 
     /**
@@ -150,10 +160,10 @@ class RestController extends Base
      */
     public function checkUserApiToken()
     {
-        $apiToken = \THCFrame\Security\Model\ApiTokenModel::first(array('token = ?' => RequestMethods::post('apiV1Token')));
+        $apiToken = \THCFrame\Security\Model\ApiTokenModel::first(['token = ?' => RequestMethods::post('apiToken')]);
 
         if (null !== $apiToken) {
-            $user = \App\Model\UserModel::first(array('id = ?' => (int) $apiToken->getUserId()));
+            $user = \App\Model\UserModel::first(['id = ?' => (int) $apiToken->getUserId()]);
 
             if (null === $user) {
                 $this->ajaxResponse('User not found', true, 404);
@@ -173,25 +183,102 @@ class RestController extends Base
     public function logApiRequestResponseData(\THCFrame\Security\Model\ApiTokenModel $apiToken,
             THCFrame\Request\Response $response, $method, $request)
     {
-        $apiLog = new \THCFrame\Security\Model\ApiRequestLogModel(array(
+        $apiLog = new \THCFrame\Security\Model\ApiRequestLogModel([
             'userId' => $apiToken->getUserId(),
             'apiId' => $apiToken->getId(),
             'requestMethod' => $method,
             'apiRequest' => serialize($request),
             'apiResponse' => serialize($response),
-        ));
+        ]);
 
         if ($apiLog->validate()) {
             $apiLog->save();
         } else {
-            \THCFrame\Core\Core::getLogger()->error('ApiLog {apiId} - {method} - {request} - {response}', array(
+            \THCFrame\Core\Core::getLogger()->error('ApiLog {apiId} - {method} - {request} - {response}', [
                 'apiId' => $apiToken->getId(),
                 'method' => $method,
                 'request' => json_encode($request),
                 'response' => json_encode($response)
-                    )
+                    ]
             );
         }
+    }
+
+    public function getDefaultContentType()
+    {
+        return $this->defaultContentType;
+    }
+
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    public function getLang()
+    {
+        return $this->lang;
+    }
+
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    public function setDefaultContentType($defaultContentType)
+    {
+        $this->defaultContentType = $defaultContentType;
+        return $this;
+    }
+
+    public function setMethod($method)
+    {
+        $this->method = $method;
+        return $this;
+    }
+
+    public function setResponse(THCFrame\Request\Response $response)
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+    public function setCache(THCFrame\Cache\Cache $cache)
+    {
+        $this->cache = $cache;
+        return $this;
+    }
+
+    public function setConfig(THCFrame\Configuration\Configuration $config)
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    public function setLang(THCFrame\Core\Lang $lang)
+    {
+        $this->lang = $lang;
+        return $this;
+    }
+
+    public function setSession(THCFrame\Session\Driver $session)
+    {
+        $this->session = $session;
+        return $this;
     }
 
 }

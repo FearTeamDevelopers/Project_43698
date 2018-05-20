@@ -41,8 +41,12 @@
                         </td>
 
                         <td>
-                            <a href="/admin/user/edit/{echo $user->id}" class="btn btn3 btn_pencil" title="Upravit"></a> 
+                            <a href="/admin/user/edit/{echo $user->id}" class="btn btn3 btn_pencil" title="Upravit"></a>
                             <a href="/admin/user/forcepasswordreset/{echo $user->id}" class="btn btn3 btn_key" title="Vygenerovat nové heslo"></a>
+                            {if $isSuperAdmin}
+                            {if $user->apiTokenCount == 0}<a href="/admin/user/generateapitoken/{echo $user->id}" class="btn btn3 btn_cloud" title="Vygenerovat Api Token"></a>{/if}
+                            {else}<a href="/admin/user/deleteapitoken/{echo $user->id}" class="btn btn3 btn_stop" title="Smazat Api Token"></a>{/else}
+                            {/if}
                             {if !$user->getDeleted()}<a href="/admin/user/delete/{echo $user->id}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>{/if}
                             {if !$user->getActive() && !$user->getDeleted()}<a href="/admin/user/accountactivation/{echo $user->id}" class="btn btn3 btn_refresh" title="Aktivovat účet"></a>{/if}
                         </td>

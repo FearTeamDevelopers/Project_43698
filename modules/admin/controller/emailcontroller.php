@@ -3,6 +3,7 @@
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
+use Admin\Model\EmailModel;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Core\StringMethods;
@@ -12,23 +13,6 @@ use THCFrame\Core\StringMethods;
  */
 class EmailController extends Controller
 {
-    /**
-     * Check whether action unique identifier already exist or not.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function _checkUrlKey($key)
-    {
-        $status = \App\Model\ActionModel::first(array('urlKey = ?' => $key));
-
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * Show list of email templates.
@@ -40,9 +24,9 @@ class EmailController extends Controller
         $view = $this->getActionView();
 
         if ($this->isSuperAdmin()) {
-            $templates = \Admin\Model\EmailModel::fetchAll();
+            $templates = EmailModel::fetchAll();
         } else {
-            $templates = \Admin\Model\EmailModel::fetchAllCommon();
+            $templates = EmailModel::fetchAllCommon();
         }
 
         $view->set('emails', $templates);
@@ -58,9 +42,9 @@ class EmailController extends Controller
         $view = $this->getActionView();
 
         if ($this->isSuperAdmin()) {
-            $templates = \Admin\Model\EmailModel::fetchAllActive();
+            $templates = EmailModel::fetchAllActive();
         } else {
-            $templates = \Admin\Model\EmailModel::fetchAllCommonActive();
+            $templates = EmailModel::fetchAllCommonActive();
         }
 
         $actions = \App\Model\ActionModel::fetchActiveWithLimit(0);
@@ -71,17 +55,17 @@ class EmailController extends Controller
 
         if (RequestMethods::post('submitSendEmail')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/email/send/');
             }
 
-            $errors = array();
+            $errors = [];
 
-            $email = new \Admin\Model\EmailModel(array(
+            $email = new EmailModel([
                 'type' => RequestMethods::post('type'),
                 'subject' => RequestMethods::post('subject'),
                 'body' => StringMethods::prepareEmailText(stripslashes(RequestMethods::post('text'))),
-            ));
+            ]);
 
             $email->populate();
 
@@ -90,7 +74,7 @@ class EmailController extends Controller
                     ->setSubject($email->getSubject());
 
             if (empty(RequestMethods::post('singlerecipients')) && empty(RequestMethods::post('grouprecipients')) && $email->type != 3) {
-                $errors['recipientlist'] = array($this->lang('EMAIL_NO_RECIPIENTS'));
+                $errors['recipientlist'] = [$this->lang('EMAIL_NO_RECIPIENTS')];
             }
 
             if (empty($errors) && $email->type == 1) {
@@ -100,7 +84,7 @@ class EmailController extends Controller
                 $mailer->setSendTo($recipientsArr);
 
                 if ($mailer->send()) {
-                    Event::fire('admin.log', array('success', 'Email sent to: '.$recipients));
+                    Event::fire('admin.log', ['success', 'Email sent to: '.$recipients]);
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
                     self::redirect('/admin/email/send/');
                 } else {
@@ -109,8 +93,8 @@ class EmailController extends Controller
                 }
             } elseif (empty($errors) && $email->type == 2) {
                 $roles = RequestMethods::post('grouprecipients');
-                $users = \App\Model\UserModel::all(array('active = ?' => true, 'deleted = ?' => false, 'role in ?' => $roles), array('email'));
-                $recipientsArr = array();
+                $users = \App\Model\UserModel::all(['active = ?' => true, 'deleted = ?' => false, 'role in ?' => $roles], ['email']);
+                $recipientsArr = [];
 
                 foreach ($users as $user) {
                     $recipientsArr[] = $user->getEmail();
@@ -119,7 +103,7 @@ class EmailController extends Controller
                 $mailer->setSendTo($recipientsArr);
 
                 if ($mailer->send()) {
-                    Event::fire('admin.log', array('success', 'Email sent to: '.implode(',', $recipientsArr)));
+                    Event::fire('admin.log', ['success', 'Email sent to: '.implode(',', $recipientsArr)]);
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
                     self::redirect('/admin/email/send/');
                 } else {
@@ -138,7 +122,7 @@ class EmailController extends Controller
 
                 if ($mailer->send()) {
                     $recipientStr = $mailer->getSendToAsString();
-                    Event::fire('admin.log', array('success', 'Email sent to: '.$recipientStr));
+                    Event::fire('admin.log', ['success', 'Email sent to: '.$recipientStr]);
                     $view->successMessage($this->lang('EMAIL_SEND_SUCCESS'));
                     self::redirect('/admin/email/send/');
                 } else {
@@ -146,9 +130,9 @@ class EmailController extends Controller
                     self::redirect('/admin/email/send/');
                 }
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '));
+                Event::fire('admin.log', ['fail', 'Errors: ']);
                 $view->set('errors', $errors)
-                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                     ->set('email', $email);
             }
         }
@@ -174,12 +158,12 @@ class EmailController extends Controller
         }
 
         if ($this->isSuperAdmin()) {
-            $template = \Admin\Model\EmailModel::fetchActiveByIdAndLang($id, $fieldName);
+            $template = EmailModel::fetchActiveByIdAndLang($id, $fieldName);
         } else {
-            $template = \Admin\Model\EmailModel::fetchCommonActiveByIdAndLang($id, $fieldName);
+            $template = EmailModel::fetchCommonActiveByIdAndLang($id, $fieldName);
         }
 
-        $this->ajaxResponse(json_encode(array('text' => stripslashes($template->$fieldName), 'subject' => $template->getSubject())));
+        $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['text' => stripslashes($template->$fieldName), 'subject' => $template->getSubject()]);
     }
 
     /**
@@ -195,45 +179,45 @@ class EmailController extends Controller
 
         if (RequestMethods::post('submitAddEmailTemplate')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/email/');
             }
 
-            $errors = array();
+            $errors = [];
             $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
 
             for ($i = 1; $i <= 100; $i+=1) {
-                if ($this->_checkUrlKey($urlKeyCh)) {
+                if (EmailModel::checkUrlKey($urlKeyCh)) {
                     break;
                 } else {
                     $urlKeyCh = $urlKey.'-'.$i;
                 }
 
                 if ($i == 100) {
-                    $errors['title'] = array($this->lang('ARTICLE_UNIQUE_ID'));
+                    $errors['title'] = [$this->lang('ARTICLE_UNIQUE_ID')];
                     break;
                 }
             }
 
-            $emailTemplate = new \Admin\Model\EmailModel(array(
+            $emailTemplate = new EmailModel([
                 'title' => RequestMethods::post('title'),
                 'subject' => RequestMethods::post('subject'),
                 'urlKey' => $urlKeyCh,
                 'body' => stripslashes(RequestMethods::post('text')),
                 'bodyEn' => stripslashes(RequestMethods::post('texten')),
                 'type' => $this->isSuperAdmin() ? RequestMethods::post('type') : 1,
-            ));
+            ]);
 
             if (empty($errors) && $emailTemplate->validate()) {
                 $id = $emailTemplate->save();
 
-                Event::fire('admin.log', array('success', 'Email template id: '.$id));
+                Event::fire('admin.log', ['success', 'Email template id: '.$id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/email/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: '.json_encode($errors + $emailTemplate->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: '.json_encode($errors + $emailTemplate->getErrors())]);
                 $view->set('errors', $errors + $emailTemplate->getErrors())
-                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                     ->set('template', $emailTemplate);
             }
         }
@@ -248,17 +232,17 @@ class EmailController extends Controller
     {
         $view = $this->getActionView();
 
-        $emailTemplate = \Admin\Model\EmailModel::first(array('id = ?' => (int) $id));
+        $emailTemplate = EmailModel::first(['id = ?' => (int) $id]);
 
         if (null === $emailTemplate) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/email/');
         }
 
         if($emailTemplate->getType() == 2 && !$this->isSuperAdmin()){
             $view->warningMessage($this->lang('LOW_PERMISSIONS'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/email/');
         }
 
@@ -269,19 +253,19 @@ class EmailController extends Controller
                 self::redirect('/admin/email/');
             }
 
-            $errors = array();
+            $errors = [];
             $urlKey = $urlKeyCh = StringMethods::createUrlKey(RequestMethods::post('title'));
 
-            if ($emailTemplate->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)) {
+            if ($emailTemplate->urlKey != $urlKey && !EmailModel::checkUrlKey($urlKey)) {
                 for ($i = 1; $i <= 100; $i+=1) {
-                    if ($this->_checkUrlKey($urlKeyCh)) {
+                    if (EmailModel::checkUrlKey($urlKeyCh)) {
                         break;
                     } else {
                         $urlKeyCh = $urlKey . '-' . $i;
                     }
 
                     if ($i == 100) {
-                        $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+                        $errors['title'] = [$this->lang('ARTICLE_TITLE_IS_USED')];
                         break;
                     }
                 }
@@ -298,12 +282,12 @@ class EmailController extends Controller
             if (empty($errors) && $emailTemplate->validate()) {
                 $emailTemplate->save();
 
-                Event::fire('admin.log', array('success', 'Email template id: '.$id));
+                Event::fire('admin.log', ['success', 'Email template id: '.$id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/email/');
             } else {
-                Event::fire('admin.log', array('fail', 'Email template id: '.$id,
-                    'Errors: '.json_encode($errors + $emailTemplate->getErrors()), ));
+                Event::fire('admin.log', ['fail', 'Email template id: '.$id,
+                    'Errors: '.json_encode($errors + $emailTemplate->getErrors()), ]);
                 $view->set('errors', $errors + $emailTemplate->getErrors())
                     ->set('template', $emailTemplate);
             }
@@ -323,7 +307,7 @@ class EmailController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $emailTemplate = \Admin\Model\EmailModel::first(array('id = ?' => (int) $id));
+        $emailTemplate = EmailModel::first(['id = ?' => (int) $id]);
 
         if (null === $emailTemplate) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -332,10 +316,10 @@ class EmailController extends Controller
                 $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
             if ($emailTemplate->delete()) {
-                Event::fire('admin.log', array('success', 'Email template id: ' . $id));
+                Event::fire('admin.log', ['success', 'Email template id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Email template id: ' . $id));
+                Event::fire('admin.log', ['fail', 'Email template id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }

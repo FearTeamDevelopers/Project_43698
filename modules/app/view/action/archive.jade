@@ -1,21 +1,23 @@
 section.wrapper.akce.singlePage
     header.row
-        h2 Archiv akcí
+        h2 Archiv akcí {echo $currentyear}
     section.row.container
         |{if !empty($actions)}
         |{foreach $action in $actions}
         article
+            |{if $action->getStartDate()}
+            .date
+                .den {echo \App\Helper\DateFormater::g2dn($action->getStartDate())}
+                .mesic {echo \App\Helper\DateFormater::g2mn($action->getStartDate())}
+            |{/if}
             header
                 a(href!='/akce/r/{echo $action->getUrlKey()}')
                     h3 {echo $action->getTitle()}
             .body
                 div {echo html_entity_decode($action->getShortBody())}
-                |{if $deviceType === 'computer'}
-                a.readMore(href!='/akce/r/{echo $action->getUrlKey()}') čti více
-                |{/if}
         |{/foreach}
         |{/if}{else}
         .large-12.medium-12.small-12.columns
             h2 Žádné akce v archivu nejsou
         |{/else}
-    include ../components/pager
+    include ../components/actionpager

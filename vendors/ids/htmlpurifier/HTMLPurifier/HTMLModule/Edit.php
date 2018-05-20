@@ -11,10 +11,10 @@ class HTMLPurifier_HTMLModule_Edit extends HTMLPurifier_HTMLModule
 
     public function setup($config) {
         $contents = 'Chameleon: #PCDATA | Inline ! #PCDATA | Flow';
-        $attr = array(
+        $attr = [
             'cite' => 'URI',
             // 'datetime' => 'Datetime', // not implemented
-        );
+        ];
         $this->addElement('del', 'Inline', $contents, 'Common', $attr);
         $this->addElement('ins', 'Inline', $contents, 'Common', $attr);
     }

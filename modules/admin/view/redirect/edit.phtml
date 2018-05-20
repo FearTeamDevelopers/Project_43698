@@ -19,7 +19,7 @@
                     {if !empty($modules)}
                         {foreach $module in $modules}
                             {script $sel=""}
-                            {if $module == $redirect->module}
+                            {if strtolower($module) == strtolower($redirect->module)}
                                 {script $sel="selected"}
                             {/if}
                             <option value="{echo strtolower($module)}" {echo $sel}>{echo $module}</option>
@@ -46,7 +46,7 @@
                 {/if}
             </span>
         </p>
-       
+
         <p class="stdformbutton">
             <input name="submitEditRedirect" type="submit" value="Uložit" class="submit radius2" />
         </p>

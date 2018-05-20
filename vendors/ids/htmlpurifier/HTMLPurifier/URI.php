@@ -101,7 +101,7 @@ class HTMLPurifier_URI
         }
 
         // validate path
-        $path_parts = array();
+        $path_parts = [];
         $segments_encoder = new HTMLPurifier_PercentEncoder($chars_pchar . '/');
         if (!is_null($this->host)) { // this catches $this->host === ''
             // path-abempty (hier and relative)

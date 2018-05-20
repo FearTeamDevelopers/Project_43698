@@ -13,9 +13,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $configuration = new THCFrame\Configuration\Configuration(array(
+        $configuration = new THCFrame\Configuration\Configuration([
             "type" => "ini"
-        ));
+        ]);
         
         $configuration = $configuration->initialize();
         return ($configuration instanceof THCFrame\Configuration\Driver\Ini);
@@ -27,9 +27,9 @@ THCFrame\Core\Test::add(
 THCFrame\Core\Test::add(
     function()
     {
-        $configuration = new THCFrame\Configuration\Configuration(array(
+        $configuration = new THCFrame\Configuration\Configuration([
             "type" => "ini"
-        ));
+        ]);
         
         $configuration = $configuration->initialize();
         $parsed = $configuration->parse("_configuration");

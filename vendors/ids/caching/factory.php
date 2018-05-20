@@ -76,7 +76,7 @@ class IDS_Caching
             include_once $path;
 
             if (class_exists($class)) {
-                $object = call_user_func(array($class, 'getInstance'), 
+                $object = call_user_func([$class, 'getInstance'], 
                     $type, $init);
             }
         }

@@ -5,12 +5,14 @@ namespace App\Controller;
 use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Registry\Registry;
+use THCFrame\View\View;
 
 /**
  *
  */
 class ReportController extends Controller
 {
+
     /**
      * Check if are set specific metadata or leave their default values.
      */
@@ -19,24 +21,24 @@ class ReportController extends Controller
         $uri = RequestMethods::server('REQUEST_URI');
 
         if ($object->getMetaImage() != '') {
-            $layoutView->set('metaogimage', "http://{$this->getServerHost()}{$object->getMetaImage()}");
+            $layoutView->set('metaogimage', "{$this->getServerHost()}{$object->getMetaImage()}");
         }
 
         if ($object->getMetaTitle() != '') {
-            $layoutView->set('metatitle', 'Reportáže - '.$object->getMetaTitle());
+            $layoutView->set(View::META_TITLE, 'Reportáže - ' . $object->getMetaTitle());
         }
 
         if ($object->getMetaDescription() != '') {
-            $layoutView->set('metadescription', $object->getMetaDescription());
+            $layoutView->set(View::META_DESCRIPTION, $object->getMetaDescription());
         }
 
-        $canonical = 'http://'.$this->getServerHost().'/reportaze/r/'.$object->getUrlKey();
+        $canonical = $this->getServerHost() . '/reportaze/r/' . $object->getUrlKey();
 
-        $layoutView->set('canonical', $canonical)
+        $layoutView->set(View::META_CANONICAL, $canonical)
                 ->set('article', 1)
                 ->set('articlecreated', $object->getCreated())
                 ->set('articlemodified', $object->getModified())
-                ->set('metaogurl', "http://{$this->getServerHost()}{$uri}")
+                ->set('metaogurl', "{$this->getServerHost()}{$uri}")
                 ->set('metaogtype', 'article');
     }
 
@@ -57,25 +59,25 @@ class ReportController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/reportaze';
+            $canonical = $this->getServerHost() . '/reportaze';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/reportaze/p/'.$page;
+            $canonical = $this->getServerHost() . '/reportaze/p/' . $page;
         }
 
-        $content = $this->getCache()->get('reports-'.$page);
+        $content = $this->getCache()->get('reports-' . $page);
 
         if (null !== $content) {
             $reports = $content;
         } else {
             $reports = \App\Model\ReportModel::fetchActiveWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('reports-'.$page, $reports);
+            $this->getCache()->set('reports-' . $page, $reports);
         }
 
         $reportCount = \App\Model\ReportModel::count(
-                        array('active = ?' => true,
+                        ['active = ?' => true,
                             'archive = ?' => false,
-                            'approved = ?' => 1, )
+                            'approved = ?' => 1,]
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
@@ -86,8 +88,8 @@ class ReportController extends Controller
                 ->set('pagerpathprefix', '/reportaze')
                 ->set('pagecount', $reportsPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Reportáže');
+        $layoutView->set(View::META_CANONICAL, $canonical)
+                ->set(View::META_TITLE, 'Hastrman - Reportáže');
     }
 
     /**
@@ -107,25 +109,25 @@ class ReportController extends Controller
         }
 
         if ($page == 1) {
-            $canonical = 'http://'.$this->getServerHost().'/archiv-reportazi';
+            $canonical = $this->getServerHost() . '/archiv-reportazi';
         } else {
-            $canonical = 'http://'.$this->getServerHost().'/archiv-reportazi/p/'.$page;
+            $canonical = $this->getServerHost() . '/archiv-reportazi/p/' . $page;
         }
 
-        $content = $this->getCache()->get('report-arch-'.$page);
+        $content = $this->getCache()->get('report-arch-' . $page);
 
         if (null !== $content) {
             $reports = $content;
         } else {
             $reports = \App\Model\ReportModel::fetchArchivatedWithLimit($articlesPerPage, $page);
 
-            $this->getCache()->set('report-arch-'.$page, $reports);
+            $this->getCache()->set('report-arch-' . $page, $reports);
         }
 
         $reportCount = \App\Model\ReportModel::count(
-                        array('active = ?' => true,
+                        ['active = ?' => true,
                             'archive = ?' => true,
-                            'approved = ?' => 1, )
+                            'approved = ?' => 1,]
         );
         $reportsPageCount = ceil($reportCount / $articlesPerPage);
 
@@ -136,8 +138,8 @@ class ReportController extends Controller
                 ->set('pagerpathprefix', '/archiv-reportazi')
                 ->set('pagecount', $reportsPageCount);
 
-        $layoutView->set('canonical', $canonical)
-                ->set('metatitle', 'Hastrman - Reportáže - Archiv');
+        $layoutView->set(View::META_CANONICAL, $canonical)
+                ->set(View::META_TITLE, 'Hastrman - Reportáže - Archiv');
     }
 
     /**
@@ -162,34 +164,46 @@ class ReportController extends Controller
         $view->set('report', $report)
                 ->set('newcomment', null)
                 ->set('comments', $comments);
+    }
 
-        if (RequestMethods::post('submitAddComment')) {
-            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
-                self::redirect('/reportaze/r/'.$report->getId());
-            }
+    /**
+     * Add comment to report
+     *
+     * @before _secured
+     *
+     * @param type $id
+     */
+    public function addComment($id)
+    {
+        $this->disableView();
 
-            $comment = new \App\Model\CommentModel(array(
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true ||
+                $this->checkMultiSubmissionProtectionToken() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
+
+        $report = \App\Model\ReportModel::first(
+                        ['id = ?' => (int) $id], ['id', 'userId']
+        );
+
+        if (null === $report) {
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
+        } else {
+            $comment = new \App\Model\CommentModel([
                 'userId' => $this->getUser()->getId(),
                 'resourceId' => $report->getId(),
                 'replyTo' => RequestMethods::post('replyTo', 0),
                 'type' => \App\Model\CommentModel::RESOURCE_REPORT,
                 'body' => RequestMethods::post('text'),
-            ));
+            ]);
 
             if ($comment->validate()) {
                 $id = $comment->save();
-
-                $this->getCache()->invalidate();
-
-                Event::fire('app.log', array('success', 'Comment id: '.$id.' from user: '.$this->getUser()->getId()));
-                $view->successMessage($this->lang('CREATE_SUCCESS'));
-                self::redirect('/reportaze/r/'.$report->getId());
+                Event::fire('app.log', ['success', 'Comment id: ' . $id . ' from user: ' . $this->getUser()->getId()]);
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('app.log', array('fail', 'Errors: '.json_encode($comment->getErrors())));
-                $view->set('errors', $comment->getErrors())
-                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
-                    ->set('newcomment', $comment);
+                Event::fire('app.log', ['fail', 'Errors: ' . json_encode($comment->getErrors())]);
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
     }
@@ -207,7 +221,7 @@ class ReportController extends Controller
         $report = $session->get('reportPreview');
 
         if (null === $report) {
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             $view->warningMessage($this->lang('NOT_FOUND'));
             self::redirect('/admin/report/');
         }
@@ -215,6 +229,7 @@ class ReportController extends Controller
         $act = RequestMethods::get('action');
 
         $view->set('report', $report)
-            ->set('act', $act);
+                ->set('act', $act);
     }
+
 }

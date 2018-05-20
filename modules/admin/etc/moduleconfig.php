@@ -12,37 +12,37 @@ class ModuleConfig extends Module
     /**
      * @read
      */
-    protected $_moduleName = 'Admin';
+    protected $moduleName = 'Admin';
 
     /**
      * @read
      */
-    protected $_observerClass = 'Admin\Etc\ModuleObserver';
+    protected $observerClass = 'Admin\Etc\ModuleObserver';
 
     /**
      * @read
      *
      * @var array
      */
-    protected $_routes = array(
-        array(
+    protected $routes = [
+        [
             'pattern' => '/admin/login',
             'module' => 'admin',
             'controller' => 'user',
             'action' => 'login',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/admin/logout',
             'module' => 'admin',
             'controller' => 'user',
             'action' => 'logout',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/admin/email/loadtemplate/:id/:lang',
             'module' => 'admin',
             'controller' => 'email',
             'action' => 'loadtemplate',
-            'args' => array(':id', ':lang'),
-        ),
-    );
+            'args' => [':id', ':lang'],
+        ],
+    ];
 }

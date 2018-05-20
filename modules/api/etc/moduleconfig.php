@@ -3,6 +3,7 @@
 namespace Api\Etc;
 
 use THCFrame\Module\Module;
+use THCFrame\Router\Route;
 
 /**
  * Class for module specific settings.
@@ -12,30 +13,32 @@ class ModuleConfig extends Module
     /**
      * @read
      */
-    protected $_moduleName = 'Api';
+    protected $moduleName = 'Api';
 
     /**
      * @read
      */
-    protected $_observerClass = 'Api\Etc\ModuleObserver';
+    protected $observerClass = 'Api\Etc\ModuleObserver';
 
     /**
      * @read
      *
      * @var array
      */
-    protected $_routes = array(
-        array(
+    protected $routes = [
+        [
             'pattern' => '/api/v1/login',
             'module' => 'api',
             'controller' => 'user',
             'action' => 'login',
-        ),
-        array(
+            'method' => Route::HTTP_POST
+        ],
+        [
             'pattern' => '/api/v1/log-book-sync',
             'module' => 'api',
             'controller' => 'index',
             'action' => 'logbooksync',
-        ),
-    );
+            'method' => Route::HTTP_POST
+        ],
+    ];
 }

@@ -23,7 +23,7 @@ class Session extends Model
      * @column
      * @readwrite
      * @type integer
-     * 
+     *
      * @validate required, numeric, max(10)
      * @label expires
      */
@@ -33,7 +33,7 @@ class Session extends Model
      * @column
      * @readwrite
      * @type text
-     * 
+     *
      * @validate alphanumeric
      * @label data
      */

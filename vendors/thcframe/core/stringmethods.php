@@ -11,8 +11,8 @@ use THCFrame\Registry\Registry;
 class StringMethods
 {
 
-    private static $_delimiter = '#';
-    private static $_singular = array(
+    private static $delimiter = '#';
+    private static $singular = [
         '(matr)ices$' => '\\1ix',
         '(vert|ind)ices$' => '\\1ex',
         '^(ox)en' => '\\1',
@@ -40,8 +40,8 @@ class StringMethods
         '(c)hildren$' => '\\1\\2hild',
         '(n)ews$' => '\\1\\2ews',
         '([^u])s$' => '\\1'
-    );
-    private static $_plural = array(
+    ];
+    private static $plural = [
         '^(ox)$' => '\\1\\2en',
         '([m|l])ouse$' => '\\1ice',
         '(matr|vert|ind)ix|ex$' => '\\1ices',
@@ -61,8 +61,8 @@ class StringMethods
         '(ax|cris|test)is$' => '\\1es',
         's$' => 's',
         '$' => 's'
-    );
-    private static $_diacriticalConversionTable = Array(
+    ];
+    private static $diacriticalConversionTable = [
         'ä' => 'a',
         'Ä' => 'A',
         'á' => 'a',
@@ -147,7 +147,39 @@ class StringMethods
         'Ž' => 'Z',
         'ź' => 'z',
         'Ź' => 'Z'
-    );
+    ];
+
+    /**
+     * @var array
+     */
+    private static $stopwordsEn = ['a', 'able', 'about', 'across', 'after', 'all', 'almost', 'also', 'am', 'among', 'an', 'and', 'any', 'are', 'as', 'at',
+        'be', 'because', 'been', 'but', 'by', 'can', 'cannot', 'could', 'dear', 'did', 'do', 'does', 'either', 'else', 'ever', 'every', 'for', 'from', 'get', 'got',
+        'had', 'has', 'have', 'he', 'her', 'hers', 'him', 'his', 'how', 'however', 'i', 'if', 'in', 'into', 'is', 'it', 'its', 'just', 'least', 'let', 'like', 'likely',
+        'may', 'me', 'might', 'most', 'must', 'my', 'neither', 'no', 'nor', 'not', 'of', 'off', 'often', 'on', 'only', 'or', 'other', 'our', 'own', 'rather',
+        'said', 'say', 'says', 'she', 'should', 'since', 'so', 'some', 'than', 'that', 'the', 'their', 'them', 'then', 'there', 'these', 'they', 'this', 'tis', 'to', 'too', 'twas',
+        'us', 'wants', 'was', 'we', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'whom', 'why', 'will', 'with', 'would', 'yet', 'you', 'your',
+        "ain't", "aren't", "can't", "could've", "couldn't", "didn't", "doesn't", "don't", "hasn't", "he'd", "he'll", "he's", "how'd", "how'll", "how's",
+        "i'd", "i'll", "i'm", "i've", "isn't", "it's", "might've", "mightn't", "must've", "mustn't", "shan't", "she'd", "she'll", "she's", "should've",
+        "shouldn't", "that'll", "that's", "there's", "they'd", "they'll", "they're", "they've", "wasn't", "we'd", "we'll", "we're", "weren't", "what'd",
+        "what's", "when'd", "when'll", "when's", "where'd", "where'll", "where's", "who'd", "who'll", "who's", "why'd", "why'll", "why's", "won't", "would've",
+        "wouldn't", "you'd", "you'll", "you're", "you've",];
+
+    /**
+     * @var array
+     */
+    private static $stopwordsCs = [
+        'com', 'net', 'org', 'div', 'nbsp', 'http', 'jeden', 'jedna', 'dva', 'tri', 'ctyri', 'pet', 'sest', 'sedm', 'osm',
+        'devet', 'deset', 'dny', 'den', 'dne', 'dni', 'dnes', 'timto', 'budes', 'budem', 'byli', 'jses', 'muj', 'svym',
+        'tomto', 'tam', 'tohle', 'tuto', 'tyto', 'jej', 'zda', 'proc', 'mate', 'tato', 'kam', 'tohoto', 'kdo', 'kteri',
+        'nam', 'tom', 'tomuto', 'mit', 'nic', 'proto', 'kterou', 'byla', 'toho', 'protoze', 'asi', 'nasi', 'napiste',
+        'coz', 'tim', 'takze', 'svych', 'jeji', 'svymi', 'jste', 'tedy', 'teto', 'bylo', 'kde', 'prave', 'nad', 'nejsou',
+        'pod', 'tema', 'mezi', 'pres', 'pak', 'vam', 'ani', 'kdyz', 'vsak', 'jsem', 'tento', 'clanku', 'clanky', 'aby',
+        'jsme', 'pred', 'pta', 'jejich', 'byl', 'jeste', 'bez', 'take', 'pouze', 'prvni', 'vase', 'ktera', 'nas', 'novy',
+        'tipy', 'pokud', 'muze', 'design', 'strana', 'jeho', 'sve', 'jine', 'zpravy', 'nove', 'neni', 'vas', 'jen', 'podle',
+        'zde', 'clanek', 'email', 'byt', 'vice', 'bude', 'jiz', 'nez', 'ktery', 'ktere', 'nebo', 'ten', 'tak', 'pri', 'jsou',
+        'jak', 'dalsi', 'ale', 'jako', 'zpet', 'pro', 'www', 'atd', 'cca', 'cili', 'dal', 'der', 'des', 'det', 'druh', 'faq',
+        'hot', 'for', 'info', 'ing',
+    ];
 
     /**
      *
@@ -174,7 +206,7 @@ class StringMethods
      */
     private static function _normalize($pattern)
     {
-        return self::$_delimiter . trim($pattern, self::$_delimiter) . self::$_delimiter;
+        return self::$delimiter . trim($pattern, self::$delimiter) . self::$delimiter;
     }
 
     /**
@@ -184,7 +216,7 @@ class StringMethods
      */
     public static function getDelimiter()
     {
-        return self::$_delimiter;
+        return self::$delimiter;
     }
 
     /**
@@ -194,7 +226,7 @@ class StringMethods
      */
     public static function setDelimiter($delimiter)
     {
-        self::$_delimiter = $delimiter;
+        self::$delimiter = $delimiter;
     }
 
     /**
@@ -219,7 +251,7 @@ class StringMethods
             return $matches[0];
         }
 
-        return null;
+        return [];
     }
 
     /**
@@ -231,7 +263,7 @@ class StringMethods
      */
     public static function getHash($string, $algo = null)
     {
-        if($algo === null){
+        if ($algo === null) {
             $algo = Registry::get('configuration')->security->encoder;
         }
 
@@ -345,7 +377,7 @@ class StringMethods
     {
         $result = $string;
 
-        foreach (self::$_singular as $rule => $replacement) {
+        foreach (self::$singular as $rule => $replacement) {
             $rule = self::_normalize($rule);
 
             if (preg_match($rule, $string)) {
@@ -366,7 +398,7 @@ class StringMethods
     {
         $result = $string;
 
-        foreach (self::$_plural as $rule => $replacement) {
+        foreach (self::$plural as $rule => $replacement) {
             $rule = self::_normalize($rule);
 
             if (preg_match($rule, $string)) {
@@ -386,7 +418,7 @@ class StringMethods
      */
     public static function removeDiacriticalMarks($string)
     {
-        return strtr($string, self::$_diacriticalConversionTable);
+        return strtr($string, self::$diacriticalConversionTable);
     }
 
     /**
@@ -396,23 +428,23 @@ class StringMethods
      * @param string $replace
      * @return string
      */
-    public static function fastClean($string, $badChars = array(), $replace = '', $keepDiacritic = false)
+    public static function fastClean($string, $badChars = [], $replace = '', $keepDiacritic = false)
     {
-        if(empty($badChars)){
-            $badChars = array('.', ',', '_', '(', ')', '[', ']', '|', ';',
+        if (empty($badChars)) {
+            $badChars = ['.', ',', '_', '(', ')', '[', ']', '|', ';',
                 '?', '<', '>', '/', '\\', '!', '@', '&', '*', ':', '+', '^',
                 '=', '°', '´', '`', '%', "'", '"', '$', '#',
                 '≤', '&le;', '≥', '&ge;', '≠', '&ne;',
                 '‘', '&lsquo;', '’', '&rsquo;', '“', '&ldquo;', '”', '&rdquo;', '‚', '&sbquo;',
                 '„', '&bdquo;', '′', '&prime;', '″', '&Prime;', '—', '&mdash;',
                 '˜', '&tilde;', '‹', '&lsaquo;', '›', '&rsaquo;', '«', '&laquo;', '»', '&raquo;'
-            );
+            ];
             //'‐', '–', '&ndash;'
         }
 
-        if($keepDiacritic === false){
+        if ($keepDiacritic === false) {
             $noDiacriticString = self::removeDiacriticalMarks($string);
-        }else{
+        } else {
             $noDiacriticString = $string;
         }
 
@@ -469,7 +501,7 @@ class StringMethods
             // splits all html-tags to scanable lines
             preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
             $total_length = mb_strlen($ending);
-            $open_tags = array();
+            $open_tags = [];
             $truncate = '';
             foreach ($lines as $line_matchings) {
                 // if there is any html-tag in this line, handle it and add it (uncounted) to the output
@@ -559,7 +591,7 @@ class StringMethods
     {
         if (func_num_args() > 1) {
             $args = func_get_args();
-            $out = array();
+            $out = [];
 
             foreach ($args as $arg) {
                 $out[] = self::xss_safe($arg);
@@ -641,7 +673,7 @@ class StringMethods
         foreach ($args as &$arg) {
             $arg = self::xss_safe($arg);
         }
-        call_user_func_array("\\vprintf", array($formatString, $args));
+        call_user_func_array("\\vprintf", [$formatString, $args]);
     }
 
     /**
@@ -662,12 +694,11 @@ class StringMethods
      */
     public static function prepareEmailText($text)
     {
-        $prepared = str_replace(array('</p>', '</div>'), '<br/>', $text);
-        $prepared = strip_tags($prepared,'<br/><br><a><img/><img><table><tr><td><tbody><meta/><meta>');
+        $prepared = str_replace(['</p>', '</div>'], '<br/>', $text);
+        $prepared = strip_tags($prepared, '<br/><br><a><img/><img><table><tr><td><tbody><meta/><meta>');
 
         return $prepared;
     }
-
 
     /**
      * @param type $string
@@ -676,11 +707,60 @@ class StringMethods
      */
     public static function createUrlKey($string)
     {
-        $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
-        $preCleaned = static::fastClean($string, $neutralChars, '-');
+        $printableChars = preg_replace('/[[:^print:]]/', "", $string);
+        $neutralChars = ['.', ',', '_', '(', ')', '[', ']', '|', ' '];
+        $preCleaned = static::fastClean($printableChars, $neutralChars, '-');
         $cleaned = static::fastClean($preCleaned);
         $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
 
         return strtolower($return);
     }
+
+    public static function getEnStopwords()
+    {
+        return self::$stopwordsEn;
+    }
+
+    public static function getCsStopwords()
+    {
+        return self::$stopwordsCs;
+    }
+
+    /**
+     * Clean string. Cleaned string contains only [a-z0-9\s].
+     *
+     * @param string     $str
+     * @param bool       $removeStopwords
+     *
+     * @return string
+     */
+    public static function cleanString($str, $removeStopwords = false)
+    {
+        $cleanStr = self::removeDiacriticalMarks($str);
+        $cleanStr = strtolower(strip_tags(trim($cleanStr)));
+        $cleanStr = preg_replace('/[^a-z0-9\s]+/', ' ', $cleanStr);
+
+        if ($removeStopwords) {
+            $cleanStr = preg_replace('/\b(' . implode('|', self::$stopwordsCs) . ')\b/', ' ', $cleanStr);
+            $cleanStr = preg_replace('/\b(' . implode('|', self::$stopwordsEn) . ')\b/', ' ', $cleanStr);
+        }
+
+        $cleanStr2 = self::removeMultipleSpaces($cleanStr);
+
+        unset($cleanStr);
+
+        return $cleanStr2;
+    }
+
+    /**
+     * Removes multiple spaces from string
+     *
+     * @param type $string
+     * @return type
+     */
+    public static function removeMultipleSpaces($string)
+    {
+        return preg_replace('/(\s|&nbsp;)+/', ' ', $string);
+    }
+
 }

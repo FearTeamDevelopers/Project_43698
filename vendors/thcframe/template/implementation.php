@@ -7,18 +7,18 @@ use THCFrame\Core\StringMethods;
 use THCFrame\Template\Exception as Exception;
 
 /**
- * In order for our template parser to remain flexible, the structure of our 
- * template dialect needs to be in a separate class to the parser. 
- * This allows us to swap out different implementation classes for the same parser. 
+ * In order for our template parser to remain flexible, the structure of our
+ * template dialect needs to be in a separate class to the parser.
+ * This allows us to swap out different implementation classes for the same parser.
  * All of our implementation classes should also inherit from a base implementation class.
  */
 class Implementation extends Base
 {
 
     /**
-     * The _handler() method takes a $node array and 
+     * The _handler() method takes a $node array and
      * determines the correct handler method to execute
-     * 
+     *
      * @param array $node
      * @return mixed
      */
@@ -36,10 +36,10 @@ class Implementation extends Base
     }
 
     /**
-     * The handle() method uses the _handler() method to get the correct handler 
-     * method, and executes it, throwing a Exception\Implementation exception if 
+     * The handle() method uses the _handler() method to get the correct handler
+     * method, and executes it, throwing a Exception\Implementation exception if
      * there was a problem executing the statement’s handler
-     * 
+     *
      * @param string $node
      * @param mixed $content
      * @return mixed
@@ -49,16 +49,16 @@ class Implementation extends Base
     {
         try {
             $handler = $this->_handler($node);
-            return call_user_func_array(array($this, $handler), array($node, $content));
+            return call_user_func_array([$this, $handler], [$node, $content]);
         } catch (\Exception $e) {
             throw new Exception\Implementation($e->getMessage());
         }
     }
 
     /**
-     * The match() method evaluates a $source string to 
+     * The match() method evaluates a $source string to
      * determine if it matches a tag or statement
-     * 
+     *
      * @param mixed $source
      * @return mixed
      */
@@ -87,10 +87,10 @@ class Implementation extends Base
             return null;
         }
 
-        return array(
+        return [
             "type" => $type,
             "delimiter" => $delimiter
-        );
+        ];
     }
 
 }

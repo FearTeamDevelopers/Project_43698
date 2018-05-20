@@ -54,7 +54,7 @@ class Init
      *
      * @var array
      */
-    public $config = array();
+    public $config = [];
 
     /**
      * Instance of this class depending on the supplied config file
@@ -62,7 +62,7 @@ class Init
      * @var Init[]|array
      * @static
      */
-    private static $instances = array();
+    private static $instances = [];
 
     /**
      * Constructor
@@ -73,7 +73,7 @@ class Init
      *
      * @return \IDS\Init $this
      */
-    public function __construct(array $config = array())
+    public function __construct(array $config = [])
     {
         $this->config = $config;
     }

@@ -6,8 +6,6 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
-use THCFrame\Core\StringMethods;
-use THCFrame\Core\Lang;
 
 /**
  * Module specific controller class extending framework controller class.
@@ -16,9 +14,11 @@ class Controller extends BaseController
 {
 
     /**
-     * @param type $options
+     * Controller constructor.
+     * @param array $options
+     * @throws \Exception
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -29,10 +29,8 @@ class Controller extends BaseController
 
         $metaData = $this->getCache()->get('global_meta_data');
 
-        if (null !== $metaData) {
-            $metaData = $metaData;
-        } else {
-            $metaData = array(
+        if (null === $metaData) {
+            $metaData = [
                 'metadescription' => $this->getConfig()->meta_description,
                 'metarobots' => $this->getConfig()->meta_robots,
                 'metatitle' => $this->getConfig()->meta_title,
@@ -41,7 +39,7 @@ class Controller extends BaseController
                 'metaogimage' => $this->getConfig()->meta_og_image,
                 'metaogsitename' => $this->getConfig()->meta_og_site_name,
                 'showfeedback' => $this->getConfig()->show_feedback,
-            );
+            ];
 
             $this->getCache()->set('global_meta_data', $metaData);
         }
@@ -58,9 +56,9 @@ class Controller extends BaseController
     }
 
     /**
-     * @param type $pageCount
-     * @param type $page
-     * @param type $path
+     * @param int $pageCount
+     * @param int $page
+     * @param string $path
      */
     protected function pagerMetaLinks($pageCount, $page, $path)
     {
@@ -74,9 +72,9 @@ class Controller extends BaseController
 
             $this->getLayoutView()
                     ->set('pagedprev', $prevPage)
-                    ->set('pagedprevlink', $path.$prevPage)
+                    ->set('pagedprevlink', $path . $prevPage)
                     ->set('pagednext', $nextPage)
-                    ->set('pagednextlink', $path.$nextPage);
+                    ->set('pagednextlink', $path . $nextPage);
         }
     }
 
@@ -85,8 +83,8 @@ class Controller extends BaseController
      */
     protected function disableView()
     {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
     }
 
     /**
@@ -98,8 +96,7 @@ class Controller extends BaseController
         $user = $this->getSecurity()->getUser();
 
         if (!$user) {
-            $this->_willRenderActionView = false;
-            $this->_willRenderLayoutView = false;
+            $this->disableView();
             self::redirect('/prihlasit');
         }
 
@@ -130,11 +127,7 @@ class Controller extends BaseController
      */
     protected function isMember()
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_member') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_member') === true);
     }
 
     /**
@@ -152,11 +145,7 @@ class Controller extends BaseController
      */
     protected function isParticipant()
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_participant') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_participant') === true);
     }
 
     /**
@@ -168,18 +157,25 @@ class Controller extends BaseController
     }
 
     /**
-     * @param type $key
-     * @param type $args
-     *
-     * @return type
+     * @param string $key
+     * @param array $args
+     * @return mixed|string
      */
-    public function lang($key, $args = array())
+    public function lang($key, $args = [])
     {
         return $this->getLang()->_get($key, $args);
     }
 
     /**
-     *
+     * @return bool
+     */
+    protected function checkEuCookieLegal()
+    {
+        return RequestMethods::issetcookie('cookies-consent');
+    }
+
+    /**
+     * @throws \THCFrame\View\Exception\Renderer
      */
     public function render()
     {
@@ -189,6 +185,7 @@ class Controller extends BaseController
         if ($view) {
             $view->set('authUser', $this->getSecurity()->getUser())
                     ->set('deviceType', $this->getDeviceType())
+                    ->set('euCookieLegal', $this->checkEuCookieLegal())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
@@ -199,6 +196,7 @@ class Controller extends BaseController
         if ($layoutView) {
             $layoutView->set('authUser', $this->getSecurity()->getUser())
                     ->set('deviceType', $this->getDeviceType())
+                    ->set('euCookieLegal', $this->checkEuCookieLegal())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
@@ -208,4 +206,5 @@ class Controller extends BaseController
 
         parent::render();
     }
+
 }

@@ -134,7 +134,7 @@ class IDS_Log_Database implements IDS_Log_Interface
      *
      * @var array
      */
-    private static $instances = array();
+    private static $instances = [];
 
     /**
      * Constructor

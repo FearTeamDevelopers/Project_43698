@@ -16,15 +16,15 @@ class AnnotationBaseAuthorization extends Base implements AuthorizationInterface
 
     /**
      * Authorization type
-     * 
+     *
      * @read
-     * @var type 
+     * @var type
      */
     protected $_type = 'annotationbase';
-    
+
     /**
      * RoleManager instance
-     * 
+     *
      * @read
      * @var \THCFrame\Security\Authorization\RoleManager
      */
@@ -32,7 +32,7 @@ class AnnotationBaseAuthorization extends Base implements AuthorizationInterface
 
     /**
      * Object constructor
-     * 
+     *
      * @param \THCFrame\Security\Authorization\RoleManager $roleManager
      */
     public function __construct(RoleManager $roleManager)
@@ -44,7 +44,7 @@ class AnnotationBaseAuthorization extends Base implements AuthorizationInterface
 
     /**
      * Check if logged user has access to the requested resource
-     * 
+     *
      * @param \THCFrame\Security\UserInterface $user
      * @param string $requiredRole
      * @return boolean

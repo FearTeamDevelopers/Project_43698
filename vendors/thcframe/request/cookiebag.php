@@ -80,7 +80,7 @@ class CookieBag extends AbstractBag
 
     public function hashKey($key)
     {
-        if (ENV === 'live') {
+        if (ENV === \THCFrame\Core\Core::ENV_LIVE) {
             $secret = Registry::get('configuration')->session->secret;
             return hash_hmac('sha512', $key, $secret);
         } else {

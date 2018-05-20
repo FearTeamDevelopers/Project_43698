@@ -112,10 +112,10 @@ abstract class elFinderVolumeDriver {
 	 *
 	 * @var array
 	 **/
-	protected $archivers = array(
-		'create'  => array(),
-		'extract' => array()
-	);
+	protected $archivers = [
+		'create'  => [],
+		'extract' => []
+	];
 	
 	/**
 	 * Server character encoding
@@ -136,7 +136,7 @@ abstract class elFinderVolumeDriver {
 	 *
 	 * @var array
 	 **/
-	protected $error = array();
+	protected $error = [];
 	
 	/**
 	 * Today 24:00 timestamp
@@ -157,7 +157,7 @@ abstract class elFinderVolumeDriver {
 	 *
 	 * @var array
 	 **/
-	protected $options = array(
+	protected $options = [
 		'id'              => '',
 		// root directory path
 		'path'            => '',
@@ -202,11 +202,11 @@ abstract class elFinderVolumeDriver {
 		// on upload -  if true - old file will be replaced with new one, if false new file get name - original_name-number.ext
 		'uploadOverwrite' => true,
 		// mimetypes allowed to upload
-		'uploadAllow'     => array(),
+		'uploadAllow'     => [],
 		// mimetypes not allowed to upload
-		'uploadDeny'      => array(),
+		'uploadDeny'      => [],
 		// order to proccess uploadAllow and uploadDeny options
-		'uploadOrder'     => array('deny', 'allow'),
+		'uploadOrder'     => ['deny', 'allow'],
 		// maximum upload file size. NOTE - this is size for every uploaded files
 		'uploadMaxSize'   => 0,
 		// files dates format
@@ -220,7 +220,7 @@ abstract class elFinderVolumeDriver {
 		// allow to copy from other volumes to this one?
 		'copyTo'          => true,
 		// list of commands disabled on this root
-		'disabled'        => array(),
+		'disabled'        => [],
 		// regexp or function name to validate new file name
 		'acceptedName'    => '/^[^\.].*/', //<-- DONT touch this! Use constructor options to overwrite it!
 		// function/class method to control files permissions
@@ -228,43 +228,43 @@ abstract class elFinderVolumeDriver {
 		// some data required by access control
 		'accessControlData' => null,
 		// default permissions. not set hidden/locked here - take no effect
-		'defaults'     => array(
+		'defaults'     => [
 			'read'   => true,
 			'write'  => true
-		),
+		],
 		// files attributes
-		'attributes'   => array(),
+		'attributes'   => [],
 		// Allowed archive's mimetypes to create. Leave empty for all available types.
-		'archiveMimes' => array(),
+		'archiveMimes' => [],
 		// Manual config for archivers. See example below. Leave empty for auto detect
-		'archivers'    => array(),
+		'archivers'    => [],
 		// plugin settings
-		'plugin'       => array(),
+		'plugin'       => [],
 		// required to fix bug on macos
 		'utf8fix'      => false,
 		 //                           й                 ё              Й               Ё              Ø         Å
-		'utf8patterns' => array("\u0438\u0306", "\u0435\u0308", "\u0418\u0306", "\u0415\u0308", "\u00d8A", "\u030a"),
-		'utf8replace'  => array("\u0439",        "\u0451",       "\u0419",       "\u0401",       "\u00d8", "\u00c5")
-	);
+		'utf8patterns' => ["\u0438\u0306", "\u0435\u0308", "\u0418\u0306", "\u0415\u0308", "\u00d8A", "\u030a"],
+		'utf8replace'  => ["\u0439",        "\u0451",       "\u0419",       "\u0401",       "\u00d8", "\u00c5"]
+	];
 
 	/**
 	 * Defaults permissions
 	 *
 	 * @var array
 	 **/
-	protected $defaults = array(
+	protected $defaults = [
 		'read'   => true,
 		'write'  => true,
 		'locked' => false,
 		'hidden' => false
-	);
+	];
 	
 	/**
 	 * Access control function/class
 	 *
 	 * @var mixed
 	 **/
-	protected $attributes = array();
+	protected $attributes = [];
 	
 	/**
 	 * Access control function/class
@@ -278,21 +278,21 @@ abstract class elFinderVolumeDriver {
 	 *
 	 * @var array
 	 **/
-	protected $uploadAllow = array();
+	protected $uploadAllow = [];
 	
 	/**
 	 * Mime types denied to upload
 	 *
 	 * @var array
 	 **/
-	protected $uploadDeny = array();
+	protected $uploadDeny = [];
 	
 	/**
 	 * Order to validate uploadAllow and uploadDeny
 	 *
 	 * @var array
 	 **/
-	protected $uploadOrder = array();
+	protected $uploadOrder = [];
 	
 	/**
 	 * Maximum allowed upload file size.
@@ -328,14 +328,14 @@ abstract class elFinderVolumeDriver {
 	 *
 	 * @var array
 	 **/
-	protected $disabled = array();
+	protected $disabled = [];
 	
 	/**
 	 * default extensions/mimetypes for mimeDetect == 'internal' 
 	 *
 	 * @var array
 	 **/
-	protected static $mimetypes = array(
+	protected static $mimetypes = [
 		// applications
 		'ai'    => 'application/postscript',
 		'eps'   => 'application/postscript',
@@ -451,7 +451,7 @@ abstract class elFinderVolumeDriver {
 		'webm'  => 'video/webm',
 		'ogv'   => 'video/ogg',
 		'ogm'   => 'video/ogg'
-		);
+		];
 	
 	/**
 	 * Directory separator - required by client
@@ -465,28 +465,28 @@ abstract class elFinderVolumeDriver {
 	 *
 	 * @var array
 	 **/
-	protected $onlyMimes = array();
+	protected $onlyMimes = [];
 	
 	/**
 	 * Store files moved or overwrited files info
 	 *
 	 * @var array
 	 **/
-	protected $removed = array();
+	protected $removed = [];
 	
 	/**
 	 * Cache storage
 	 *
 	 * @var array
 	 **/
-	protected $cache = array();
+	protected $cache = [];
 	
 	/**
 	 * Cache by folders
 	 *
 	 * @var array
 	 **/
-	protected $dirsCache = array();
+	protected $dirsCache = [];
 	
 	/*********************************************************************/
 	/*                            INITIALIZATION                         */
@@ -573,12 +573,12 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	public function debug() {
-		return array(
+		return [
 			'id'         => $this->id(),
 			'name'       => strtolower(substr(get_class($this), strlen('elfinderdriver'))),
 			'mimeDetect' => $this->mimeDetect,
 			'imgLib'     => $this->imgLib
-		);
+		];
 	}
 	
 	/**
@@ -608,19 +608,19 @@ abstract class elFinderVolumeDriver {
 		}
 		
 		// default file attribute
-		$this->defaults = array(
+		$this->defaults = [
 			'read'    => isset($this->options['defaults']['read'])  ? !!$this->options['defaults']['read']  : true,
 			'write'   => isset($this->options['defaults']['write']) ? !!$this->options['defaults']['write'] : true,
 			'locked'  => false,
 			'hidden'  => false
-		);
+		];
 
 		// root attributes
-		$this->attributes[] = array(
+		$this->attributes[] = [
 			'pattern' => '~^'.preg_quote(DIRECTORY_SEPARATOR).'$~',
 			'locked'  => true,
 			'hidden'  => false
-		);
+		];
 		// set files attributes
 		if (!empty($this->options['attributes']) && is_array($this->options['attributes'])) {
 			
@@ -647,15 +647,15 @@ abstract class elFinderVolumeDriver {
 		// check some options is arrays
 		$this->uploadAllow = isset($this->options['uploadAllow']) && is_array($this->options['uploadAllow'])
 			? $this->options['uploadAllow']
-			: array();
+			: [];
 			
 		$this->uploadDeny = isset($this->options['uploadDeny']) && is_array($this->options['uploadDeny'])
 			? $this->options['uploadDeny']
-			: array();
+			: [];
 
 		if (is_string($this->options['uploadOrder'])) { // telephat_mode on, compatibility with 1.x
 			$parts = explode(',', isset($this->options['uploadOrder']) ? $this->options['uploadOrder'] : 'deny,allow');
-			$this->uploadOrder = array(trim($parts[0]), trim($parts[1]));
+			$this->uploadOrder = [trim($parts[0]), trim($parts[1])];
 		} else { // telephat_mode off
 			$this->uploadOrder = $this->options['uploadOrder'];
 		}
@@ -679,7 +679,7 @@ abstract class elFinderVolumeDriver {
 			
 		$this->disabled = isset($this->options['disabled']) && is_array($this->options['disabled'])
 			? $this->options['disabled']
-			: array();
+			: [];
 		
 		$this->cryptLib   = $this->options['cryptLib'];
 		$this->mimeDetect = $this->options['mimeDetect'];
@@ -771,10 +771,10 @@ abstract class elFinderVolumeDriver {
 			$this->options['tmbURL']  = '';
 			$this->options['tmbPath'] = '';
 			// read only volume
-			array_unshift($this->attributes, array(
+			array_unshift($this->attributes, [
 				'pattern' => '/.*/',
 				'read'    => false
-			));
+			]);
 		}
 		$this->treeDeep = $this->options['treeDeep'] > 0 ? (int)$this->options['treeDeep'] : 1;
 		$this->tmbSize  = $this->options['tmbSize'] > 0 ? (int)$this->options['tmbSize'] : 48;
@@ -902,7 +902,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	public function options($hash) {
-		return array(
+		return [
 			'path'          => $this->path($this->decode($hash)),
 			'url'           => $this->URL,
 			'tmbUrl'        => $this->tmbURL,
@@ -910,13 +910,13 @@ abstract class elFinderVolumeDriver {
 			'separator'     => $this->separator,
 			'copyOverwrite' => intval($this->options['copyOverwrite']),
 			'uploadMaxSize' => intval($this->uploadMaxSize),
-			'archivers'     => array(
+			'archivers'     => [
 				// 'create'  => array_keys($this->archivers['create']),
 				// 'extract' => array_keys($this->archivers['extract']),
-				'create'  => isset($this->archivers['create']) && is_array($this->archivers['create'])  ? array_keys($this->archivers['create'])  : array(),
-				'extract' => isset($this->archivers['extract']) && is_array($this->archivers['extract']) ? array_keys($this->archivers['extract']) : array()
-			)
-		);
+				'create'  => isset($this->archivers['create']) && is_array($this->archivers['create'])  ? array_keys($this->archivers['create'])  : [],
+				'extract' => isset($this->archivers['extract']) && is_array($this->archivers['extract']) ? array_keys($this->archivers['extract']) : []
+			]
+		];
 	}
 	
 	/**
@@ -928,7 +928,7 @@ abstract class elFinderVolumeDriver {
 	 */
 	public function getOptionsPlugin($name = '') {
 		if ($name) {
-			return isset($this->options['plugin'][$name])? $this->options['plugin'][$name] : array();
+			return isset($this->options['plugin'][$name])? $this->options['plugin'][$name] : [];
 		} else {
 			return $this->options['plugin'];
 		}
@@ -955,7 +955,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 * @author Troex Nevelin
 	 **/
-	public function mimeAccepted($mime, $mimes = array(), $empty = true) {
+	public function mimeAccepted($mime, $mimes = [], $empty = true) {
 		$mimes = !empty($mimes) ? $mimes : $this->onlyMimes;
 		if (empty($mimes)) {
 			return $empty;
@@ -1028,7 +1028,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	public function resetRemoved() {
-		$this->removed = array();
+		$this->removed = [];
 	}
 	
 	/**
@@ -1117,7 +1117,7 @@ abstract class elFinderVolumeDriver {
 			return false;
 		}
 		
-		$list = array();
+		$list = [];
 		$path = $this->decode($hash);
 		
 		foreach ($this->getScandir($path) as $stat) {
@@ -1164,7 +1164,7 @@ abstract class elFinderVolumeDriver {
 		}
 
 		$path = $this->decode($hash);
-		$tree = array();
+		$tree = [];
 		
 		while ($path && $path != $this->root) {
 			$path = $this->dirnameCE($path);
@@ -1183,7 +1183,7 @@ abstract class elFinderVolumeDriver {
 			}
 		}
 
-		return $tree ? $tree : array($current);
+		return $tree ? $tree : [$current];
 	}
 	
 	/**
@@ -1468,11 +1468,11 @@ abstract class elFinderVolumeDriver {
 			}
 		}
 		
-		$stat = array(
+		$stat = [
 			'mime'   => $mime, 
 			'width'  => 0, 
 			'height' => 0, 
-			'size'   => $tmpsize);
+			'size'   => $tmpsize];
 		
 		// $w = $h = 0;
 		if (strpos($mime, 'image') === 0 && ($s = getimagesize($tmpname))) {
@@ -1693,7 +1693,7 @@ abstract class elFinderVolumeDriver {
 			return $this->setError(elFinder::ERROR_ARCHIVE_TYPE);
 		}
 		
-		$files = array();
+		$files = [];
 		
 		foreach ($hashes as $hash) {
 			if (($file = $this->file($hash)) == false) {
@@ -1795,7 +1795,7 @@ abstract class elFinderVolumeDriver {
 	 **/
 	public function rm($hash) {
 		return $this->commandDisabled('rm')
-			? array(elFinder::ERROR_ACCESS_DENIED)
+			? [elFinder::ERROR_ACCESS_DENIED]
 			: $this->remove($this->decode($hash));
 	}
 	
@@ -1835,7 +1835,7 @@ abstract class elFinderVolumeDriver {
 	 * @return boolean|string
 	 * @author Naoki Sawada
 	 */
-	public function getContentUrl($hash, $options = array()) {
+	public function getContentUrl($hash, $options = []) {
 		if (($file = $this->file($hash)) == false || !$file['url'] || $file['url'] == 1) {
 			return false;
 		}
@@ -1906,7 +1906,7 @@ abstract class elFinderVolumeDriver {
 	 **/
 	protected function setError($error) {
 		
-		$this->error = array();
+		$this->error = [];
 		
 		foreach (func_get_args() as $err) {
 			if (is_array($err)) {
@@ -2255,7 +2255,7 @@ abstract class elFinderVolumeDriver {
 				@setlocale(LC_ALL, $locale);
 			}
 			if (is_array($var)) {
-				$_ret = array();
+				$_ret = [];
 				foreach($var as $_k => $_v) {
 					$_ret[$_k] = $this->convEnc($_v, $from, $to, '', false, $unknown = '_');
 				}
@@ -2384,7 +2384,7 @@ abstract class elFinderVolumeDriver {
 	 **/
 	protected function updateCache($path, $stat) {
 		if (empty($stat) || !is_array($stat)) {
-			return $this->cache[$path] = array();
+			return $this->cache[$path] = [];
 		}
 
 		$stat['hash'] = $this->encode($path);
@@ -2505,7 +2505,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function cacheDir($path) {
-		$this->dirsCache[$path] = array();
+		$this->dirsCache[$path] = [];
 
 		foreach ($this->scandirCE($path) as $p) {
 			if (($stat = $this->stat($p)) && empty($stat['hidden'])) {
@@ -2521,7 +2521,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function clearcache() {
-		$this->cache = $this->dirsCache = array();
+		$this->cache = $this->dirsCache = [];
 	}
 	
 	/**
@@ -2553,7 +2553,7 @@ abstract class elFinderVolumeDriver {
 		$type = explode(';', $type);
 		$type = trim($type[0]);
 
-		if (in_array($type, array('application/x-empty', 'inode/x-empty'))) {
+		if (in_array($type, ['application/x-empty', 'inode/x-empty'])) {
 			// finfo return this mime for empty files
 			$type = 'text/plain';
 		} elseif ($type == 'application/x-zip') {
@@ -2683,7 +2683,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function getScandir($path) {
-		$files = array();
+		$files = [];
 		
 		!isset($this->dirsCache[$path]) && $this->cacheDir($path);
 
@@ -2706,7 +2706,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function gettree($path, $deep, $exclude='') {
-		$dirs = array();
+		$dirs = [];
 		
 		!isset($this->dirsCache[$path]) && $this->cacheDir($path);
 
@@ -2734,7 +2734,7 @@ abstract class elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function doSearch($path, $q, $mimes) {
-		$result = array();
+		$result = [];
 
 		foreach($this->scandirCE($path) as $p) {
 			$stat = $this->stat($p);
@@ -3108,11 +3108,11 @@ abstract class elFinderVolumeDriver {
 
     	$result = false;
     	
-		list($size_w, $size_h) = array($width, $height);
+		list($size_w, $size_h) = [$width, $height];
     
     	if ($keepProportions == true) {
            
-      		list($orig_w, $orig_h, $new_w, $new_h) = array($s[0], $s[1], $width, $height);
+      		list($orig_w, $orig_h, $new_w, $new_h) = [$s[0], $s[1], $width, $height];
         
       		/* Calculating image scale width and height */
       		$xscale = $orig_w / $new_w;
@@ -3396,11 +3396,11 @@ abstract class elFinderVolumeDriver {
 	 **/
 	protected function procExec($command , array &$output = null, &$return_var = -1, array &$error_output = null) {
 
-		$descriptorspec = array(
-			0 => array("pipe", "r"),  // stdin
-			1 => array("pipe", "w"),  // stdout
-			2 => array("pipe", "w")   // stderr
-		);
+		$descriptorspec = [
+			0 => ["pipe", "r"],  // stdin
+			1 => ["pipe", "w"],  // stdout
+			2 => ["pipe", "w"]   // stderr
+		];
 
 		$process = proc_open($command, $descriptorspec, $pipes, null, null);
 
@@ -3559,10 +3559,10 @@ abstract class elFinderVolumeDriver {
 	 */
 	protected function getArchivers($use_cache = true) {
 
-		$arcs = array(
-				'create'  => array(),
-				'extract' => array()
-		);
+		$arcs = [
+				'create'  => [],
+				'extract' => []
+		];
 
 		if (!function_exists('proc_open')) {
 			return $arcs;
@@ -3575,111 +3575,111 @@ abstract class elFinderVolumeDriver {
 		$this->procExec('tar --version', $o, $ctar);
 		
 		if ($ctar == 0) {
-			$arcs['create']['application/x-tar']  = array('cmd' => 'tar', 'argc' => '-cf', 'ext' => 'tar');
-			$arcs['extract']['application/x-tar'] = array('cmd' => 'tar', 'argc' => '-xf', 'ext' => 'tar');
+			$arcs['create']['application/x-tar']  = ['cmd' => 'tar', 'argc' => '-cf', 'ext' => 'tar'];
+			$arcs['extract']['application/x-tar'] = ['cmd' => 'tar', 'argc' => '-xf', 'ext' => 'tar'];
 			unset($o);
 			$test = $this->procExec('gzip --version', $o, $c);
 		
 			if ($c == 0) {
-				$arcs['create']['application/x-gzip']  = array('cmd' => 'tar', 'argc' => '-czf', 'ext' => 'tgz');
-				$arcs['extract']['application/x-gzip'] = array('cmd' => 'tar', 'argc' => '-xzf', 'ext' => 'tgz');
+				$arcs['create']['application/x-gzip']  = ['cmd' => 'tar', 'argc' => '-czf', 'ext' => 'tgz'];
+				$arcs['extract']['application/x-gzip'] = ['cmd' => 'tar', 'argc' => '-xzf', 'ext' => 'tgz'];
 			}
 			unset($o);
 			$test = $this->procExec('bzip2 --version', $o, $c);
 			if ($c == 0) {
-				$arcs['create']['application/x-bzip2']  = array('cmd' => 'tar', 'argc' => '-cjf', 'ext' => 'tbz');
-				$arcs['extract']['application/x-bzip2'] = array('cmd' => 'tar', 'argc' => '-xjf', 'ext' => 'tbz');
+				$arcs['create']['application/x-bzip2']  = ['cmd' => 'tar', 'argc' => '-cjf', 'ext' => 'tbz'];
+				$arcs['extract']['application/x-bzip2'] = ['cmd' => 'tar', 'argc' => '-xjf', 'ext' => 'tbz'];
 			}
 		}
 		unset($o);
 		$this->procExec('zip -v', $o, $c);
 		if ($c == 0) {
-			$arcs['create']['application/zip']  = array('cmd' => 'zip', 'argc' => '-r9', 'ext' => 'zip');
+			$arcs['create']['application/zip']  = ['cmd' => 'zip', 'argc' => '-r9', 'ext' => 'zip'];
 		}
 		unset($o);
 		$this->procExec('unzip --help', $o, $c);
 		if ($c == 0) {
-			$arcs['extract']['application/zip'] = array('cmd' => 'unzip', 'argc' => '',  'ext' => 'zip');
+			$arcs['extract']['application/zip'] = ['cmd' => 'unzip', 'argc' => '',  'ext' => 'zip'];
 		}
 		unset($o);
 		$this->procExec('rar --version', $o, $c);
 		if ($c == 0 || $c == 7) {
-			$arcs['create']['application/x-rar']  = array('cmd' => 'rar', 'argc' => 'a -inul', 'ext' => 'rar');
-			$arcs['extract']['application/x-rar'] = array('cmd' => 'rar', 'argc' => 'x -y',    'ext' => 'rar');
+			$arcs['create']['application/x-rar']  = ['cmd' => 'rar', 'argc' => 'a -inul', 'ext' => 'rar'];
+			$arcs['extract']['application/x-rar'] = ['cmd' => 'rar', 'argc' => 'x -y',    'ext' => 'rar'];
 		} else {
 			unset($o);
 			$test = $this->procExec('unrar', $o, $c);
 			if ($c==0 || $c == 7) {
-				$arcs['extract']['application/x-rar'] = array('cmd' => 'unrar', 'argc' => 'x -y', 'ext' => 'rar');
+				$arcs['extract']['application/x-rar'] = ['cmd' => 'unrar', 'argc' => 'x -y', 'ext' => 'rar'];
 			}
 		}
 		unset($o);
 		$this->procExec('7za --help', $o, $c);
 		if ($c == 0) {
-			$arcs['create']['application/x-7z-compressed']  = array('cmd' => '7za', 'argc' => 'a', 'ext' => '7z');
-			$arcs['extract']['application/x-7z-compressed'] = array('cmd' => '7za', 'argc' => 'e -y', 'ext' => '7z');
+			$arcs['create']['application/x-7z-compressed']  = ['cmd' => '7za', 'argc' => 'a', 'ext' => '7z'];
+			$arcs['extract']['application/x-7z-compressed'] = ['cmd' => '7za', 'argc' => 'e -y', 'ext' => '7z'];
 				
 			if (empty($arcs['create']['application/x-gzip'])) {
-				$arcs['create']['application/x-gzip'] = array('cmd' => '7za', 'argc' => 'a -tgzip', 'ext' => 'tar.gz');
+				$arcs['create']['application/x-gzip'] = ['cmd' => '7za', 'argc' => 'a -tgzip', 'ext' => 'tar.gz'];
 			}
 			if (empty($arcs['extract']['application/x-gzip'])) {
-				$arcs['extract']['application/x-gzip'] = array('cmd' => '7za', 'argc' => 'e -tgzip -y', 'ext' => 'tar.gz');
+				$arcs['extract']['application/x-gzip'] = ['cmd' => '7za', 'argc' => 'e -tgzip -y', 'ext' => 'tar.gz'];
 			}
 			if (empty($arcs['create']['application/x-bzip2'])) {
-				$arcs['create']['application/x-bzip2'] = array('cmd' => '7za', 'argc' => 'a -tbzip2', 'ext' => 'tar.bz');
+				$arcs['create']['application/x-bzip2'] = ['cmd' => '7za', 'argc' => 'a -tbzip2', 'ext' => 'tar.bz'];
 			}
 			if (empty($arcs['extract']['application/x-bzip2'])) {
-				$arcs['extract']['application/x-bzip2'] = array('cmd' => '7za', 'argc' => 'a -tbzip2 -y', 'ext' => 'tar.bz');
+				$arcs['extract']['application/x-bzip2'] = ['cmd' => '7za', 'argc' => 'a -tbzip2 -y', 'ext' => 'tar.bz'];
 			}
 			if (empty($arcs['create']['application/zip'])) {
-				$arcs['create']['application/zip'] = array('cmd' => '7za', 'argc' => 'a -tzip -l', 'ext' => 'zip');
+				$arcs['create']['application/zip'] = ['cmd' => '7za', 'argc' => 'a -tzip -l', 'ext' => 'zip'];
 			}
 			if (empty($arcs['extract']['application/zip'])) {
-				$arcs['extract']['application/zip'] = array('cmd' => '7za', 'argc' => 'e -tzip -y', 'ext' => 'zip');
+				$arcs['extract']['application/zip'] = ['cmd' => '7za', 'argc' => 'e -tzip -y', 'ext' => 'zip'];
 			}
 			if (empty($arcs['create']['application/x-tar'])) {
-				$arcs['create']['application/x-tar'] = array('cmd' => '7za', 'argc' => 'a -ttar -l', 'ext' => 'tar');
+				$arcs['create']['application/x-tar'] = ['cmd' => '7za', 'argc' => 'a -ttar -l', 'ext' => 'tar'];
 			}
 			if (empty($arcs['extract']['application/x-tar'])) {
-				$arcs['extract']['application/x-tar'] = array('cmd' => '7za', 'argc' => 'e -ttar -y', 'ext' => 'tar');
+				$arcs['extract']['application/x-tar'] = ['cmd' => '7za', 'argc' => 'e -ttar -y', 'ext' => 'tar'];
 			}
 		} else if (substr(PHP_OS,0,3) === 'WIN') {
 			// check `7z` for Windows server.
 			unset($o);
 			$this->procExec('7z', $o, $c);
 			if ($c == 0) {
-				$arcs['create']['application/x-7z-compressed']  = array('cmd' => '7z', 'argc' => 'a -mx0', 'ext' => '7z');
-				$arcs['extract']['application/x-7z-compressed'] = array('cmd' => '7z', 'argc' => 'x -y', 'ext' => '7z');
+				$arcs['create']['application/x-7z-compressed']  = ['cmd' => '7z', 'argc' => 'a -mx0', 'ext' => '7z'];
+				$arcs['extract']['application/x-7z-compressed'] = ['cmd' => '7z', 'argc' => 'x -y', 'ext' => '7z'];
 					
 				if (empty($arcs['create']['application/x-gzip'])) {
-					$arcs['create']['application/x-gzip'] = array('cmd' => '7z', 'argc' => 'a -tgzip -mx0', 'ext' => 'tar.gz');
+					$arcs['create']['application/x-gzip'] = ['cmd' => '7z', 'argc' => 'a -tgzip -mx0', 'ext' => 'tar.gz'];
 				}
 				if (empty($arcs['extract']['application/x-gzip'])) {
-					$arcs['extract']['application/x-gzip'] = array('cmd' => '7z', 'argc' => 'x -tgzip -y', 'ext' => 'tar.gz');
+					$arcs['extract']['application/x-gzip'] = ['cmd' => '7z', 'argc' => 'x -tgzip -y', 'ext' => 'tar.gz'];
 				}
 				if (empty($arcs['create']['application/x-bzip2'])) {
-					$arcs['create']['application/x-bzip2'] = array('cmd' => '7z', 'argc' => 'a -tbzip2 -mx0', 'ext' => 'tar.bz');
+					$arcs['create']['application/x-bzip2'] = ['cmd' => '7z', 'argc' => 'a -tbzip2 -mx0', 'ext' => 'tar.bz'];
 				}
 				if (empty($arcs['extract']['application/x-bzip2'])) {
-					$arcs['extract']['application/x-bzip2'] = array('cmd' => '7z', 'argc' => 'x -tbzip2 -y', 'ext' => 'tar.bz');
+					$arcs['extract']['application/x-bzip2'] = ['cmd' => '7z', 'argc' => 'x -tbzip2 -y', 'ext' => 'tar.bz'];
 				}
 				if (empty($arcs['create']['application/zip'])) {
-					$arcs['create']['application/zip'] = array('cmd' => '7z', 'argc' => 'a -tzip -l -mx0', 'ext' => 'zip');
+					$arcs['create']['application/zip'] = ['cmd' => '7z', 'argc' => 'a -tzip -l -mx0', 'ext' => 'zip'];
 				}
 				if (empty($arcs['extract']['application/zip'])) {
-					$arcs['extract']['application/zip'] = array('cmd' => '7z', 'argc' => 'x -tzip -y', 'ext' => 'zip');
+					$arcs['extract']['application/zip'] = ['cmd' => '7z', 'argc' => 'x -tzip -y', 'ext' => 'zip'];
 				}
 				if (empty($arcs['create']['application/x-tar'])) {
-					$arcs['create']['application/x-tar'] = array('cmd' => '7z', 'argc' => 'a -ttar -l -mx0', 'ext' => 'tar');
+					$arcs['create']['application/x-tar'] = ['cmd' => '7z', 'argc' => 'a -ttar -l -mx0', 'ext' => 'tar'];
 				}
 				if (empty($arcs['extract']['application/x-tar'])) {
-					$arcs['extract']['application/x-tar'] = array('cmd' => '7z', 'argc' => 'x -ttar -y', 'ext' => 'tar');
+					$arcs['extract']['application/x-tar'] = ['cmd' => '7z', 'argc' => 'x -ttar -y', 'ext' => 'tar'];
 				}
 				if (empty($arcs['create']['application/x-rar'])) {
-					$arcs['create']['application/x-rar']  = array('cmd' => '7z', 'argc' => 'a -trar -l -mx0', 'ext' => 'rar');
+					$arcs['create']['application/x-rar']  = ['cmd' => '7z', 'argc' => 'a -trar -l -mx0', 'ext' => 'rar'];
 				}
 				if (empty($arcs['extract']['application/x-rar'])) {
-					$arcs['extract']['application/x-rar'] = array('cmd' => '7z', 'argc' => 'x -trar -y', 'ext' => 'rar');
+					$arcs['extract']['application/x-rar'] = ['cmd' => '7z', 'argc' => 'x -trar -y', 'ext' => 'rar'];
 				}
 			}
 		}

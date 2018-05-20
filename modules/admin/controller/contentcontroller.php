@@ -6,48 +6,31 @@ use Admin\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Core\StringMethods;
+use App\Model\PageContentModel;
 
 /**
- * 
+ *
  */
 class ContentController extends Controller
 {
 
     /**
-     * Check whether unique content identifier already exist or not.
-     * 
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function _checkUrlKey($key)
-    {
-        $status = \App\Model\PageContentModel::first(array('urlKey = ?' => $key));
-
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Get list of all content pages.
-     * 
+     *
      * @before _secured, _participant
      */
     public function index()
     {
         $view = $this->getActionView();
 
-        $content = \App\Model\PageContentModel::all();
+        $content = PageContentModel::all();
 
         $view->set('content', $content);
     }
 
     /**
      * Create new page.
-     * 
+     *
      * @before _secured, _admin
      */
     public function add()
@@ -58,21 +41,21 @@ class ContentController extends Controller
 
         if (RequestMethods::post('submitAddContent')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/content/');
             }
 
-            $errors = array();
+            $errors = [];
             $urlKey = StringMethods::createUrlKey(RequestMethods::post('page'));
 
-            if (!$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            if (!PageContentModel::checkUrlKey($urlKey)) {
+                $errors['title'] = [$this->lang('ARTICLE_TITLE_IS_USED')];
             }
 
             $metaDesc = substr(strip_tags(RequestMethods::post('text')), 0, 600);
             $keywords = strtolower(StringMethods::removeDiacriticalMarks(RequestMethods::post('keywords')));
 
-            $content = new \App\Model\PageContentModel(array(
+            $content = new PageContentModel([
                 'title' => RequestMethods::post('page'),
                 'urlKey' => $urlKey,
                 'body' => RequestMethods::post('text'),
@@ -80,19 +63,19 @@ class ContentController extends Controller
                 'keywords' => $keywords,
                 'metaTitle' => RequestMethods::post('metatitle'),
                 'metaDescription' => RequestMethods::post('metadescription', $metaDesc),
-            ));
+            ]);
 
             if (empty($errors) && $content->validate()) {
                 $id = $content->save();
-                $this->getCache()->invalidate();
-                
-                Event::fire('admin.log', array('success', 'Content id: ' . $id));
+                $this->getCache()->clearCache();
+
+                Event::fire('admin.log', ['success', 'Content id: ' . $id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/content/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $content->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: ' . json_encode($errors + $content->getErrors())]);
                 $view->set('errors', $errors + $content->getErrors())
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('content', $content);
             }
         }
@@ -100,7 +83,7 @@ class ContentController extends Controller
 
     /**
      * Edit existing page.
-     * 
+     *
      * @before _secured, _admin
      *
      * @param int $id page id
@@ -109,11 +92,11 @@ class ContentController extends Controller
     {
         $view = $this->getActionView();
 
-        $content = \App\Model\PageContentModel::first(array('id = ?' => (int) $id));
+        $content = PageContentModel::first(['id = ?' => (int) $id]);
 
         if (null === $content) {
             $view->warningMessage($this->lang('NOT_FOUND'));
-            $this->_willRenderActionView = false;
+            $this->willRenderActionView = false;
             self::redirect('/admin/content/');
         }
 
@@ -124,12 +107,12 @@ class ContentController extends Controller
                 self::redirect('/admin/content/');
             }
 
-            $errors = array();
+            $errors = [];
             $originalContent = clone $content;
             $urlKey = StringMethods::createUrlKey(RequestMethods::post('page'));
 
-            if ($content->getUrlKey() !== $urlKey && !$this->_checkUrlKey($urlKey)) {
-                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            if ($content->getUrlKey() !== $urlKey && !PageContentModel::checkUrlKey($urlKey)) {
+                $errors['title'] = [$this->lang('ARTICLE_TITLE_IS_USED')];
             }
 
             $metaDesc = substr(strip_tags(RequestMethods::post('text')), 0, 600);
@@ -147,14 +130,14 @@ class ContentController extends Controller
             if (empty($errors) && $content->validate()) {
                 $content->save();
                 \Admin\Model\PageContentHistoryModel::logChanges($originalContent, $content);
-                $this->getCache()->invalidate();
-                
-                Event::fire('admin.log', array('success', 'Content id: ' . $id));
+                $this->getCache()->clearCache();
+
+                Event::fire('admin.log', ['success', 'Content id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/content/');
             } else {
-                Event::fire('admin.log', array('fail', 'Content id: ' . $id,
-                    'Errors: ' . json_encode($errors + $content->getErrors()),));
+                Event::fire('admin.log', ['fail', 'Content id: ' . $id,
+                    'Errors: ' . json_encode($errors + $content->getErrors()),]);
                 $view->set('errors', $content->getErrors())
                         ->set('content', $content);
             }
@@ -163,7 +146,7 @@ class ContentController extends Controller
 
     /**
      * Return list of pages to insert page link to content.
-     * 
+     *
      * @before _secured, _participant
      */
     public function insertToContent()
@@ -171,7 +154,7 @@ class ContentController extends Controller
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $contents = \App\Model\PageContentModel::all(array(), array('urlKey', 'title'));
+        $contents = PageContentModel::all([], ['urlKey', 'title']);
 
         $view->set('contents', $contents);
     }

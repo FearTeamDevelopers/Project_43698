@@ -9,7 +9,7 @@ class HTMLPurifier_AttrDef_CSS_Border extends HTMLPurifier_AttrDef
     /**
      * Local copy of properties this property is shorthand for.
      */
-    protected $info = array();
+    protected $info = [];
 
     public function __construct($config) {
         $def = $config->getCSSDefinition();
@@ -22,7 +22,7 @@ class HTMLPurifier_AttrDef_CSS_Border extends HTMLPurifier_AttrDef
         $string = $this->parseCDATA($string);
         $string = $this->mungeRgb($string);
         $bits = explode(' ', $string);
-        $done = array(); // segments we've finished
+        $done = []; // segments we've finished
         $ret = ''; // return value
         foreach ($bits as $bit) {
             foreach ($this->info as $propname => $validator) {

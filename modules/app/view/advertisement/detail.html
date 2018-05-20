@@ -9,6 +9,7 @@
         <li><a href="/bazar" class="fi-arrow-left">Bazar</a></li>{if isset($authUser) && $authUser->getId() == $ad->getUserId() && $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
         <li><a href="/bazar/upravit/{echo $ad->getUniqueKey()}" class="fi-pencil">Upravit</a></li>
         <li><a href="/bazar/prodano/{echo $ad->getUniqueKey()}" class="ajaxReload fi-dollar">Prodáno</a></li>
+        <li><a href="/bazar/prodlouzit/{echo $ad->getUniqueKey()}" class="ajaxReload fi-refresh">Prodloužit platnost</a></li>
         <li><a href="/bazar/odstranit/{echo $ad->getUniqueKey()}" class="fi-trash">Smazat</a></li>{/if}
       </ul>
     </div>
@@ -16,38 +17,42 @@
       <div class="row">
         {script $images=$ad->getImages()}
         {if !empty($images)}
-        <div class="large-7 medium-7 small-12 column">
+        <div class="large-6 medium-6 small-12 column">
           <div class="images large-12">
             {foreach $image in $images}
             {if $image_i == 0}
-            <div class="mainImage large-12"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgMain()}"/></a></div>{if count($images)>1}<a href="#" class="fi-arrow-down dropdown">zobrazit více fotek</a>{/if}
-            {/if}{else}
-            <div class="thumbImage large-6 small-6 medium-6 column left"><a href="{echo $image->getImgMain()}" data-lightbox="bla"><img src="{echo $image->getImgThumb()}"/></a></div>{/else}
+            <div class="mainImage large-12"><a href="{echo $image->getImgMain()}" data-lightbox="adImage"><img src="{echo $image->getImgMain()}" alt="{echo $image->getPhotoName()}"/></a></div>{/if}{else}
+            <div class="thumbImage large-3 small-4 medium-3 column left"><a href="{echo $image->getImgMain()}" data-lightbox="adImage"><img src="{echo $image->getImgThumb()}" alt="{echo $image->getPhotoName()}"/></a></div>{/else}
             {/foreach}
           </div>
         </div>{/if}
         {if !empty($images)}
-        <div class="large-5 medium-5 small-12 column">
-          <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small>{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}<span class="price">{echo " PRODÁNO"}</span><br/>{/if}{elseif "" == $ad->getPrice()}<span class="price">{echo " Dohodou"}</span><br/>{/elseif}{else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}</div>
-        </div>{/if}{else}
-        <div class="large-12 column">
-          <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><small><span>sekce:</span></small><span>{echo " ".$ad->getSectionTitle()}<br/></span><small><span>cena:</span></small>{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}<span class="price">{echo " PRODÁNO"}</span><br/>{/if}{elseif "" == $ad->getPrice()}<span class="price">{echo " Dohodou"}</span><br/>{/elseif}{else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}</div>
-        </div>{/else}
-      </div>
-      <div class="row">
-        <div class="large-12 column">
-          <div class="info description">
-            <div>{echo $ad->content} <br/></div>{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
-            <div class="large-4 medium-6 small-12 centerBlock mv10"><a href="#sendEmail" class="sendEmail">
+        <div class="large-6 medium-6 small-12 column">
+          <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><span>{echo " ".$ad->getSectionTitle()}<br/></span>{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}<span class="price">{echo " PRODÁNO"}</span>{/if}{elseif "" == $ad->getPrice()}<span class="price">{echo " Dohodou"}</span>{/elseif}{else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}<br/></div>
+          <div class="info">
+            <div class="description">{echo $ad->content} <br/></div>{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+            <div class="large-12 medium-12 small-12 centerBlock mv10"><a href="#sendEmail" class="sendEmail">
                 <div class="more blue"><span>Odpovědět na Inzerát</span></div></a></div>{/if}
           </div>
-        </div>
+        </div>{/if}{else}
+        <div class="large-12 column">
+          <div class="info"><span>{echo $ad->getUserAlias()} <br/></span><span>{echo " ".$ad->getSectionTitle()}<br/></span>{if $ad->getState() == \App\Model\AdvertisementModel::STATE_SOLD}<span class="price">{echo " PRODÁNO"}</span>{/if}{elseif "" == $ad->getPrice()}<span class="price">{echo " Dohodou"}</span>{/elseif}{else}<span class="price">{echo " ".number_format($ad->getPrice(), 0, ",", " ")." Kč"}<br/></span>{/else}<br/></div>
+          <div class="info">
+            <div class="description">{echo $ad->content} <br/></div>{if $ad->getState() != \App\Model\AdvertisementModel::STATE_SOLD}
+            <div class="large-12 medium-12 small-12 centerBlock mv10"><a href="#sendEmail" class="sendEmail">
+                <div class="more blue"><span>Odpovědět na Inzerát</span></div></a></div>{/if}
+          </div>
+        </div>{/else}
       </div>
     </article>
     <div class="row">
       <div class="large-6 medium-9 small-9 centerBlock">
         <form id="sendEmail" method="post" action="#" class="mv30">
           <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
+          <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>
+          <p class="adContFormUrl">Toto pole nechte prázdné:
+            <input type="text" name="url"/>
+          </p>
           <label>
             Vaše jméno:
             {echo \App\Helper\FormPrinter::input("text", "name", array($admessage,"msAuthor"), array("required"=>true))}

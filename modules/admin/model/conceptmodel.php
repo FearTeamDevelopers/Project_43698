@@ -14,7 +14,7 @@ class ConceptModel extends BasicConceptModel
     const CONCEPT_TYPE_REPORT = 3;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -25,5 +25,13 @@ class ConceptModel extends BasicConceptModel
             $this->setCreated(date('Y-m-d H:i:s'));
         }
         $this->setModified(date('Y-m-d H:i:s'));
+    }
+
+    public static function fetchByUserAndType($userId, $type)
+    {
+        return self::all([
+                    'userId = ?' => (int)$userId,
+                    'type = ?' => (int)$type],
+                ['id', 'created', 'modified'], ['created' => 'DESC'], 10);
     }
 }

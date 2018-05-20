@@ -5,9 +5,9 @@ namespace THCFrame\Router\Model;
 use THCFrame\Model\Model;
 
 /**
- * ORM Redirect model 
- * 
- * SQL code: 
+ * ORM Redirect model
+ *
+ * SQL code:
  * CREATE TABLE `tb_redirect` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 `fromPath` varchar(250) NOT NULL DEFAULT '',
@@ -38,7 +38,7 @@ class RedirectModel extends Model
      * @type varchar
      * @length 250
      * @unique
-     * 
+     *
      * @validate required, alphanumeric, max(250)
      * @label from
      */
@@ -50,7 +50,7 @@ class RedirectModel extends Model
      * @type varchar
      * @length 250
      * @unique
-     * 
+     *
      * @validate required, alphanumeric, max(250)
      * @label to
      */
@@ -62,7 +62,7 @@ class RedirectModel extends Model
      * @type varchar
      * @length 30
      * @unique
-     * 
+     *
      * @validate required, alphanumeric, max(30)
      * @label module
      */
@@ -74,7 +74,7 @@ class RedirectModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -86,14 +86,14 @@ class RedirectModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {

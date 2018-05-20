@@ -1,0 +1,1 @@
+jQuery(".cookies-consent #cookie-ok").click(function(e){e.preventDefault();var o=o||[];jQuery(".cookies-consent #cookies-analytics").prop("checked")?(o.push(["rememberConsentGiven"]),o.push(["setConsentGiven"]),setCookie("cookies-consent",1,7)):(o.push(["forgetConsentGiven"]),deleteCookie("cookies-consent")),jQuery(".cookies-consent").hide()});

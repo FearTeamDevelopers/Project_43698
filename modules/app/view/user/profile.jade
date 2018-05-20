@@ -1,15 +1,14 @@
 section.wrapper.profil.singlePage
 	.row
-		.buttonWrapper.large-8.medium-12.small-12.centerBlock
+		.buttonWrapper.large-10.medium-12.small-12.centerBlock
 			ul
 				li
-					a(href="/bazar/pridat").fi-plus Nový inzerát
-				li
-					a(href="/bazar/moje-inzeraty").fi-page-copy Moje inzeráty
-				li
 					a(href="#").fi-pencil#openEdit Upravit údaje
+				li
+					a(href="/smazat-ucet").fi-trash.red-text#delete-account Smazat účet
+					
 	.row
-		article.small-12.large-8.medium-8.centerBlock#info
+		article.small-12.large-10.medium-10.centerBlock#info
 			table
 				tr
 					td
@@ -26,14 +25,20 @@ section.wrapper.profil.singlePage
 				tr
 					td
 						span Informace na email:
-					|{if $user->getNewActionNotification || $user->getNewReportNotification}
+					|{if $user->getNewActionNotification || $user->getNewReportNotification || $user->getNewNewsNotification}
 					td
-						|{if $user->getNewActionNotification}Informace o nových akcích<br/>{/if}
-						|{if $user->getNewReportNotification}Informace o nových reportážích{/if}
+						|{if $user->getNewActionNotification}Souhlasím se zasíláním informací o akcích na e-mail<br/>{/if}
+						|{if $user->getNewReportNotification}Souhlasím se zasíláním informací o reportážích na e-mail<br/>{/if}
+						|{if $user->getNewNewsNotification}Souhlasím se zasíláním informací o novinkách na e-mail<br/>{/if}
 					|{/if}{else}
 					td Nedostávám žádné informace emailem
 					|{/else}
-		article.small-12.large-8.medium-8.centerBlock#edit
+				tr
+					td
+						span Omezení zpracování osobních údajů:
+					td
+						|{if $user->pdLimitProcessing}Je aktivní{/if}{else}Není aktivní{/else}
+		article.small-12.large-10.medium-10.centerBlock#edit
 			a(href="#").fi-x-circle#closeEdit
 			form(method="post", action="#")
 				input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
@@ -72,19 +77,24 @@ section.wrapper.profil.singlePage
 							label
 								|{if $user->getNewActionNotification}
 								input(type="checkbox",name="actionNotification",value="1", checked="checked")
-								| Informace o nových akcích
 								|{/if}{else}
 								input(type="checkbox",name="actionNotification",value="1")
-								| Informace o nových akcích
 								|{/else}
+								|&nbsp;Souhlasím se zasíláním informací o akcích na e-mail
 							label
 								|{if $user->getNewReportNotification}
 								input(type="checkbox",name="reportNotification",value="1", checked="checked")
-								| Informace o nových reportážích
 								|{/if}{else}
 								input(type="checkbox",name="reportNotification",value="1")
-								| Informace o nových reportážích
 								|{/else}
+								|&nbsp;Souhlasím se zasíláním informací o reportážích na e-mail
+							label
+								|{if $user->getNewNewsNotification}
+								input(type="checkbox",name="newsNotification",value="1", checked="checked")
+								|{/if}{else}
+								input(type="checkbox",name="newsNotification",value="1")
+								|{/else}
+								|&nbsp;Souhlasím se zasíláním informací o novinkách na e-mail
 					tr
 						td
 							span Email:
@@ -102,7 +112,7 @@ section.wrapper.profil.singlePage
 							label.error.fi-alert
 								|{echo implode("<br/>", $errors["oldpass"])}
 							|{/if}
-							|{echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+							|{echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr
 						td
 							span Heslo:
@@ -111,7 +121,7 @@ section.wrapper.profil.singlePage
 							label.error.fi-alert
 								|{echo implode("<br/>", $errors["password"])}
 							|{/if}
-							|{echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+							|{echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
 					tr
 						td
 							span Ověření hesla:
@@ -120,12 +130,23 @@ section.wrapper.profil.singlePage
 							label.error.fi-alert
 								|{echo implode("<br/>", $errors["password2"])}
 							|{/if}
-							|{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+							|{echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+					tr
+						td
+							span Omezení zpracování osobních údajů:
+						td
+							label
+								|{if $user->pdLimitProcessing}
+								input(type="checkbox",name="pdLimitProcessing",value="1", checked="checked")
+								|{/if}{else}
+								input(type="checkbox",name="pdLimitProcessing",value="1")
+								|{/else}
+								|&nbsp;Přeji si omezit zpracování osobních údajů
 					tr
 						td(colspan=2)
 							input(type="submit", name="editProfile", value="Upravit").more
 	.row
-		article.small-12.large-8.medium-8.centerBlock
+		article.small-12.large-10.medium-10.centerBlock
 			table
 				tr
 					td(colspan='2')

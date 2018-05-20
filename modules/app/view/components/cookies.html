@@ -1,0 +1,15 @@
+{if $euCookieLegal == false}
+<div class="cookies-consent">
+  <div class="cookies-consent-text">Tento web používá k poskytování služeb a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.</div>
+  <div class="cookies-consent-types">
+    <label for="cookies-mandatory">Nezbytné</label>
+    <input type="checkbox" disabled="disabled" checked="checked" id="cookies-mandatory"/>
+    <label for="cookies-analytics">Statistické</label>
+    <input type="checkbox" checked="checked" id="cookies-analytics"/>
+  </div>
+  <div class="cookies-consent-buttons"><a id="cookie-ok" href="#">Rozumím</a><a href="/ochrana-soukromi">Více informací</a></div>
+</div>
+<noscript>
+  <style type="text/css"></style>
+  <div class="cookies-consent">{display:none}</div>
+</noscript>{/if}

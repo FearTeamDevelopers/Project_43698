@@ -3,11 +3,12 @@
 namespace App\Model;
 
 use App\Model\Basic\BasicPagecontentModel;
+use Search\Model\IndexableInterface;
 
 /**
- * 
+ *
  */
-class PageContentModel extends BasicPagecontentModel
+class PageContentModel extends BasicPagecontentModel implements IndexableInterface
 {
 
     /**
@@ -16,7 +17,7 @@ class PageContentModel extends BasicPagecontentModel
     protected $_alias = 'co';
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -35,7 +36,24 @@ class PageContentModel extends BasicPagecontentModel
      */
     public static function fetchByUrlKey($urlKey)
     {
-        return self::first(array('urlKey = ?' => $urlKey, 'active = ?' => true));
+        return self::first(['urlKey = ?' => $urlKey, 'active = ?' => true]);
+    }
+
+    /**
+     * Check whether unique identifier already exist or not
+     *
+     * @param type $urlKey
+     * @return boolean
+     */
+    public static function checkUrlKey($urlKey)
+    {
+        $status = self::first(['urlKey = ?' => $urlKey]);
+
+        if (null === $status) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

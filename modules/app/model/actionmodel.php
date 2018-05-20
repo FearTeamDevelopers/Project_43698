@@ -5,11 +5,13 @@ namespace App\Model;
 use App\Model\Basic\BasicActionModel;
 use THCFrame\Core\StringMethods;
 use THCFrame\Core\Lang;
+use THCFrame\Registry\Registry;
+use Search\Model\IndexableInterface;
 
 /**
  *
  */
-class ActionModel extends BasicActionModel
+class ActionModel extends BasicActionModel implements IndexableInterface
 {
 
     const STATE_WAITING = 0;
@@ -19,11 +21,11 @@ class ActionModel extends BasicActionModel
     /**
      * @var type
      */
-    private static $_statesConv = array(
+    private static $_statesConv = [
         self::STATE_WAITING => 'Čeká na shválení',
         self::STATE_APPROVED => 'Schváleno',
         self::STATE_REJECTED => 'Zamítnuto',
-    );
+    ];
 
     /**
      * @readwrite
@@ -39,7 +41,7 @@ class ActionModel extends BasicActionModel
      */
     private static function checkUrlKey($key)
     {
-        $status = self::first(array('urlKey = ?' => $key));
+        $status = self::first(['urlKey = ?' => $key]);
 
         if (null === $status) {
             return true;
@@ -73,8 +75,8 @@ class ActionModel extends BasicActionModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $query = self::getQuery(['ac.*'])
+                ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -86,8 +88,8 @@ class ActionModel extends BasicActionModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('ac.*'))
-                ->join('tb_user', 'ac.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['ac.*'])
+                ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->order('ac.created', 'desc')
                 ->limit((int) $limit);
 
@@ -104,14 +106,59 @@ class ActionModel extends BasicActionModel
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
         if ($limit === 0) {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'asc')
+            $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())],
+                    ['id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'],
+                    ['rank' => 'desc', 'startDate' => 'asc']
             );
         } else {
-            $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())), array('id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'asc'), $limit, $page
+            $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())],
+                    ['id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'],
+                    ['rank' => 'desc', 'startDate' => 'asc'], $limit, $page
             );
         }
 
         return $actions;
+    }
+
+    /**
+     * Called from app module.
+     *
+     * @param int $lastId
+     * @param date $lastStartDate
+     * @return array
+     */
+    public static function fetchMoreActionsToHomepage($lastId, $lastStartDate)
+    {
+        if(empty($lastId) || empty($lastStartDate)){
+            return [];
+        }
+
+        $starDate = date('Y-m-d', strtotime($lastStartDate));
+
+        $actions = self::all(
+                ['id <> ?' => $lastId, 'active = ?' => true, 'approved = ?' => 1,
+                    'archive = ?' => false, 'startDate >= ?' => $starDate],
+                ['id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate',
+                    '(select id from tb_action where active = 1 and approved = 1 and archive = 0 order by startDate desc limit 1) as maxId'],
+                ['rank' => 'desc', 'startDate' => 'asc'], 9
+        );
+        $returnArr = [];
+
+        if (null !== $actions) {
+            foreach ($actions as $action) {
+                $returnArr[] = [
+                    'id' => $action->getId(),
+                    'maxId' => $action->getMaxId(),
+                    'title' => $action->getTitle(),
+                    'urlKey' => $action->getUrlKey(),
+                    'startDate' => $action->getStartDate(),
+                    'day' => \App\Helper\DateFormater::g2dn($action->getStartDate()),
+                    'month' => \App\Helper\DateFormater::g2mn($action->getStartDate())
+                ];
+            }
+        }
+
+        return $returnArr;
     }
 
     /**
@@ -123,7 +170,9 @@ class ActionModel extends BasicActionModel
      */
     public static function fetchOldWithLimit($limit = 10, $page = 1)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())), array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
+        $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())],
+                ['urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'],
+                ['rank' => 'desc', 'startDate' => 'desc'], $limit, $page
         );
 
         return $actions;
@@ -132,13 +181,17 @@ class ActionModel extends BasicActionModel
     /**
      * Called from app module.
      *
-     * @param type $limit
-     * @param type $page
+     * @param int $year
+     * @param int $page
+     * @param int $limit
      * @return type
      */
-    public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
+    public static function fetchArchivatedWithLimit($year, $page = 1, $limit = 10)
     {
-        $actions = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), array('urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'), array('rank' => 'desc', 'startDate' => 'desc'), $limit, $page
+        $actions = self::all(
+                ['active = ?' => true, 'approved = ?' => 1, 'startDate < ?' => date('Y-m-d'), 'startDate >= ?' => $year . '-01-01', 'endDate <= ?' => $year . '-12-31'],
+                ['urlKey', 'userAlias', 'title', 'shortBody', 'created', 'rank', 'startDate'],
+                ['rank' => 'desc', 'startDate' => 'desc'], $limit, $page
         );
 
         return $actions;
@@ -152,7 +205,7 @@ class ActionModel extends BasicActionModel
      */
     public static function fetchByUrlKey($urlKey)
     {
-        return self::first(array('active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey));
+        return self::first(['active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey]);
     }
 
     /**
@@ -169,14 +222,17 @@ class ActionModel extends BasicActionModel
      *
      * @param \THCFrame\Bag\BagInterface $post
      * @param array $options
-     * @return type
+     * @return array
      */
-    public static function createFromPost(\THCFrame\Bag\BagInterface $post,
-            array $options = array())
+    public static function createFromPost(\THCFrame\Bag\BagInterface $post, array $options = []): array
     {
         $urlKey = $urlKeyCh = StringMethods::createUrlKey($post->get('title'));
-        $errors = array();
+        $errors = [];
         $user = $options['user'];
+
+        if (empty($user)) {
+            throw new \THCFrame\Core\Exception\Argument('Not all of required options are available');
+        }
 
         for ($i = 1; $i <= 100; $i+=1) {
             if (self::checkUrlKey($urlKeyCh)) {
@@ -186,26 +242,22 @@ class ActionModel extends BasicActionModel
             }
 
             if ($i == 100) {
-                $errors['title'] = array(Lang::get('ARTICLE_UNIQUE_ID'));
+                $errors['title'] = [Lang::get('ARTICLE_UNIQUE_ID')];
                 break;
             }
         }
 
         if ($post->get('datestart') > $post->get('dateend')) {
-            $errors['startDate'] = array(Lang::get('ARTICLE_STARTDATE_ERROR'));
+            $errors['startDate'] = [Lang::get('ARTICLE_STARTDATE_ERROR')];
         }
 
-        if (!empty($post->get('timestart')) && empty($post->get('timeend'))) {
-            $errors['startTime'] = array(Lang::get('ARTICLE_TIME_ERROR'));
-        } elseif (!empty($post->get('timeend')) && empty($post->get('timestart'))) {
-            $errors['startTime'] = array(Lang::get('ARTICLE_TIME_ERROR'));
-        }
-
-        $shortText = str_replace(array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/' . $urlKey, '[Celý článek]'), $post->get('shorttext'));
+        $shortText = str_replace(['(!read_more_link!)', '(!read_more_title!)'],
+                ['/akce/r/' . $urlKey, '[Celý článek]'], $post->get('shorttext'));
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks($post->get('keywords')));
+        $metaDesc = StringMethods::removeMultipleSpaces(strip_tags($post->get('metadescription', $shortText)));
 
-        $action = new static(array(
+        $action = new static([
             'title' => $post->get('title'),
             'userId' => $user->getId(),
             'userAlias' => $user->getWholeName(),
@@ -217,14 +269,14 @@ class ActionModel extends BasicActionModel
             'rank' => $post->get('rank', 1),
             'startDate' => $post->get('datestart'),
             'endDate' => $post->get('dateend'),
-            'startTime' => $post->get('timestart'),
-            'endTime' => $post->get('timeend'),
+            'startTime' => $post->get('timestart', '0:00'),
+            'endTime' => $post->get('timeend', '0:00'),
             'keywords' => $keywords,
             'metaTitle' => $post->get('metatitle', $post->get('title')),
-            'metaDescription' => strip_tags($post->get('metadescription', $shortText)),
-        ));
+            'metaDescription' => $metaDesc,
+        ]);
 
-        return array($action, $errors);
+        return [$action, $errors];
     }
 
     /**
@@ -234,12 +286,15 @@ class ActionModel extends BasicActionModel
      * @param array $options
      * @return type
      */
-    public static function editFromPost(\THCFrame\Bag\BagInterface $post,
-            \App\Model\ActionModel $action, array $options = array())
+    public static function editFromPost(\THCFrame\Bag\BagInterface $post, ActionModel $action, array $options = [])
     {
         $urlKey = $urlKeyCh = StringMethods::createUrlKey($post->get('title'));
-        $errors = array();
+        $errors = [];
         $user = $options['user'];
+
+        if (empty($user)) {
+            throw new \THCFrame\Core\Exception\Argument('Not all of required options are available');
+        }
 
         if ($action->urlKey != $urlKey && !self::checkUrlKey($urlKey)) {
             for ($i = 1; $i <= 100; $i+=1) {
@@ -250,7 +305,7 @@ class ActionModel extends BasicActionModel
                 }
 
                 if ($i == 100) {
-                    $errors['title'] = array(Lang::get('ARTICLE_TITLE_IS_USED'));
+                    $errors['title'] = [Lang::get('ARTICLE_TITLE_IS_USED')];
                     break;
                 }
             }
@@ -262,25 +317,20 @@ class ActionModel extends BasicActionModel
         }
 
         $shortText = str_replace(
-                array('(!read_more_link!)', '(!read_more_title!)'), array('/akce/r/' . $urlKey, '[Celý článek]'), $post->get('shorttext')
+                ['(!read_more_link!)', '(!read_more_title!)'], ['/akce/r/' . $urlKey, '[Celý článek]'], $post->get('shorttext')
         );
 
         if ($post->get('datestart') > $post->get('dateend')) {
-            $errors['startDate'] = array(Lang::get('ARTICLE_STARTDATE_ERROR'));
-        }
-
-        if (!empty($post->get('timestart')) && empty($post->get('timeend'))) {
-            $errors['startTime'] = array(Lang::get('ARTICLE_TIME_ERROR'));
-        } elseif (!empty($post->get('timeend')) && empty($post->get('timestart'))) {
-            $errors['startTime'] = array(Lang::get('ARTICLE_TIME_ERROR'));
+            $errors['startDate'] = [Lang::get('ARTICLE_STARTDATE_ERROR')];
         }
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks($post->get('keywords')));
+        $metaDesc = StringMethods::removeMultipleSpaces(strip_tags($post->get('metadescription', $shortText)));
 
-        if (!$this->isAdmin()) {
-            $action->approved = $options['autoPublish'];
-        } else {
+        if ($options['isAdmin']) {
             $action->approved = $post->get('approve');
+        } else {
+            $action->approved = $options['autoPublish'];
         }
 
         $action->title = $post->get('title');
@@ -290,15 +340,41 @@ class ActionModel extends BasicActionModel
         $action->rank = $post->get('rank', 1);
         $action->startDate = $post->get('datestart');
         $action->endDate = $post->get('dateend');
-        $action->startTime = $post->get('timestart');
-        $action->endTime = $post->get('timeend');
+        $action->startTime = $post->get('timestart', '0:00');
+        $action->endTime = $post->get('timeend', '0:00');
         $action->active = $post->get('active');
         $action->archive = $post->get('archive');
         $action->keywords = $keywords;
         $action->metaTitle = $post->get('metatitle', $post->get('title'));
-        $action->metaDescription = strip_tags($post->get('metadescription', $shortText));
+        $action->metaDescription = $metaDesc;
 
-        return array($action, $errors);
+        return [$action, $errors];
+    }
+
+    /**
+     * Called from app module.
+     *
+     * @return array
+     */
+    public static function fetchActionYears()
+    {
+        $db = Registry::get('database')->get('main');
+        $result = $db->execute("SELECT DISTINCT YEAR(startDate) as a_years "
+                . "FROM tb_action "
+                . "WHERE (startDate is not null or startDate != '') and YEAR(startDate) <= YEAR(curdate()) "
+                . "ORDER BY 1 DESC");
+
+        $returnArr = [];
+        if (!empty($result)) {
+            foreach ($result as $row) {
+                if (!empty($row['a_years'])) {
+                    $returnArr[] = $row['a_years'];
+                }
+            }
+        }
+
+        unset($result);
+        return $returnArr;
     }
 
 }

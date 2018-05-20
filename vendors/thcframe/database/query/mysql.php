@@ -12,27 +12,27 @@ class Mysql extends Database\Query
 {
 
     /**
-     * 
+     *
      * @return type
      * @throws Exception\Sql
      */
     public function all()
     {
-        $sql = $this->_buildSelect();
+        $sql = $this->buildSelect();
         $result = $this->connector->execute($sql);
-        
+
         if ($result === false) {
             $err = $this->connector->getLastError();
             $this->_logError($err, $sql);
-            
-            if (ENV == 'dev') {
+
+            if (ENV == \THCFrame\Core\Core::ENV_DEV) {
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
                 throw new Exception\Sql('There was an error');
             }
         }
 
-        $rows = array();
+        $rows = [];
 
         for ($i = 0; $i < $result->num_rows; $i++) {
             $rows[] = $result->fetch_array(MYSQLI_ASSOC);

@@ -6,7 +6,7 @@
 		display block
 		margin 0 auto
 		margin-top 2rem
-		margin-bottom 2rem
+		margin-bottom 5rem
 		padding 1.875rem
 		header
 			.loginInfo
@@ -36,18 +36,20 @@
 				&:before
 					padding-right 0.5em
 		form
-			input[type=submit]
-				height:2.3125rem;
+			input[type=submit], a.specialButton
+				display inline-block
+				height 2.4rem
 				width 100%
 				margin 0 auto
-				line-height:2.3125rem;
-				font-family: 'Ubuntu', sans-serif !important;
-				font-size 0.875rem
+				font-size .95rem
 				padding 0 0.5rem
-				color #ffffff
-				background defaultBLue
-				border 3px outset white
+				color white
+				background defaultGreen
+				border none
 				&:hover
-					border-color defaultBLue
-					color defaultBLue
-					background white
+					background defaultBLue
+					border none
+			a.specialButton
+				text-align center
+				padding 0.5rem 0
+				margin-top 0.5rem

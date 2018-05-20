@@ -9,7 +9,7 @@ class HTMLPurifier_Injector_PurifierLinkify extends HTMLPurifier_Injector
 
     public $name = 'PurifierLinkify';
     public $docURL;
-    public $needed = array('a' => array('href'));
+    public $needed = ['a' => ['href']];
 
     public function prepare($config, $context) {
         $this->docURL = $config->get('AutoFormat.PurifierLinkify.DocURL');
@@ -21,7 +21,7 @@ class HTMLPurifier_Injector_PurifierLinkify extends HTMLPurifier_Injector
         if (strpos($token->data, '%') === false) return;
 
         $bits = preg_split('#%([a-z0-9]+\.[a-z0-9]+)#Si', $token->data, -1, PREG_SPLIT_DELIM_CAPTURE);
-        $token = array();
+        $token = [];
 
         // $i = index
         // $c = count
@@ -32,7 +32,7 @@ class HTMLPurifier_Injector_PurifierLinkify extends HTMLPurifier_Injector
                 $token[] = new HTMLPurifier_Token_Text($bits[$i]);
             } else {
                 $token[] = new HTMLPurifier_Token_Start('a',
-                    array('href' => str_replace('%s', $bits[$i], $this->docURL)));
+                    ['href' => str_replace('%s', $bits[$i], $this->docURL)]);
                 $token[] = new HTMLPurifier_Token_Text('%' . $bits[$i]);
                 $token[] = new HTMLPurifier_Token_End('a');
             }

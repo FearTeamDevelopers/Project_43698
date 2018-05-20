@@ -5,7 +5,7 @@ namespace THCFrame\Security\Model;
 use THCFrame\Model\Model;
 
 /**
- * 
+ *
  */
 class PermissionModel extends Model
 {
@@ -43,7 +43,7 @@ class PermissionModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 1
      * @validate max(1)
      */
@@ -59,7 +59,7 @@ class PermissionModel extends Model
      * @label module
      */
     protected $_module;
-    
+
     /**
      * @column
      * @readwrite
@@ -88,7 +88,7 @@ class PermissionModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 1
      * @validate max(1)
      */
@@ -100,7 +100,7 @@ class PermissionModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 1
      * @validate max(1)
      */
@@ -112,7 +112,7 @@ class PermissionModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -124,14 +124,14 @@ class PermissionModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {

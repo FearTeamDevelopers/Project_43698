@@ -1,6 +1,7 @@
 section.wrapper.singlePage
-   .row.container
-      header
-         h1 {echo $news->getTitle()}
-         span {echo "Vytvořil: ".$news->getUserAlias().", ".\App\Helper\DateFormater::t2d($news->getCreated())}
-      |{echo html_entity_decode($news->getBody())}
+    input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+    .row.container
+        header
+            h1 {echo $news->getTitle()}
+            span {echo "Vytvořil: ".$news->getUserAlias().", ".\App\Helper\DateFormater::t2d($news->getCreated())}
+        |{echo html_entity_decode($news->getBody())}

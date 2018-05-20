@@ -7,14 +7,14 @@ use THCFrame\Database\Exception;
 use THCFrame\Model\Model;
 
 /**
- * Factory allows many different kinds of configuration driver classes to be used, 
+ * Factory allows many different kinds of configuration driver classes to be used,
  * we need a way to share code across all driver classes.
  */
 abstract class Connector extends Base
 {
 
     /**
-     * 
+     *
      * @return \THCFrame\Database\Connector
      */
     public function initialize()
@@ -23,7 +23,7 @@ abstract class Connector extends Base
     }
 
     /**
-     * 
+     *
      * @param type $method
      * @return \THCFrame\Session\Exception\Implementation
      */

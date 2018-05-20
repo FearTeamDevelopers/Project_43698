@@ -6,7 +6,7 @@ use THCFrame\Core\Base;
 use THCFrame\Request\Exception;
 
 /**
- * Class accepts a response constructor option, which is the result of an HTTP request. 
+ * Class accepts a response constructor option, which is the result of an HTTP request.
  * It splits this response string into headers and a body, which are available through getter
  * methods
  */
@@ -23,12 +23,12 @@ class Response extends Base
     /**
      * @readwrite
      */
-    protected $_data = array();
+    protected $_data = [];
 
     /**
      * @read
      */
-    protected $_headers = array();
+    protected $_headers = [];
 
     /**
      * @readwrite
@@ -36,7 +36,12 @@ class Response extends Base
     protected $_httpVersionStatusHeader;
 
     /**
-     * 
+     * @readwrite
+     */
+    protected $_httpStatusCode;
+
+    /**
+     *
      * @param type $method
      * @return \THCFrame\Request\Exception\Implementation
      */
@@ -47,10 +52,10 @@ class Response extends Base
 
     /**
      * Object constructor
-     * 
+     *
      * @param array $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         if (!empty($options['response'])) {
             $response = $this->_response = $options['response'];
@@ -66,10 +71,13 @@ class Response extends Base
             $headers = array_pop($matches[0]);
             $headers = explode(PHP_EOL, str_replace('\r\n\r\n', '', trim($headers)));
 
-            $this->_body = str_replace($headers, '', $response);
+            $this->_body = trim(str_replace($headers, '', $response));
 
             $version = array_shift($headers);
             $this->setHttpVersionStatusHeader($version);
+
+            preg_match('#HTTP/\d+\.\d+ (\d+)#', $version, $versionMatches);
+            $this->setHttpStatusCode($versionMatches[1]);
 
             foreach ($headers as $header) {
                 preg_match('#(.*?)\:\s?(.*)#', $header, $matches);
@@ -79,14 +87,14 @@ class Response extends Base
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function __toString()
     {
         if (!empty($this->_data) && $this->_body !== null) {
             $this->setHeader('Content-type', 'application/json');
-            return json_encode(array('body' => $this->_body, 'data' => $this->_data));
+            return json_encode(['body' => $this->_body, 'data' => $this->_data]);
         } elseif (!empty($this->_data) && $this->_body === null) {
             $this->setHeader('Content-type', 'application/json');
             return json_encode($this->_data);
@@ -100,7 +108,7 @@ class Response extends Base
 
     /**
      * Set header
-     * 
+     *
      * @param string $type
      * @param string $content
      * @return \THCFrame\Request\Response
@@ -115,7 +123,30 @@ class Response extends Base
     }
 
     /**
-     * 
+     *
+     * @return string
+     */
+    public function getHeaders()
+    {
+        return $this->_headers;
+    }
+
+    /**
+     *
+     * @param string $type
+     * @return string|null
+     */
+    public function getHeaderValue($type)
+    {
+        if (!empty($this->_headers) && isset($this->_headers[$type])) {
+            return $this->_headers[$type];
+        }
+
+        return null;
+    }
+
+    /**
+     *
      * @param type $versionHeader
      * @return \THCFrame\Request\Response
      */
@@ -127,8 +158,17 @@ class Response extends Base
     }
 
     /**
+     *
+     * @return string
+     */
+    public function getHttpVersionStatusHeader()
+    {
+        return $this->_httpVersionStatusHeader;
+    }
+
+    /**
      * Check if headers can be send
-     * 
+     *
      * @return boolean
      */
     public function canSendHeaders()
@@ -166,7 +206,7 @@ class Response extends Base
     }
 
     /**
-     * 
+     *
      * @param string $body
      */
     public function setBody($body)
@@ -177,7 +217,16 @@ class Response extends Base
     }
 
     /**
-     * 
+     *
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->_body;
+    }
+
+    /**
+     *
      * @param type $key
      * @param type $value
      * @return \THCFrame\Request\Response
@@ -195,7 +244,7 @@ class Response extends Base
 
     /**
      * Prepend string to body
-     * 
+     *
      * @param string $string
      */
     public function prependBody($string)
@@ -205,7 +254,7 @@ class Response extends Base
 
     /**
      * Append string to body
-     * 
+     *
      * @param string $string
      */
     public function appendBody($string)
@@ -215,13 +264,13 @@ class Response extends Base
 
     /**
      * Return response status message by status code
-     * 
+     *
      * @param int $code
      * @return string
      */
     public function getStatusMessageByCode($code = 200)
     {
-        $httpCodes = array(
+        $httpCodes = [
             100 => 'Continue',
             101 => 'Switching Protocols',
             102 => 'Processing',
@@ -277,9 +326,37 @@ class Response extends Base
             507 => 'Insufficient Storage',
             509 => 'Bandwidth Limit Exceeded',
             510 => 'Not Extended'
-        );
-        
-        return $httpCodes[(int)$code];
+        ];
+
+        return $httpCodes[(int) $code];
+    }
+
+    public function getResponse()
+    {
+        return $this->_response;
+    }
+
+    public function getHttpStatusCode()
+    {
+        return $this->_httpStatusCode;
+    }
+
+    public function setResponse($response)
+    {
+        $this->_response = $response;
+        return $this;
+    }
+
+    public function setHeaders($headers)
+    {
+        $this->_headers = $headers;
+        return $this;
+    }
+
+    public function setHttpStatusCode($httpStatusCode)
+    {
+        $this->_httpStatusCode = $httpStatusCode;
+        return $this;
     }
 
 }

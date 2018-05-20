@@ -4,7 +4,6 @@ namespace THCFrame\Core;
 
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry as Registry;
-use THCFrame\Core\StringMethods;
 
 /**
  * Class controlling translates
@@ -12,13 +11,13 @@ use THCFrame\Core\StringMethods;
 class Lang
 {
 
-    private $_customTranslates = array();
-    private $_defaultMessage;
+    private $customTranslates = [];
+    private $defaultMessage;
     public static $instance = null;
 
     public function __construct()
     {
-        Event::fire('framework.lang.initialize.before', array());
+        Event::fire('framework.lang.initialize.before', []);
 
         $defaultLang = Registry::get('configuration')->system->lang;
 
@@ -27,10 +26,10 @@ class Lang
         }
 
         if (!is_array($custom)) {
-            throw new \Exception('Lang file content is not array');
+            throw new Exception\Lang('Lang file content is not array');
         }
 
-        $prepared = array();
+        $prepared = [];
         foreach ($custom as $key => $value) {
             $key = trim(StringMethods::removeDiacriticalMarks($key));
             $key = strtoupper(str_replace(' ', '_', $key));
@@ -40,20 +39,20 @@ class Lang
         unset($custom);
 
         if (isset($prepared['defaultMessage'])) {
-            $this->_defaultMessage = $custom['defaultMessage'];
+            $this->defaultMessage = $prepared['defaultMessage'];
             unset($prepared['defaultMessage']);
         } else {
-            $this->_defaultMessage = 'Translate not found';
+            $this->defaultMessage = 'Translate not found';
         }
 
-        $this->_customTranslates = $prepared;
+        $this->customTranslates = $prepared;
 
-        Event::fire('framework.lang.initialize.after', array($defaultLang));
+        Event::fire('framework.lang.initialize.after', [$defaultLang]);
     }
 
     /**
-     *
-     * @return type
+     * @return null|Lang
+     * @throws Exception\Lang
      */
     public static function getInstance()
     {
@@ -65,36 +64,38 @@ class Lang
     }
 
     /**
-     *
-     * @param type $key
-     * @param type $args
-     * @return type
+     * @param string $key
+     * @param array $args
+     * @return mixed|string
+     * @throws Exception\Lang
      */
-    public static function get($key, $args = array())
+    public static function get($key, $args = [])
     {
         $lang = self::getInstance();
         return $lang->_get($key, $args);
     }
 
     /**
-     *
+     * @param string $key
+     * @param array $args
+     * @return mixed|string
      */
-    public function _get($key, $args = array())
+    public function _get($key, $args = [])
     {
         $key = trim(StringMethods::removeDiacriticalMarks($key));
         $key = strtoupper(str_replace(' ', '_', $key));
 
-        if (isset($this->_customTranslates[$key])) {
+        if (isset($this->customTranslates[$key])) {
             if (!empty($args) && is_array($args)) {
-                if (strpos($this->_customTranslates[$key], '%s') !== false) {
-                    return vsprintf($this->_customTranslates[$key], $args);
+                if (strpos($this->customTranslates[$key], '%s') !== false) {
+                    return vsprintf($this->customTranslates[$key], $args);
                 }
             }
 
-            return $this->_customTranslates[$key];
+            return $this->customTranslates[$key];
         }
 
-        return $this->_defaultMessage;
+        return $this->defaultMessage;
     }
 
 }

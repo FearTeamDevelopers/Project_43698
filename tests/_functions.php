@@ -11,13 +11,13 @@ THCFrame\Core\Test::add(
     {
         $html = $post(
             "register",
-            array(
+            [
                 "first" => "Hello",
                 "last" => "World",
                 "email" => "info@example.com",
                 "password" => "password",
                 "register" => "register"
-            )
+            ]
         );
         
         return (stristr($html, "Your account has been created!"));
@@ -31,11 +31,11 @@ THCFrame\Core\Test::add(
     {
         $html = $post(
             "login",
-            array(
+            [
                 "email" => "info@example.com",
                 "password" => "password",
                 "login" => "login"
-            )
+            ]
         );
         
         return (stristr($html, "Location: /"));

@@ -16,7 +16,7 @@ class HTMLPurifier_ConfigSchema_Interchange
     /**
      * Array of Directive ID => array(directive info)
      */
-    public $directives = array();
+    public $directives = [];
 
     /**
      * Adds a directive array to $directives

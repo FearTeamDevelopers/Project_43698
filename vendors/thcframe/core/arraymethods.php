@@ -110,7 +110,7 @@ class ArrayMethods
      * @param array $return
      * @return array
      */
-    public static function flatten($array, $return = array())
+    public static function flatten($array, $return = [])
     {
         foreach ($array as $key => $value) {
             if (is_array($value) || is_object($value)) {

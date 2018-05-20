@@ -31,22 +31,24 @@ class AdvertisementController extends Controller
             foreach ($adverts as $key => $value) {
                 $availabilityRequestToken = \THCFrame\Core\Rand::randStr(126);
 
-                \App\Model\AdvertisementModel::updateAll(array('uniqueKey = ?' => $value['uniqueKey']),
-                        array('availabilityRequestToken' => $availabilityRequestToken,
-                    'availabilityRequestTokenExpiration' => date('Y-m-d H:i:s',
-                            strtotime('+1 day'))));
+                \App\Model\AdvertisementModel::updateAll(['uniqueKey = ?' => $value['uniqueKey']],
+                        [
+                            'availabilityRequestToken' => $availabilityRequestToken,
+                            'availabilityRequestTokenExpiration' => date('Y-m-d H:i:s', strtotime('+1 day'))
+                            ]
+                        );
 
                 $adsString .= '<tr><td>' . $value['title'] . '</td>'
                         . '<td>' . \THCFrame\Date\Date::getInstance()->format($value['created'],
                                 \THCFrame\Date\Date::CZ_BASE_DATETIME_FORMAT) . '</td>'
                         . '<td>' . $value['expireIn'] . '</td>'
-                        . '<td><a href="http://' . $this->getServerHost() . '/bazar/prodlouzit/' . $value['uniqueKey'] . '/' . $availabilityRequestToken . '" target=_blank>Prodloužit</a></td>'
+                        . '<td><a href="' . $this->getServerHost() . '/bazar/prodlouzit/' . $value['uniqueKey'] . '/' . $availabilityRequestToken . '" target=_blank>Prodloužit</a></td>'
                         . '</tr>';
             }
 
             $adsString .= '</tbody></table>';
 
-            $data = array('{ADS}' => $adsString);
+            $data = ['{ADS}' => $adsString];
             $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('ad-expiration-notification', $data);
 
             $mailer = new \THCFrame\Mailer\Mailer();
@@ -57,10 +59,10 @@ class AdvertisementController extends Controller
 
             if ($mailer->send()) {
                 Event::fire('cron.log',
-                        array('success', 'Advertisement expiration check send to: ' . $email));
+                        ['success', 'Advertisement expiration check send to: ' . $email]);
             } else {
                 Event::fire('cron.log',
-                        array('fail', 'Advertisement expiration check send to: ' . $email));
+                        ['fail', 'Advertisement expiration check send to: ' . $email]);
             }
         }
     }

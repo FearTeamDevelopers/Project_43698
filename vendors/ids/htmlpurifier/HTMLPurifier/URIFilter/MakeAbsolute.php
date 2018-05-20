@@ -6,7 +6,7 @@ class HTMLPurifier_URIFilter_MakeAbsolute extends HTMLPurifier_URIFilter
 {
     public $name = 'MakeAbsolute';
     protected $base;
-    protected $basePathStack = array();
+    protected $basePathStack = [];
     public function prepare($config) {
         $def = $config->getDefinition('URI');
         $this->base = $def->base;
@@ -76,7 +76,7 @@ class HTMLPurifier_URIFilter_MakeAbsolute extends HTMLPurifier_URIFilter
      * Resolve dots and double-dots in a path stack
      */
     private function _collapseStack($stack) {
-        $result = array();
+        $result = [];
         $is_folder = false;
         for ($i = 0; isset($stack[$i]); $i++) {
             $is_folder = false;

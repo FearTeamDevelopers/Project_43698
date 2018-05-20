@@ -6,7 +6,7 @@ use THCFrame\Core\Base;
 use THCFrame\Configuration\Exception;
 
 /**
- * Factory allows many different kinds of configuration driver classes to be used, 
+ * Factory allows many different kinds of configuration driver classes to be used,
  * we need a way to share code across all driver classes.
  */
 abstract class Driver extends Base
@@ -14,12 +14,12 @@ abstract class Driver extends Base
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_env;
 
     /**
-     * 
+     *
      * @param type $method
      * @return \THCFrame\Configuration\Exception\Implementation
      */
@@ -27,9 +27,9 @@ abstract class Driver extends Base
     {
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
-    
+
     /**
-     * 
+     *
      * @return \THCFrame\Configuration\Driver
      */
     public function initialize()

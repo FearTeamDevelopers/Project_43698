@@ -12,10 +12,10 @@ section.wrapper.bazar.singlePage
    section.row.container
       .large-12.medium-12.small-12.column
          |{foreach $url in $result}
-         article
+         article.searchResult
             a(href!="{echo $url['path']}")
-               h3 {echo $url_i}
-            small
-               span {echo date("d.m. Y H:i", strtotime($url['created']))} <br/>
+               h3 {echo $url['title']}
+            .body
+                div {echo html_entity_decode($url['text'])}
          |{/foreach}
    |{/else}

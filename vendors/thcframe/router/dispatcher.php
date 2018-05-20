@@ -9,8 +9,8 @@ use THCFrame\Core\Inspector;
 use THCFrame\Router\Exception;
 
 /**
- * Dispatcher class will use the requested URL, as well as the controller/action metadata, 
- * to determine the correct controller/action to execute. 
+ * Dispatcher class will use the requested URL, as well as the controller/action metadata,
+ * to determine the correct controller/action to execute.
  * It needs to handle multiple defined routes and inferred routes if no defined routes
  * are matched.
  */
@@ -19,15 +19,15 @@ final class Dispatcher extends Base
 
     /**
      * Module active for last request
-     * 
-     * @var type 
+     *
+     * @var type
      * @read
      */
     protected $_activeModule;
 
     /**
      * The suffix used to append to the class name
-     * 
+     *
      * @var string
      * @read
      */
@@ -35,14 +35,14 @@ final class Dispatcher extends Base
 
     /**
      * The path to look for classes (or controllers)
-     * 
+     *
      * @var string
      * @read
      */
     protected $_controllerPath;
 
     /**
-     * 
+     *
      * @param string $method
      * @return \THCFrame\Router\Exception\Implementation
      */
@@ -53,7 +53,7 @@ final class Dispatcher extends Base
 
     /**
      * Sets a suffix to append to the class name being dispatched
-     * 
+     *
      * @param string $suffix
      * @return \THCFrame\Router\Dispatcher
      */
@@ -66,7 +66,7 @@ final class Dispatcher extends Base
 
     /**
      * Get class name suffix
-     * 
+     *
      * @return string
      */
     protected function _getSuffix()
@@ -76,7 +76,7 @@ final class Dispatcher extends Base
 
     /**
      * Set the path where dispatch class (controllers) reside
-     * 
+     *
      * @param string $path
      * @return \THCFrame\Router\Dispatcher
      */
@@ -92,24 +92,24 @@ final class Dispatcher extends Base
      */
     public function initialize()
     {
-        Event::fire('framework.dispatcher.initialize.before', array());
+        Event::fire('framework.dispatcher.initialize.before', []);
 
         $configuration = Registry::get('configuration');
 
         if (!empty($configuration->dispatcher)) {
             $this->_setSuffix($configuration->dispatcher->suffix);
         } else {
-            throw new \Exception('Error in configuration file');
+            throw new Exception\Argument('Error in configuration file');
         }
 
-        Event::fire('framework.dispatcher.initialize.after', array());
+        Event::fire('framework.dispatcher.initialize.after', []);
 
         return $this;
     }
 
     /**
      * Attempts to dispatch the supplied Route object
-     * 
+     *
      * @param \THCFrame\Router\Route $route
      * @throws Exception\Module
      * @throws Exception\Controller
@@ -120,7 +120,9 @@ final class Dispatcher extends Base
         $module = trim($route->getModule());
         $class = trim($route->getController());
         $action = trim($route->getAction());
+        $method = $route->getMethod() === null ? null : trim($route->getMethod());
         $parameters = $route->getMapArguments();
+        $status = null;
 
         if ('' === $module) {
             throw new Exception\Module('Module Name not specified');
@@ -130,9 +132,12 @@ final class Dispatcher extends Base
             throw new Exception\Action('Method Name not specified');
         }
 
-        $status = null;
-        if(in_array(ucfirst($module), \THCFrame\Core\Core::getModuleNames())){
-            $status = Registry::get('configuration')->{$module.'status'};
+        if ($method !== null) {
+            $action .= ucfirst($method);
+        }
+
+        if (in_array(ucfirst($module), \THCFrame\Core\Core::getModuleNames())) {
+            $status = isset(Registry::get('configuration')->{$module . 'status'}) ? Registry::get('configuration')->{$module . 'status'} : null;
         }
 
         if ($status !== null && $status != 1) {
@@ -141,20 +146,20 @@ final class Dispatcher extends Base
 
         $module = str_replace('\\', '', $module);
         preg_match('/^[a-zA-Z0-9_]+$/', $module, $matches);
-        
+
         if (count($matches) !== 1) {
             throw new Exception\Module(sprintf('Disallowed characters in module name %s', $module));
         }
 
         $class = str_replace('\\', '', $class);
         preg_match('/^[a-zA-Z0-9_]+$/', $class, $matches);
-        
+
         if (count($matches) !== 1) {
             throw new Exception\Controller(sprintf('Disallowed characters in class name %s', $class));
         }
 
         $fileName = strtolower("./modules/{$module}/controller/{$class}controller.php");
-        $class = "\\".ucfirst($module)."\\Controller\\".ucfirst($class).'Controller';
+        $class = "\\" . ucfirst($module) . "\\Controller\\" . ucfirst($class) . 'Controller';
 
         if (!file_exists($fileName)) {
             throw new Exception\Controller(sprintf('Class file %s not found', $fileName));
@@ -164,18 +169,18 @@ final class Dispatcher extends Base
 
         $this->_activeModule = $module;
 
-        Event::fire('framework.dispatcher.controller.before', array($class, $parameters));
+        Event::fire('framework.dispatcher.controller.before', [$class, $parameters]);
 
         try {
-            $instance = new $class(array(
+            $instance = new $class([
                 'parameters' => $parameters
-            ));
+            ]);
             Registry::set('controller', $instance);
         } catch (\Exception $e) {
             throw new Exception\Controller(sprintf('Controller %s error: %s', $class, $e->getMessage()));
         }
 
-        Event::fire('framework.dispatcher.controller.after', array($class, $parameters));
+        Event::fire('framework.dispatcher.controller.after', [$class, $parameters]);
 
         if (!method_exists($instance, $action)) {
             $instance->willRenderLayoutView = false;
@@ -193,7 +198,7 @@ final class Dispatcher extends Base
 
         $hooks = function($meta, $type) use ($inspector, $instance) {
             if (isset($meta[$type])) {
-                $run = array();
+                $run = [];
 
                 foreach ($meta[$type] as $method) {
                     $hookMeta = $inspector->getMethodMeta($method);
@@ -208,22 +213,22 @@ final class Dispatcher extends Base
             }
         };
 
-        Event::fire('framework.dispatcher.beforehooks.before', array($action, $parameters));
+        Event::fire('framework.dispatcher.beforehooks.before', [$action, $parameters]);
 
         $hooks($methodMeta, '@before');
 
-        Event::fire('framework.dispatcher.beforehooks.after', array($action, $parameters));
-        Event::fire('framework.dispatcher.action.before', array($action, $parameters));
-        
-        call_user_func_array(
-                array($instance, $action), is_array($parameters) ? $parameters : array());
+        Event::fire('framework.dispatcher.beforehooks.after', [$action, $parameters]);
+        Event::fire('framework.dispatcher.action.before', [$action, $parameters]);
 
-        Event::fire('framework.dispatcher.action.after', array($action, $parameters));
-        Event::fire('framework.dispatcher.afterhooks.before', array($action, $parameters));
-        
+        call_user_func_array(
+                [$instance, $action], is_array($parameters) ? $parameters : []);
+
+        Event::fire('framework.dispatcher.action.after', [$action, $parameters]);
+        Event::fire('framework.dispatcher.afterhooks.before', [$action, $parameters]);
+
         $hooks($methodMeta, '@after');
 
-        Event::fire('framework.dispatcher.afterhooks.after', array($action, $parameters));
+        Event::fire('framework.dispatcher.afterhooks.after', [$action, $parameters]);
 
         // unset controller
         Registry::erase('controller');

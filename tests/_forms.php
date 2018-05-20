@@ -23,14 +23,14 @@ THCFrame\Core\Test::add(
     function() use ($get, $has)
     {
         $html = $get("register");
-        $status = $has($html, array(
+        $status = $has($html, [
             "first",
             "last",
             "email",
             "password",
             "photo",
             "register"
-        ));
+        ]);
         
         return $status;
     },
@@ -42,11 +42,11 @@ THCFrame\Core\Test::add(
     function() use ($get, $has)
     {
         $html = $get("login");
-        $status = $has($html, array(
+        $status = $has($html, [
             "email",
             "password",
             "login"
-        ));
+        ]);
         
         return $status;
     },

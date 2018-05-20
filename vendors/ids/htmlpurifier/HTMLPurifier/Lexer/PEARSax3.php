@@ -25,20 +25,20 @@ class HTMLPurifier_Lexer_PEARSax3 extends HTMLPurifier_Lexer
     /**
      * Internal accumulator array for SAX parsers.
      */
-    protected $tokens = array();
+    protected $tokens = [];
     protected $last_token_was_empty;
 
     private $parent_handler;
-    private $stack = array();
+    private $stack = [];
 
     public function tokenizeHTML($string, $config, $context) {
 
-        $this->tokens = array();
+        $this->tokens = [];
         $this->last_token_was_empty = false;
 
         $string = $this->normalize($string, $config, $context);
 
-        $this->parent_handler = set_error_handler(array($this, 'muteStrictErrorHandler'));
+        $this->parent_handler = set_error_handler([$this, 'muteStrictErrorHandler']);
 
         $parser = new XML_HTMLSax3();
         $parser->set_object($this);

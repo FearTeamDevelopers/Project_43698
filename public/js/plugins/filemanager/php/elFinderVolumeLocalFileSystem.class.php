@@ -62,13 +62,13 @@ class elFinderVolumeLocalFileSystem extends elFinderVolumeDriver {
 		$root = $this->stat($this->root);
 		
 		if ($this->options['quarantine']) {
-			$this->attributes[] = array(
+			$this->attributes[] = [
 				'pattern' => '~^'.preg_quote(DIRECTORY_SEPARATOR.$this->options['quarantine']).'$~',
 				'read'    => false,
 				'write'   => false,
 				'locked'  => true,
 				'hidden'  => true
-			);
+			];
 		}
 		
 		// chek thumbnails path
@@ -96,11 +96,11 @@ class elFinderVolumeLocalFileSystem extends elFinderVolumeDriver {
 		if (!empty($this->options['quarantine'])) {
 			$this->quarantine = $this->root.DIRECTORY_SEPARATOR.$this->options['quarantine'];
 			if ((!is_dir($this->quarantine) && !$this->_mkdir($this->root, $this->options['quarantine'])) || !is_writable($this->quarantine)) {
-				$this->archivers['extract'] = array();
+				$this->archivers['extract'] = [];
 				$this->disabled[] = 'extract';
 			}
 		} else {
-			$this->archivers['extract'] = array();
+			$this->archivers['extract'] = [];
 			$this->disabled[] = 'extract';
 		}
 		
@@ -173,9 +173,9 @@ class elFinderVolumeLocalFileSystem extends elFinderVolumeDriver {
 		$initial_slashes = (int) $initial_slashes;
 
 		$comps = explode('/', $path);
-		$new_comps = array();
+		$new_comps = [];
 		foreach ($comps as $comp) {
-			if (in_array($comp, array('', '.'))) {
+			if (in_array($comp, ['', '.'])) {
 				continue;
 			}
 				
@@ -270,7 +270,7 @@ class elFinderVolumeLocalFileSystem extends elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function _stat($path) {
-		$stat = array();
+		$stat = [];
 
 		if (!file_exists($path)) {
 			return $stat;
@@ -389,7 +389,7 @@ class elFinderVolumeLocalFileSystem extends elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function _scandir($path) {
-		$files = array();
+		$files = [];
 		
 		foreach (scandir($path) as $name) {
 			if ($name != '.' && $name != '..') {
@@ -668,7 +668,7 @@ class elFinderVolumeLocalFileSystem extends elFinderVolumeDriver {
 			unlink($archive);
 			
 			// get files list
-			$ls = array();
+			$ls = [];
 			foreach (scandir($dir) as $i => $name) {
 				if ($name != '.' && $name != '..') {
 					$ls[] = $name;

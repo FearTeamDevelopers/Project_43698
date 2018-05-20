@@ -45,14 +45,14 @@
  */
 class elFinderPluginSanitizer
 {
-	private $opts = array();
+	private $opts = [];
 	
 	public function __construct($opts) {
-		$defaults = array(
+		$defaults = [
 			'enable'   => true,  // For control by volume driver
-			'targets'  => array('\\','/',':','*','?','"','<','>','|'), // target chars
+			'targets'  => ['\\','/',':','*','?','"','<','>','|'], // target chars
 			'replace'  => '_'    // replace to this
-		);
+		];
 	
 		$this->opts = array_merge($defaults, $opts);
 	}
@@ -76,7 +76,7 @@ class elFinderPluginSanitizer
 		}
 	
 		if ($path) {
-			$path = $this->sanitizeFileName($path, $opts, array('/'));
+			$path = $this->sanitizeFileName($path, $opts, ['/']);
 		}
 		$name = $this->sanitizeFileName($name, $opts);
 		return true;
@@ -93,7 +93,7 @@ class elFinderPluginSanitizer
 		return $opts;
 	}
 	
-	private function sanitizeFileName($filename, $opts, $allows = array()) {
+	private function sanitizeFileName($filename, $opts, $allows = []) {
 		$targets = $allows? array_diff($opts['targets'], $allows) : $opts['targets'];
 		return str_replace($targets, $opts['replace'], $filename);
   	}

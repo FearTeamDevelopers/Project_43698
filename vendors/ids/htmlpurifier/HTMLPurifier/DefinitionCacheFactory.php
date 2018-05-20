@@ -6,9 +6,9 @@
 class HTMLPurifier_DefinitionCacheFactory
 {
 
-    protected $caches = array('Serializer' => array());
-    protected $implementations = array();
-    protected $decorators = array();
+    protected $caches = ['Serializer' => []];
+    protected $implementations = [];
+    protected $decorators = [];
 
     /**
      * Initialize default decorators

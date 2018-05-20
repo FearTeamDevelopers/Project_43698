@@ -1,5 +1,4 @@
 <?php
-
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
@@ -10,6 +9,7 @@ use THCFrame\Core\StringMethods;
  */
 class DevController extends Controller
 {
+
     /**
      * Fill database tables tb_action, tb_news and tb_report with testing data
      * For database filling use these urls:
@@ -32,7 +32,7 @@ class DevController extends Controller
 
         $ROW_COUNT = 50;
 
-        $content = \App\Model\PageContentModel::first(array('urlKey = ?' => 'kurzy-sdi'), array('body'));
+        $content = \App\Model\PageContentModel::first(['urlKey = ?' => 'kurzy-sdi'], ['body']);
 
         $SHORT_TEXT = 'Vedle používání zdravého rozumu, dostatečné kvalifikace i praxe je kvalitní a spolehlivá
             potápěčská technika jednou z podmínek dosažení nejvyšší míry bezpečnosti vašich ponorů.
@@ -43,21 +43,21 @@ class DevController extends Controller
         unset($content);
 
         if ((int) $type == 1) {
-            for ($i = 0; $i < $ROW_COUNT; $i+=1) {
-                $news = new \App\Model\NewsModel(array(
-                    'title' => 'News-'.$i.'-'.time(),
+            for ($i = 0; $i < $ROW_COUNT; $i += 1) {
+                $news = new \App\Model\NewsModel([
+                    'title' => 'News-' . $i . '-' . time(),
                     'userId' => 1,
                     'userAlias' => 'System',
-                    'urlKey' => 'news-'.$i.'-'.time(),
+                    'urlKey' => 'news-' . $i . '-' . time(),
                     'approved' => 1,
                     'archive' => 0,
                     'shortBody' => $SHORT_TEXT,
                     'body' => $LARGE_TEXT,
                     'rank' => 1,
                     'keywords' => 'news',
-                    'metaTitle' => 'News-'.$i.'-'.time(),
+                    'metaTitle' => 'News-' . $i . '-' . time(),
                     'metaDescription' => $SHORT_TEXT,
-                ));
+                ]);
 
                 $news->save();
                 unset($news);
@@ -66,16 +66,16 @@ class DevController extends Controller
         }
 
         if ((int) $type == 2) {
-            for ($i = 0; $i < $ROW_COUNT; $i+=1) {
+            for ($i = 0; $i < $ROW_COUNT; $i += 1) {
                 $date = new \DateTime();
-                $date->add(new \DateInterval('P'.(int) $i.'D'));
+                $date->add(new \DateInterval('P' . (int) $i . 'D'));
                 $startDate = $date->format('Y-m-d');
 
-                $action = new \App\Model\ActionModel(array(
-                    'title' => 'Action-'.$i.'-'.time(),
+                $action = new \App\Model\ActionModel([
+                    'title' => 'Action-' . $i . '-' . time(),
                     'userId' => 1,
                     'userAlias' => 'System',
-                    'urlKey' => 'action-'.$i.'-'.time(),
+                    'urlKey' => 'action-' . $i . '-' . time(),
                     'approved' => 1,
                     'archive' => 0,
                     'shortBody' => $SHORT_TEXT,
@@ -86,9 +86,9 @@ class DevController extends Controller
                     'startTime' => '',
                     'endTime' => '',
                     'keywords' => 'action',
-                    'metaTitle' => 'Action-'.$i.'-'.time(),
+                    'metaTitle' => 'Action-' . $i . '-' . time(),
                     'metaDescription' => $SHORT_TEXT,
-                ));
+                ]);
 
                 $action->save();
                 unset($action);
@@ -97,25 +97,25 @@ class DevController extends Controller
         }
 
         if ((int) $type == 3) {
-            for ($i = 0; $i < $ROW_COUNT; $i+=1) {
-                $report = new \App\Model\ReportModel(array(
-                    'title' => 'Report-'.$i.'-'.time(),
+            for ($i = 0; $i < $ROW_COUNT; $i += 1) {
+                $report = new \App\Model\ReportModel([
+                    'title' => 'Report-' . $i . '-' . time(),
                     'userId' => 1,
                     'userAlias' => 'System',
-                    'urlKey' => 'report-'.$i.'-'.time(),
+                    'urlKey' => 'report-' . $i . '-' . time(),
                     'approved' => 1,
                     'archive' => 0,
                     'shortBody' => $SHORT_TEXT,
                     'body' => $LARGE_TEXT,
                     'rank' => 1,
                     'keywords' => 'report',
-                    'metaTitle' => 'Report-'.$i.'-'.time(),
+                    'metaTitle' => 'Report-' . $i . '-' . time(),
                     'metaDescription' => $SHORT_TEXT,
                     'metaImage' => '',
                     'photoName' => '',
                     'imgMain' => '',
                     'imgThumb' => '',
-                ));
+                ]);
 
                 $report->save();
                 unset($report);
@@ -124,40 +124,25 @@ class DevController extends Controller
         }
     }
 
-    /**
-     * @param type $string
-     *
-     * @return type
-     */
-    protected function createUrlKey($string)
-    {
-        $neutralChars = array('.', ',', '_', '(', ')', '[', ']', '|', ' ');
-        $preCleaned = StringMethods::fastClean($string, $neutralChars, '-');
-        $cleaned = StringMethods::fastClean($preCleaned);
-        $return = mb_ereg_replace('[\-]+', '-', trim(trim($cleaned), '-'));
-
-        return strtolower($return);
-    }
-
-    protected function _checkUrlKey($key, $keys, $type)
+    protected function checkUrlKey($key, $keys, $type)
     {
         if (in_array($key, $keys)) {
             return true;
         } else {
             if ($type == 'action') {
-                $action = \App\Model\ActionModel::first(array('urlKey = ?' => $key));
+                $action = \App\Model\ActionModel::first(['urlKey = ?' => $key]);
 
                 if (null !== $action) {
                     return 5;
                 }
             } elseif ($type == 'report') {
-                $report = \App\Model\ReportModel::first(array('urlKey = ?' => $key));
+                $report = \App\Model\ReportModel::first(['urlKey = ?' => $key]);
 
                 if (null !== $report) {
                     return 5;
                 }
             } elseif ($type == 'news') {
-                $news = \App\Model\NewsModel::first(array('urlKey = ?' => $key));
+                $news = \App\Model\NewsModel::first(['urlKey = ?' => $key]);
 
                 if (null !== $news) {
                     return 5;
@@ -180,13 +165,13 @@ class DevController extends Controller
         $this->disableView();
 
         $oldDb = new \THCFrame\Database\Database();
-        $db = $oldDb->initializeDirectly(array(
+        $db = $oldDb->initializeDirectly([
             'type' => 'mysql',
             'host' => 'localhost',
             'username' => 'root',
             'password' => '',
             'schema' => 'hastrman_old',
-        ));
+        ]);
 
         $insertReportSql = "INSERT INTO `tb_report` VALUES (default, 2, 1, 1, 1, '%s', 'Bohumír Kuhn', '%s', '%s', '%s', default, default, default, default, default, '%s', '%s', default, '%s', '%s');";
         $insertActionSql = "INSERT INTO `tb_action` VALUES (default, 2, 1, 1, 1, '%s', 'Bohumír Kuhn', '%s', '%s', '%s', default, default, default, default, default, default, '%s', '%s', '%s', '%s');";
@@ -196,27 +181,27 @@ class DevController extends Controller
         $actions = $db->execute('SELECT * FROM `jos_content` where catid IN (41,42) and state = 1');
         $news = $db->execute('SELECT * FROM `jos_content` where catid IN (36) and state = 1');
 
-        $patterns = array('/https:/i', '/images\/stories\//i', '/\'/');
-        $replaces = array('http:', '/public/uploads/images/stories/', "\'");
+        $patterns = ['/https:/i', '/images\/stories\//i', '/\'/'];
+        $replaces = ['', '/public/uploads/images/stories/', "\'"];
         $contentCount = 0;
 
         if (!empty($reports)) {
-            $urlKeys = array();
+            $urlKeys = [];
             foreach ($reports as $obj) {
                 $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
-                $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
+                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
+                $title = trim(StringMethods::fastClean($obj['title'], [], '', true));
                 $urlKey = StringMethods::createUrlKey($title);
 
-                $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'report');
+                $urlKeyCheck = $this->checkUrlKey($urlKey, $urlKeys, 'report');
                 if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i+=1) {
-                        if (!$this->_checkUrlKey($urlKey, $urlKeys, 'report')) {
+                    for ($i = 1; $i <= 50; $i += 1) {
+                        if (!$this->checkUrlKey($urlKey, $urlKeys, 'report')) {
                             break;
                         } else {
-                            $urlKey = $urlKey.'-'.$i;
+                            $urlKey = $urlKey . '-' . $i;
                         }
                     }
                 } elseif ($urlKeyCheck === 5) {
@@ -227,27 +212,27 @@ class DevController extends Controller
 
                 $sql = sprintf($insertReportSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
                 \THCFrame\Core\Core::getLogger()->debug($sql);
-                $contentCount+=1;
+                $contentCount += 1;
             }
         }
 
         if (!empty($actions)) {
-            $urlKeys = array();
+            $urlKeys = [];
             foreach ($actions as $obj) {
                 $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
-                $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
+                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
+                $title = trim(StringMethods::fastClean($obj['title'], [], '', true));
                 $urlKey = StringMethods::createUrlKey($title);
 
-                $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'action');
+                $urlKeyCheck = $this->checkUrlKey($urlKey, $urlKeys, 'action');
                 if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i+=1) {
-                        if (!$this->_checkUrlKey($urlKey, $urlKeys, 'action')) {
+                    for ($i = 1; $i <= 50; $i += 1) {
+                        if (!$this->checkUrlKey($urlKey, $urlKeys, 'action')) {
                             break;
                         } else {
-                            $urlKey = $urlKey.'-'.$i;
+                            $urlKey = $urlKey . '-' . $i;
                         }
                     }
                 } elseif ($urlKeyCheck === 5) {
@@ -258,27 +243,27 @@ class DevController extends Controller
 
                 $sql = sprintf($insertActionSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
                 \THCFrame\Core\Core::getLogger()->debug($sql);
-                $contentCount+=1;
+                $contentCount += 1;
             }
         }
 
         if (!empty($news)) {
-            $urlKeys = array();
+            $urlKeys = [];
             foreach ($news as $obj) {
                 $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
                 $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
                 $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)).'...';
-                $title = trim(StringMethods::fastClean($obj['title'], array(), '', true));
+                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
+                $title = trim(StringMethods::fastClean($obj['title'], [], '', true));
                 $urlKey = StringMethods::createUrlKey($title);
 
-                $urlKeyCheck = $this->_checkUrlKey($urlKey, $urlKeys, 'news');
+                $urlKeyCheck = $this->checkUrlKey($urlKey, $urlKeys, 'news');
                 if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i+=1) {
-                        if (!$this->_checkUrlKey($urlKey, $urlKeys, 'news')) {
+                    for ($i = 1; $i <= 50; $i += 1) {
+                        if (!$this->checkUrlKey($urlKey, $urlKeys, 'news')) {
                             break;
                         } else {
-                            $urlKey = $urlKey.'-'.$i;
+                            $urlKey = $urlKey . '-' . $i;
                         }
                     }
                 } elseif ($urlKeyCheck === 5) {
@@ -289,13 +274,13 @@ class DevController extends Controller
 
                 $sql = sprintf($insertNewsSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
                 \THCFrame\Core\Core::getLogger()->debug($sql);
-                $contentCount+=1;
+                $contentCount += 1;
             }
         }
 
         $db->disconnect();
 
-        print('<pre>'.print_r($contentCount, true).'</pre>');
+        print('<pre>' . print_r($contentCount, true) . '</pre>');
         die;
     }
 
@@ -308,11 +293,11 @@ class DevController extends Controller
 
         $mailer = new \THCFrame\Mailer\Mailer();
         $mailer->setBody('Test message')
-                ->setSubject('Hastrman test email');
+            ->setSubject('Hastrman test email');
 
         $mailer->send();
 
-        print('<pre>'.print_r('Send', true).'</pre>');
+        print('<pre>' . print_r('Send', true) . '</pre>');
         die;
     }
 }

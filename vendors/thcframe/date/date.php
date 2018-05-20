@@ -18,7 +18,7 @@ class Date
     const FULL_MONTHS_NAMES = 1;
     const SHORT_MONTHS_NAMES = 2;
 
-    private static $_instance = null;
+    private static $instance = null;
 
     private function __construct()
     {
@@ -31,11 +31,11 @@ class Date
      */
     public static function getInstance()
     {
-        if (self::$_instance === null) {
-            self::$_instance = new self();
+        if (self::$instance === null) {
+            self::$instance = new self();
         }
 
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
@@ -57,9 +57,9 @@ class Date
     public function getEnMonths($type = 1)
     {
         if($type == self::FULL_MONTHS_NAMES){
-            return array(1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+            return [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         }else{
-            return array(1 => 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
+            return [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         }
     }
     
@@ -70,9 +70,9 @@ class Date
     public function getCzMonths($type = 1)
     {
         if($type == self::FULL_MONTHS_NAMES){
-            return array(1 => 'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec');
+            return [1 => 'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen', 'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'];
         }else{
-            return array(1 => 'Led', 'Úno', 'Bře', 'Dub', 'Kvě', 'Čer', 'Čec', 'Srp', 'Zář', 'Říj', 'Lis', 'Pro');
+            return [1 => 'Led', 'Úno', 'Bře', 'Dub', 'Kvě', 'Čer', 'Čec', 'Srp', 'Zář', 'Říj', 'Lis', 'Pro'];
         }
     }
 
@@ -260,18 +260,18 @@ class Date
             $year = date('Y');
         }
 
-        $days = array();
+        $days = [];
         $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
         for ($i = 1; $i <= $daysOfMonth; $i++) {
             $tm = mktime(0, 0, 0, $month, $i, $year);
-            $days[$i] = array(
+            $days[$i] = [
                 'day' => date('d', $tm),
                 'dayname' => date('D', $tm),
                 'weekofyear' => date('W', $tm),
                 'month' => date('F', $tm),
                 'daysofmonth' => $daysOfMonth
-            );
+            ];
         }
         
         return $days;

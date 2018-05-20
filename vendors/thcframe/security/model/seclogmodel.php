@@ -5,7 +5,7 @@ namespace THCFrame\Security\Model;
 use THCFrame\Model\Model;
 
 /**
- * 
+ *
  */
 class SecLogModel extends Model
 {
@@ -24,7 +24,7 @@ class SecLogModel extends Model
      * @readwrite
      * @type varchar
      * @length 100
-     * 
+     *
      * @validate alphanumeric, max(100)
      */
     protected $_userId;
@@ -34,7 +34,7 @@ class SecLogModel extends Model
      * @readwrite
      * @type varchar
      * @length 50
-     * 
+     *
      * @validate alpha, max(50)
      */
     protected $_module;
@@ -44,7 +44,7 @@ class SecLogModel extends Model
      * @readwrite
      * @type varchar
      * @length 50
-     * 
+     *
      * @validate alpha, max(50)
      */
     protected $_controller;
@@ -54,7 +54,7 @@ class SecLogModel extends Model
      * @readwrite
      * @type varchar
      * @length 50
-     * 
+     *
      * @validate alpha, max(50)
      */
     protected $_action;
@@ -64,7 +64,7 @@ class SecLogModel extends Model
      * @readwrite
      * @type text
      * @null
-     * 
+     *
      * @validate alphanumeric
      */
     protected $_params;
@@ -74,28 +74,28 @@ class SecLogModel extends Model
      * @readwrite
      * @type text
      * @null
-     * 
+     *
      * @validate alphanumeric, max(500)
      */
     protected $_userAgent;
-    
+
     /**
      * @column
      * @readwrite
      * @type char
      * @length 15
-     * 
+     *
      * @validate numeric, max(15)
      */
     protected $_userIp;
-    
+
     /**
      * @column
      * @readwrite
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -107,14 +107,14 @@ class SecLogModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {

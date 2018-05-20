@@ -1,5 +1,4 @@
 <?php
-
 namespace THCFrame\Security\Model;
 
 use THCFrame\Model\Model;
@@ -19,6 +18,8 @@ use THCFrame\Request\CookieBag;
 class BasicUserModel extends Model
 {
 
+    const ADMIN_PASS_LEN = 8;
+    const MEMBER_PASS_LEN = 6;
     const ADMIN_PASS_STRENGHT = 0.5;
     const MEMBER_PASS_STRENGHT = 0.3;
 
@@ -570,15 +571,16 @@ class BasicUserModel extends Model
             throw new Exception\WrongPassword('Wrong Password provided');
         }
 
-        if ($passStrength === null) {
-            if ($this->getRole() == 'role_member') {
-                $passStrength = self::MEMBER_PASS_STRENGHT;
-            } else {
-                $passStrength = self::ADMIN_PASS_STRENGHT;
-            }
+        $passStrenght = self::MEMBER_PASS_STRENGHT;
+        $minPassLen = self::MEMBER_PASS_LEN;
+        $role = $this->getRole();
+
+        if (in_array($role, ['role_admin', 'role_superadmin'])) {
+            $passStrenght = self::ADMIN_PASS_STRENGHT;
+            $minPassLen = self::ADMIN_PASS_LEN;
         }
 
-        if (PasswordManager::strength($newPassword) <= $passStrength) {
+        if (mb_strlen($newPassword) < $minPassLen || PasswordManager::strength($newPassword) <= $passStrenght) {
             throw new Exception\WeakPassword('Password is too weak');
         }
 
@@ -643,6 +645,22 @@ class BasicUserModel extends Model
     }
 
     /**
+     * Check if user has assigned api token
+     *
+     * @return boolean
+     */
+    public function hasApiToken()
+    {
+        $token = \THCFrame\Security\Model\ApiTokenModel::first(['userId = ?' => $this->_id]);
+
+        if ($token === null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Function to enable 'Remember Me' functionality
      *
      * @param type $userID
@@ -655,10 +673,10 @@ class BasicUserModel extends Model
         $authID = Rand::randStr(128);
         $cookieBag = CookieBag::getInstance();
 
-        $token = new AuthtokenModel(array(
+        $token = new AuthtokenModel([
             'userId' => $userID,
             'token' => $authID
-        ));
+        ]);
 
         if ($token->validate()) {
             $token->save();
@@ -689,8 +707,8 @@ class BasicUserModel extends Model
         $cookieBag = CookieBag::getInstance();
 
         if ($cookieBag->get('AUTHID') != '') {
-            $count = RememberMeTokenModel::count(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
-            $token = RememberMeTokenModel::first(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
+            $count = RememberMeTokenModel::count(['token = ?' => RequestMethods::cookie('THCF_AUTHID')]);
+            $token = RememberMeTokenModel::first(['token = ?' => RequestMethods::cookie('THCF_AUTHID')]);
 
             if ($token !== null) {
                 $currentTime = time();
@@ -722,9 +740,8 @@ class BasicUserModel extends Model
         $cookieBag = CookieBag::getInstance();
 
         if ($cookieBag->get('AUTHID') != '') {
-            RememberMeTokenModel::deleteAll(array('token = ?' => RequestMethods::cookie('THCF_AUTHID')));
+            RememberMeTokenModel::deleteAll(['token = ?' => RequestMethods::cookie('THCF_AUTHID')]);
             $cookieBag->erase('AUTHID');
         }
     }
-
 }

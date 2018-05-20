@@ -81,7 +81,7 @@ class Security extends Base implements SecurityInterface
      */
     public function initialize($configuration)
     {
-        Event::fire('framework.security.initialize.before', array());
+        Event::fire('framework.security.initialize.before', []);
 
         @session_regenerate_id();
         $this->_session = Registry::get('session');
@@ -90,7 +90,7 @@ class Security extends Base implements SecurityInterface
             $this->_csrf = new CSRF($this->_session);
             $this->_passwordManager = new PasswordManager($configuration->security);
         } else {
-            throw new \Exception('Error in configuration file');
+            throw new Exception\Argument('Error in configuration file');
         }
 
         $user = $this->_session->get('authUser');
@@ -103,10 +103,10 @@ class Security extends Base implements SecurityInterface
 
         if ($user instanceof BasicUserModel) {
             $this->_user = $user;
-            Event::fire('framework.security.initialize.user', array($user));
+            Event::fire('framework.security.initialize.user', [$user]);
         }
 
-        Event::fire('framework.security.initialize.after', array());
+        Event::fire('framework.security.initialize.after', []);
 
         return $this;
     }
@@ -123,7 +123,7 @@ class Security extends Base implements SecurityInterface
         $user->salt = null;
 
         $this->_session->set('authUser', $user)
-                ->set('lastActive', time());
+            ->set('lastActive', time());
 
         $this->_user = $user;
         return;
@@ -165,8 +165,8 @@ class Security extends Base implements SecurityInterface
     public function logout()
     {
         $this->_session->remove('authUser')
-                ->remove('lastActive')
-                ->remove('csrf');
+            ->remove('lastActive')
+            ->remove('csrf');
 
         BasicUserModel::deleteAuthenticationToken();
 
@@ -210,39 +210,44 @@ class Security extends Base implements SecurityInterface
     /**
      * Encrypt provided text
      *
-     * @param string $text
+     * @param string $string
      * @return string
      */
-    public function encrypt($text)
+    public function encrypt($string)
     {
-        $key = pack('H*', '0df9cf7ce4fbde15dc3e9303da18208e485ea44797a2795b239dda8e546845d4');
-        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+        $encryptMethod = Registry::get('configuration')->security->encryption->cipher;
+        $secret = Registry::get('configuration')->security->encryption->key;
+        $secretIv = Registry::get('configuration')->security->encryption->iv;
 
-        $ciphertext = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $text, MCRYPT_MODE_CBC, $iv);
-        $ciphertext = $iv . $ciphertext;
-        $ciphertext_base64 = base64_encode($ciphertext);
+        // hash
+        $key = hash('sha512', $secret);
 
-        return $ciphertext_base64;
+        // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+        $iv = substr(hash('sha256', $secretIv), 0, 16);
+
+        $output = openssl_encrypt($string, $encryptMethod, $key, 0, $iv);
+        return base64_encode($output);
     }
 
     /**
      * Decrypt encrypted text
      *
-     * @param string $encryptedText
+     * @param string $string
      * @return string
      */
-    public function decrypt($encryptedText)
+    public function decrypt($string)
     {
-        $key = pack('H*', '0df9cf7ce4fbde15dc3e9303da18208e485ea44797a2795b239dda8e546845d4');
-        $ciphertext_dec = base64_decode($encryptedText);
-        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-        $iv_dec = substr($ciphertext_dec, 0, $iv_size);
+        $encryptMethod = Registry::get('configuration')->security->encryption->cipher;
+        $secret = Registry::get('configuration')->security->encryption->key;
+        $secretIv = Registry::get('configuration')->security->encryption->iv;
 
-        $ciphertext_dec = substr($ciphertext_dec, $iv_size);
-        $plaintext_dec = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $ciphertext_dec, MCRYPT_MODE_CBC, $iv_dec);
+        // hash
+        $key = hash('sha512', $secret);
 
-        return $plaintext_dec;
+        // iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+        $iv = substr(hash('sha256', $secretIv), 0, 16);
+
+        return openssl_decrypt(base64_decode($string), $encryptMethod, $key, 0, $iv);
     }
 
     /**
@@ -254,7 +259,7 @@ class Security extends Base implements SecurityInterface
      */
     public function forceLogin($userId)
     {
-        $user = \App\Model\UserModel::first(array('id = ?' => (int) $userId));
+        $user = \App\Model\UserModel::first(['id = ?' => (int)$userId]);
 
         if ($user === null) {
             throw new Exception\UserNotExists('User not found');
@@ -274,7 +279,7 @@ class Security extends Base implements SecurityInterface
      */
     public function getPwdHash($string)
     {
-        if (ENV == 'dev') {
+        if (ENV == \THCFrame\Core\Core::ENV_DEV) {
             $salt = $this->getPasswordManager()->createSalt();
             return $this->getPasswordManager()->getPasswordHash($string, $salt) . '/' . $salt;
         } else {

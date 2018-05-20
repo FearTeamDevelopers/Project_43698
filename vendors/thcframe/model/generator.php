@@ -5,6 +5,7 @@ namespace THCFrame\Model;
 use THCFrame\Core\Base;
 use THCFrame\Registry\Registry;
 use THCFrame\Model\Modelwriter;
+use THCFrame\Model\Exception;
 use THCFrame\Core\Core;
 
 /**
@@ -19,39 +20,39 @@ class Generator extends Base
      * @readwrite
      * @var type
      */
-    protected $_dbIdent;
+    protected $dbIdent;
 
     /**
      * @readwrite
      * @var type
      */
-    protected $_dbSchema;
+    protected $dbSchema;
 
     /**
      *
      * @var THCFrame\Database\Connector
      */
-    private $_db;
+    private $db;
 
     /**
      *
      * @var THCFrame\Database\ConnectionHandler
      */
-    private $_connectionHandler;
+    private $connectionHandler;
 
     /**
      *
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
-        $this->_connectionHandler = Registry::get('database');
+        $this->connectionHandler = Registry::get('database');
 
         parent::__construct($options);
-        $ident = $this->_dbIdent;
+        $ident = $this->dbIdent;
 
-        $this->_db = $this->_connectionHandler->get($ident);
-        $this->_dbSchema = Registry::get('configuration')->database->$ident->schema;
+        $this->db = $this->connectionHandler->get($ident);
+        $this->dbSchema = Registry::get('configuration')->database->$ident->schema;
     }
 
     /**
@@ -59,9 +60,9 @@ class Generator extends Base
      *
      * @return string
      */
-    private function _getTablePrefix()
+    private function getTablePrefix()
     {
-        $ident = $this->_dbIdent;
+        $ident = $this->dbIdent;
         $tbPrefix = Registry::get('configuration')->database->$ident->tablePrefix;
 
         return $tbPrefix;
@@ -72,10 +73,10 @@ class Generator extends Base
      *
      * @return array
      */
-    private function _getTables()
+    private function getTables()
     {
-        $sqlResult = $this->_db->execute('SHOW TABLE STATUS IN ' . $this->getDbSchema() . " LIKE '" . $this->_getTablePrefix() . "%'");
-        $tables = array();
+        $sqlResult = $this->db->execute('SHOW TABLE STATUS IN ' . $this->getDbSchema() . " LIKE '" . $this->getTablePrefix() . "%'");
+        $tables = [];
 
         $moduleNames = Core::getModuleNames(true);
 
@@ -98,14 +99,14 @@ class Generator extends Base
      * @param string $tableName
      * @return array
      */
-    private function _getTableColumns($tableName)
+    private function getTableColumns($tableName)
     {
-        $sqlResult = $this->_db->execute('SHOW FULL COLUMNS FROM ' . $tableName);
-        $columns = array();
+        $sqlResult = $this->db->execute('SHOW FULL COLUMNS FROM ' . $tableName);
+        $columns = [];
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             if (strtolower($row['Key']) == 'mul') {
-                $fkResult = $this->_db->execute(
+                $fkResult = $this->db->execute(
                         "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE
                         from INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i
                         LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS AS r
@@ -128,7 +129,7 @@ class Generator extends Base
 
                         $foreignStr = preg_replace('/\s+/', ' ', "{$fkrow['CONSTRAINT_NAME']} REFERENCES {$fkrow['REFERENCED_TABLE_NAME']} ({$fkrow['REFERENCED_COLUMN_NAME']}) {$deleteRule} {$updateRule}");
 
-                        $row += array('Foreign' => $foreignStr);
+                        $row += ['Foreign' => $foreignStr];
                     }
                 }
             }
@@ -146,9 +147,9 @@ class Generator extends Base
      * @return string
      * @throws \Exception
      */
-    private function _createModelFileName($tableName, $module)
+    private function createModelFileName($tableName, $module)
     {
-        $tbPrefix = $this->_getTablePrefix();
+        $tbPrefix = $this->getTablePrefix();
         if (in_array(ucfirst($module), \THCFrame\Core\Core::getModuleNames())) {
 
             $path = MODULES_PATH . '/' . $module . '/model/basic/';
@@ -158,7 +159,7 @@ class Generator extends Base
 
             return $path . 'basic' . strtolower(str_replace($tbPrefix, '', $tableName)) . 'model.php';
         } else {
-            throw new \Exception($module . ' is not one of the registered application modules');
+            throw new Exception\Argument($module . ' is not one of the registered application modules');
         }
     }
 
@@ -168,9 +169,9 @@ class Generator extends Base
      * @param string $tableName
      * @return string
      */
-    private function _createModelClassName($tableName)
+    private function createModelClassName($tableName)
     {
-        $tbPrefix = $this->_getTablePrefix();
+        $tbPrefix = $this->getTablePrefix();
 
         return 'Basic' . ucfirst(str_replace($tbPrefix, '', $tableName)) . 'Model';
     }
@@ -181,12 +182,12 @@ class Generator extends Base
      * @param array $column
      * @return string
      */
-    private function _createColumnAnnotations($column)
+    private function createColumnAnnotations($column)
     {
         if (!empty($column)) {
             preg_match('#^([a-z]*)\(?([0-9]*)\)?#i', $column['Type'], $matches);
 
-            $lines = array();
+            $lines = [];
             switch (strtolower($column['Key'])) {
                 case 'pri': {
                         $lines[] = '* @primary';
@@ -197,9 +198,9 @@ class Generator extends Base
                         break;
                     }
                 case 'mul': {
-                        if(isset($column['Foreign']) && !empty($column['Foreign'])){
-                            $lines[] = '* @foreign '.$column['Foreign'];
-                        }else{
+                        if (isset($column['Foreign']) && !empty($column['Foreign'])) {
+                            $lines[] = '* @foreign ' . $column['Foreign'];
+                        } else {
                             $lines[] = '* @index';
                         }
                         break;
@@ -219,10 +220,10 @@ class Generator extends Base
             if (!empty($column['Comment'])) {
                 $parts = explode(';', $column['Comment']);
                 foreach ($parts as $part) {
-                    if(empty($part)){
+                    if (empty($part)) {
                         continue;
                     }
-                    if(strpos($part, 'required') !== false){
+                    if (strpos($part, 'required') !== false) {
                         $required = true;
                     }
                     $lines[] = '* ' . $part;
@@ -231,24 +232,16 @@ class Generator extends Base
 
             stripos($column['Type'], 'unsigned') !== false ? $lines[] = '* @unsigned' : '';
 
-            if(strtolower($column['Null']) != 'no' && $required === false){
+            if (strtolower($column['Null']) != 'no' && $required === false) {
                 $lines[] = '* @null';
             }
 
-            if ((int) $column['Default'] === 0
-                    && strtolower($column['Null']) == 'no'
-                    && strtolower($column['Key']) != 'pri'
-                    && $required === false
-                    && empty($column['Foreign'])
-                    && in_array($matches[1], array('int', 'integer', 'tinyint', 'smallint', 'mediumint'))) {
+            if ((int) $column['Default'] === 0 && strtolower($column['Null']) == 'no' && strtolower($column['Key']) != 'pri' && $required === false && empty($column['Foreign']) && in_array($matches[1], ['int', 'integer', 'tinyint', 'smallint', 'mediumint'])) {
                 $lines[] = '* @default 0';
-            } elseif ((int) $column['Default'] === 0
-                    && strtolower($column['Null']) == 'no'
-                    && $required === false
-                    && in_array($matches[1], array('float', 'double', 'decimal'))) {
+            } elseif ((int) $column['Default'] === 0 && strtolower($column['Null']) == 'no' && $required === false && in_array($matches[1], ['float', 'double', 'decimal'])) {
                 $lines[] = '* @default 0.0';
             } elseif (!empty($column['Default'])) {
-                $lines[] = '* @default '.$column['Default'];
+                $lines[] = '* @default ' . $column['Default'];
             }
 
             $definition = implode(PHP_EOL . '     ', $lines);
@@ -269,25 +262,25 @@ ANNOTATION;
      */
     public function createModels()
     {
-        $tables = $this->_getTables();
+        $tables = $this->getTables();
 
         if (!empty($tables)) {
             foreach ($tables as $table => $module) {
-                Core::getLogger()->log('-------- Creating model class for '.$table.' --------', 'system');
-                $columns = $this->_getTableColumns($table);
+                Core::getLogger()->log('-------- Creating model class for ' . $table . ' --------', 'system');
+                $columns = $this->getTableColumns($table);
 
                 if (!empty($columns)) {
-                    $modelWriter = new Modelwriter(array(
-                        'filename' => $this->_createModelFileName($table, $module),
-                        'classname' => $this->_createModelClassName($table),
+                    $modelWriter = new Modelwriter([
+                        'filename' => $this->createModelFileName($table, $module),
+                        'classname' => $this->createModelClassName($table),
                         'extends' => 'Model',
-                        'namespace' => ucfirst($module) . '\Model\Basic')
+                        'namespace' => ucfirst($module) . '\Model\Basic']
                     );
 
                     $modelWriter->addUse('THCFrame\Model\Model');
 
                     foreach ($columns as $column) {
-                        $an = $this->_createColumnAnnotations($column);
+                        $an = $this->createColumnAnnotations($column);
                         $modelWriter->addProperty($column['Field'], $an);
                     }
 
@@ -295,9 +288,31 @@ ANNOTATION;
                     unset($modelWriter, $columns);
                 }
 
-                Core::getLogger()->log('-------- Model class was successfully created for table '.$table.' --------', 'system');
+                Core::getLogger()->log('-------- Model class was successfully created for table ' . $table . ' --------', 'system');
             }
         }
+    }
+
+    public function getDbIdent()
+    {
+        return $this->dbIdent;
+    }
+
+    public function getDbSchema()
+    {
+        return $this->dbSchema;
+    }
+
+    public function setDbIdent(type $dbIdent)
+    {
+        $this->dbIdent = $dbIdent;
+        return $this;
+    }
+
+    public function setDbSchema(type $dbSchema)
+    {
+        $this->dbSchema = $dbSchema;
+        return $this;
     }
 
 }

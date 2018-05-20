@@ -34,7 +34,7 @@ class HTMLPurifier_Config
      * Namespace indexed array of serials for specific namespaces (see
      * getSerial() for more info).
      */
-    protected $serials = array();
+    protected $serials = [];
 
     /**
      * Serial for entire configuration object
@@ -221,7 +221,7 @@ class HTMLPurifier_Config
      */
     public function getAll() {
         if (!$this->finalized) $this->autoFinalize();
-        $ret = array();
+        $ret = [];
         foreach ($this->plist->squash() as $name => $value) {
             list($ns, $key) = explode('.', $name, 2);
             $ret[$ns][$key] = $value;
@@ -310,7 +310,7 @@ class HTMLPurifier_Config
      * Convenience function for error reporting
      */
     private function _listify($lookup) {
-        $list = array();
+        $list = [];
         foreach ($lookup as $name => $b) $list[] = $name;
         return implode(', ', $list);
     }
@@ -550,10 +550,10 @@ class HTMLPurifier_Config
             $schema = HTMLPurifier_ConfigSchema::instance();
         }
         if ($allowed !== true) {
-             if (is_string($allowed)) $allowed = array($allowed);
-             $allowed_ns = array();
-             $allowed_directives = array();
-             $blacklisted_directives = array();
+             if (is_string($allowed)) $allowed = [$allowed];
+             $allowed_ns = [];
+             $allowed_directives = [];
+             $blacklisted_directives = [];
              foreach ($allowed as $ns_or_directive) {
                  if (strpos($ns_or_directive, '.') !== false) {
                      // directive
@@ -568,7 +568,7 @@ class HTMLPurifier_Config
                  }
              }
         }
-        $ret = array();
+        $ret = [];
         foreach ($schema->info as $key => $def) {
             list($ns, $directive) = explode('.', $key, 2);
             if ($allowed !== true) {
@@ -577,7 +577,7 @@ class HTMLPurifier_Config
             }
             if (isset($def->isAlias)) continue;
             if ($directive == 'DefinitionID' || $directive == 'DefinitionRev') continue;
-            $ret[] = array($ns, $directive);
+            $ret[] = [$ns, $directive];
         }
         return $ret;
     }
@@ -611,11 +611,11 @@ class HTMLPurifier_Config
      * strict parts of HTMLPurifier_Config
      */
     public static function prepareArrayFromForm($array, $index = false, $allowed = true, $mq_fix = true, $schema = null) {
-        if ($index !== false) $array = (isset($array[$index]) && is_array($array[$index])) ? $array[$index] : array();
+        if ($index !== false) $array = (isset($array[$index]) && is_array($array[$index])) ? $array[$index] : [];
         $mq = $mq_fix && function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc();
 
         $allowed = HTMLPurifier_Config::getAllowedDirectivesForForm($allowed, $schema);
-        $ret = array();
+        $ret = [];
         foreach ($allowed as $key) {
             list($ns, $directive) = $key;
             $skey = "$ns.$directive";

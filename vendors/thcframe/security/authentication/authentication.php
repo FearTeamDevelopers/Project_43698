@@ -14,18 +14,18 @@ class Authentication extends Base
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_type;
-    
+
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_options;
-    
+
     /**
-     * 
+     *
      * @param type $method
      * @return \THCFrame\Security\Exception\Implementation
      */
@@ -36,36 +36,34 @@ class Authentication extends Base
 
     /**
      * Factory method
-     * It accepts initialization options and selects the type of returned object, 
+     * It accepts initialization options and selects the type of returned object,
      * based on the internal $_type property
      */
     public function initialize($configuration)
     {
-        Event::fire('framework.authentication.initialize.before', array($this->type));
-        
+        Event::fire('framework.authentication.initialize.before', [$this->type]);
+
         if (!$this->type) {
             if(!empty($configuration->security->authentication)){
                 $this->type = $configuration->security->authentication->type;
                 $this->options = (array) $configuration->security->authentication;
             }else{
-                throw new \Exception('Error in configuration file');
+                throw new Exception\Argument('Error in configuration file');
             }
         }
-        
+
         if (!$this->type) {
             throw new Exception\Argument('Invalid authentication type');
         }
 
-        Event::fire('framework.authentication.initialize.after', array($this->type));
-        
+        Event::fire('framework.authentication.initialize.after', [$this->type]);
+
         switch ($this->type){
             case 'database':{
                 return new DatabaseAuthentication($this->options);
-                break;
             }
             default:{
                 throw new Exception\Argument('Invalid authentication type');
-                break;
             }
         }
     }

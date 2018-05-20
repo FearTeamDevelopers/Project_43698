@@ -14,11 +14,11 @@ class CommentModel extends BasicCommentModel
     const RESOURCE_NEWS = 2;
     const RESOURCE_REPORT = 3;
 
-    private static $_resourceConv = array(
+    private static $_resourceConv = [
         'action' => self::RESOURCE_ACTION,
         'news' => self::RESOURCE_NEWS,
         'report' => self::RESOURCE_REPORT,
-    );
+    ];
 
     /**
      * @readwrite
@@ -53,8 +53,8 @@ class CommentModel extends BasicCommentModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $query = self::getQuery(['cm.*'])
+                ->join('tb_user', 'cm.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -66,8 +66,8 @@ class CommentModel extends BasicCommentModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['cm.*'])
+                ->join('tb_user', 'cm.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->order('cm.created', 'desc')
                 ->limit((int) $limit);
 
@@ -81,7 +81,7 @@ class CommentModel extends BasicCommentModel
      */
     public static function fetchByUserId($userId)
     {
-        return self::all(array('userId = ?' => (int) $userId), array('*'), array('created' => 'desc'));
+        return self::all(['userId = ?' => (int) $userId], ['*'], ['created' => 'desc']);
     }
 
     /**
@@ -92,8 +92,8 @@ class CommentModel extends BasicCommentModel
      */
     public static function fetchCommentsByResourceAndType($resourceId, $type, $limit = 20)
     {
-        $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['cm.*'])
+                ->join('tb_user', 'cm.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->where('cm.resourceId = ?', (int) $resourceId)
                 ->where('cm.type = ?', (int) $type)
                 ->where('cm.replyTo = ?', 0)
@@ -123,8 +123,8 @@ class CommentModel extends BasicCommentModel
             return;
         }
 
-        $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['cm.*'])
+                ->join('tb_user', 'cm.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->where('cm.resourceId = ?', (int) $resourceId)
                 ->where('cm.created >= ?', (int) $created)
                 ->where('cm.type = ?', (int) $type)
@@ -143,7 +143,7 @@ class CommentModel extends BasicCommentModel
      */
     public static function fetchReplies($id)
     {
-        $comment = new self(array('id' => $id));
+        $comment = new self(['id' => $id]);
 
         $comment->_replies = $comment->getReplies();
 
@@ -161,8 +161,8 @@ class CommentModel extends BasicCommentModel
      */
     public function getReplies()
     {
-        $query = self::getQuery(array('cm.*'))
-                ->join('tb_user', 'cm.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['cm.*'])
+                ->join('tb_user', 'cm.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->where('cm.replyTo = ?', $this->getId())
                 ->order('cm.created', 'desc');
 

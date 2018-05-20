@@ -14,7 +14,7 @@ class HTMLPurifier_Strategy_RemoveForeignElements extends HTMLPurifier_Strategy
     public function execute($tokens, $config, $context) {
         $definition = $config->getHTMLDefinition();
         $generator = new HTMLPurifier_Generator($config, $context);
-        $result = array();
+        $result = [];
 
         $escape_invalid_tags = $config->get('Core.EscapeInvalidTags');
         $remove_invalid_img  = $config->get('Core.RemoveInvalidImg');

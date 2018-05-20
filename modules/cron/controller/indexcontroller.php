@@ -75,13 +75,13 @@ class IndexController extends Controller
         $host = RequestMethods::server('HTTP_HOST');
 
         try {
-            $pageContent = \App\Model\PageContentModel::all(array('active = ?' => true));
-            $redirects = RedirectModel::all(array('module = ?' => 'app'));
-            $news = \App\Model\NewsModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
-            $actions = \App\Model\ActionModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
-            $reports = \App\Model\ReportModel::all(array('active = ?' => true, 'approved = ?' => 1), array('urlKey'));
+            $pageContent = \App\Model\PageContentModel::all(['active = ?' => true]);
+            $redirects = RedirectModel::all(['module = ?' => 'app']);
+            $news = \App\Model\NewsModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
+            $actions = \App\Model\ActionModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
+            $reports = \App\Model\ReportModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
 
-            $redirectArr = array();
+            $redirectArr = [];
             if (null !== $redirects) {
                 foreach ($redirects as $redirect) {
                     $redirectArr[$redirect->getToPath()] = $redirect->getFromPath();
@@ -136,17 +136,17 @@ class IndexController extends Controller
 
             @file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml . $xmlEnd);
             $this->resertConnections();
-            Event::fire('cron.log', array('success', 'Links count: ' . $linkCounter));
+            Event::fire('cron.log', ['success', 'Links count: ' . $linkCounter]);
         } catch (\Exception $ex) {
             $this->resertConnections();
-            Event::fire('cron.log', array('fail', 'Error while creating sitemap file: ' . $ex->getMessage()));
+            Event::fire('cron.log', ['fail', 'Error while creating sitemap file: ' . $ex->getMessage()]);
 
             $message = $ex->getMessage() . PHP_EOL . $ex->getTraceAsString();
 
-            $mailer = new \THCFrame\Mailer\Mailer(array(
+            $mailer = new \THCFrame\Mailer\Mailer([
                 'body' => 'Error while creating sitemap file: ' . $message,
                 'subject' => 'ERROR: Cron generateSitemap'
-            ));
+            ]);
 
             $mailer->setFrom('cron@hastrman.cz')
                     ->send();
@@ -180,10 +180,10 @@ class IndexController extends Controller
         }
 
         if ($message !== '') {
-            $mailer = new \THCFrame\Mailer\Mailer(array(
+            $mailer = new \THCFrame\Mailer\Mailer([
                 'body' => $message,
                 'subject' => 'WARNING: System chcek'
-            ));
+            ]);
 
             $mailer->setFrom('cron@hastrman.cz')
                     ->send();
@@ -200,7 +200,7 @@ class IndexController extends Controller
         $scanner = new \THCFrame\Security\FileHashScanner\Scanner();
 
         $scanner->scan();
-        Event::fire('cron.log', array('success', 'File hash checked'));
+        Event::fire('cron.log', ['success', 'File hash checked']);
     }
 
 }

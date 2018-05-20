@@ -14,16 +14,16 @@ class RoleManager extends Base
     /**
      * Array of all available roles
      * @readwrite
-     * @var array 
+     * @var array
      */
     protected $_roles;
 
     /**
      * Object constructor
-     * 
+     *
      * @param array $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         foreach ($options as $value) {
             $start = strpos($value, '[');
@@ -44,14 +44,14 @@ class RoleManager extends Base
 
                 $this->_roles[$role] = $trimedExtendArr;
             } else {
-                $this->_roles[$value] = array($value);
+                $this->_roles[$value] = [$value];
             }
         }
     }
 
     /**
      * Return all roles
-     * 
+     *
      * @return array
      */
     public function getRoles()
@@ -61,7 +61,7 @@ class RoleManager extends Base
 
     /**
      * Check if required role exists and return it
-     * 
+     *
      * @param string $rolename
      * @return mixed
      */
@@ -76,7 +76,7 @@ class RoleManager extends Base
 
     /**
      * Check if required role exists
-     * 
+     *
      * @param string $rolename
      * @return boolean
      */

@@ -1,4 +1,4 @@
-﻿(function() {
+(function() {
 	CKEDITOR.dialog.add("lightbox", function(g) {
 		var l = CKEDITOR.plugins.link,
 			h = function(a) {

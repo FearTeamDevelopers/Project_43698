@@ -15,7 +15,7 @@ class Controller extends RestController
     /**
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -31,7 +31,7 @@ class Controller extends RestController
      *
      * @return type
      */
-    public function lang($key, $args = array())
+    public function lang($key, $args = [])
     {
         return $this->getLang()->_get($key, $args);
     }

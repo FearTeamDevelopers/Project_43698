@@ -3,31 +3,27 @@
 		color black
 		display block
 		float left
-		&:nth-child(odd)
-			padding 0 10px 20px 0px
-		&:not(:nth-child(odd))
-			padding 0 0 20px 10px
+		padding 0 8px 10px 8px
 		@media (max-width:640px)
-			&:nth-child(odd)
-			&:not(:nth-child(odd))
+			&:nth-child(even)
+			&:not(:nth-child(even))
 				padding 0 20px 20px
 
 	.article-item
-		height 250px
 		background-color white
 		box-shadow 0 0 5px rgba(black, .4)
 		overflow hidden
-		&> div
-			padding 0 20px 20px
 		header
-			height 90px
+			height 70px
 			.date
 			.name
 				float left
 				display inline-block
 				text-align:center
 			.name
-				width calc(100% - 75px)
+				margin-left 10px
+				text-align left
+				width calc(100% - 90px)
 				h4
 					line-height 70px
 					height 70px
@@ -38,14 +34,14 @@
 					color black
 					font-weight 700
 			.date
-				width 75px
-				height 90px
+				width 80px
+				height 75px
 				box-shadow 0 0 1px rgba(black, 0.2)
 				.den
-					height 55px
-					line-height 55px
+					height 50px
+					line-height 50px
 					background-color white
-					font-size 37px
+					font-size 30px
 					font-weight bold
 				.mesic
 					background-color #a61d1d

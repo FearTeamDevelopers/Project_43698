@@ -3,6 +3,9 @@
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
+use App\Model\AdSectionModel;
+use App\Model\AdvertisementModel;
+use App\Model\AdImageModel;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Core\StringMethods;
@@ -14,24 +17,6 @@ class AdvertisementController extends Controller
 {
 
     /**
-     * Check whether unique ad section identifier already exist or not.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function _checkSectionUrlKey($key)
-    {
-        $status = \App\Model\AdSectionModel::first(array('urlKey = ?' => $key));
-
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Get list of all advertisements.
      *
      * @before _secured, _participant
@@ -39,7 +24,7 @@ class AdvertisementController extends Controller
     public function index()
     {
         $view = $this->getActionView();
-        $ads = \App\Model\AdvertisementModel::fetchAll();
+        $ads = AdvertisementModel::fetchAll();
         $view->set('ads', $ads);
     }
 
@@ -51,7 +36,7 @@ class AdvertisementController extends Controller
     public function sections()
     {
         $view = $this->getActionView();
-        $adsections = \App\Model\AdSectionModel::fetchAll();
+        $adsections = AdSectionModel::fetchAll();
         $view->set('adsections', $adsections);
     }
 
@@ -65,7 +50,7 @@ class AdvertisementController extends Controller
     public function detail($id)
     {
         $view = $this->getActionView();
-        $ad = \App\Model\AdvertisementModel::fetchById($id);
+        $ad = AdvertisementModel::fetchById($id);
 
         if (null === $ad) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -90,14 +75,14 @@ class AdvertisementController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $ad = \App\Model\AdvertisementModel::first(
-                        array('id = ?' => (int) $id), array('id')
+        $ad = AdvertisementModel::first(
+                        ['id = ?' => (int) $id], ['id']
         );
 
         if (null === $ad) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
-            $adImages = \App\Model\AdImageModel::all(array('adId = ?' => $ad->getId()));
+            $adImages = AdImageModel::all(['adId = ?' => $ad->getId()]);
 
             if ($adImages !== null) {
                 foreach ($adImages as $image) {
@@ -107,10 +92,10 @@ class AdvertisementController extends Controller
 
             if ($ad->delete()) {
                 $this->getCache()->erase('bazar-');
-                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                Event::fire('admin.log', ['success', 'Ad id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id));
+                Event::fire('admin.log', ['fail', 'Ad id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -131,7 +116,7 @@ class AdvertisementController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id));
+        $ad = AdvertisementModel::first(['id = ?' => (int) $id]);
 
         if (null === $ad) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -146,11 +131,11 @@ class AdvertisementController extends Controller
                 $ad->save();
 
                 $this->getCache()->erase('bazar-');
-                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                Event::fire('admin.log', ['success', 'Ad id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id,
-                    'Errors: ' . json_encode($ad->getErrors())));
+                Event::fire('admin.log', ['fail', 'Ad id: ' . $id,
+                    'Errors: ' . json_encode($ad->getErrors())]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -171,8 +156,8 @@ class AdvertisementController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $adImage = \App\Model\AdImageModel::first(array('id = ?' => (int) $imageId));
-        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => $adImage->getAdId()));
+        $adImage = AdImageModel::first(['id = ?' => (int) $imageId]);
+        $ad = AdvertisementModel::first(['id = ?' => $adImage->getAdId()]);
 
         if ($adImage->getId() === $ad->getMainPhotoId()) {
             $ad->mainPhotoId = null;
@@ -183,12 +168,12 @@ class AdvertisementController extends Controller
         } else {
             if ($adImage->delete()) {
                 $this->getCache()->erase('bazar-');
-                Event::fire('admin.log', array('success', 'Ad image id: ' . $imageId
-                    . ' from ad: ' . $adImage->getAdId(),));
+                Event::fire('admin.log', ['success', 'Ad image id: ' . $imageId
+                    . ' from ad: ' . $adImage->getAdId(),]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Ad image id: ' . $imageId
-                    . ' from ad: ' . $adImage->getAdId(),));
+                Event::fire('admin.log', ['fail', 'Ad image id: ' . $imageId
+                    . ' from ad: ' . $adImage->getAdId(),]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -207,32 +192,32 @@ class AdvertisementController extends Controller
 
         if (RequestMethods::post('submitAddAdSection')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMutliSubmissionProtectionToken() !== true) {
+                    $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/advertisement/sections/');
             }
 
-            $errors = array();
+            $errors = [];
             $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
-            if (!$this->_checkSectionUrlKey($urlKey)) {
-                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            if (!AdSectionModel::checkUrlKey($urlKey)) {
+                $errors['title'] = [$this->lang('ARTICLE_TITLE_IS_USED')];
             }
 
-            $adsection = new \App\Model\AdSectionModel(array(
+            $adsection = new AdSectionModel([
                 'title' => RequestMethods::post('title'),
                 'urlKey' => $urlKey,
-            ));
+            ]);
 
             if (empty($errors) && $adsection->validate()) {
                 $id = $adsection->save();
 
-                Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
+                Event::fire('admin.log', ['success', 'AdSection id: ' . $id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
                 self::redirect('/admin/advertisement/sections/');
             } else {
-                Event::fire('admin.log', array('fail', 'Errors: ' . json_encode($errors + $adsection->getErrors())));
+                Event::fire('admin.log', ['fail', 'Errors: ' . json_encode($errors + $adsection->getErrors())]);
                 $view->set('adsection', $adsection)
-                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
+                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                         ->set('errors', $errors + $adsection->getErrors());
             }
         }
@@ -249,7 +234,7 @@ class AdvertisementController extends Controller
     {
         $view = $this->getActionView();
 
-        $adsection = \App\Model\AdSectionModel::first(array('id = ?' => (int) $id));
+        $adsection = AdSectionModel::first(['id = ?' => (int) $id]);
 
         if (null === $adsection) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -263,11 +248,11 @@ class AdvertisementController extends Controller
                 self::redirect('/admin/advertisement/sections/');
             }
 
-            $errors = array();
+            $errors = [];
             $urlKey = StringMethods::createUrlKey(RequestMethods::post('title'));
 
-            if ($adsection->getUrlKey() !== $urlKey && !$this->_checkSectionUrlKey($urlKey)) {
-                $errors['title'] = array($this->lang('ARTICLE_TITLE_IS_USED'));
+            if ($adsection->getUrlKey() !== $urlKey && !AdSectionModel::checkUrlKey($urlKey)) {
+                $errors['title'] = [$this->lang('ARTICLE_TITLE_IS_USED')];
             }
 
             $adsection->title = RequestMethods::post('title');
@@ -278,12 +263,12 @@ class AdvertisementController extends Controller
                 $adsection->save();
 
                 $this->getCache()->erase('bazar-');
-                Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
+                Event::fire('admin.log', ['success', 'AdSection id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/advertisement/sections/');
             } else {
-                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
-                    'Errors: ' . json_encode($errors + $adsection->getErrors()),));
+                Event::fire('admin.log', ['fail', 'AdSection id: ' . $id,
+                    'Errors: ' . json_encode($errors + $adsection->getErrors()),]);
                 $view->set('errors', $errors + $adsection->getErrors());
             }
         }
@@ -304,8 +289,8 @@ class AdvertisementController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $adsection = \App\Model\AdSectionModel::first(
-                        array('id = ?' => (int) $id), array('id')
+        $adsection = AdSectionModel::first(
+                        ['id = ?' => (int) $id], ['id']
         );
 
         if (null === $adsection) {
@@ -313,11 +298,11 @@ class AdvertisementController extends Controller
         } else {
             if ($adsection->delete()) {
                 $this->getCache()->erase('bazar-');
-                Event::fire('admin.log', array('success', 'AdSection id: ' . $id));
+                Event::fire('admin.log', ['success', 'AdSection id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'AdSection id: ' . $id,
-                    'Errors: ' . json_encode($adsection->getErrors()),));
+                Event::fire('admin.log', ['fail', 'AdSection id: ' . $id,
+                    'Errors: ' . json_encode($adsection->getErrors()),]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -338,7 +323,7 @@ class AdvertisementController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $ad = \App\Model\AdvertisementModel::first(array('id = ?' => (int) $id, 'hasAvailabilityRequest = ?' => true));
+        $ad = AdvertisementModel::first(['id = ?' => (int) $id, 'hasAvailabilityRequest = ?' => true]);
 
         if (null === $ad) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -356,11 +341,11 @@ class AdvertisementController extends Controller
                 $ad->save();
 
                 $this->getCache()->erase('bazar-');
-                Event::fire('admin.log', array('success', 'Ad id: ' . $id));
+                Event::fire('admin.log', ['success', 'Ad id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', array('fail', 'Ad id: ' . $id,
-                    'Errors: ' . json_encode($ad->getErrors()),));
+                Event::fire('admin.log', ['fail', 'Ad id: ' . $id,
+                    'Errors: ' . json_encode($ad->getErrors()),]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -374,6 +359,7 @@ class AdvertisementController extends Controller
     public function load()
     {
         $this->disableView();
+        $maxRows = 100;
 
         $page = (int) RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
@@ -381,10 +367,10 @@ class AdvertisementController extends Controller
         if ($search != '') {
             $whereCond = "adv.created LIKE '%%?%%' OR adv.userAlias LIKE '%%?%%' OR adv.title LIKE '%%?%%'";
 
-            $query = \App\Model\AdvertisementModel::getQuery(
-                            array('adv.id', 'adv.userId', 'adv.userAlias', 'adv.title',
-                                'adv.active', 'adv.state', 'adv.expirationDate', 'adv.created',))
-                    ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+            $query = AdvertisementModel::getQuery(
+                            ['adv.id', 'adv.userId', 'adv.userAlias', 'adv.title',
+                                'adv.active', 'adv.state', 'adv.expirationDate', 'adv.created',])
+                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                     ->wheresql($whereCond, $search, $search, $search);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
@@ -404,23 +390,23 @@ class AdvertisementController extends Controller
                 $query->order('adv.id', 'desc');
             }
 
-            $limit = (int) RequestMethods::post('iDisplayLength');
+            $limit = min((int) RequestMethods::post('iDisplayLength'), $maxRows);
             $query->limit($limit, $page + 1);
-            $ads = \App\Model\AdvertisementModel::initialize($query);
+            $ads = AdvertisementModel::initialize($query);
 
-            $countQuery = \App\Model\AdvertisementModel::getQuery(array('adv.id'))
-                    ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+            $countQuery = AdvertisementModel::getQuery(['adv.id'])
+                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                     ->wheresql($whereCond, $search, $search, $search);
 
-            $adsCount = \App\Model\AdvertisementModel::initialize($countQuery);
+            $adsCount = AdvertisementModel::initialize($countQuery);
             unset($countQuery);
             $count = count($adsCount);
             unset($adsCount);
         } else {
-            $query = \App\Model\AdvertisementModel::getQuery(
-                            array('adv.id', 'adv.userId', 'adv.userAlias', 'adv.title',
-                                'adv.active', 'adv.state', 'adv.expirationDate', 'adv.created',))
-                    ->join('tb_user', 'adv.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+            $query = AdvertisementModel::getQuery(
+                            ['adv.id', 'adv.userId', 'adv.userAlias', 'adv.title',
+                                'adv.active', 'adv.state', 'adv.expirationDate', 'adv.created',])
+                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -439,17 +425,17 @@ class AdvertisementController extends Controller
                 $query->order('adv.id', 'desc');
             }
 
-            $limit = (int) RequestMethods::post('iDisplayLength');
+            $limit = min((int) RequestMethods::post('iDisplayLength'), $maxRows);
             $query->limit($limit, $page + 1);
-            $ads = \App\Model\AdvertisementModel::initialize($query);
-            $count = \App\Model\AdvertisementModel::count();
+            $ads = AdvertisementModel::initialize($query);
+            $count = AdvertisementModel::count();
         }
 
         $draw = $page + 1 + time();
 
         $str = '{ "draw": ' . $draw . ', "recordsTotal": ' . $count . ', "recordsFiltered": ' . $count . ', "data": [';
 
-        $returnArr = array();
+        $returnArr = [];
         if (null !== $ads) {
             foreach ($ads as $ad) {
                 $label = '';
@@ -459,11 +445,11 @@ class AdvertisementController extends Controller
                     $label .= "<span class='infoLabel infoLabelRed'>Neaktivní</span>";
                 }
 
-                if ($ad->state == \App\Model\AdvertisementModel::STATE_SOLD) {
+                if ($ad->state == AdvertisementModel::STATE_SOLD) {
                     $label .= "<span class='infoLabel infoLabelOrange'>Prodáno</span>";
                 }
 
-                $arr = array();
+                $arr = [];
                 $arr [] = '[ "' . $ad->getId() . '"';
                 $arr [] = '"' . htmlentities($ad->getTitle()) . '"';
                 $arr [] = '"' . $ad->getUserAlias() . '"';

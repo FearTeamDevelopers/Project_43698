@@ -9,12 +9,12 @@ class HTMLPurifier_HTMLModule_Target extends HTMLPurifier_HTMLModule
     public $name = 'Target';
 
     public function setup($config) {
-        $elements = array('a');
+        $elements = ['a'];
         foreach ($elements as $name) {
             $e = $this->addBlankElement($name);
-            $e->attr = array(
+            $e->attr = [
                 'target' => new HTMLPurifier_AttrDef_HTML_FrameTarget()
-            );
+            ];
         }
     }
 

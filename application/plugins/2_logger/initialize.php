@@ -4,9 +4,9 @@
 if (ENV == 'dev') {
     require_once 'logger.php';
 
-    $logger = new Logger(array(
+    $logger = new Logger([
         'file' => APP_PATH . '/application/logs/' . date('Y-m-d') . '-event.log'
-    ));
+    ]);
 
 // log cache events
     THCFrame\Events\Events::add('framework.cache.initialize.before', function($type, $options) use ($logger) {

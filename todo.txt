@@ -1,6 +1,0 @@
-Do detailu akce, reportaze pridat vypis komentaru a formular pro pridavani komentaru
-    ? + moznost odpovidat na prispevky
-
-Do bazaru pridat overlay pro inzerati, ktery maji nastaveny priznak sold
-    pruhlednej obdelnik se svetlym textem Prodáno
-

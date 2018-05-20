@@ -9,9 +9,9 @@ use THCFrame\Core\Exception as Exception;
 /**
  * Base class can create getters/setters simply by adding comments around the
  * protected properties.
- * 
+ *
  * In order for us to achieve this sort of thing, we would need to determine the name of the property that must
- * be read/modified, and also determine whether we are allowed to read/modify it, 
+ * be read/modified, and also determine whether we are allowed to read/modify it,
  * based on the @read/@write/@readwrite flags in the comments.
  */
 class Base
@@ -19,20 +19,20 @@ class Base
 
     /**
      * Inspector instance
-     * 
-     * @var THCFrame\Core\Inspector 
+     *
+     * @var THCFrame\Core\Inspector
      */
-    private $_inspector;
+    private $inspector;
 
     /**
      * Storage for dynamicly created variables mainly from database joins
-     * 
-     * @var array 
+     *
+     * @var array
      */
-    protected $_dataStore = array();
+    protected $dataStore = [];
 
     /**
-     * 
+     *
      * @param string $property
      * @return \THCFrame\Core\Exception\ReadOnly
      */
@@ -42,7 +42,7 @@ class Base
     }
 
     /**
-     * 
+     *
      * @param string $property
      * @return \THCFrame\Core\Exception\WriteOnly
      */
@@ -52,7 +52,7 @@ class Base
     }
 
     /**
-     * 
+     *
      * @return \THCFrame\Core\Exception\Property
      */
     protected function _getPropertyException()
@@ -61,7 +61,7 @@ class Base
     }
 
     /**
-     * 
+     *
      * @param string $method
      * @return \THCFrame\Core\Exception\Implementation
      */
@@ -72,12 +72,12 @@ class Base
 
     /**
      * Object constructor
-     * 
+     *
      * @param $options $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
-        $this->_inspector = new Inspector($this);
+        $this->inspector = new Inspector($this);
 
         if (is_array($options) || is_object($options)) {
             foreach ($options as $key => $value) {
@@ -89,11 +89,11 @@ class Base
     }
 
     /**
-     * There are four basic parts to our __call() method: 
-     * checking to see that the inspector is set, 
-     * handling the getProperty() methods, handling the setProperty() methods and 
+     * There are four basic parts to our __call() method:
+     * checking to see that the inspector is set,
+     * handling the getProperty() methods, handling the setProperty() methods and
      * handling the unsProperty() methods
-     * 
+     *
      * @param string $name
      * @param string $arguments
      * @return null|\THCFrame\Core\Base
@@ -101,7 +101,7 @@ class Base
      */
     public function __call($name, $arguments)
     {
-        if (empty($this->_inspector)) {
+        if (empty($this->inspector)) {
             throw new Exception('Call parent::__construct!');
         }
 
@@ -109,9 +109,10 @@ class Base
         if (count($getMatches) > 0) {
             $normalized = lcfirst($getMatches[0]);
             $property = "_{$normalized}";
+            $property2 = "{$normalized}";
 
             if (property_exists($this, $property)) {
-                $meta = $this->_inspector->getPropertyMeta($property);
+                $meta = $this->inspector->getPropertyMeta($property);
 
                 if (empty($meta['@readwrite']) && empty($meta['@read'])) {
                     throw $this->_getWriteonlyException($normalized);
@@ -124,8 +125,23 @@ class Base
                 } else {
                     return null;
                 }
-            } elseif (array_key_exists($normalized, $this->_dataStore)) {
-                return $this->_dataStore[$normalized];
+            } elseif (property_exists($this, $property2)) {
+                $meta = $this->inspector->getPropertyMeta($property2);
+
+                if (empty($meta['@readwrite']) && empty($meta['@write'])) {
+                    throw $this->_getReadonlyException($normalized);
+                }
+
+                unset($meta);
+
+                if (isset($this->$property2)) {
+                    return $this->$property2;
+                } else {
+                    return null;
+                }
+                return $this;
+            } elseif (array_key_exists($normalized, $this->dataStore)) {
+                return $this->dataStore[$normalized];
             } else {
                 return null;
             }
@@ -137,9 +153,10 @@ class Base
         if (count($setMatches) > 0) {
             $normalized = lcfirst($setMatches[0]);
             $property = "_{$normalized}";
+            $property2 = "{$normalized}";
 
             if (property_exists($this, $property)) {
-                $meta = $this->_inspector->getPropertyMeta($property);
+                $meta = $this->inspector->getPropertyMeta($property);
 
                 if (empty($meta['@readwrite']) && empty($meta['@write'])) {
                     throw $this->_getReadonlyException($normalized);
@@ -149,9 +166,20 @@ class Base
 
                 $this->$property = $arguments[0];
                 return $this;
+            } elseif (property_exists($this, $property2)) {
+                $meta = $this->inspector->getPropertyMeta($property2);
+
+                if (empty($meta['@readwrite']) && empty($meta['@write'])) {
+                    throw $this->_getReadonlyException($normalized);
+                }
+
+                unset($meta);
+
+                $this->$property2 = $arguments[0];
+                return $this;
             } else {
                 //if variable is not class property its stored into _dataStore array
-                $this->_dataStore[$normalized] = $arguments[0];
+                $this->dataStore[$normalized] = $arguments[0];
                 return $this;
             }
         }
@@ -162,9 +190,10 @@ class Base
         if (count($unsetMatches) > 0) {
             $normalized = lcfirst($setMatches[0]);
             $property = "_{$normalized}";
+            $property2 = "{$normalized}";
 
             if (property_exists($this, $property)) {
-                $meta = $this->_inspector->getPropertyMeta($property);
+                $meta = $this->inspector->getPropertyMeta($property);
 
                 if (empty($meta['@readwrite']) && empty($meta['@write'])) {
                     throw $this->_getReadonlyException($normalized);
@@ -174,8 +203,19 @@ class Base
 
                 unset($this->$property);
                 return $this;
+            } elseif (property_exists($this, $property2)) {
+                $meta = $this->inspector->getPropertyMeta($property2);
+
+                if (empty($meta['@readwrite']) && empty($meta['@write'])) {
+                    throw $this->_getReadonlyException($normalized);
+                }
+
+                unset($meta);
+
+                unset($this->$property2);
+                return $this;
             } else {
-                unset($this->_dataStore[$normalized]);
+                unset($this->dataStore[$normalized]);
                 return $this;
             }
         }
@@ -188,9 +228,9 @@ class Base
     /**
      * The __get() method accepts an argument that
      * represents the name of the property being set.
-     * __get() method then converts this to getProperty, 
+     * __get() method then converts this to getProperty,
      * which matches the pattern we defined in the __call() method
-     * 
+     *
      * @param string $name
      * @return mixed
      */
@@ -201,11 +241,11 @@ class Base
     }
 
     /**
-     * The __set() method accepts a second argument, 
+     * The __set() method accepts a second argument,
      * which defines the value to be set.
-     * __set() method then converts this to setProperty($value), 
+     * __set() method then converts this to setProperty($value),
      * which matches the pattern we defined in the __call() method
-     * 
+     *
      * @param string $name
      * @param mixed $value
      * @return mixed
@@ -219,9 +259,9 @@ class Base
     /**
      * The __unset() method accepts an argument that
      * represents the name of the property being set.
-     * __unset() method then converts this to unsProperty, 
+     * __unset() method then converts this to unsProperty,
      * which matches the pattern we defined in the __call() method
-     * 
+     *
      * @param string $name
      * @return mixed
      */
@@ -229,6 +269,28 @@ class Base
     {
         $function = 'uns' . ucfirst($name);
         return $this->$function();
+    }
+
+    public function getInspector()
+    {
+        return $this->inspector;
+    }
+
+    public function getDataStore()
+    {
+        return $this->dataStore;
+    }
+
+    public function setInspector(THCFrame\Core\Inspector $inspector)
+    {
+        $this->inspector = $inspector;
+        return $this;
+    }
+
+    public function setDataStore($dataStore)
+    {
+        $this->dataStore = $dataStore;
+        return $this;
     }
 
 }

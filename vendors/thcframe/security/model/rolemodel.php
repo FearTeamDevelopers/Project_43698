@@ -5,7 +5,7 @@ namespace THCFrame\Security\Model;
 use THCFrame\Model\Model;
 
 /**
- * 
+ *
  */
 class RoleModel extends Model
 {
@@ -31,7 +31,7 @@ class RoleModel extends Model
      * @length 10
      * @unsigned
      * @null
-     * 
+     *
      * @validate numeric, max(10)
      */
     protected $_parentId;
@@ -42,7 +42,7 @@ class RoleModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 1
      * @validate max(1)
      */
@@ -66,7 +66,7 @@ class RoleModel extends Model
      * @readwrite
      * @type text
      * @null
-     * 
+     *
      * @validate alphanumeric, max(1024)
      * @label description
      */
@@ -78,7 +78,7 @@ class RoleModel extends Model
      * @index
      * @type tinyint
      * @length 1
-     * 
+     *
      * @default 1
      * @validate max(1)
      */
@@ -90,7 +90,7 @@ class RoleModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -102,7 +102,7 @@ class RoleModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -110,12 +110,12 @@ class RoleModel extends Model
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
     protected $_permissions;
-    
+
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -130,10 +130,10 @@ class RoleModel extends Model
 
         $this->setModified(date("Y-m-d H:i:s"));
     }
-    
+
     public static function fetchPermissions()
     {
-        
+
     }
 
 }

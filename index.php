@@ -21,6 +21,8 @@ if (ENV == 'dev') {
     error_reporting(0);
 }
 
+ini_set('session.cookie_httponly', 'true');
+
 //check PHP version
 if (version_compare(phpversion(), '5.4', '<')) {
     header('Content-type: text/html');
@@ -32,16 +34,17 @@ if (version_compare(phpversion(), '5.4', '<')) {
 //setcookie('XDEBUG_PROFILE', 1, time()+1800);
 //setcookie('XDEBUG_PROFILE', '', time()-1800);
 
-//register modules
-$modules = array('App', 'Admin', 'Search', 'Cron');
+//register modules - automatic
+$modules = [];
 
 //autoloader prefixes
-$prefixes = array(
+$prefixes = [
     'THCFrame' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'thcframe',
-    'IDS' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'ids',              //intrudion detection
-    'Swift' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'swiftmailer',    //Email sender
-    'PHPWee' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'phpwee',        //JS, CSS, HTML minifier
-);
+    'IDS' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'ids', //intrudion detection
+    'Swift' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'swiftmailer', //Email sender
+    'PHPWee' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'phpwee', //JS, CSS, HTML minifier
+//    'Facebook' => APP_PATH . DIRECTORY_SEPARATOR . 'vendors' . DIRECTORY_SEPARATOR . 'Facebook', //facebook sdk
+];
 
 //core
 require(APP_PATH . '/vendors/thcframe/core/core.php');

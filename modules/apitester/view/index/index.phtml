@@ -1,0 +1,68 @@
+<ul class="maintabmenu multipletabmenu">
+    <li class="current"><a href="/apitester/">Api Tester</a></li>
+</ul><!--maintabmenu-->
+
+<div class="content">
+    <div class="widgetbox">
+        <div class="contenttitle radiusbottom0">
+            <h2 class="table"><span>Request</span></h2>
+        </div><!--contenttitle-->
+
+        <form class="stdform stdform2" method="post" action="#" >
+            <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+            <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
+            <p>
+                <label>URL*</label>
+                <span class="field">
+                    {echo \Admin\Helper\FormPrinter::input('text', 'requesturl', array($request,'requestUrl'), array('required'=>true))}
+                    {if isset($errors["requesturl"])}
+                    <label class="error">{echo implode("<br/>", $errors["requesturl"])}</label>
+                    {/if}
+                </span>
+            </p>
+            <p>
+                <label>Method*</label>
+                <span class="field">
+                    <select name="requestmethod" required="required">
+                        {foreach $method in \THCFrame\Request\RequestMethods::$allowedMethods}
+                        {script $sel=""}
+                        {if isset($request) && $method == $request->getRequestMethod()}
+                        {script $sel="selected"}
+                        {/if}
+
+                        <option value="{echo $method}" {echo $sel}>{echo $method}</option>
+                        {/foreach}
+                    </select>
+                    {if isset($errors["requestmethod"])}
+                    <label class="error">{echo implode("<br/>", $errors["requestmethod"])}</label>
+                    {/if}
+                </span>
+            </p>
+            <p>
+                <label>Request data</label>
+                <span class="field">
+                    <textarea rows="10" name="text" class="width80">{echo \Admin\Helper\FormPrinter::iset($request,'requestData')}</textarea>
+                    {if isset($errors["requestdata"])}
+                    <label class="error">{echo implode("<br/>", $errors["requestdata"])}</label>
+                    {/if}
+                </span>
+            </p>
+            <br/>
+            <div class="contenttitle radiusbottom0">
+                <h2 class="table"><span>Response</span></h2>
+            </div><!--contenttitle-->
+            <p>
+                <label>Response data</label>
+                <span class="field">
+                    <textarea rows="20" name="responsedata" class="width80" disabled="disabled">{echo \Admin\Helper\FormPrinter::iset($response,'body')}</textarea>
+                </span>
+            </p>
+
+            <p class="stdformbutton">
+                <input name="submitTestRequest" type="submit" value="Odeslat" class="submit radius2" />
+                <input type="reset" class="reset radius2" value="Reset" />
+            </p>
+        </form>
+    </div>
+</div>
+<br class="clear-all"/>

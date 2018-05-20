@@ -20,7 +20,7 @@ class HTMLPurifier_TagTransform_Font extends HTMLPurifier_TagTransform
 
     public $transform_to = 'span';
 
-    protected $_size_lookup = array(
+    protected $_size_lookup = [
         '0' => 'xx-small',
         '1' => 'xx-small',
         '2' => 'small',
@@ -35,7 +35,7 @@ class HTMLPurifier_TagTransform_Font extends HTMLPurifier_TagTransform
         '+2' => '150%',
         '+3' => '200%',
         '+4' => '300%'
-    );
+    ];
 
     public function transform($tag, $config, $context) {
 

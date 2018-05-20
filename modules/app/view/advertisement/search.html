@@ -14,8 +14,12 @@
   </header>
   <section class="row container">
     <div class="large-12 medium-12 small-12 column">{foreach $url in $result}
-      <article><a href="{echo $url['path']}">
-          <h3>{echo $url_i}</h3></a><small><span>{echo date("d.m. Y H:i", strtotime($url['created']))} <br/></span></small></article>{/foreach}
+      <article class="searchResult"><a href="{echo $url['path']}">
+          <h3>{echo $url['title']}</h3></a>
+        <div class="body">
+          <div>{echo html_entity_decode($url['text'])}</div>
+        </div>
+      </article>{/foreach}
     </div>
   </section>{/else}
 </section>

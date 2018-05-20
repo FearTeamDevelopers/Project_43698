@@ -27,7 +27,7 @@ class FhsBaselineModel extends Model
      * @readwrite
      * @type varchar
      * @length 100
-     * 
+     *
      * @validate alphanumeric, max(100)
      * @label file hash
      */
@@ -38,7 +38,7 @@ class FhsBaselineModel extends Model
      * @readwrite
      * @type varchar
      * @length 250
-     * 
+     *
      * @validate required, path, max(250)
      * @label path
      */
@@ -50,7 +50,7 @@ class FhsBaselineModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      * @label last modification
@@ -62,7 +62,7 @@ class FhsBaselineModel extends Model
      * @readwrite
      * @type varchar
      * @length 20
-     * 
+     *
      * @validate alphanumeric, max(20)
      * @label account
      */
@@ -74,7 +74,7 @@ class FhsBaselineModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
@@ -86,14 +86,14 @@ class FhsBaselineModel extends Model
      * @type char
      * @length 19
      * @null
-     * 
+     *
      * @default null
      * @validate datetime, max(19)
      */
     protected $_modified;
 
     /**
-     * 
+     *
      */
     public function preSave()
     {
@@ -111,12 +111,12 @@ class FhsBaselineModel extends Model
     {
         $db = Registry::get('database')->get('main');
         $result = $db->execute("SELECT path, hash, lastMod FROM tb_fhsbaseline WHERE acct=?", $acct);
-        
-        $returnArr = array();
-        
+
+        $returnArr = [];
+
         if(!empty($result)){
             foreach($result as $row){
-                $returnArr[$row['path']] = array('hash' => $row['hash'], 'lastMod' => $row['lastMod']);
+                $returnArr[$row['path']] = ['hash' => $row['hash'], 'lastMod' => $row['lastMod']];
             }
         }
         unset($result);

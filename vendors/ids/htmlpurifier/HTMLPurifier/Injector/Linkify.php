@@ -7,7 +7,7 @@ class HTMLPurifier_Injector_Linkify extends HTMLPurifier_Injector
 {
 
     public $name = 'Linkify';
-    public $needed = array('a' => array('href'));
+    public $needed = ['a' => ['href']];
 
     public function handleText(&$token) {
         if (!$this->allowsElement('a')) return;
@@ -23,7 +23,7 @@ class HTMLPurifier_Injector_Linkify extends HTMLPurifier_Injector
         // Note: this regex is extremely permissive
         $bits = preg_split('#((?:https?|ftp)://[^\s\'"<>()]+)#S', $token->data, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-        $token = array();
+        $token = [];
 
         // $i = index
         // $c = count
@@ -33,7 +33,7 @@ class HTMLPurifier_Injector_Linkify extends HTMLPurifier_Injector
                 if ($bits[$i] === '') continue;
                 $token[] = new HTMLPurifier_Token_Text($bits[$i]);
             } else {
-                $token[] = new HTMLPurifier_Token_Start('a', array('href' => $bits[$i]));
+                $token[] = new HTMLPurifier_Token_Start('a', ['href' => $bits[$i]]);
                 $token[] = new HTMLPurifier_Token_Text($bits[$i]);
                 $token[] = new HTMLPurifier_Token_End('a');
             }

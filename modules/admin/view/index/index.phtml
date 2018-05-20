@@ -20,64 +20,7 @@
     </div>
 
     {if $isAdmin}
-    <div class="grid_4">
-        <div class="widgetbox">
-            <div class="title"><h2 class="chart"><span>Online návštěvníci</span></h2></div>
-            <div class="widgetcontent padding0">
-                <iframe width="100%" height="200" src="http://piwik.hastrman.cz/index.php?module=Widgetize&action=iframe&widget=1&moduleToWidgetize=Live&actionToWidgetize=getSimpleLastVisitCount&idSite=1&period=week&date=today&disableLink=1&widget=1&token_auth=e49c4884f0eb21411273f82ba739984e" scrolling="no" frameborder="0" marginheight="0" marginwidth="0"></iframe>
-            </div><!--widgetcontent-->
-        </div><!--widgetbox-->
-    </div><!--grid_4-->
-    {/if}
-    {if $isSuperAdmin}
-    <div class="grid_5">
-        <div class="widgetbox fix-height">
-            <div class="title"><h2 class="general"><span>Chyby za poslední týden</span></h2></div>
-            <div class="widgetcontent padding0">
-                <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
-                    <colgroup>
-                        <col class="con0" /><col class="con1" />
-                        <col class="con0" />
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th class="head0">Uživatel</th>
-                            <th class="head1">Vytvořeno</th>
-                            <th class="head0">&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {if !empty($latesterrors)}
-                        {foreach $error in $latesterrors}
-                        <tr>
-                            <td>
-                                {echo $error->getUserId()}
-                            </td>
-                            <td>{echo $error->getCreated()}</td>
-                            <td>
-                                <a href="/admin/system/showlogdetail/{echo $error->getId()}" class="btn btn3 btn_search dialog" value="Detail chyby" title="Detail"></a>
-                            </td>
-                        </tr>
-                        {/foreach}
-                        {/if}
-                    </tbody>
-                </table>
-            </div><!--widgetcontent-->
-        </div><!--widgetbox-->
-    </div><!--grid_4-->
-    {/if}
-    <div class="clear"></div>
-
-    {if $isAdmin}
-    <div class="grid_10">
-        <div class="widgetbox">
-            <div class="title"><h2 class="chart"><span>Návštěvnost</span></h2></div>
-            <div class="widgetcontent padding0">
-                <iframe width="100%" height="300" src="http://piwik.hastrman.cz/index.php?module=Widgetize&action=iframe&columns[]=nb_visits&widget=1&moduleToWidgetize=VisitsSummary&actionToWidgetize=getEvolutionGraph&idSite=1&period=week&date=today&disableLink=1&widget=1&token_auth=e49c4884f0eb21411273f82ba739984e" scrolling="no" frameborder="0" marginheight="0" marginwidth="0"></iframe>
-            </div><!--widgetcontent-->
-        </div><!--widgetbox-->
-    </div><!--grid_10-->
-    <div class="grid_6">
+    <div class="grid_9">
         <div class="widgetbox">
             <div class="title"><h2 class="general"><span>Nový uživatelé</span></h2></div>
             <div class="widgetcontent padding0 statement">
@@ -123,6 +66,45 @@
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
     </div><!--grid_6-->
+    {/if}
+    <div class="clear"></div>
+
+    {if $isSuperAdmin}
+    <div class="grid_16">
+        <div class="widgetbox fix-height">
+            <div class="title"><h2 class="general"><span>Chyby za poslední týden</span></h2></div>
+            <div class="widgetcontent padding0">
+                <table cellpadding="0" cellspacing="0" border="0" class="stdtable">
+                    <colgroup>
+                        <col class="con0" /><col class="con1" />
+                        <col class="con0" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="head0">Uživatel</th>
+                            <th class="head1">Vytvořeno</th>
+                            <th class="head0">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($latesterrors)}
+                        {foreach $error in $latesterrors}
+                        <tr>
+                            <td>
+                                {echo $error->getUserId()}
+                            </td>
+                            <td>{echo $error->getCreated()}</td>
+                            <td>
+                                <a href="/admin/system/showlogdetail/{echo $error->getId()}" class="btn btn3 btn_search dialog" value="Detail chyby" title="Detail"></a>
+                            </td>
+                        </tr>
+                        {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div><!--widgetcontent-->
+        </div><!--widgetbox-->
+    </div><!--grid_4-->
     {/if}
     <div class="clear"></div>
 
@@ -195,7 +177,7 @@
                                 {if $authUser->getId() == $report->getUserId() || $isAdmin}
                                     <a href="/admin/report/edit/{echo $report->getId()}">{echo $report->getTitle()}</a>
                                 {/if}{else}
-                                    {echo $news->getTitle()}
+                                    {echo $report->getTitle()}
                                 {/else}
                             </td>
                             <td>{echo $report->getUserAlias()}</td>
@@ -241,7 +223,7 @@
                                 {if $authUser->getId() == $action->getUserId() || $isAdmin}
                                     <a href="/admin/action/edit/{echo $action->getId()}">{echo $action->getTitle()}</a>
                                 {/if}{else}
-                                    {echo $news->getTitle()}
+                                    {echo $action->getTitle()}
                                 {/else}
                             </td>
                             <td>{echo $action->getUserAlias()}</td>
@@ -258,7 +240,7 @@
                 </table>
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
-    </div><!--grid_5-->
+    </div><!--grid_8-->
 
     <div class="grid_8">
         <div class="widgetbox">
@@ -286,7 +268,7 @@
                 {/if}
             </div><!--widgetcontent-->
         </div><!--widgetbox-->
-    </div><!--grid_5-->
+    </div><!--grid_8-->
 
     <div class="clear"></div>
 </div><!--content-->

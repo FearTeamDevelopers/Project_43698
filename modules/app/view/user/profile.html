@@ -1,16 +1,15 @@
 
 <section class="wrapper profil singlePage">
   <div class="row">
-    <div class="buttonWrapper large-8 medium-12 small-12 centerBlock">
+    <div class="buttonWrapper large-10 medium-12 small-12 centerBlock">
       <ul>
-        <li><a href="/bazar/pridat" class="fi-plus">Nový inzerát</a></li>
-        <li><a href="/bazar/moje-inzeraty" class="fi-page-copy">Moje inzeráty</a></li>
         <li><a href="#" id="openEdit" class="fi-pencil">Upravit údaje</a></li>
+        <li><a href="/smazat-ucet" id="delete-account" class="fi-trash red-text">Smazat účet</a></li>
       </ul>
     </div>
   </div>
   <div class="row">
-    <article id="info" class="small-12 large-8 medium-8 centerBlock">
+    <article id="info" class="small-12 large-10 medium-10 centerBlock">
       <table>
         <tr>
           <td><span>Jméno:</span></td>
@@ -25,16 +24,21 @@
           <td>{echo $user->email}</td>
         </tr>
         <tr>
-          <td><span>Informace na email:</span></td>{if $user->getNewActionNotification || $user->getNewReportNotification}
+          <td><span>Informace na email:</span></td>{if $user->getNewActionNotification || $user->getNewReportNotification || $user->getNewNewsNotification}
           <td>
-            {if $user->getNewActionNotification}Informace o nových akcích<br/>{/if}
-            {if $user->getNewReportNotification}Informace o nových reportážích{/if}
+            {if $user->getNewActionNotification}Souhlasím se zasíláním informací o akcích na e-mail<br/>{/if}
+            {if $user->getNewReportNotification}Souhlasím se zasíláním informací o reportážích na e-mail<br/>{/if}
+            {if $user->getNewNewsNotification}Souhlasím se zasíláním informací o novinkách na e-mail<br/>{/if}
           </td>{/if}{else}
           <td>Nedostávám žádné informace emailem</td>{/else}
         </tr>
+        <tr>
+          <td><span>Omezení zpracování osobních údajů:</span></td>
+          <td>{if $user->pdLimitProcessing}Je aktivní{/if}{else}Není aktivní{/else}</td>
+        </tr>
       </table>
     </article>
-    <article id="edit" class="small-12 large-8 medium-8 centerBlock"><a href="#" id="closeEdit" class="fi-x-circle"></a>
+    <article id="edit" class="small-12 large-10 medium-10 centerBlock"><a href="#" id="closeEdit" class="fi-x-circle"></a>
       <form method="post" action="#">
         <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
         <table>
@@ -63,16 +67,19 @@
             <td><span>Informace na email:</span></td>
             <td>
               <label>{if $user->getNewActionNotification}
-                <input type="checkbox" name="actionNotification" value="1" checked="checked"/>Informace o nových akcích
-                {/if}{else}
-                <input type="checkbox" name="actionNotification" value="1"/>Informace o nových akcích
-                {/else}
+                <input type="checkbox" name="actionNotification" value="1" checked="checked"/>{/if}{else}
+                <input type="checkbox" name="actionNotification" value="1"/>{/else}
+                &nbsp;Souhlasím se zasíláním informací o akcích na e-mail
               </label>
               <label>{if $user->getNewReportNotification}
-                <input type="checkbox" name="reportNotification" value="1" checked="checked"/>Informace o nových reportážích
-                {/if}{else}
-                <input type="checkbox" name="reportNotification" value="1"/>Informace o nových reportážích
-                {/else}
+                <input type="checkbox" name="reportNotification" value="1" checked="checked"/>{/if}{else}
+                <input type="checkbox" name="reportNotification" value="1"/>{/else}
+                &nbsp;Souhlasím se zasíláním informací o reportážích na e-mail
+              </label>
+              <label>{if $user->getNewNewsNotification}
+                <input type="checkbox" name="newsNotification" value="1" checked="checked"/>{/if}{else}
+                <input type="checkbox" name="newsNotification" value="1"/>{/else}
+                &nbsp;Souhlasím se zasíláním informací o novinkách na e-mail
               </label>
             </td>
           </tr>
@@ -87,21 +94,31 @@
             <td><span>Původní heslo:</span></td>
             <td>{if isset($errors["oldpass"])}
               <label class="error fi-alert">{echo implode("<br/>", $errors["oldpass"])}</label>{/if}
-              {echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+              {echo \App\Helper\FormPrinter::input("password", "oldpass", array(), array("pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>
           <tr>
             <td><span>Heslo:</span></td>
             <td>{if isset($errors["password"])}
               <label class="error fi-alert">{echo implode("<br/>", $errors["password"])}</label>{/if}
-              {echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+              {echo \App\Helper\FormPrinter::input("password", "password", array(), array("pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
             </td>
           </tr>
           <tr>
             <td><span>Ověření hesla:</span></td>
             <td>{if isset($errors["password2"])}
               <label class="error fi-alert">{echo implode("<br/>", $errors["password2"])}</label>{/if}
-              {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+              {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "nepovinné (v případě, že nechcete měnit heslo)"))}
+            </td>
+          </tr>
+          <tr>
+            <td><span>Omezení zpracování osobních údajů:</span></td>
+            <td>
+              <label>{if $user->pdLimitProcessing}
+                <input type="checkbox" name="pdLimitProcessing" value="1" checked="checked"/>{/if}{else}
+                <input type="checkbox" name="pdLimitProcessing" value="1"/>{/else}
+                &nbsp;Přeji si omezit zpracování osobních údajů
+              </label>
             </td>
           </tr>
           <tr>
@@ -114,7 +131,7 @@
     </article>
   </div>
   <div class="row">
-    <article class="small-12 large-8 medium-8 centerBlock">
+    <article class="small-12 large-10 medium-10 centerBlock">
       <table>
         <tr>
           <td colspan="2"><strong>Akce, kterých se účastním:</strong></td>

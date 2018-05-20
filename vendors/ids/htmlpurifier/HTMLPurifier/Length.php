@@ -25,10 +25,10 @@ class HTMLPurifier_Length
     /**
      * Lookup array of units recognized by CSS 2.1
      */
-    protected static $allowedUnits = array(
+    protected static $allowedUnits = [
         'em' => true, 'ex' => true, 'px' => true, 'in' => true,
         'cm' => true, 'mm' => true, 'pt' => true, 'pc' => true
-    );
+    ];
 
     /**
      * @param number $n Magnitude

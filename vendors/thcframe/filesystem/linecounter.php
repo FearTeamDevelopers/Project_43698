@@ -5,22 +5,22 @@ namespace THCFrame\Filesystem;
 use THCFrame\Core\Base as Base;
 
 /**
- * 
+ *
  */
 class LineCounter extends Base
 {
 
     /**
      * @readwrite
-     * @var type 
+     * @var type
      */
-    protected $_fileCounter = array('gen' => array('commentedLines' => 0,
+    protected $_fileCounter = ['gen' => ['commentedLines' => 0,
                                                     'functions' => 0,
                                                     'classes' => 0,
                                                     'commentBlocks' => 0,
                                                     'blankLines' => 0,
-                                                    'totalFiles' => 0)
-                                );
+                                                    'totalFiles' => 0]
+                                ];
 
     /**
      * @read
@@ -28,16 +28,16 @@ class LineCounter extends Base
     protected $_allowedExtensions = "(html|htm|phtml|php|js|css|ini|sql|styl|jade)";
 
     /**
-     * 
+     *
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
     }
 
     /**
-     * 
+     *
      * @return type
      */
     public function getFileCounter()
@@ -46,7 +46,7 @@ class LineCounter extends Base
     }
 
     /**
-     * 
+     *
      * @param type $dir
      * @return type
      */
@@ -69,7 +69,7 @@ class LineCounter extends Base
                 if (is_dir($path . "/" . $file) && ($file !== '.' && $file !== '..')) {
                     $lineCounter += $this->countLines($path . "/" . $file);
                 } elseif ($file !== '.' && $file !== '..') {
-                    //Check if we have a valid file 
+                    //Check if we have a valid file
                     $ext = pathinfo($file, PATHINFO_EXTENSION);
 
                     if (preg_match("/" . $this->_allowedExtensions . "$/i", $ext)) {
@@ -116,11 +116,11 @@ class LineCounter extends Base
 
                     //Add to the files counter
                     $this->_fileCounter['gen']['totalFiles']++;
-                    
+
                     if(!isset($this->_fileCounter[strtolower($ext)])){
                         $this->_fileCounter[strtolower($ext)] = 0;
                     }
-                    
+
                     $this->_fileCounter[strtolower($ext)]++;
                 }
             }

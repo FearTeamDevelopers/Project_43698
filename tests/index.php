@@ -18,15 +18,15 @@ require("./_functions.php");
 
 // connect to database
 
-$database = new THCFrame\Database\Database(array(
+$database = new THCFrame\Database\Database([
     "type" => "mysql",
-    "options" => array(
+    "options" => [
         "host" => "localhost",
         "username" => "root",
         "password" => "",
         "schema" => "frametest"
-    )
-));
+    ]
+]);
 $database = $database->initialize();
 $database = $database->connect();
 

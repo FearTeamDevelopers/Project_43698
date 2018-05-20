@@ -27,7 +27,7 @@ class HTMLPurifier_AttrDef_CSS extends HTMLPurifier_AttrDef
         // for details
 
         $declarations = explode(';', $css);
-        $propvalues = array();
+        $propvalues = [];
 
         /**
          * Name of the current CSS property being validated.

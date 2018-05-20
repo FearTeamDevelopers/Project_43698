@@ -8,7 +8,7 @@ class HTMLPurifier_PropertyList
     /**
      * Internal data-structure for properties
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * Parent plist
@@ -50,7 +50,7 @@ class HTMLPurifier_PropertyList
      * no value is specified, the entire plist is reset.
      */
     public function reset($name = null) {
-        if ($name == null) $this->data = array();
+        if ($name == null) $this->data = [];
         else unset($this->data[$name]);
     }
 

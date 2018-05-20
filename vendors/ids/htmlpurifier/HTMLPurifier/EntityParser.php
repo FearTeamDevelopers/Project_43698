@@ -27,24 +27,24 @@ class HTMLPurifier_EntityParser
      * Decimal to parsed string conversion table for special entities.
      */
     protected $_special_dec2str =
-            array(
+            [
                     34 => '"',
                     38 => '&',
                     39 => "'",
                     60 => '<',
                     62 => '>'
-            );
+            ];
 
     /**
      * Stripped entity names to decimal conversion table for special entities.
      */
     protected $_special_ent2dec =
-            array(
+            [
                     'quot' => 34,
                     'amp'  => 38,
                     'lt'   => 60,
                     'gt'   => 62
-            );
+            ];
 
     /**
      * Substitutes non-special entities with their parsed equivalents. Since
@@ -58,7 +58,7 @@ class HTMLPurifier_EntityParser
         // it will try to detect missing semicolons, but don't rely on it
         return preg_replace_callback(
             $this->_substituteEntitiesRegex,
-            array($this, 'nonSpecialEntityCallback'),
+            [$this, 'nonSpecialEntityCallback'],
             $string
             );
     }
@@ -109,7 +109,7 @@ class HTMLPurifier_EntityParser
     public function substituteSpecialEntities($string) {
         return preg_replace_callback(
             $this->_substituteEntitiesRegex,
-            array($this, 'specialEntityCallback'),
+            [$this, 'specialEntityCallback'],
             $string);
     }
 

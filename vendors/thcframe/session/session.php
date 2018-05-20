@@ -23,7 +23,7 @@ class Session extends Base
     protected $_options;
 
     /**
-     * 
+     *
      * @param string $method
      * @return \THCFrame\Session\Exception\Implementation
      */
@@ -34,22 +34,22 @@ class Session extends Base
 
     /**
      * Factory method
-     * It accepts initialization options and selects the type of returned object, 
+     * It accepts initialization options and selects the type of returned object,
      * based on the internal $_type property.
-     * 
+     *
      * @return \THCFrame\Session\Session\Driver\Server
      * @throws Exception\Argument
      */
     public function initialize($configuration)
     {
-        Event::fire('framework.session.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.session.initialize.before', [$this->type, $this->options]);
 
         if (!$this->type) {
             if (!empty($configuration->session) && !empty($configuration->session->type)) {
                 $this->type = $configuration->session->type;
                 $this->options = (array) $configuration->session;
             } else {
-                throw new \Exception('Error in configuration file');
+                throw new Exception\Argument('Error in configuration file');
             }
         }
 
@@ -57,20 +57,17 @@ class Session extends Base
             throw new Exception\Argument('Invalid session type');
         }
 
-        Event::fire('framework.session.initialize.after', array($this->type, $this->options));
+        Event::fire('framework.session.initialize.after', [$this->type, $this->options]);
 
         switch ($this->type) {
             case 'server': {
                     return new Driver\Server($this->options);
-                    break;
                 }
             case 'database': {
                     return new Driver\Database($this->options);
-                    break;
                 }
             default: {
                     throw new Exception\Argument('Invalid session type');
-                    break;
                 }
         }
     }

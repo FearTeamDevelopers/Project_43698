@@ -9,7 +9,7 @@ use THCFrame\Database\ConnectionHandler;
 
 /**
  * Factory class returns a Database\Connector subclass.
- * Connectors are the classes that do the actual interfacing with the 
+ * Connectors are the classes that do the actual interfacing with the
  * specific database engine. They execute queries and return data
  */
 class Database extends Base
@@ -18,15 +18,15 @@ class Database extends Base
     /**
      * @readwrite
      */
-    protected $_type;
+    protected $type;
 
     /**
      * @readwrite
      */
-    protected $_options;
+    protected $options;
 
     /**
-     * 
+     *
      * @param type $method
      * @return \THCFrame\Session\Exception\Implementation
      */
@@ -37,16 +37,16 @@ class Database extends Base
 
     /**
      * Factory method
-     * It accepts initialization options and selects the type of returned object, 
+     * It accepts initialization options and selects the type of returned object,
      * based on the internal $_type property.
-     * 
+     *
      * @param \THCFrame\Configuration\Driver $configuration
      * @return \THCFrame\Database\Database\Connector
      * @throws Exception\Argument
      */
     public function initialize($configuration)
     {
-        Event::fire('framework.database.initialize.before', array());
+        Event::fire('framework.database.initialize.before', []);
 
         $databases = $configuration->database;
         $conHandler = new ConnectionHandler();
@@ -68,7 +68,7 @@ class Database extends Base
                     throw new Exception\Connector($exc->getMessage());
                 }
 
-                Event::fire('framework.database.initialize.after', array($type, $options));
+                Event::fire('framework.database.initialize.after', [$type, $options]);
             }
         }
 
@@ -76,7 +76,7 @@ class Database extends Base
     }
 
     /**
-     * 
+     *
      * @param array     $options
      * @return \THCFrame\Database\Database\Connector
      * @throws Exception\Argument
@@ -97,13 +97,13 @@ class Database extends Base
     }
 
     /**
-     * 
+     *
      * @param type $type
      * @param type $options
      * @return \THCFrame\Database\Connector\Mysql
      * @throws Exception\Argument
      */
-    private function createConnector($type = 'mysql', $options = array())
+    private function createConnector($type = 'mysql', $options = [])
     {
         if (empty($options)) {
             throw new Exception\Argument('Invalid database options');
@@ -112,13 +112,33 @@ class Database extends Base
         switch ($type) {
             case 'mysql': {
                     return new Connector\Mysql($options);
-                    break;
                 }
             default: {
                     throw new Exception\Argument('Invalid database type');
-                    break;
                 }
         }
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function setOptions($options)
+    {
+        $this->options = $options;
+        return $this;
     }
 
 }

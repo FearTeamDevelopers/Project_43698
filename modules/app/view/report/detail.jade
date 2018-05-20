@@ -1,4 +1,5 @@
 section.wrapper.report
+    input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
     header.row
         .reportInfo.large-12.column
             h2 {echo $report->getTitle()}
@@ -8,7 +9,7 @@ section.wrapper.report
             br
             span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
         .imgWrapper.large-12.column
-            img.centerBlock(src!='{echo $report->getImgMain()}')
+            img.centerBlock(src!='{echo $report->getImgMain()}' alt!='{echo $report->getPhotoName()}')
     .page.row
         |{if $report->getImgMain() != ""}
         .container.large-12.comlumn

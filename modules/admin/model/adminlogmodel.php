@@ -30,6 +30,6 @@ class AdminLogModel extends BasicAdminlogModel
      */
     public static function fetchErrorsFromLastWeek()
     {
-        return self::all(array('result = ?' => 'fail', 'created between date_sub(now(),INTERVAL 1 WEEK) and now()' => ''), array('*'), array('created' => 'desc'));
+        return self::all(['result = ?' => 'fail', 'created between date_sub(now(),INTERVAL 1 WEEK) and now()' => ''], ['*'], ['created' => 'desc']);
     }
 }

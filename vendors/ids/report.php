@@ -56,7 +56,7 @@ class Report implements \Countable, \IteratorAggregate
      *
      * @var Event[]|array
      */
-    protected $events = array();
+    protected $events = [];
 
     /**
      * List of affected tags
@@ -66,7 +66,7 @@ class Report implements \Countable, \IteratorAggregate
      *
      * @var string[]|array
      */
-    protected $tags = array();
+    protected $tags = [];
 
     /**
      * Impact level
@@ -86,7 +86,7 @@ class Report implements \Countable, \IteratorAggregate
      *
      * @var array
      */
-    protected $centrifuge = array();
+    protected $centrifuge = [];
 
     /**
      * Constructor
@@ -145,7 +145,7 @@ class Report implements \Countable, \IteratorAggregate
     public function getTags()
     {
         if (!$this->tags) {
-            $this->tags = array();
+            $this->tags = [];
 
             foreach ($this->events as $event) {
                 $this->tags = array_merge($this->tags, $event->getTags());
@@ -236,7 +236,7 @@ class Report implements \Countable, \IteratorAggregate
     protected function clear()
     {
         $this->impact = 0;
-        $this->tags   = array();
+        $this->tags   = [];
     }
 
     /**
@@ -258,7 +258,7 @@ class Report implements \Countable, \IteratorAggregate
      * @throws \InvalidArgumentException if argument is illegal
      * @return void
      */
-    public function setCentrifuge(array $centrifuge = array())
+    public function setCentrifuge(array $centrifuge = [])
     {
         if (!$centrifuge) {
             throw new \InvalidArgumentException('Empty centrifuge given');
@@ -277,31 +277,31 @@ class Report implements \Countable, \IteratorAggregate
         if (!$this->isEmpty()) {
             $output .= vsprintf(
                 "Total impact: %d<br/>\nAffected tags: %s<br/>\n",
-                array(
+                [
                     $this->getImpact(),
                     implode(', ', $this->getTags())
-                )
+                ]
             );
 
             foreach ($this->events as $event) {
                 $output .= vsprintf(
                     "<br/>\nVariable: %s | Value: %s<br/>\nImpact: %d | Tags: %s<br/>\n",
-                    array(
+                    [
                         htmlspecialchars($event->getName()),
                         htmlspecialchars($event->getValue()),
                         $event->getImpact(),
                         implode(', ', $event->getTags())
-                    )
+                    ]
                 );
 
                 foreach ($event as $filter) {
                     $output .= vsprintf(
                         "Description: %s | Tags: %s | ID %s<br/>\n",
-                        array(
+                        [
                             $filter->getDescription(),
                             implode(', ', $filter->getTags()),
                             $filter->getId()
-                        )
+                        ]
                     );
                 }
             }
@@ -311,10 +311,10 @@ class Report implements \Countable, \IteratorAggregate
             if ($centrifuge = $this->getCentrifuge()) {
                 $output .= vsprintf(
                     "Centrifuge detection data<br/> Threshold: %s<br/> Ratio: %s",
-                    array(
+                    [
                         isset($centrifuge['threshold']) && $centrifuge['threshold'] ? $centrifuge['threshold'] : '---',
                         isset($centrifuge['ratio']) && $centrifuge['ratio'] ? $centrifuge['ratio'] : '---'
-                    )
+                    ]
                 );
                 if (isset($centrifuge['converted'])) {
                     $output .= '<br/>  Converted: ' . $centrifuge['converted'];

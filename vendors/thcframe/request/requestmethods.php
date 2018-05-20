@@ -12,7 +12,8 @@ use THCFrame\Bag\DataBag;
 class RequestMethods
 {
 
-    private static $dataBags = array();
+    private static $dataBags = [];
+    public static $allowedMethods = ['GET', 'POST', 'PUT', 'DELETE'];
 
     private function __construct()
     {
@@ -130,6 +131,20 @@ class RequestMethods
     }
 
     /**
+     * Check if key is in $_COOKIE array
+     *
+     * @param mixed $key
+     * @return boolean
+     */
+    public static function issetcookie($key)
+    {
+        if (isset($_COOKIE[$key])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Return client ip address
      *
      * @return string
@@ -153,6 +168,23 @@ class RequestMethods
             $ipaddress = 'UNKNOWN';
         }
         return $ipaddress;
+    }
+
+    /**
+     * Return server url with http schema
+     *
+     * @return string
+     */
+    public static function getServerHost()
+    {
+        if ((!empty(RequestMethods::server('REQUEST_SCHEME')) && RequestMethods::server('REQUEST_SCHEME') == 'https')
+                || (!empty(RequestMethods::server('HTTPS')) && RequestMethods::server('HTTPS') == 'on')
+                || (!empty(RequestMethods::server('SERVER_PORT')) && RequestMethods::server('SERVER_PORT') == '443')) {
+            $serverRequestScheme = 'https://';
+        } else {
+            $serverRequestScheme = 'http://';
+        }
+        return $serverRequestScheme . RequestMethods::server('HTTP_HOST');
     }
 
     /**
@@ -210,19 +242,36 @@ class RequestMethods
     public static function getGetDataBag()
     {
         if (isset(self::$dataBags['get'])) {
-            $postDataBag = self::$dataBags['get'];
-            $postDataBag->clear()
+            $getDataBag = self::$dataBags['get'];
+            $getDataBag->clear()
                     ->initialize($_GET);
 
-            self::$dataBags['get'] = $postDataBag;
+            self::$dataBags['get'] = $getDataBag;
         } else {
-            $postDataBag = new DataBag($_GET);
-            $postDataBag->setName('get');
+            $getDataBag = new DataBag($_GET);
+            $getDataBag->setName('get');
 
-            self::$dataBags['get'] = $postDataBag;
+            self::$dataBags['get'] = $getDataBag;
         }
 
         return self::$dataBags['get'];
+    }
+
+    /**
+     *
+     * @param string $method
+     * @return boolean
+     */
+    public static function isAllowedMethod($method)
+    {
+        $formatedMethod = strtoupper($method);
+        if (preg_match('/^[A-Z]+/', $formatedMethod)) {
+            if (in_array($formatedMethod, self::$allowedMethods)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

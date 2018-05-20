@@ -60,7 +60,7 @@ class elFinderVolumeMySQL extends elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	public function __construct() {
-		$opts = array(
+		$opts = [
 			'host'          => 'localhost',
 			'user'          => '',
 			'pass'          => '',
@@ -71,7 +71,7 @@ class elFinderVolumeMySQL extends elFinderVolumeDriver {
 			'tmbPath'       => '',
 			'tmpPath'       => '',
 			'icon'          => (defined('ELFINDER_IMG_PARENT_URL')? (rtrim(ELFINDER_IMG_PARENT_URL, '/').'/') : '').'img/volume_icon_sql.png'
-		);
+		];
 		$this->options = array_merge($this->options, $opts);
 		$this->options['mimeDetect'] = 'internal';
 	}
@@ -219,7 +219,7 @@ class elFinderVolumeMySQL extends elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	public function search($q, $mimes) {
-		$result = array();
+		$result = [];
 
 		$sql = 'SELECT f.id, f.parent_id, f.name, f.size, f.mtime AS ts, f.mime, f.read, f.write, f.locked, f.hidden, f.width, f.height, 0 AS dirs 
 				FROM %s AS f 
@@ -367,7 +367,7 @@ class elFinderVolumeMySQL extends elFinderVolumeDriver {
 	 * @author Dmitry Levashov
 	 **/
 	protected function cacheDir($path) {
-		$this->dirsCache[$path] = array();
+		$this->dirsCache[$path] = [];
 
 		$sql = 'SELECT f.id, f.parent_id, f.name, f.size, f.mtime AS ts, f.mime, f.read, f.write, f.locked, f.hidden, f.width, f.height, IF(ch.id, 1, 0) AS dirs 
 				FROM '.$this->tbf.' AS f 
@@ -413,7 +413,7 @@ class elFinderVolumeMySQL extends elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function getParents($path) {
-		$parents = array();
+		$parents = [];
 
 		while ($path) {
 			if ($file = $this->stat($path)) {
@@ -453,7 +453,7 @@ class elFinderVolumeMySQL extends elFinderVolumeDriver {
 	 * @author Dmitry (dio) Levashov
 	 **/
 	protected function doSearch($path, $q, $mimes) {
-		return array();
+		return [];
 	}
 
 
@@ -613,7 +613,7 @@ class elFinderVolumeMySQL extends elFinderVolumeDriver {
 			return $stat;
 			
 		}
-		return array();
+		return [];
 	}
 	
 	/**

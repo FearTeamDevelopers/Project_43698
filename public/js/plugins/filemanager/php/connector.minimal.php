@@ -50,23 +50,23 @@ if(HTTPS){
 
 // Documentation for connector options:
 // https://github.com/Studio-42/elFinder/wiki/Connector-configuration-options
-$opts = array(
+$opts = [
     // 'debug' => true,
-    'bind' => array(
-        'upload.presave' => array(
+    'bind' => [
+        'upload.presave' => [
             'Plugin.AutoResize.onUpLoadPreSave'
-        )
-    ),
-    'plugin' => array(
-        'AutoResize' => array(
+        ]
+    ],
+    'plugin' => [
+        'AutoResize' => [
         'enable' => true,
         'maxWidth'  => 1024,
         'maxHeight'  => 1024,
         'quality' => 75
-        )
-    ),
-    'roots' => array(
-        array(
+        ]
+    ],
+    'roots' => [
+        [
             'driver' => 'LocalFileSystem', // driver for accessing file system (REQUIRED)
             'path' => '../../../../uploads/', // path to files (REQUIRED)
             'URL' => $url, // URL to files (REQUIRED)
@@ -75,9 +75,9 @@ $opts = array(
             'uploadMaxSize' => 15000000,
             'imgLib' => 'gd',
             'tmbCrop' => false
-        )
-    )
-);
+        ]
+    ]
+];
 
 // run elFinder
 $connector = new elFinderConnector(new elFinder($opts));

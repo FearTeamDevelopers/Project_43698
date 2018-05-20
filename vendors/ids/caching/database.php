@@ -187,7 +187,7 @@ class IDS_Caching_Database implements IDS_Caching_Interface
             $result = $handle->prepare('SELECT * FROM `' . 
                 $this->config['table'] . 
                 '` where type=?');
-            $result->execute(array($this->type));
+            $result->execute([$this->type]);
 
             foreach ($result as $row) {
                 return unserialize($row['data']);

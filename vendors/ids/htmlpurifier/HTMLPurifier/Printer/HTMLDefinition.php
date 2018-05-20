@@ -14,7 +14,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
 
         $this->def = $config->getHTMLDefinition();
 
-        $ret .= $this->start('div', array('class' => 'HTMLPurifier_Printer'));
+        $ret .= $this->start('div', ['class' => 'HTMLPurifier_Printer']);
 
         $ret .= $this->renderDoctype();
         $ret .= $this->renderEnvironment();
@@ -65,7 +65,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
 
         $ret .= $this->start('tr');
             $ret .= $this->element('th', 'Tag transforms');
-            $list = array();
+            $list = [];
             foreach ($def->info_tag_transform as $old => $new) {
                 $new = $this->getClass($new, 'TagTransform_');
                 $list[] = "<$old> with $new";
@@ -114,11 +114,11 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
         ksort($this->def->info);
         $ret .= $this->heavyHeader('Allowed tags', 2);
         $ret .= $this->start('tr');
-        $ret .= $this->element('td', $this->listifyTagLookup($this->def->info), array('colspan' => 2));
+        $ret .= $this->element('td', $this->listifyTagLookup($this->def->info), ['colspan' => 2]);
         $ret .= $this->end('tr');
         foreach ($this->def->info as $name => $def) {
             $ret .= $this->start('tr');
-                $ret .= $this->element('th', "<$name>", array('class'=>'heavy', 'colspan' => 2));
+                $ret .= $this->element('th', "<$name>", ['class'=>'heavy', 'colspan' => 2]);
             $ret .= $this->end('tr');
             $ret .= $this->start('tr');
                 $ret .= $this->element('th', 'Inline content');
@@ -150,7 +150,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
             }
             $ret .= $this->start('tr');
                 $ret .= $this->element('th', 'Allowed attributes');
-                $ret .= $this->element('td',$this->listifyAttr($def->attr), array(), 0);
+                $ret .= $this->element('td',$this->listifyAttr($def->attr), [], 0);
             $ret .= $this->end('tr');
 
             if (!empty($def->required_attr)) {
@@ -171,21 +171,21 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
         $context = new HTMLPurifier_Context();
         $ret = '';
         $ret .= $this->start('tr');
-            $elements = array();
-            $attr = array();
+            $elements = [];
+            $attr = [];
             if (isset($def->elements)) {
                 if ($def->type == 'strictblockquote') {
-                    $def->validateChildren(array(), $this->config, $context);
+                    $def->validateChildren([], $this->config, $context);
                 }
                 $elements = $def->elements;
             }
             if ($def->type == 'chameleon') {
                 $attr['rowspan'] = 2;
             } elseif ($def->type == 'empty') {
-                $elements = array();
+                $elements = [];
             } elseif ($def->type == 'table') {
-                $elements = array_flip(array('col', 'caption', 'colgroup', 'thead',
-                    'tfoot', 'tbody', 'tr'));
+                $elements = array_flip(['col', 'caption', 'colgroup', 'thead',
+                    'tfoot', 'tbody', 'tr']);
             }
             $ret .= $this->element('th', 'Allowed children', $attr);
 
@@ -220,7 +220,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
      */
     protected function listifyTagLookup($array) {
         ksort($array);
-        $list = array();
+        $list = [];
         foreach ($array as $name => $discard) {
             if ($name !== '#PCDATA' && !isset($this->def->info[$name])) continue;
             $list[] = $name;
@@ -235,7 +235,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
      */
     protected function listifyObjectList($array) {
         ksort($array);
-        $list = array();
+        $list = [];
         foreach ($array as $discard => $obj) {
             $list[] = $this->getClass($obj, 'AttrTransform_');
         }
@@ -248,7 +248,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
      */
     protected function listifyAttr($array) {
         ksort($array);
-        $list = array();
+        $list = [];
         foreach ($array as $name => $obj) {
             if ($obj === false) continue;
             $list[] = "$name&nbsp;=&nbsp;<i>" . $this->getClass($obj, 'AttrDef_') . '</i>';
@@ -262,7 +262,7 @@ class HTMLPurifier_Printer_HTMLDefinition extends HTMLPurifier_Printer
     protected function heavyHeader($text, $num = 1) {
         $ret = '';
         $ret .= $this->start('tr');
-        $ret .= $this->element('th', $text, array('colspan' => $num, 'class' => 'heavy'));
+        $ret .= $this->element('th', $text, ['colspan' => $num, 'class' => 'heavy']);
         $ret .= $this->end('tr');
         return $ret;
     }

@@ -50,7 +50,7 @@ abstract class HTMLPurifier_Injector
      * need to be allowed by the definition. Takes form of
      * array('element' => array('attr', 'attr2'), 'element2')
      */
-    public $needed = array();
+    public $needed = [];
 
     /**
      * Index of inputTokens to rewind to.

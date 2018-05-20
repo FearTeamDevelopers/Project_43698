@@ -1,8 +1,8 @@
 <?php
 
-$template = new THCFrame\Template\Template(array(
+$template = new THCFrame\Template\Template([
     "implementation" => new THCFrame\Template\Implementation\Standard()
-));
+]);
 
 THCFrame\Core\Test::add(
     function() use ($template)
@@ -43,9 +43,9 @@ THCFrame\Core\Test::add(
         $template->parse("
             {foreach \$number in \$numbers}{echo \$number_i},{echo \$number},{/foreach}"
         );
-        $processed = $template->process(array(
-            "numbers" => array(1, 2, 3)
-        ));
+        $processed = $template->process([
+            "numbers" => [1, 2, 3]
+        ]);
         
         return (trim($processed) == "0,1,1,2,2,3,");
     },
@@ -59,9 +59,9 @@ THCFrame\Core\Test::add(
         $template->parse("
             {for \$number in \$numbers}{echo \$number_i},{echo \$number},{/for}
         ");
-        $processed = $template->process(array(
-            "numbers" => array(1, 2, 3)
-        ));
+        $processed = $template->process([
+            "numbers" => [1, 2, 3]
+        ]);
         
         return (trim($processed) == "0,1,1,2,2,3,");
     },
@@ -78,17 +78,17 @@ THCFrame\Core\Test::add(
             {else}yes{/else}
         ");
         
-        $yes = $template->process(array(
+        $yes = $template->process([
             "check" => "yes"
-        ));
+        ]);
         
-        $maybe = $template->process(array(
+        $maybe = $template->process([
             "check" => "maybe"
-        ));
+        ]);
         
-        $no = $template->process(array(
+        $no = $template->process([
             "check" => null
-        ));
+        ]);
         
         return ($yes == $maybe && $maybe == $no);
     },

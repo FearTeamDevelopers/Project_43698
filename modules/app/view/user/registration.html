@@ -1,12 +1,17 @@
 
-<section class="wrapper login singlePage">
+<section class="wrapper registration singlePage">
   <div class="row">
     <div class="small-12 medium-12 large-12 columns">
       <div class="container">
         <header>
           <h2 class="fi-check">Registrace</h2>
         </header>
-        <form method="post" action="#">{if isset($errors["firstname"])}
+        <form method="post" action="#">
+          <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
+          <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>
+          <p class="adContFormUrl">Toto pole nechte prázdné:
+            <input type="text" name="url"/>
+          </p>{if isset($errors["firstname"])}
           <label class="error fi-alert">{echo implode("<br/>", $errors["firstname"])}</label>{/if}
           {echo \App\Helper\FormPrinter::input("text", "firstname", array($user,"firstname"), array("required"=>true, "placeholder" => "Jméno"))}
           {if isset($errors["lastname"])}
@@ -17,27 +22,26 @@
           {echo \App\Helper\FormPrinter::input("tel", "phone", array($user,"phone"), array("placeholder" => "Kontaktní telefon - nepovinné"))}
           {if isset($errors["email"])}
           <label class="error fi-alert">{echo implode("<br/>", $errors["email"])}</label>{/if}
-          {echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}<span>Informace na email:<br/></span>
-          <label>{if $user->getNewActionNotification}
-            <input type="checkbox" name="actionNotification" value="1" checked="checked"/>Informace o nových akcích
-            {/if}{else}
-            <input type="checkbox" name="actionNotification" value="1"/>Informace o nových akcích
-            {/else}
-          </label>
-          <label>{if $user->getNewReportNotification}
-            <input type="checkbox" name="reportNotification" value="1" checked="checked"/>Informace o nových reportážích
-            {/if}{else}
-            <input type="checkbox" name="reportNotification" value="1"/>Informace o nových reportážích
-            {/else}
-          </label>{if isset($errors["password"])}
+          {echo \App\Helper\FormPrinter::input("email", "email", array($user,"email"), array("required"=>true, "placeholder" => "Kontaktní a přihlašovací email"))}
+          {if isset($errors["password"])}
           <label class="error fi-alert">{echo implode("<br/>", $errors["password"])}</label>{/if}
-          {echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Heslo"))}
+          {echo \App\Helper\FormPrinter::input("password", "password", array(), array("required"=>true, "pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "Heslo"))}
           {if isset($errors["password2"])}
           <label class="error fi-alert">{echo implode("<br/>", $errors["password2"])}</label>{/if}
-          {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("required"=>true, "pattern" => ".#(5,)#", "title" => "min. 5 znaků", "placeholder" => "Ověření hesla"))}
+          {echo \App\Helper\FormPrinter::input("password", "password2", array(), array("required"=>true, "pattern" => ".#(6,)#", "title" => "min. 6 znaků", "placeholder" => "Ověření hesla"))}
+          <label>
+            <input type="checkbox" name="pdConsentToProcessing" value="1" required="required" oninvalid="this.setCustomValidity(this.willValidate ? &quot;&quot; :&quot;You must choose the account type from the list&quot;)"/>&nbsp;Souhlasím se zpracováváním osobních údajů podle&nbsp;<a href="/ochrana-soukromi">Zásad ochrany soukromí</a>
+          </label><span>Informace na email:<br/></span>
+          <label>
+            <input type="checkbox" name="actionNotification" value="1"/>&nbsp;Souhlasím se zasíláním informací o akcích na e-mail
+          </label>
+          <label>
+            <input type="checkbox" name="reportNotification" value="1"/>&nbsp;Souhlasím se zasíláním informací o reportážích na e-mail
+          </label>
+          <label>
+            <input type="checkbox" name="newsNotification" value="1"/>&nbsp;Souhlasím se zasíláním informací o novinkách na e-mail
+          </label><br/>
           <input type="submit" name="register" value="Registrovat"/>
-          <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
-          <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}"/>
         </form>
       </div>
     </div>

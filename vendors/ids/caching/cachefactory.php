@@ -73,7 +73,7 @@ class CacheFactory
 
             if (class_exists($class)) {
                 $object = call_user_func(
-                    array('' . $class, 'getInstance'),
+                    ['' . $class, 'getInstance'],
                     $type,
                     $init
                 );

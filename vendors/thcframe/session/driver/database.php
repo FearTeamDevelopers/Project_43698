@@ -25,22 +25,22 @@ class Database extends Session\Driver
      * @readwrite
      */
     protected $_secret;
-    
+
     /**
-     * 
+     *
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
         session_set_save_handler(
-                array($this, 'open'), 
-                array($this, 'close'), 
-                array($this, 'get'), 
-                array($this, 'set'), 
-                array($this, 'erase'), 
-                array($this, 'gc')
+                [$this, 'open'],
+                [$this, 'close'],
+                [$this, 'get'],
+                [$this, 'set'],
+                [$this, 'erase'],
+                [$this, 'gc']
         );
 
         @session_start();
@@ -48,7 +48,7 @@ class Database extends Session\Driver
 
     /**
      * Session keys are hashed with sha512 algo
-     * 
+     *
      * @param string $key
      * @return hash
      */
@@ -56,7 +56,7 @@ class Database extends Session\Driver
     {
         return hash_hmac('sha512', $key, $this->getSecret());
     }
-    
+
     public function open()
     {
         try{
@@ -68,23 +68,23 @@ class Database extends Session\Driver
 
     public function close()
     {
-        
+
     }
 
     public function clear()
     {
-        
+
     }
 
     /**
-     * 
+     *
      * @param type $key
      */
     public function erase($key)
     {
         $key = $this->hashKey($key);
-        $state = Session::deleteAll(array('id = ?' => $key));
-        
+        $state = Session::deleteAll(['id = ?' => $key]);
+
         if($state != -1){
             return true;
         }else{
@@ -93,7 +93,7 @@ class Database extends Session\Driver
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $default
      * @return type
@@ -101,8 +101,8 @@ class Database extends Session\Driver
     public function get($key, $default = '')
     {
         $key = $this->hashKey($key);
-        $ses = Session::first(array('id = ?' => $key));
-        
+        $ses = Session::first(['id = ?' => $key]);
+
         if($ses !== null){
             return $ses->getData();
         }else{
@@ -111,7 +111,7 @@ class Database extends Session\Driver
     }
 
     /**
-     * 
+     *
      * @param type $key
      * @param type $value
      * @return boolean
@@ -119,12 +119,12 @@ class Database extends Session\Driver
     public function set($key, $value)
     {
         $key = $this->hashKey($key);
-        $ses = new Session(array(
+        $ses = new Session([
             'id' => $key,
             'expires' => time(),
             'data' => $value
-        ));
-        
+        ]);
+
         if($ses->validate()){
             $ses->save();
             return true;
@@ -132,9 +132,9 @@ class Database extends Session\Driver
             return false;
         }
     }
-    
+
     /**
-     * 
+     *
      * @param type $max
      * @return boolean
      */
@@ -142,9 +142,9 @@ class Database extends Session\Driver
     {
         $max = $this->getTtl();
         $old = time() - $max;
-        
-        $state = Session::deleteAll(array('expires < ?' => $old));
-        
+
+        $state = Session::deleteAll(['expires < ?' => $old]);
+
         if($state != -1){
             return true;
         }else{

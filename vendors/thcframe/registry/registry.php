@@ -15,7 +15,7 @@ class Registry
      * 
      * @var array
      */
-    private static $_instances = array();
+    private static $instances = [];
 
     private function __construct()
     {
@@ -38,8 +38,8 @@ class Registry
      */
     public static function get($key, $default = null)
     {
-        if (isset(self::$_instances[$key])) {
-            return self::$_instances[$key];
+        if (isset(self::$instances[$key])) {
+            return self::$instances[$key];
         }
         return $default;
     }
@@ -53,7 +53,7 @@ class Registry
      */
     public static function set($key, $instance = null)
     {
-        self::$_instances[$key] = $instance;
+        self::$instances[$key] = $instance;
     }
 
     /**
@@ -63,7 +63,7 @@ class Registry
      */
     public static function erase($key)
     {
-        unset(self::$_instances[$key]);
+        unset(self::$instances[$key]);
     }
 
 }

@@ -12,7 +12,7 @@ use THCFrame\Bag\BagInterface;
 abstract class AbstractBag implements BagInterface
 {
 
-    private $data = array();
+    private $data = [];
 
     private $dataBagName;
 
@@ -94,7 +94,7 @@ abstract class AbstractBag implements BagInterface
      */
     public function clear()
     {
-        $this->data = array();
+        $this->data = [];
         return $this;
     }
 

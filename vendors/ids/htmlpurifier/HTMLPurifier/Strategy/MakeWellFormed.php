@@ -52,7 +52,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
         $generator = new HTMLPurifier_Generator($config, $context);
         $escape_invalid_tags = $config->get('Core.EscapeInvalidTags');
         // used for autoclose early abortion
-        $global_parent_allowed_elements = array();
+        $global_parent_allowed_elements = [];
         if (isset($definition->info[$definition->info_parent])) {
             // may be unset under testing circumstances
             $global_parent_allowed_elements = $definition->info[$definition->info_parent]->child->getAllowedElements($config);
@@ -62,7 +62,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
         $i = false; // injector index
         $token      = false; // the current token
         $reprocess  = false; // whether or not to reprocess the same token
-        $stack = array();
+        $stack = [];
 
         // member variables
         $this->stack   =& $stack;
@@ -79,7 +79,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
 
         // -- begin INJECTOR --
 
-        $this->injectors = array();
+        $this->injectors = [];
 
         $injectors = $config->getBatch('AutoFormat');
         $def_injectors = $definition->info_injector;
@@ -300,7 +300,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
                                 // [TagClosedAuto]
                                 $element->armor['MakeWellFormed_TagClosedError'] = true;
                                 $element->carryover = true;
-                                $this->processToken(array($new_token, $token, $element));
+                                $this->processToken([$new_token, $token, $element]);
                             } else {
                                 $this->insertBefore($new_token);
                             }
@@ -428,7 +428,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
             }
 
             // insert tags, in FORWARD $j order: c,b,a with </a></b></c>
-            $replace = array($token);
+            $replace = [$token];
             for ($j = 1; $j < $c; $j++) {
                 // ...as well as from the insertions
                 $new_token = new HTMLPurifier_Token_End($skipped_tags[$j]->name);
@@ -479,9 +479,9 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
     protected function processToken($token, $injector = -1) {
 
         // normalize forms of token
-        if (is_object($token)) $token = array(1, $token);
-        if (is_int($token))    $token = array($token);
-        if ($token === false)  $token = array(1);
+        if (is_object($token)) $token = [1, $token];
+        if (is_int($token))    $token = [$token];
+        if ($token === false)  $token = [1];
         if (!is_array($token)) throw new HTMLPurifier_Exception('Invalid token type from injector');
         if (!is_int($token[0])) array_unshift($token, 1);
         if ($token[0] === 0) throw new HTMLPurifier_Exception('Deleting zero tokens is not valid');
@@ -494,7 +494,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
 
         if ($injector > -1) {
             // determine appropriate skips
-            $oldskip = isset($old[0]) ? $old[0]->skip : array();
+            $oldskip = isset($old[0]) ? $old[0]->skip : [];
             foreach ($token as $object) {
                 $object->skip = $oldskip;
                 $object->skip[$injector] = true;
@@ -508,7 +508,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
      * this token.  You must reprocess after this.
      */
     private function insertBefore($token) {
-        array_splice($this->tokens, $this->t, 0, array($token));
+        array_splice($this->tokens, $this->t, 0, [$token]);
     }
 
     /**

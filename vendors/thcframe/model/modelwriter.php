@@ -11,41 +11,41 @@ use THCFrame\Core\Base;
  */
 class Modelwriter extends Base
 {
-    private $_use = array();
-    private $_property = array();
+
+    private $use = [];
+    private $property = [];
 
     /**
      * @readwrite
      * @var type
      */
-    protected $_namespace;
+    protected $namespace;
 
     /**
      * @readwrite
      * @var type
      */
-    protected $_extends;
+    protected $extends;
 
     /**
      * @readwrite
      * @var type
      */
-    protected $_implements = array();
+    protected $implements = [];
 
     /**
      * @readwrite
      * @var string
      */
-    protected $_filename;
+    protected $filename;
 
     /**
      * @readwrite
      * @var string
      */
-    protected $_classname;
+    protected $classname;
 
-
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
     }
@@ -59,7 +59,7 @@ class Modelwriter extends Base
      */
     public function addProperty($propertyName, $propertyAnnotations)
     {
-        $this->_property[$propertyName] = $propertyAnnotations;
+        $this->property[$propertyName] = $propertyAnnotations;
 
         return $this;
     }
@@ -72,7 +72,7 @@ class Modelwriter extends Base
      */
     public function addImplements($implements)
     {
-        $this->_implements[] = $implements;
+        $this->implements[] = $implements;
         return $this;
     }
 
@@ -85,10 +85,10 @@ class Modelwriter extends Base
      */
     public function addUse($use, $useAlias = null)
     {
-        if($useAlias !== null){
-            $this->_use[$useAlias] = $use;
-        }else{
-            $this->_use[] = $use;
+        if ($useAlias !== null) {
+            $this->use[$useAlias] = $use;
+        } else {
+            $this->use[] = $use;
         }
 
         return $this;
@@ -99,17 +99,16 @@ class Modelwriter extends Base
      */
     private function _writeHeader()
     {
-        $extends = !empty($this->_extends) ? 'extends '.$this->_extends: '';
-        $implements = !empty($this->_implements)? implode(',', $this->_implements) : '';
+        $extends = !empty($this->extends) ? 'extends ' . $this->extends : '';
+        $implements = !empty($this->implements) ? implode(',', $this->implements) : '';
         $useStr = '';
 
-        foreach ($this->_use as $key => $value){
-            if(strlen($key) > 3){
-                $useStr .= 'use '.$value.' as '.$key.';'.PHP_EOL;
-            }else{
-                $useStr .= 'use '.$value.';'.PHP_EOL;
+        foreach ($this->use as $key => $value) {
+            if (strlen($key) > 3) {
+                $useStr .= 'use ' . $value . ' as ' . $key . ';' . PHP_EOL;
+            } else {
+                $useStr .= 'use ' . $value . ';' . PHP_EOL;
             }
-
         }
 
         $contentModel = <<<MODEL
@@ -123,7 +122,7 @@ class {$this->getClassname()} {$extends} {$implements}
 
 MODEL;
 
-        file_put_contents($this->_filename, $contentModel);
+        file_put_contents($this->filename, $contentModel);
     }
 
     /**
@@ -131,15 +130,15 @@ MODEL;
      */
     private function _writeProperties()
     {
-        if(!empty($this->_property)){
-            foreach($this->_property as $name => $annotation){
+        if (!empty($this->property)) {
+            foreach ($this->property as $name => $annotation) {
                 $property = <<<PROPERTY
 
 {$annotation}
     protected \$_{$name};
 
 PROPERTY;
-                file_put_contents($this->_filename, $property, FILE_APPEND);
+                file_put_contents($this->filename, $property, FILE_APPEND);
             }
         }
     }
@@ -149,8 +148,8 @@ PROPERTY;
      */
     private function _writeGettersSetters()
     {
-        if(!empty($this->_property)){
-            foreach($this->_property as $name => $annotation){
+        if (!empty($this->property)) {
+            foreach ($this->property as $name => $annotation) {
                 $normalizedName = ucfirst($name);
 
                 $getterSetter = <<<BASICMETHODS
@@ -167,7 +166,7 @@ PROPERTY;
     }
 
 BASICMETHODS;
-                file_put_contents($this->_filename, $getterSetter, FILE_APPEND);
+                file_put_contents($this->filename, $getterSetter, FILE_APPEND);
             }
         }
     }
@@ -181,7 +180,7 @@ BASICMETHODS;
 
 }
 END;
-        file_put_contents($this->_filename, $classEnd, FILE_APPEND);
+        file_put_contents($this->filename, $classEnd, FILE_APPEND);
     }
 
     /**
@@ -194,4 +193,70 @@ END;
         $this->_writeGettersSetters();
         $this->_writeFooter();
     }
+
+    public function getUse()
+    {
+        return $this->use;
+    }
+
+    public function getProperty()
+    {
+        return $this->property;
+    }
+
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    public function getExtends()
+    {
+        return $this->extends;
+    }
+
+    public function getImplements()
+    {
+        return $this->implements;
+    }
+
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    public function getClassname()
+    {
+        return $this->classname;
+    }
+
+    public function setNamespace(type $namespace)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
+
+    public function setExtends(type $extends)
+    {
+        $this->extends = $extends;
+        return $this;
+    }
+
+    public function setImplements(type $implements)
+    {
+        $this->implements = $implements;
+        return $this;
+    }
+
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
+    public function setClassname($classname)
+    {
+        $this->classname = $classname;
+        return $this;
+    }
+
 }

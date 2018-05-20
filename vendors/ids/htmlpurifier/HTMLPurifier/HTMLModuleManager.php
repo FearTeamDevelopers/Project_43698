@@ -22,30 +22,30 @@ class HTMLPurifier_HTMLModuleManager
      * Active instances of modules for the specified doctype are
      * indexed, by name, in this array.
      */
-    public $modules = array();
+    public $modules = [];
 
     /**
      * Array of recognized HTMLPurifier_Module instances, indexed by
      * module's class name. This array is usually lazy loaded, but a
      * user can overload a module by pre-emptively registering it.
      */
-    public $registeredModules = array();
+    public $registeredModules = [];
 
     /**
      * List of extra modules that were added by the user using addModule().
      * These get unconditionally merged into the current doctype, whatever
      * it may be.
      */
-    public $userModules = array();
+    public $userModules = [];
 
     /**
      * Associative array of element name to list of modules that have
      * definitions for the element; this array is dynamically filled.
      */
-    public $elementLookup = array();
+    public $elementLookup = [];
 
     /** List of prefixes we should use for registering small names */
-    public $prefixes = array('HTMLPurifier_HTMLModule_');
+    public $prefixes = ['HTMLPurifier_HTMLModule_'];
 
     public $contentSets;     /**< Instance of HTMLPurifier_ContentSets */
     public $attrCollections; /**< Instance of HTMLPurifier_AttrCollections */
@@ -60,7 +60,7 @@ class HTMLPurifier_HTMLModuleManager
         $this->doctypes  = new HTMLPurifier_DoctypeRegistry();
 
         // setup basic modules
-        $common = array(
+        $common = [
             'CommonAttributes', 'Text', 'Hypertext', 'List',
             'Presentation', 'Edit', 'Bdo', 'Tables', 'Image',
             'StyleAttribute',
@@ -68,17 +68,17 @@ class HTMLPurifier_HTMLModuleManager
             'Scripting', 'Object',  'Forms',
             // Sorta legacy, but present in strict:
             'Name',
-        );
-        $transitional = array('Legacy', 'Target');
-        $xml = array('XMLCommonAttributes');
-        $non_xml = array('NonXMLCommonAttributes');
+        ];
+        $transitional = ['Legacy', 'Target'];
+        $xml = ['XMLCommonAttributes'];
+        $non_xml = ['NonXMLCommonAttributes'];
 
         // setup basic doctypes
         $this->doctypes->register(
             'HTML 4.01 Transitional', false,
             array_merge($common, $transitional, $non_xml),
-            array('Tidy_Transitional', 'Tidy_Proprietary'),
-            array(),
+            ['Tidy_Transitional', 'Tidy_Proprietary'],
+            [],
             '-//W3C//DTD HTML 4.01 Transitional//EN',
             'http://www.w3.org/TR/html4/loose.dtd'
         );
@@ -86,8 +86,8 @@ class HTMLPurifier_HTMLModuleManager
         $this->doctypes->register(
             'HTML 4.01 Strict', false,
             array_merge($common, $non_xml),
-            array('Tidy_Strict', 'Tidy_Proprietary', 'Tidy_Name'),
-            array(),
+            ['Tidy_Strict', 'Tidy_Proprietary', 'Tidy_Name'],
+            [],
             '-//W3C//DTD HTML 4.01//EN',
             'http://www.w3.org/TR/html4/strict.dtd'
         );
@@ -95,8 +95,8 @@ class HTMLPurifier_HTMLModuleManager
         $this->doctypes->register(
             'XHTML 1.0 Transitional', true,
             array_merge($common, $transitional, $xml, $non_xml),
-            array('Tidy_Transitional', 'Tidy_XHTML', 'Tidy_Proprietary', 'Tidy_Name'),
-            array(),
+            ['Tidy_Transitional', 'Tidy_XHTML', 'Tidy_Proprietary', 'Tidy_Name'],
+            [],
             '-//W3C//DTD XHTML 1.0 Transitional//EN',
             'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'
         );
@@ -104,17 +104,17 @@ class HTMLPurifier_HTMLModuleManager
         $this->doctypes->register(
             'XHTML 1.0 Strict', true,
             array_merge($common, $xml, $non_xml),
-            array('Tidy_Strict', 'Tidy_XHTML', 'Tidy_Strict', 'Tidy_Proprietary', 'Tidy_Name'),
-            array(),
+            ['Tidy_Strict', 'Tidy_XHTML', 'Tidy_Strict', 'Tidy_Proprietary', 'Tidy_Name'],
+            [],
             '-//W3C//DTD XHTML 1.0 Strict//EN',
             'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'
         );
 
         $this->doctypes->register(
             'XHTML 1.1', true,
-            array_merge($common, $xml, array('Ruby')),
-            array('Tidy_Strict', 'Tidy_XHTML', 'Tidy_Proprietary', 'Tidy_Strict', 'Tidy_Name'), // Tidy_XHTML1_1
-            array(),
+            array_merge($common, $xml, ['Ruby']),
+            ['Tidy_Strict', 'Tidy_XHTML', 'Tidy_Proprietary', 'Tidy_Strict', 'Tidy_Name'], // Tidy_XHTML1_1
+            [],
             '-//W3C//DTD XHTML 1.1//EN',
             'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'
         );
@@ -245,7 +245,7 @@ class HTMLPurifier_HTMLModuleManager
 
         // prepare any injectors
         foreach ($this->modules as $module) {
-            $n = array();
+            $n = [];
             foreach ($module->info_injector as $i => $injector) {
                 if (!is_object($injector)) {
                     $class = "HTMLPurifier_Injector_$injector";
@@ -260,7 +260,7 @@ class HTMLPurifier_HTMLModuleManager
         foreach ($this->modules as $module) {
             foreach ($module->info as $name => $def) {
                 if (!isset($this->elementLookup[$name])) {
-                    $this->elementLookup[$name] = array();
+                    $this->elementLookup[$name] = [];
                 }
                 $this->elementLookup[$name][] = $module->name;
             }
@@ -298,7 +298,7 @@ class HTMLPurifier_HTMLModuleManager
      */
     public function getElements() {
 
-        $elements = array();
+        $elements = [];
         foreach ($this->modules as $module) {
             if (!$this->trusted && !$module->safe) continue;
             foreach ($module->info as $name => $v) {

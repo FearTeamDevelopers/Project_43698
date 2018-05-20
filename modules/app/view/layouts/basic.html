@@ -126,7 +126,7 @@
       </div>{/if}
     </div>
     <div class="content">
-      <div id="loader"><img src="/public/images/loaders/loader6.gif">Nahrávám...</div>{yield action}
+      <div id="loader"><img src="/public/images/loaders/loader6.gif" alt="Loader">Nahrávám...</div>{yield action}
       <footer id="kontakty" class="wrapper blue">
         <div class="row container">
           <header>
@@ -143,7 +143,21 @@
           </div>
         </div>
       </footer>
+    </div>{if $euCookieLegal == false}
+    <div class="cookies-consent">
+      <div class="cookies-consent-text">Tento web používá k poskytování služeb a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.</div>
+      <div class="cookies-consent-types">
+        <label for="cookies-mandatory">Nezbytné</label>
+        <input type="checkbox" disabled checked id="cookies-mandatory">
+        <label for="cookies-analytics">Statistické</label>
+        <input type="checkbox" checked id="cookies-analytics">
+      </div>
+      <div class="cookies-consent-buttons"><a id="cookie-ok" href="#">Rozumím</a><a href="/ochrana-soukromi">Více informací</a></div>
     </div>
+    <noscript>
+      <style type="text/css"></style>
+      <div class="cookies-consent">{display:none}</div>
+    </noscript>{/if}
     <div id="dialog" title="Chcete pokračovat?">
       <p></p>
     </div>{if $showfeedback}<a href="/feedback" class="fi-comment feedback">Pošlete nám feedback</a>{/if}
@@ -151,32 +165,42 @@
     <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
     <script type="text/javascript" src="/public/js/plugins/modernizr.js"></script>
-    <script type="text/javascript" src="/public/js/foundation.min.js"></script>{if isset($includecarousel)}
+    <script type="text/javascript" src="/public/js/foundation.min.js"></script>
+    <script type="text/javascript" src="/public/js/custom/build/system.js"></script>
+    <script type="text/javascript" src="/public/js/custom/build/cookies.js"></script>{if isset($includecarousel)}
     <script type="text/javascript" src="/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js"></script>
     <script type="text/javascript" src="/public/js/custom/build/homeCarousel.js"></script>{/if}
     <script type="text/javascript" src="/public/js/plugins/lightbox.min.js"></script>{if isset($includejssorslider)}
     <script type="text/javascript" src="/public/js/plugins/jssor.slider.mini.js"></script>
     <script type="text/javascript" src="/public/js/custom/build/jssor.slider.init.js"></script>{/if}
-    <script type="text/javascript" src="/public/js/custom/build/generalApp.js"></script>
-    {if $env == "live"}
-    <!-- Piwik-->
+    <script type="text/javascript" src="/public/js/custom/build/generalApp.js"></script>{if $env == "live"}
+    <!-- Matomo-->
     <script type="text/javascript">
-      var _paq = _paq || [];
-      _paq.push(["trackPageView"]);
-      _paq.push(["enableLinkTracking"]);
-      (function() {
-        var u="//piwik.hastrman.cz/";
-        _paq.push(["setTrackerUrl", u+"piwik.php"]);
-        _paq.push(["setSiteId", 1]);
-        var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0];
-        g.type="text/javascript"; g.async=true; g.defer=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-      })();
+      if(navigator.doNotTrack != 1){
+          var _paq = _paq || [];
+          var consent = getCookie("cookies-consent");
+      
+          if(consent === ""){
+              _paq.push(["requireConsent"]);
+          }
+      
+          _paq.push(["setDoNotTrack", true]);
+          _paq.push(["trackPageView"]);
+          _paq.push(["enableLinkTracking"]);
+      
+          (function() {
+              var u="//piwik.hastrman.cz/";
+              _paq.push(["setTrackerUrl", u+"piwik.php"]);
+              _paq.push(["setSiteId", "1"]);
+              var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0];
+              g.type="text/javascript"; g.async=true; g.defer=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+          })();
+      }
     </script>
     <noscript>
       <p><img src="//piwik.hastrman.cz/piwik.php?idsite=1" style="border:0;" alt=""></p>
     </noscript>
-    <!-- End Piwik Code-->
-    {/if}
+    <!-- End Piwik Code-->{/if}
     <!-- End JS scripts-->
   </body>
 </html>

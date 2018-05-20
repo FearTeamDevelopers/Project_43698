@@ -10,10 +10,10 @@ class Autoloader
 
     /**
      * Path prefixes
-     * 
-     * @var array 
+     *
+     * @var array
      */
-    private $_prefixes = array();
+    private $prefixes = [];
 
     /**
      * Registers this instance as an autoloader
@@ -22,7 +22,7 @@ class Autoloader
      */
     public function register($prepend = false)
     {
-        spl_autoload_register(array($this, 'loadClass'), true, $prepend);
+        spl_autoload_register([$this, 'loadClass'], true, $prepend);
     }
 
     /**
@@ -30,7 +30,7 @@ class Autoloader
      */
     public function unregister()
     {
-        spl_autoload_unregister(array($this, 'loadClass'));
+        spl_autoload_unregister([$this, 'loadClass']);
     }
 
     /**
@@ -44,7 +44,7 @@ class Autoloader
             $this->addNamespace($prefix, $path);
         }
     }
-    
+
     /**
      * Adds a base directory for a namespace prefix.
      *
@@ -65,15 +65,15 @@ class Autoloader
         $base_dir = rtrim($base_dir, DIRECTORY_SEPARATOR) . '/';
 
         // initialize the namespace prefix array
-        if (isset($this->_prefixes[$prefix]) === false) {
-            $this->_prefixes[$prefix] = array();
+        if (isset($this->prefixes[$prefix]) === false) {
+            $this->prefixes[$prefix] = [];
         }
 
         // retain the base directory for the namespace prefix
         if ($prepend) {
-            array_unshift($this->_prefixes[$prefix], $base_dir);
+            array_unshift($this->prefixes[$prefix], $base_dir);
         } else {
-            array_push($this->_prefixes[$prefix], $base_dir);
+            array_push($this->prefixes[$prefix], $base_dir);
         }
     }
 
@@ -89,7 +89,7 @@ class Autoloader
         if (mb_ereg_match('.*Swift.*', $class)) {
             return;
         }
-        
+
         // the current namespace prefix
         $prefix = $class;
 
@@ -120,7 +120,7 @@ class Autoloader
 
     /**
      * Load the mapped file for a namespace prefix and relative class.
-     * 
+     *
      * @param string $prefix The namespace prefix.
      * @param string $relative_class The relative class name.
      * @return mixed Boolean false if no mapped file can be loaded, or the
@@ -129,12 +129,12 @@ class Autoloader
     protected function loadMappedFile($prefix, $relative_class)
     {
         // are there any base directories for this namespace prefix?
-        if (isset($this->_prefixes[$prefix]) === false) {
+        if (isset($this->prefixes[$prefix]) === false) {
             return false;
         }
 
         // look through base directories for this namespace prefix
-        foreach ($this->_prefixes[$prefix] as $base_dir) {
+        foreach ($this->prefixes[$prefix] as $base_dir) {
 
             // replace the namespace prefix with the base directory,
             // replace namespace separators with directory separators
@@ -155,7 +155,7 @@ class Autoloader
 
     /**
      * If a file exists, require it from the file system.
-     * 
+     *
      * @param string $file The file to require.
      * @return bool True if the file exists, false if not.
      */

@@ -6,6 +6,7 @@ section.wrapper.login.singlePage
                     h2.fi-torso Přihlášení
                 form(method="POST" action="#")
                     input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+                    input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")
                     |{if isset($account_error)}
                     label.error.fi-alert
                         |{echo $account_error}
@@ -20,10 +21,6 @@ section.wrapper.login.singlePage
                     label.error.fi-alert
                         |{echo $password_error}
                     |{/if}
-                    input(type="submit" name="submitLogin" value="Přihlásit")
-                |<br/><br/>
-                span Zaregistrujte se a vytvořte si účet
-                    a(href="/registrace") &nbsp;zde
-                |<br/><br/>
-                span V případě potíží s přihlášením si prosím zkontrolujte, že máte povolené ukládání souborů cookie.
-                    a(href="/ochrana-soukromi") Více o souborech cookie.
+                    input(type="submit" name="submitLogin" value="Přihlásit se")
+                    br
+                    a.specialButton(href="/registrace") Registrace

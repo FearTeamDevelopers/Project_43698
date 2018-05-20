@@ -66,7 +66,7 @@ class IDS_Log_File implements IDS_Log_Interface
      *
      * @var array
      */
-    private static $instances = array();
+    private static $instances = [];
 
     /**
      * Holds current remote address

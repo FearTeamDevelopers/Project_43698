@@ -6,7 +6,7 @@ use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
 use THCFrame\Router\Exception;
 use THCFrame\Router\Route;
-use THCFrame\Registry\Registry;
+use THCFrame\Request\RequestMethods;
 
 /**
  * Router class
@@ -21,105 +21,105 @@ class Router extends Base
 
     /**
      * Stores the Route objects
-     * 
+     *
      * @readwrite
      * @var array
      */
-    protected $_routes = array();
+    protected $_routes = [];
 
     /**
-     * Stores route redirects. 
+     * Stores route redirects.
      * Key represent from path and value is to path
-     * 
+     *
      * @readwrite
      * @var array
      */
-    protected $_redirects = array();
+    protected $redirects = [];
 
     /**
-     * @readwrite 
+     * @readwrite
      * @var Route
      */
     protected $_lastRoute = null;
 
     /**
      * Application default routes
-     * 
+     *
      * @var array
      */
-    private static $_defaultRoutes = array(
-        array(
+    private static $_defaultRoutes = [
+        [
             'pattern' => '/:module/:controller/:action/:id',
             'module' => ':module',
             'controller' => ':controller',
             'action' => ':action',
             'args' => ':id',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/:module/:controller/:action/',
             'module' => ':module',
             'controller' => ':controller',
             'action' => ':action',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/:controller/:action/:id',
             'module' => 'app',
             'controller' => ':controller',
             'action' => ':action',
             'args' => ':id',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/:module/:controller/',
             'module' => ':module',
             'controller' => ':controller',
             'action' => 'index',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/:controller/:action',
             'module' => 'app',
             'controller' => ':controller',
             'action' => ':action',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/:module/',
             'module' => ':module',
             'controller' => 'index',
             'action' => 'index',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/:controller',
             'module' => 'app',
             'controller' => ':controller',
             'action' => 'index',
-        ),
-        array(
+        ],
+        [
             'pattern' => '/',
             'module' => 'app',
             'controller' => 'index',
             'action' => 'index',
-        )
-    );
+        ]
+    ];
 
     /**
      * Object constructor
-     * 
+     *
      * @param array $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
-        Event::fire('framework.router.construct.before', array());
+        Event::fire('framework.router.construct.before', []);
 
         $this->_createRoutes(self::$_defaultRoutes);
 
-        Event::fire('framework.router.construct.after', array($this));
+        Event::fire('framework.router.construct.after', [$this]);
 
         $this->_findRoute($this->_url);
     }
 
     /**
-     * 
+     *
      * @param string $method
      * @return \THCFrame\Router\Exception\Implementation
      */
@@ -131,11 +131,11 @@ class Router extends Base
     /**
      * Create routes
      */
-    private function _createRoutes(array $routes = array())
+    private function _createRoutes(array $routes = [])
     {
         if (!empty($routes)) {
             foreach ($routes as $route) {
-                $newRoute = new Route\Dynamic(array('pattern' => $route['pattern']));
+                $newRoute = new Route\Dynamic(['pattern' => $route['pattern']]);
 
                 if (preg_match('/^:/', $route['module'])) {
                     $newRoute->addDynamicElement(':module', ':module');
@@ -153,6 +153,14 @@ class Router extends Base
                     $newRoute->addDynamicElement(':action', ':action');
                 } else {
                     $newRoute->setAction($route['action']);
+                }
+
+                if (isset($route['method']) && !empty($route['method'])) {
+                    if (RequestMethods::isAllowedMethod($route['method'])) {
+                        $newRoute->setMethod($route['method']);
+                    } else {
+                        throw new Exception('Unknown method. Use GET, POST, PUT or DELETE only');
+                    }
                 }
 
                 if (isset($route['args']) && is_array($route['args'])) {
@@ -174,21 +182,21 @@ class Router extends Base
 
     /**
      * Finds a maching route in the routes array using specified $path
-     * 
+     *
      * @param string $path
      */
     private function _findRoute($path)
     {
-        Event::fire('framework.router.findroute.checkredirect.before', array($path));
+        Event::fire('framework.router.findroute.checkredirect.before', [$path]);
 
-        if (!empty($this->_redirects)) {
-            if (isset($this->_redirects[$path])) {
-                $path = $this->_redirects[$path];
+        if (count($this->redirects)) {
+            if (isset($this->redirects[$path])) {
+                $path = $this->redirects[$path];
             }
         }
 
-        Event::fire('framework.router.findroute.checkredirect.after', array($path));
-        Event::fire('framework.router.findroute.before', array($path));
+        Event::fire('framework.router.findroute.checkredirect.after', [$path]);
+        Event::fire('framework.router.findroute.before', [$path]);
 
         foreach ($this->_routes as $route) {
             if ($route->matchMap($path) === true) {
@@ -201,17 +209,17 @@ class Router extends Base
             throw new Exception\Module('Not found');
         }
 
-        Event::fire('framework.router.findroute.after', array(
+        Event::fire('framework.router.findroute.after', [
             $path,
             $this->_lastRoute->getModule(),
             $this->_lastRoute->getController(),
-            $this->_lastRoute->getAction())
+            $this->_lastRoute->getAction()]
         );
     }
 
     /**
      * Add route to route collection
-     * 
+     *
      * @param \THCFrame\Router\Route $route
      * @return \THCFrame\Router\Router
      */
@@ -224,7 +232,7 @@ class Router extends Base
 
     /**
      * Remove route from route collection
-     * 
+     *
      * @param \THCFrame\Router\Route $route
      * @return \THCFrame\Router\Router
      */
@@ -240,12 +248,12 @@ class Router extends Base
 
     /**
      * Return list of all routes in routes array
-     * 
+     *
      * @return array $list
      */
     public function getRoutes()
     {
-        $list = array();
+        $list = [];
 
         foreach ($this->_routes as $route) {
             $list[$route->getPattern()] = get_class($route);
@@ -255,31 +263,43 @@ class Router extends Base
     }
 
     /**
-     * 
+     *
      * @param array $redirects
      */
     public function addRedirects(array $redirects)
     {
         if (!empty($redirects)) {
             foreach ($redirects as $redirect) {
-                $this->_redirects[$redirect->getFromPath()] = $redirect->getToPath();
+                $this->redirects[$redirect->getFromPath()] = $redirect->getToPath();
             }
         }
     }
 
     /**
      * Return all stored redirects
-     * 
+     *
      * @return type
      */
     public function getRedirects()
     {
-        return $this->_redirects;
+        return $this->redirects;
+    }
+
+    /**
+     * Set redirects
+     *
+     * @param array $redirects
+     * @return $this
+     */
+    public function setRedirects($redirects = [])
+    {
+        $this->redirects = $redirects;
+        return $this;
     }
 
     /**
      * Public method for _createRoutes method
-     * 
+     *
      * @param array $routes
      */
     public function addRoutes(array $routes)

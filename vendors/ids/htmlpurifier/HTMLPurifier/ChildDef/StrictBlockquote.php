@@ -29,7 +29,7 @@ class HTMLPurifier_ChildDef_StrictBlockquote extends HTMLPurifier_ChildDef_Requi
         $result = parent::validateChildren($tokens_of_children, $config, $context);
         $this->elements = $this->real_elements;
 
-        if ($result === false) return array();
+        if ($result === false) return [];
         if ($result === true) $result = $tokens_of_children;
 
         $def = $config->getHTMLDefinition();
@@ -37,7 +37,7 @@ class HTMLPurifier_ChildDef_StrictBlockquote extends HTMLPurifier_ChildDef_Requi
         $block_wrap_end   = new HTMLPurifier_Token_End(  $def->info_block_wrapper);
         $is_inline = false;
         $depth = 0;
-        $ret = array();
+        $ret = [];
 
         // assuming that there are no comment tokens
         foreach ($result as $i => $token) {

@@ -5,10 +5,12 @@ section.wrapper.singlePage
                 h2.fi-clipboard-pencil Feedback
             div Vaše návrhy a nápady, jak naše stránky ještě vylepšit. Nebo pokud někde něco nefunguje, tak nám o tom napište.
             form(method='POST' action='#').mv30
+                input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+                input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")
+                p.adContFormUrl Toto pole nechte prázdné:
+                        input(type="text",name="url")
                 |{if isset($errors["message"])}
                 label.error {echo implode("<br/>", $errors["message"])}
                 |{/if}
                 textarea(name='message', required, rows=7) {echo \App\Helper\FormPrinter::iset($feedback,'message')}
                 input(type="submit" name="submitFeedback" value="Odeslat").more
-                input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
-                input(type="hidden", name="submstoken", id="submstoken", value!="{echo $submstoken}")

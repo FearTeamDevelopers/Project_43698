@@ -15,7 +15,7 @@
         </colgroup>
         <thead>
             <tr>
-                <th class="head0">Model</th>
+                <th class="head0">Source</th>
                 <th class="head1">Run Re-Index</th>
             </tr>
         </thead>
@@ -23,14 +23,14 @@
             {if !empty($tables)}
             {foreach $table in $tables}
             <tr>
-                <td>{echo $table["modelLabel"]}</td>
+                <td>{echo $table}</td>
                 <td><a href="/search/index/updateindex/{echo $table_i}" class="btn btn3 btn_refresh"></a></td>
             </tr>
             {/foreach}
-            {/if} 
+            {/if}
         </tbody>
     </table>
-    
+
     <br/>
     <div class="contenttitle radiusbottom0">
         <h2 class="table"><span>Index Log</span></h2>
@@ -59,7 +59,7 @@
                         <td>{echo $log->getCreated()}</td>
                     </tr>
                 {/foreach}
-            {/if} 
+            {/if}
         </tbody>
     </table>
 </div><!--content-->

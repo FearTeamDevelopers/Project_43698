@@ -1,4 +1,3 @@
-
 jQuery.noConflict();
 
 jQuery(document).ready(function ($) {
@@ -14,8 +13,7 @@ jQuery(document).ready(function ($) {
             jQuery(this).closest('li').find('ul').slideUp(300, function () {
                 jQuery(this).closest('li').removeClass('active');
             });
-        }
-        else if (jQuery('nav ul li').hasClass('active')) {
+        } else if (jQuery('nav ul li').hasClass('active')) {
             jQuery('nav ul li.active').find('ul').slideUp(300).closest('li').removeClass('active');
             jQuery(this).closest('li').find('ul').slideDown(300, function () {
                 jQuery(this).closest('li').addClass('active');
@@ -99,6 +97,7 @@ jQuery(document).ready(function ($) {
             position: {my: 'center', at: 'top', of: window},
             buttons: {
                 Cancel: function () {
+                    jQuery('#dialog p').text('');
                     jQuery(this).dialog('close');
                 }
             }
@@ -115,7 +114,7 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    jQuery('.uploadForm .multi_upload_dec').click(function () {
+    jQuery('.uploadForm .multi_upload_dec').click(function (event) {
         event.preventDefault();
         if (jQuery('.uploadForm .file_inputs input[type=file]').length > 1) {
             jQuery('.uploadForm .file_inputs input[type=file]').last().remove();
@@ -150,13 +149,14 @@ jQuery(document).ready(function ($) {
                             jQuery('#csrf').val(data.csrf);
                             clicked.parent('span').hide('explode', 500);
                         } else {
-                            alert(data.message);
+                            jQuery('#dialog p').text(data.message);
                         }
                         jQuery("#loader, .loader").hide();
                     });
                     jQuery(this).dialog("close");
                 },
                 "Zrušit": function () {
+                    jQuery('#dialog p').text('');
                     jQuery(this).dialog("close");
                 }
             }
@@ -171,12 +171,11 @@ jQuery(document).ready(function ($) {
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
-        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat v mazání?');
+        jQuery('#dialog p').text('Opravdu chcete pokračovat v mazání?');
 
-        jQuery('#deleteDialog').dialog({
+        jQuery('#dialog').dialog({
             resizable: false,
-            width: 300,
-            height: 150,
+            width: 320,
             modal: true,
             buttons: {
                 "Smazat": function () {
@@ -187,12 +186,13 @@ jQuery(document).ready(function ($) {
                             jQuery("#loader, .loader").hide();
                             parentTr.fadeOut();
                         } else {
-                            alert(data.message);
+                            jQuery('#dialog p').text(data.message);
                         }
                     });
                     jQuery(this).dialog("close");
                 },
                 "Zrušit": function () {
+                    jQuery('#dialog p').text('');
                     jQuery(this).dialog("close");
                 }
             }
@@ -201,17 +201,16 @@ jQuery(document).ready(function ($) {
         return false;
     });
 
-    jQuery('.ajaxReload').click(function () {
+    jQuery('.ajaxReload').click(function (event) {
         event.preventDefault();
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
-        jQuery('#deleteDialog p').text('Opravdu chcete pokračovat?');
+        jQuery('#dialog p').text('Opravdu chcete pokračovat?');
 
-        jQuery('#deleteDialog').dialog({
+        jQuery('#dialog').dialog({
             resizable: false,
-            width: 300,
-            height: 150,
+            width: 320,
             modal: true,
             buttons: {
                 "Ano": function () {
@@ -221,11 +220,12 @@ jQuery(document).ready(function ($) {
                             jQuery('#csrf').val(data.csrf);
                             location.reload();
                         } else {
-                            alert(data.message);
+                            jQuery('#dialog p').text(data.message);
                         }
                     });
                 },
                 "Ne": function () {
+                    jQuery('#dialog p').text('');
                     jQuery(this).dialog("close");
                 }
             }
@@ -234,7 +234,8 @@ jQuery(document).ready(function ($) {
     });
 
     //activate/deactivate
-    jQuery('.ajaxChangestate').click(function () {
+    jQuery('.ajaxChangestate').click(function (event) {
+        event.preventDefault();
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
 
@@ -244,7 +245,19 @@ jQuery(document).ready(function ($) {
                 jQuery('#csrf').val(data.csrf);
                 location.reload();
             } else {
-                alert(data.message);
+                jQuery('#dialog p').text(data.message);
+
+                jQuery('#dialog').dialog({
+                    resizable: false,
+                    width: 320,
+                    modal: true,
+                    buttons: {
+                        "Zavřít": function () {
+                            jQuery('#dialog p').text('');
+                            jQuery(this).dialog("close");
+                        }
+                    }
+                });
             }
         });
 
@@ -259,4 +272,70 @@ jQuery(document).ready(function ($) {
         event.preventDefault();
         jQuery('.fulltextsearch').submit();
     });
+    
+    jQuery('a#delete-account').click(function (event) {
+        var confirmation = prompt('Potvrďte smazání účtu slovy: "Smazat účet"');
+
+        if (confirmation !== null && confirmation === 'Smazat účet') {
+            jQuery('#dialog p').text('Účet bude smazán');
+
+            jQuery('#dialog').dialog({
+                resizable: false,
+                width: 320,
+                modal: true,
+                buttons: {
+                    "Zavřít": function () {
+                        jQuery('#dialog p').text('');
+                        jQuery(this).dialog("close");
+                    }
+                }
+            });
+        } else {
+            jQuery('#dialog p').text('Potvrzení není platné');
+
+            jQuery('#dialog').dialog({
+                resizable: false,
+                width: 320,
+                modal: true,
+                buttons: {
+                    "Zavřít": function () {
+                        jQuery('#dialog p').text('');
+                        jQuery(this).dialog("close");
+                    }
+                }
+            });
+            event.preventDefault();
+        }
+    });
+
+
+    var search2 = $('#s2');
+    var icon2 = $('#search2btn');
+
+    // handling the focus event on input2
+    $(search2).on('focus', function () {
+        $(this).animate({
+            width: '100%'
+        }, 400, function () {
+            // callback function
+        });
+        $(icon2).animate({
+            right: '10px'
+        }, 400, function () {
+            // callback function
+        });
+    });
+
+    $(search2).on('blur', function () {
+        if (search2.val() == '') {
+            $(search2).animate({
+                width: '45%'
+            }, 400, function () { });
+
+            $(icon2).animate({
+                right: '360px'
+            }, 400, function () { });
+        }
+    });
+
 });

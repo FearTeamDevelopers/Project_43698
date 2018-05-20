@@ -6,13 +6,13 @@
 class HTMLPurifier_URIScheme_data extends HTMLPurifier_URIScheme {
 
     public $browsable = true;
-    public $allowed_types = array(
+    public $allowed_types = [
         // you better write validation code for other types if you
         // decide to allow them
         'image/jpeg' => true,
         'image/gif' => true,
         'image/png' => true,
-        );
+        ];
     // this is actually irrelevant since we only write out the path
     // component
     public $may_omit_host = true;
@@ -65,7 +65,7 @@ class HTMLPurifier_URIScheme_data extends HTMLPurifier_URIScheme {
         if (function_exists('exif_imagetype')) {
             $image_code = exif_imagetype($file);
         } elseif (function_exists('getimagesize')) {
-            set_error_handler(array($this, 'muteErrorHandler'));
+            set_error_handler([$this, 'muteErrorHandler']);
             $info = getimagesize($file);
             restore_error_handler();
             if ($info == false) return false;

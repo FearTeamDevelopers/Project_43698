@@ -17,7 +17,7 @@ class HTMLPurifier_ChildDef_Optional extends HTMLPurifier_ChildDef_Required
         if ($result === false) {
             if (empty($tokens_of_children)) return true;
             elseif ($this->whitespace) return $tokens_of_children;
-            else return array();
+            else return [];
         }
         return $result;
     }

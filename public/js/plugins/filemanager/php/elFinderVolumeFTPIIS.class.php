@@ -33,7 +33,7 @@ class elFinderVolumeFTPIIS extends elFinderVolumeFTP {
 			return $this->setError('Unable to open root folder.');
 		}
 		
-		$stat = array();
+		$stat = [];
 		$stat['name'] = $this->root;
 		$stat['mime'] = 'directory';
 		$this->filesCache[$this->root] = $stat;
@@ -50,7 +50,7 @@ class elFinderVolumeFTPIIS extends elFinderVolumeFTP {
 	 **/
 	protected function parseRaw($raw) {
 		$info = preg_split("/\s+/", $raw, 9);
-		$stat = array();
+		$stat = [];
 
 		$stat['name'] = join(" ", array_slice($info, 3, 9));
 		$stat['read'] = true;
@@ -75,7 +75,7 @@ class elFinderVolumeFTPIIS extends elFinderVolumeFTP {
 	 * @return void
 	 **/
 	protected function cacheDir($path) {
-		$this->dirsCache[$path] = array();
+		$this->dirsCache[$path] = [];
 
 		if (preg_match('/\'|\"/', $path)) {
 			foreach (ftp_nlist($this->connect, $path) as $p) {
@@ -98,7 +98,7 @@ class elFinderVolumeFTPIIS extends elFinderVolumeFTP {
 	}
 
 	protected function _stat($path) {
-		$stat = array();
+		$stat = [];
 
 		$stat = $this->filesCache[$path];
 		
@@ -116,11 +116,11 @@ class elFinderVolumeFTPIIS extends elFinderVolumeFTP {
 	protected function ftp_scan_dir($remote_directory)
 	{
 		$buff = ftp_rawlist($this->connect, $remote_directory, true);
-		$items = array();
+		$items = [];
 		foreach ($buff as $str) {
 			$info = preg_split("/\s+/", $str, 9);
 			$remote_file_path = $remote_directory . DIRECTORY_SEPARATOR . join(" ", array_slice($info, 3, 9));
-			$item = array();
+			$item = [];
 			$item['type'] = $info[2] == '<DIR>' ? 'd' : 'f';
 			$item['path'] = $remote_file_path;
 			$items[] = $item;

@@ -9,7 +9,7 @@ class HTMLPurifier_ConfigSchema {
      * Defaults of the directives and namespaces.
      * @note This shares the exact same structure as HTMLPurifier_Config::$conf
      */
-    public $defaults = array();
+    public $defaults = [];
 
     /**
      * The default property list. Do not edit this property list.
@@ -45,7 +45,7 @@ class HTMLPurifier_ConfigSchema {
      * about the schema, you're better of using the ConfigSchema_Interchange,
      * which uses more memory but has much richer information.
      */
-    public $info = array();
+    public $info = [];
 
     /**
      * Application-wide singleton
@@ -113,7 +113,7 @@ class HTMLPurifier_ConfigSchema {
      */
     public function addValueAliases($key, $aliases) {
         if (!isset($this->info[$key]->aliases)) {
-            $this->info[$key]->aliases = array();
+            $this->info[$key]->aliases = [];
         }
         foreach ($aliases as $alias => $real) {
             $this->info[$key]->aliases[$alias] = $real;

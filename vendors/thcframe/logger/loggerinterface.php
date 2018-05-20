@@ -25,7 +25,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function emergency($message, array $context = array());
+    public function emergency($message, array $context = []);
 
     /**
      * Je nutné ihned provést akci.
@@ -37,7 +37,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function alert($message, array $context = array());
+    public function alert($message, array $context = []);
 
     /**
      * Kritické podmínky.
@@ -48,7 +48,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function critical($message, array $context = array());
+    public function critical($message, array $context = []);
 
     /**
      * Běhové chyby, které nevyžadují okamžitou akci, ale měly by být typicky
@@ -58,7 +58,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function error($message, array $context = array());
+    public function error($message, array $context = []);
 
     /**
      * Výjimečné události, které nejsou chybami.
@@ -70,7 +70,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function warning($message, array $context = array());
+    public function warning($message, array $context = []);
 
     /**
      * Normální, ale podstatné události.
@@ -79,7 +79,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function notice($message, array $context = array());
+    public function notice($message, array $context = []);
 
     /**
      * Zajímavé události.
@@ -90,7 +90,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function info($message, array $context = array());
+    public function info($message, array $context = []);
 
     /**
      * Detailní ladící informace.
@@ -99,7 +99,7 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function debug($message, array $context = array());
+    public function debug($message, array $context = []);
 
     /**
      * Zaloguje s libovolnou úrovní.
@@ -109,5 +109,5 @@ interface LoggerInterface
      * @param array $context
      * @return \THCFrame\Logger\LoggerInterface
      */
-    public function log($level, $message, array $context = array());
+    public function log($level, $message, array $context = []);
 }

@@ -35,7 +35,7 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 
 /***********LOGIN PAGE STYLES*************/
 .loginbox { background: #444; padding: 10px; width: 400px; margin: 8% auto 0 auto; position: relative; }
-.loginboxinner { 
+.loginboxinner {
     background: #333; padding: 20px; position: relative; border: 1px solid #333;
     -moz-box-shadow: inset 0 1px 0 #444; -webkit-box-shadow: inset 0 1px 0 #444; box-shadow: inset 0 1px 0 #444;
 }
@@ -46,12 +46,12 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .loginbox .logo { position: absolute; top: 20px; right: 20px; }
 .loginbox p { margin: 10px 0 15px 0; }
 .loginbox label { display: block; color: #ccc; letter-spacing: 1px; font-size: 18px; }
-.loginbox input { 
-    padding: 12px 10px; background: #282828 url(../../images/admin/loginputbg.png) repeat-x top left; color: #ccc; 
-    font-family: Arial, Helvetica, sans-serif; margin-top: 8px; font-size: 15px; border: 0; width: 340px; 
-    -moz-box-shadow: 0 1px 0 #444; -webkit-box-shadow: 0 1px 0 #444; box-shadow: 0 1px 0 #444; outline: none; 
+.loginbox input {
+    padding: 12px 10px; background: #282828 url(../../images/admin/loginputbg.png) repeat-x top left; color: #ccc;
+    font-family: Arial, Helvetica, sans-serif; margin-top: 8px; font-size: 15px; border: 0; width: 340px;
+    -moz-box-shadow: 0 1px 0 #444; -webkit-box-shadow: 0 1px 0 #444; box-shadow: 0 1px 0 #444; outline: none;
 }
-.loginbox button { 
+.loginbox button {
     background: #999; padding: 10px 20px; font-size: 18px; border: 0; letter-spacing: 1px; color: #333; width: 360px;
     -moz-box-shadow: 1px 1px 3px #222; -webkit-box-shadow: 1px 1px 3px #222; box-shadow: 1px 1px 3px #222; cursor: pointer;
 }
@@ -63,9 +63,9 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .loginerror p { margin: 10px 0; }
 
 /**********HEADER STYLES**************/
-.header { 
-    background: #333 url(../../images/admin/headbg.png) repeat-x top left; margin: 10px; position: relative;	border: 1px solid #222; 
-    -moz-box-shadow: 1px 1px 3px #666; -webkit-box-shadow: 1px 1px 3px #666; box-shadow: 1px 1px 3px #666; 
+.header {
+    background: #333 url(../../images/admin/headbg.png) repeat-x top left; margin: 10px; position: relative;	border: 1px solid #222;
+    -moz-box-shadow: 1px 1px 3px #666; -webkit-box-shadow: 1px 1px 3px #666; box-shadow: 1px 1px 3px #666;
 }
 .headerinner { padding: 10px;}
 .headercolumn { height: 33px; padding: 12px 10px; border-left: 1px solid #444; border-right: 1px solid #272727; float: left; position: relative; }
@@ -81,16 +81,16 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .headright { position: absolute; top: 0; right: 0; }
 .headright img { vertical-align: middle; }
 
-.headright .userinfo { 
-    display: inline-block; border: 1px solid #272727; padding: 3px 25px 3px 3px; color: #ccc; 
+.headright .userinfo {
+    display: inline-block; border: 1px solid #272727; padding: 3px 25px 3px 3px; color: #ccc;
     vertical-align: top; background: #373737 url(../../images/admin/menudroparrow.png) no-repeat right -31px; position: relative;
     -moz-box-shadow: 0 1px 0 #444; -webkit-box-shadow: 0 1px 0 #444; box-shadow: 0 1px 0 #444;
 }
 .headright .userinfo:hover { text-decoration: none; background-color: #3c3c3c; }
 .headright .userinfo span { display: inline-block; padding: 0 10px; }
 
-.headright .userinfodrop { 
-    background: #fff url(../../images/admin/arrow2.png) no-repeat right -87px; color: #333; z-index: 20; 
+.headright .userinfodrop {
+    background: #fff url(../../images/admin/arrow2.png) no-repeat right -87px; color: #333; z-index: 20;
     border: 1px solid #fff; height: 29px; -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none;
 }
 .headright .userinfodrop:hover { background-color: #fff; color: #333; border: 1px solid #fff; }
@@ -98,9 +98,9 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .headright .headercolumn:last-child { border-right: 0; }
 .headright .headercolumn:first-child { border-left: 0; }
 
-.userdrop { 
-    background: #fff; position: absolute; top: 45px; right: 10px; display: none; overflow: hidden; 
-    z-index: 10; -moz-border-radius: 2px 0 2px 2px; -webkit-border-radius: 2px 0 2px 2px; border-radius: 2px 0 2px 2px; 
+.userdrop {
+    background: #fff; position: absolute; top: 45px; right: 10px; display: none; overflow: hidden;
+    z-index: 10; -moz-border-radius: 2px 0 2px 2px; -webkit-border-radius: 2px 0 2px 2px; border-radius: 2px 0 2px 2px;
     -moz-box-shadow: 0 0 2px #333; -webkit-box-shadow: 0 0 2px #333; box-shadow: 0 0 2px #333;
 }
 .userdrop ul { list-style: none; margin: 5px 0; }
@@ -112,16 +112,16 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .headerinner2 { border-top: 1px solid #444; height: 57px; position: relative; }
 .userinfomenu { position: absolute; top: 0; right: 0; }
 .userinfomenu img { vertical-align: middle; }
-.userinfomenu .userinfo { 
-    display: inline-block; border: 1px solid #272727; padding: 3px 25px 3px 3px; color: #ccc; 
+.userinfomenu .userinfo {
+    display: inline-block; border: 1px solid #272727; padding: 3px 25px 3px 3px; color: #ccc;
     vertical-align: top; background: #373737 url(../../images/admin/menudroparrow.png) no-repeat right -31px; position: relative;
     -moz-box-shadow: 0 1px 0 #444; -webkit-box-shadow: 0 1px 0 #444; box-shadow: 0 1px 0 #444;
 }
 .userinfomenu .userinfo:hover { text-decoration: none; background-color: #3c3c3c; }
 .userinfomenu .userinfo span { display: inline-block; padding: 0 10px; }
 
-.userinfomenu .userinfodrop { 
-    background: #fff url(../../images/admin/arrow2.png) no-repeat right -87px; color: #333; z-index: 20; 
+.userinfomenu .userinfodrop {
+    background: #fff url(../../images/admin/arrow2.png) no-repeat right -87px; color: #333; z-index: 20;
     border: 1px solid #fff; height: 29px; -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none;
 }
 .userinfomenu .userinfodrop:hover { background-color: #fff; color: #333; border: 1px solid #fff; }
@@ -141,7 +141,7 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .leftmenu { -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee; }
 .leftmenu ul { list-style: none; }
 .leftmenu ul li { display: block; position: relative; }
-.leftmenu ul li a { 
+.leftmenu ul li a {
     border: 1px solid #ddd; border-top: 0; display: block; background: #fcfcfc url(../../images/icons/default/sprites.png); color: #666; padding-left: 35px;
     background-repeat: no-repeat; background-position: 8px center; font-weight: bold;
 }
@@ -175,9 +175,9 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .leftmenu ul li a.contacts { background-position: -82px -227px; }
 .leftmenu ul li a.users { background-position: -82px -191px; }
 .leftmenu ul li a.error { background-position: -119px -119px; }
-.leftmenu ul li .menutip { 
+.leftmenu ul li .menutip {
     position: absolute; z-index: 100; left: 38px; top: 0; background: url(../../images/admin/blacktrans.png); color: #fff; padding: 9px 10px; display: none;
-    -moz-border-radius: 0 2px 2px 0; -webkit-border-radius: 0 2px 2px 0; border-radius: 0 2px 2px 0; 
+    -moz-border-radius: 0 2px 2px 0; -webkit-border-radius: 0 2px 2px 0; border-radius: 0 2px 2px 0;
 }
 
 .leftmenu ul li ul { margin: 0 0 10px 36px; display: none; }
@@ -199,9 +199,9 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .lefticon .maincontent { margin-left: 45px; }
 
 #togglemenuleft { border-top: 1px solid #eee; margin-top: 20px; text-align: center; }
-#togglemenuleft a { 
-    display: inline-block; position: relative; top: -13px; width: 22px; height: 22px; 
-    background: url(../../images/admin/toggle.png) no-repeat 0 0; cursor: pointer; 
+#togglemenuleft a {
+    display: inline-block; position: relative; top: -13px; width: 22px; height: 22px;
+    background: url(../../images/admin/toggle.png) no-repeat 0 0; cursor: pointer;
 }
 #togglemenuleft a.toggle { background: url(../../images/admin/toggle.png) no-repeat 0 -25px; text-align: left; }
 
@@ -212,8 +212,8 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 /**MAIN TAB MENU**/
 .maintabmenu { list-style: none; margin: 0; line-height: 21px; position: relative; z-index: 5; }
 .maintabmenu li { display: inline-block; }
-.maintabmenu li a { 
-    padding: 8px 20px 4px 20px; color: #999; font-family: Arial, Helvetica, sans-serif; font-size: 20px; 
+.maintabmenu li a {
+    padding: 8px 20px 4px 20px; color: #999; font-family: Arial, Helvetica, sans-serif; font-size: 20px;
     -moz-border-radius: 2px 2px 0 0; -webkit-border-radius: 2px 2px 0 0; border-radius: 2px 2px 0 0; border: 1px solid #ddd;
     letter-spacing: 0.8px; display: block; background: #eee url(../../images/admin/titlebg.png) repeat-x top left; text-shadow: 1px 1px #f7f7f7;
 }
@@ -221,20 +221,20 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .maintabmenu li.current a, .maintabmenu li.ui-state-active a { display: block; background: #fff; border: 1px solid #ddd; border-bottom: 1px solid #fff; color: #333; }
 .maintabmenu li.current a:hover, .maintabmenu li.ui-state-active a:hover { text-shadow: none; }
 
-.content { 
-    padding-top: 20px; padding-bottom: 20px; border: 1px solid #ddd; background: #fff; margin-top: -1px; position: relative; line-height: 21px; 
+.content {
+    padding-top: 20px; padding-bottom: 20px; border: 1px solid #ddd; background: #fff; margin-top: -1px; position: relative; line-height: 21px;
     -moz-border-radius: 0 2px 2px 2px; -webkit-border-radius: 0 2px 2px 2px; border-radius: 0 2px 2px 2px;
     -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee;
     overflow: hidden;
 }
 
 .contenttitle { background: #222; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; }
-.contenttitle h2 { 
-    font-size: 18px; letter-spacing: 0.8px; font-family: Arial, Helvetica, sans-serif; font-weight: normal; padding: 0 0 0 10px; 
-    background-repeat: no-repeat; background-image: url(../../images/icons/default/sprites.png); background-position: -154px -443px; color: #fff; 
+.contenttitle h2 {
+    font-size: 18px; letter-spacing: 0.8px; font-family: Arial, Helvetica, sans-serif; font-weight: normal; padding: 0 0 0 10px;
+    background-repeat: no-repeat; background-image: url(../../images/icons/default/sprites.png); background-position: -154px -443px; color: #fff;
 }
-.contenttitle h2 span { 
-    display: block; padding: 6px 0 6px 10px; margin-left: 25px; border-left: 1px solid #444; background: #333; 
+.contenttitle h2 span {
+    display: block; padding: 6px 0 6px 10px; margin-left: 25px; border-left: 1px solid #444; background: #333;
     -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; text-shadow: 1px 1px #222;
 }
 
@@ -247,9 +247,9 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 
 .widgetlist { list-style: none; }
 .widgetlist li { float: left; margin-right: 10px; margin-bottom: 10px; }
-.widgetlist li a { 
-    display: inline-block; padding: 85px 20px 20px 20px; background-repeat: no-repeat; background-position: center 20px; color: #eee; font-weight: bold; 
-    background-color: #bbb;  width: 80px; text-align: center; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; 
+.widgetlist li a {
+    display: inline-block; padding: 85px 20px 20px 20px; background-repeat: no-repeat; background-position: center 20px; color: #eee; font-weight: bold;
+    background-color: #bbb;  width: 80px; text-align: center; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
 }
 .widgetlist li a:hover { text-decoration: none; }
 .widgetlist li a.default { background-color: #bbb; }
@@ -270,11 +270,11 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .stdtable thead td:first-child, .stdtable tfoot td:first-child { border-left: 1px solid #ddd; }
 .stdtable thead th.head0, .stdtable tfoot th.head0, .stdtable thead td.head0, .stdtable tfoot td.head0 { background-color: #ccc; }
 .stdtable thead th.head1, .stdtable tfoot th.head1, .stdtable thead td.head1, .stdtable tfoot td.head1 { background-color: #bbb; }
-.stdtable thead th.sorting, .stdtable thead td.sorting { 
+.stdtable thead th.sorting, .stdtable thead td.sorting {
     background-image: url(../../images/admin/sort_both.png); background-repeat: no-repeat; background-position: right 3px; }
-.stdtable thead th.sorting_asc, .stdtable thead td.sorting_asc { 
+.stdtable thead th.sorting_asc, .stdtable thead td.sorting_asc {
     background-image: url(../../images/admin/sort_asc.png); background-repeat: no-repeat; background-position: right 4px; }
-.stdtable thead th.sorting_desc, .stdtable thead td.sorting_desc  { 
+.stdtable thead th.sorting_desc, .stdtable thead td.sorting_desc  {
     background-image: url(../../images/admin/sort_desc.png); background-repeat: no-repeat; background-position: right 4px; }
 .stdtable thead td { font-weight: bold; }
 .stdtable thead td.center { text-align: center; }
@@ -299,11 +299,11 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .stdtable2 thead td:first-child, .stdtable2 tfoot td:first-child { border-left: 1px solid #ddd; }
 .stdtable2 thead th.head0, .stdtable2 tfoot th.head0, .stdtable2 thead td.head0, .stdtable2 tfoot td.head0 { background-color: #ccc; }
 .stdtable2 thead th.head1, .stdtable2 tfoot th.head1, .stdtable2 thead td.head1, .stdtable2 tfoot td.head1 { background-color: #bbb; }
-.stdtable2 thead th.sorting, .stdtable2 thead td.sorting { 
+.stdtable2 thead th.sorting, .stdtable2 thead td.sorting {
     background-image: url(../../images/admin/sort_both.png); background-repeat: no-repeat; background-position: right 3px; }
-.stdtable2 thead th.sorting_asc, .stdtable2 thead td.sorting_asc { 
+.stdtable2 thead th.sorting_asc, .stdtable2 thead td.sorting_asc {
     background-image: url(../../images/admin/sort_asc.png); background-repeat: no-repeat; background-position: right 4px; }
-.stdtable2 thead th.sorting_desc, .stdtable2 thead td.sorting_desc  { 
+.stdtable2 thead th.sorting_desc, .stdtable2 thead td.sorting_desc  {
     background-image: url(../../images/admin/sort_desc.png); background-repeat: no-repeat; background-position: right 4px; }
 .stdtable2 thead td { font-weight: bold;}
 .stdtable2 thead td.center { text-align: center; }
@@ -318,14 +318,14 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .stdtable2 tbody tr td input[type=checkbox]{width: 20px;}
 
 .tableoptions { background: #eee url(../../images/admin/titlebg.png) repeat-x top left; border: 1px solid #ccc; border-top: 0; padding: 8px; }
-.tableoptions input[type=submit] { 
-    background: #fcfcfc url(../../images/admin/titlebg.png) repeat-x top left; font-size: 13px; color: #666; padding: 7px 10px; 
+.tableoptions input[type=submit] {
+    background: #fcfcfc url(../../images/admin/titlebg.png) repeat-x top left; font-size: 13px; color: #666; padding: 7px 10px;
     border: 1px solid #bbb; -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd; margin: 0; outline: none;
 }
 .tableoptions input[type=submit]:hover { background: #eee; cursor: pointer; }
-.tableoptions select { 
+.tableoptions select {
     background: #fcfcfc url(../../images/admin/titlebg.png) repeat-x top left; padding: 6px 5px 7px 5px; border: 1px solid #bbb; margin: 0; outline: none;
-    -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd; font-size: 13px; color: #666; 
+    -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd; font-size: 13px; color: #666;
 }
 
 .attendtable thead tr td {text-align: center;}
@@ -338,22 +338,22 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 /***** DYNAMIC TABLE *****/
 .dataTables_wrapper { position: relative; color: #555;}
 .dataTables_length, .dataTables_paginate { background: #eee url(../../images/admin/titlebg.png) repeat-x top left; border: 1px solid #ccc; border-top: 0; padding: 8px; }
-.dataTables_wrapper select { 
+.dataTables_wrapper select {
     background: #fcfcfc url(../../images/admin/titlebg.png) repeat-x top left; padding: 5px; border: 1px solid #bbb; margin: 0; outline: none;
-    -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd; font-size: 11px; color: #666; 
+    -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd; font-size: 11px; color: #666;
 }
 .dataTables_wrapper input { border: 1px solid #ccc; padding: 6px 5px 7px 5px; max-width: 200px; }
 .dataTables_filter { position: absolute; top: 8px; right: 8px; }
 .dataTables_info { position: absolute; bottom: 13px; left: 8px; }
 .dataTables_paginate { text-align: right; line-height: 16px; color: #555;}
 .dataTables_paginate span { display: inline-block; }
-.dataTables_paginate .paginate_button { 
-    border: 1px solid #ccc; padding: 5px 7px; margin-left: 5px; font-weight: bold; background: #fcfcfc; 
+.dataTables_paginate .paginate_button {
+    border: 1px solid #ccc; padding: 5px 7px; margin-left: 5px; font-weight: bold; background: #fcfcfc;
     -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;  font-size: 11px;
-    -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd; 
+    -moz-box-shadow: 1px 1px 2px #ddd; -webkit-box-shadow: 1px 1px 2px #ddd; box-shadow: 1px 1px 2px #ddd;
 }
-.dataTables_paginate .paginate_active { 
-    border: 1px solid #222; background: #333;  color: #fff; padding: 5px 7px; margin-left: 5px; font-weight: bold; 
+.dataTables_paginate .paginate_active {
+    border: 1px solid #222; background: #333;  color: #fff; padding: 5px 7px; margin-left: 5px; font-weight: bold;
     -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; font-size: 11px;
 }
 .dataTables_paginate .paginate_button:hover { background: #ddd; border: 1px solid #ccc; cursor: pointer; color: #333; }
@@ -365,12 +365,12 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .stdform span.field, .stdform div.field { margin-left: 220px; display: block; position: relative; }
 .stdform .formwrapper { display: block; padding-top: 5px; margin-left: 220px; line-height: 25px; }
 .stdform p > label, .stdform div.par > label { float: left; width: 200px; text-align: right; padding: 5px 20px 0 0; }
-.stdform p span > label.error, .stdform div.par div.field > label.error{ 
+.stdform p span > label.error, .stdform div.par div.field > label.error{
     float: none; width: 500px; color: #ff6600; font-size: 14px; display: block; text-align: left; font-weight: bold; }
 
-.stdform input { 
-    border: 1px solid #ccc; background: #fcfcfc; padding: 8px 5px; width: 300px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; 
-    -moz-box-shadow: inset 1px 1px 2px #ddd; -webkit-box-shadow: inset 1px 1px 2px #ddd; box-shadow: inset 1px 1px 2px #ddd; color: #666; 
+.stdform input {
+    border: 1px solid #ccc; background: #fcfcfc; padding: 8px 5px; width: 300px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
+    -moz-box-shadow: inset 1px 1px 2px #ddd; -webkit-box-shadow: inset 1px 1px 2px #ddd; box-shadow: inset 1px 1px 2px #ddd; color: #666;
 }
 .stdform input:focus { background: #fff; -moz-box-shadow: inset 1px 1px 2px #eee; -webkit-box-shadow: inset 1px 1px 2px #eee; box-shadow: inset 1px 1px 2px #eee; }
 .stdform .width20 { width: 20%; }
@@ -382,32 +382,32 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 
 .stdform input[type=radio], .stdform input[type=checkbox] { width: auto; margin: 0; vertical-align: middle; }
 .stdform input[type=file] { margin: 10px;}
-.stdform input[type=submit] { 
-    width: auto; margin: 0; font-weight: bold; color: #eee; background: #333; border: 0; padding: 7px 10px; 
+.stdform input[type=submit] {
+    width: auto; margin: 0; font-weight: bold; color: #eee; background: #333; border: 0; padding: 7px 10px;
     -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none; cursor: pointer;
 }
 .stdform input[type=reset] {
-    width: auto; margin: 0; font-weight: bold; color: #666; border: 1px solid #ccc; background: #eee; padding: 7px 10px;	
+    width: auto; margin: 0; font-weight: bold; color: #666; border: 1px solid #ccc; background: #eee; padding: 7px 10px;
     -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none; margin-left: 5px;
 }
 .stdform input[type=submit]:hover { background: #ffdd00; color: #333; }
 .stdform input[type=reset]:hover { background: #ddd; cursor: pointer; color: #333; }
 .stdform input[disabled]{ background-color: #fecac2 ; border: 1px solid #e18b7c; }
 
-.stdform textarea { 
-    border: 1px solid #ccc; background: #fcfcfc; padding: 8px 5px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; 
+.stdform textarea {
+    border: 1px solid #ccc; background: #fcfcfc; padding: 8px 5px; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
     -moz-box-shadow: inset 1px 1px 2px #ddd; -webkit-box-shadow: inset 1px 1px 2px #ddd; box-shadow: inset 1px 1px 2px #ddd; color: #666;
 }
 .stdform textarea.error { border: 1px solid #ff6600; }
 
-.stdform select { 
-    border: 1px solid #ccc; padding: 7px 5px; min-width: 15%; background: #fcfcfc; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; 
+.stdform select {
+    border: 1px solid #ccc; padding: 7px 5px; min-width: 15%; background: #fcfcfc; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
     -moz-box-shadow: inset 1px 1px 2px #ddd; -webkit-box-shadow: inset 1px 1px 2px #ddd; box-shadow: inset 1px 1px 2px #ddd; color: #666;
 }
 .stdform select.error { border: 1px solid #ff6600; }
 
-.stdform textarea:focus, .stdform select:focus { 
-    background: #fff; -moz-box-shadow: inset 1px 1px 2px #eee; -webkit-box-shadow: inset 1px 1px 2px #eee; box-shadow: inset 1px 1px 2px #eee; 
+.stdform textarea:focus, .stdform select:focus {
+    background: #fff; -moz-box-shadow: inset 1px 1px 2px #eee; -webkit-box-shadow: inset 1px 1px 2px #eee; box-shadow: inset 1px 1px 2px #eee;
 }
 
 .stdform button { border: 1px solid #333; background: #333; color: #fff; cursor: pointer; padding: 7px 10px; font-weight: bold; }
@@ -432,12 +432,12 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .dualselect { margin-left: 220px; display: block; }
 .dualselect select { height: 200px; width: 40%; }
 .dualselect .ds_arrow { display: inline-block; vertical-align: top; padding-top: 60px; margin: 0 10px; }
-.dualselect .ds_arrow .ds_prev, .dualselect .ds_arrow .ds_next { 
-    display: block; padding: 5px 10px 7px 10px; border: 1px solid #ccc; margin-bottom: 5px; font-size: 24px; font-weight: bold; 
+.dualselect .ds_arrow .ds_prev, .dualselect .ds_arrow .ds_next {
+    display: block; padding: 5px 10px 7px 10px; border: 1px solid #ccc; margin-bottom: 5px; font-size: 24px; font-weight: bold;
     -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; background: #eee url(../../images/admin/titlebg.png) repeat-x top left;
 }
 .dualselect .ds_arrow .ds_prev:hover, .dualselect .ds_arrow .ds_next:hover {
-    background: #444; color: #fff; border-color: #333; cursor: pointer;	
+    background: #444; color: #fff; border-color: #333; cursor: pointer;
 }
 
 /**RIGHT**/
@@ -446,29 +446,29 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 
 
 /**WIDGET BOX***/
-.widgetbox { 
-    background: #fff; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; margin-bottom: 10px; 
-    -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee; 
+.widgetbox {
+    background: #fff; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; margin-bottom: 10px;
+    -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee;
 }
-.fix-height { 
+.fix-height {
     height: 250px;
     overflow-y: scroll;
 }
-.widgetbox .title { 
+.widgetbox .title {
     background: #222; -moz-border-radius: 2px 2px 0 0; -webkit-border-radius: 2px 2px 0 0;
     border-radius: 2px 2px 0 0;
 }
-.widgetbox .title h2 { 
-    font-size: 18px; letter-spacing: 0.8px; font-family: Arial, Helvetica, sans-serif; font-weight: normal; 
+.widgetbox .title h2 {
+    font-size: 18px; letter-spacing: 0.8px; font-family: Arial, Helvetica, sans-serif; font-weight: normal;
     background-repeat: no-repeat; padding: 0 0 0 10px; color: #fff; background-image: url(../../images/icons/default/sprites.png);
 }
-.widgetbox .title h2 span { 
-    display: block; padding: 6px 0 6px 10px; margin-left: 25px; border-left: 1px solid #444; background: #333; 
+.widgetbox .title h2 span {
+    display: block; padding: 6px 0 6px 10px; margin-left: 25px; border-left: 1px solid #444; background: #333;
     -moz-border-radius: 0 2px 0 0; -webkit-border-radius: 0 2px 0 0; border-radius: 0 2px 0 0; text-shadow: 1px 1px #222;
 }
-.widgetbox .widgetcontent { 
-    border: 1px solid #ddd; border-top: 0; padding: 10px; line-height: 21px; 
-    -moz-border-radius: 0 0 2px 2px; -webkit-border-radius: 0 0 2px 2px; border-radius: 0 0 2px 2px; 
+.widgetbox .widgetcontent {
+    border: 1px solid #ddd; border-top: 0; padding: 10px; line-height: 21px;
+    -moz-border-radius: 0 0 2px 2px; -webkit-border-radius: 0 0 2px 2px; border-radius: 0 0 2px 2px;
 }
 .widgetcontent ul.linklist { list-style: none; }
 .widgetcontent ul.linklist li { border-bottom: 1px dotted #ddd; padding: 1px 0; }
@@ -507,16 +507,16 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 
 /***** MEDIA STYLES *****/
 .imagelist { list-style: none; }
-.imagelist li { 
-    float: left; padding: 5px; margin: 0 20px 20px 0; background: #fff; border: 1px solid #ddd; -moz-border-radius: 2px; -webkit-border-radius: 2px; 
-    border-radius: 2px; -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee; 
+.imagelist li {
+    float: left; padding: 5px; margin: 0 20px 20px 0; background: #fff; border: 1px solid #ddd; -moz-border-radius: 2px; -webkit-border-radius: 2px;
+    border-radius: 2px; -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee;
 }
 .imagelist li img { display: block; margin-bottom: 10px; }
 .imagelist li span { display: block; text-align: right;}
 .imagelist li span a { vertical-align: middle; }
 .imagelist li span .name { font-weight: bold; float: left; color: #999; }
 .imagelist li span .name:hover { color: #333; text-decoration: none; }
-.imagelist li span a.edit, .imagelist li span a.view, .imagelist li span a.delete, .imagelist li span a.activate, .imagelist li span a.deactivate { 
+.imagelist li span a.edit, .imagelist li span a.view, .imagelist li span a.delete, .imagelist li span a.activate, .imagelist li span a.deactivate {
     display: inline-block; width: 16px; height: 16px; cursor: pointer; margin-left: 5px; vertical-align: middle; opacity: 0.5;
 }
 .imagelist li span a.edit:hover, .imagelist li span a.view:hover, .imagelist li span a.delete:hover, .imagelist li span a.activate:hover, .imagelist li span a.deactivate:hover { opacity: 1; }
@@ -558,7 +558,7 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .wizard .tabbedmenu li a.selected span.h2, .wizard .tabbedmenu li a.selected span { color: #333; }
 .wizard .tabbedmenu li a.done span.h2, .wizard .tabbedmenu li a.done span { color: #333; }
 
-.stepContainer .content { 
+.stepContainer .content {
     border: 0; -moz-box-shadow: none; -webkit-box-shadow: none; box-shadow: none;
     -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0; padding: 0;
 }
@@ -568,7 +568,7 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .stepContainer .par p:last-child { border-bottom: 0; }
 .actionBar { padding: 10px 0; position: relative; overflow: none; clear: both; }
 .actionBar .loader { float: left; display: none; }
-.actionBar a { 
+.actionBar a {
     float: right; display: inline-block; padding: 5px 15px; background: #333; color: #eee; margin-left: 5px; font-weight: bold; text-shadow: 1px 1px #111;
     -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
 }
@@ -577,37 +577,37 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .actionBar a.buttonDisabled:hover { background: #ccc; color: #666; text-shadow: 1px 1px #ddd; cursor: default; }
 .actionBar .msgBox { margin: 40px 0 10px 0; position: relative; }
 .actionBar .msgBox .content { padding: 7px 10px; background: #fffccc; color: #333; border: 1px solid #FEEA7A; }
-.actionBar .msgBox .close { 
-    padding: 0 2px 2px 2px; background: none; line-height: 10px; text-transform: lowercase; font-size: 10px; position: absolute; top: 5px; right: 7px; 
-    color: #333; text-shadow: none; font-weight: bold; -moz-border-radius: 1px; -webkit-border-radius: 1px; border-radius: 1px; 
+.actionBar .msgBox .close {
+    padding: 0 2px 2px 2px; background: none; line-height: 10px; text-transform: lowercase; font-size: 10px; position: absolute; top: 5px; right: 7px;
+    color: #333; text-shadow: none; font-weight: bold; -moz-border-radius: 1px; -webkit-border-radius: 1px; border-radius: 1px;
 }
 .actionBar .msgBox .close:hover { background: #333; color: #eee; }
 
 /*** NOTIFICATION MESSAGES ***/
-.notification { 
-    height: 51px; 
-    overflow: hidden; 
+.notification {
+    height: 51px;
+    overflow: hidden;
     position: relative;
-    margin-bottom: 20px; 
-    -moz-border-radius: 2px; 
-    -webkit-border-radius: 2px; 
-    border-radius: 2px; 
+    margin-bottom: 20px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
     -moz-box-shadow: 1px 1px 2px #ddd;
 }
 
-.notification_long { 
+.notification_long {
     max-height: 150px;
-    overflow: hidden; 
+    overflow: hidden;
     position: relative;
-    margin-bottom: 20px; 
-    -moz-border-radius: 2px; 
-    -webkit-border-radius: 2px; 
-    border-radius: 2px; 
+    margin-bottom: 20px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
     -moz-box-shadow: 1px 1px 2px #ddd;
 }
 
 .notification p, .notification_long p { margin: 14px 10px 14px 75px; font-size: 15px; color: #333; }
-.notification a.close, .notification_long a.close { 
+.notification a.close, .notification_long a.close {
     position: absolute; width: 14px; height: 14px; top: 5px; right: 5px; background-image: url(../../images/admin/close.png); background-repeat: no-repeat; }
 .notification a.close:hover, .notification_long a.close:hover { cursor: pointer; }
 .msgalert a.close { background-position: -14px 0; }
@@ -653,7 +653,7 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .userlistwidget ul li:last-child { border-bottom: 0; padding-bottom: 0; }
 .userlistwidget ul li .avatar { float: left; margin-right: 10px; padding: 2px; border: 1px solid #eee; }
 .userlistwidget ul li a { font-weight:  bold; }
-.userlistwidget .more { 
+.userlistwidget .more {
     display: block; text-align: center; background: #eee; color: #069; padding: 1px 0; font-size: 10px; text-transform: uppercase; font-weight: bold; }
 .userlistwidget .more:hover { text-decoration: none; background: #e7e7e7; }
 
@@ -664,9 +664,9 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 /*****BUTTONS & ICONS*****/
 .button_alert { background-image: url(../../images/icons/default/alert.png); }
 
-.anchorbutton { 
+.anchorbutton {
     display: inline-block; border: 1px solid #ccc; color: #333; -moz-border-radius: 2px; -webkit-border-radius: 2px;
-    border-radius: 2px; background-position: 7px; background-repeat: no-repeat; background-color: #f7f7f7; 
+    border-radius: 2px; background-position: 7px; background-repeat: no-repeat; background-color: #f7f7f7;
     -moz-box-shadow: 1px 1px 2px #e7e7e7; -webkit-box-shadow: 1px 1px 2px #e7e7e7; box-shadow: 1px 1px 2px #e7e7e7;
 }
 .anchorbutton:hover { text-decoration: none; }
@@ -675,16 +675,16 @@ button,input,select,textarea { font-size: 13px; font-family: Arial, Helvetica, s
 .buttonlist { list-style: none; }
 .buttonlist li { display: inline-block; margin-bottom: 15px; margin-right: 10px; }
 
-a.btn { 
+a.btn {
     display: inline-block; border: 1px solid #ccc; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; font-weight: bold;
     background-color: #f7f7f7; background-repeat: no-repeat; background-image: url(../../images/icons/default/sprites.png);
     -moz-box-shadow: 1px 1px 2px #eee; -webkit-box-shadow: 1px 1px 2px #eee; box-shadow: 1px 1px 2px #eee; color: #666;
 }
-a.btn:hover { 
-    text-decoration: none; color: #333; -moz-box-shadow: 1px 1px 5px #ddd; -webkit-box-shadow: 1px 1px 5px #ddd; box-shadow: 1px 1px 5px #ddd; 
+a.btn:hover {
+    text-decoration: none; color: #333; -moz-box-shadow: 1px 1px 5px #ddd; -webkit-box-shadow: 1px 1px 5px #ddd; box-shadow: 1px 1px 5px #ddd;
 }
-a.btn span { 
-    padding: 5px 10px; margin-left: 35px; display: block; background: #fff url(../../images/admin/buttonbg.png) repeat-x 0 -31px; border-left: 1px solid #ccc; 
+a.btn span {
+    padding: 5px 10px; margin-left: 35px; display: block; background: #fff url(../../images/admin/buttonbg.png) repeat-x 0 -31px; border-left: 1px solid #ccc;
     text-shadow: 1px 1px #fff;
 }
 a.btn2 { -moz-border-radius: 50px; -webkit-border-radius: 50px; border-radius: 50px; }
@@ -787,8 +787,8 @@ a.btn_list { background-position: -10px -480px; }
 a.btn_list2 { background-position: -47px -480px; }
 a.btn_table { background-position: -82px -480px; }
 
-.stdbtn { 
-    font-weight: bold; padding: 7px 10px; border: 1px solid #ccc; background: #eee url(../../images/admin/buttons.png) repeat-x top left; color: #333; 
+.stdbtn {
+    font-weight: bold; padding: 7px 10px; border: 1px solid #ccc; background: #eee url(../../images/admin/buttons.png) repeat-x top left; color: #333;
     -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; cursor: pointer;
 }
 .stdbtn:hover { text-decoration: none; }
@@ -833,9 +833,9 @@ a.btn_table { background-position: -82px -480px; }
 /***** ERROR PAGES *****/
 .errorWrapper { width: 700px; text-align: center; margin: 80px auto 0 auto; }
 .errorWrapper span { color: #ccc; font-size: 14px; font-style: italic; text-shadow: 1px 1px #555; }
-.errorWrapper a { 
-    display: inline-block; padding: 10px 30px; background: #999; color: #222; font-weight: bold; margin-top: 20px; 
-    -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; 
+.errorWrapper a {
+    display: inline-block; padding: 10px 30px; background: #999; color: #222; font-weight: bold; margin-top: 20px;
+    -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px;
 }
 .errorWrapper a.default { color: #222; background: #999; }
 .errorWrapper a.hover { background: #fff; color: #333; }
@@ -868,14 +868,14 @@ a.btn_table { background-position: -82px -480px; }
 .clear-all{clear: both;}
 
 .ui-datepicker-inline .ui-datepicker-calendar td a:hover { background: #ddd; text-decoration: none; color: #666; text-shadow: none; }
-.ui-datepicker-inline .ui-datepicker-calendar td.ui-datepicker-today a { 
-    background: #333; text-decoration: none; color: #fff; text-shadow: none; font-weight: bold; 
+.ui-datepicker-inline .ui-datepicker-calendar td.ui-datepicker-today a {
+    background: #333; text-decoration: none; color: #fff; text-shadow: none; font-weight: bold;
 }
 
 .collectiondetail{margin: 5px;}
 .collectiondetail_description{padding-left: 25px;}
-.photoactive img{border: 3px solid green;}
-.photoinactive img{border: 3px solid red;}
+.active img, .active iframe {border: 3px solid green;}
+.inactive img, .inactive iframe {border: 3px solid red;}
 
 .rowActive{background-color: #bbbbbb;}
 .showText{cursor: pointer;}
@@ -885,8 +885,8 @@ a.btn_table { background-position: -82px -480px; }
 .online-users ul li img{width: 15px; margin-right: 6px;}
 
 #loader{
-    position: absolute; 
-    top: 15%; left: 44%; 
+    position: absolute;
+    top: 15%; left: 44%;
     z-index: 999;
     width: 200px;
     text-align: center;
@@ -945,7 +945,7 @@ a.btn_table { background-position: -82px -480px; }
     .chatcontent .messagebox input { width: 74.3%; }
 }
 
-@media screen and (max-width: 700px) { 
+@media screen and (max-width: 700px) {
     .maincontent { margin-right: 0; }
     .mainright { position: relative; margin-top: 10px; width: auto; }
     .mainright .widgetbox { width: 48%; float: left; margin-right: 4%; }
@@ -964,7 +964,7 @@ a.btn_table { background-position: -82px -480px; }
 
     .stdform p, .stdform div.par { background: none; }
     .stdform label { display: block; text-align: left; float: none; width: auto; }
-    .stdform span.field, .stdform div.field, .dualselect, 
+    .stdform span.field, .stdform div.field, .dualselect,
     .stdform .formwrapper, .stdform .formwrapper { margin-left: 0; }
     .stdform small.desc { margin: 5px 0 0 0; }
     .stdform .stdformbutton { margin-left: 0; }
@@ -980,12 +980,12 @@ a.btn_table { background-position: -82px -480px; }
 }
 
 @media screen and (max-width: 570px) {
-    .tablewrapper { width: 100%; overflow: auto; }	
+    .tablewrapper { width: 100%; overflow: auto; }
     .mainright .widgetbox { float: none; margin-right: 0; width: auto; margin-bottom: 10px; }
-    .one_half, .one_third, .two_third, .three_fourth, 
-    .one_fourth, .one_fifth, .two_fifth, .three_fifth, 
+    .one_half, .one_third, .two_third, .three_fourth,
+    .one_fourth, .one_fifth, .two_fifth, .three_fifth,
     .four_fifth, .one_sixth, .five_sixth {
-        float: none; width: auto; margin-right: 0; margin-bottom: 20px; display: block; 
+        float: none; width: auto; margin-right: 0; margin-bottom: 20px; display: block;
     }
 
     .chartbox .one_half { float: left; margin-right: 3%; width: 48.5%; }
@@ -999,9 +999,9 @@ a.btn_table { background-position: -82px -480px; }
     /* CALENDAR STYLES */
     .fc-header-left { font-size: 11px; }
     .fc-button, .fc-button-content { height: auto; }
-    .fc-button-month .fc-button-content, 
-    .fc-button-agendaWeek .fc-button-content, 
-    .fc-button-agendaDay .fc-button-content, 
+    .fc-button-month .fc-button-content,
+    .fc-button-agendaWeek .fc-button-content,
+    .fc-button-agendaDay .fc-button-content,
     .fc-button-today .fc-button-content { padding: 2px 5px; }
     .fc-header-title h2 { font-size: 14px; }
 
@@ -1054,9 +1054,9 @@ a.btn_table { background-position: -82px -480px; }
     .flatmode { display: none; }
     .vs2 { margin-left: 0 !important; }
     .imagelist li img { width: 210px; }
-    .multipletabmenu li a { 
-        width: auto; padding: 5px; font-size: 11px; font-weight: bold; text-transform: uppercase; font-family: Arial, Helvetica, sans-serif; 
-        letter-spacing: 0; 
+    .multipletabmenu li a {
+        width: auto; padding: 5px; font-size: 11px; font-weight: bold; text-transform: uppercase; font-family: Arial, Helvetica, sans-serif;
+        letter-spacing: 0;
     }
     .dualselect select { width: 30%; }
     .dualselect .ds_arrow { margin: 0; }

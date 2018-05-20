@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'CREATE_SUCCESS' => 'Vše bylo úspěšně uloženo',
     'CREATE_FAIL' => 'Během ukládání se vyskytla neznámá chyba',
     'ACTIVATE_SUCCESS' => 'Vše bylo úspěšně aktivováno',
@@ -43,6 +43,7 @@ return array(
     'EMAIL_NO_RECIPIENTS' => 'Nejsou vybráni žádní příjemci',
 
     'LOGIN_COMMON_ERROR' => 'Email nebo heslo není správně',
+    'LOGIN_API_TOKEN_NOT_ASSIGN' => 'Uživatel nemá přiřazený api token',
     'LOGIN_EMAIL_ERROR' => 'Email není vyplněn',
     'LOGIN_PASS_ERROR' => 'Heslo není vyplněno',
     'LOGIN_TIMEOUT' => 'Byl jste odhlášen z důvodu dlouhé neaktivity',
@@ -52,6 +53,12 @@ return array(
     'ACCOUNT_EXPIRED' => 'Platnost účtu vypršela',
     'ACCOUNT_PASS_EXPIRED' => 'Platnost hesla vypršela. Nastavení nového hesla musí provést administrátor.',
     'ACCOUNT_ACTIVATED' => 'Účet byl aktivován',
+    'ACCOUNT_DELETED' => 'Účet byl smazán',
+    'ACCOUNT_PROCESSING_DISABLED' => 'Uživatel omezil zpracování osobních údajů',
+
+    'API_TOKEN_CREATED' => 'Token byl úspěšně vytvořen',
+    'API_TOKEN_DELETED' => 'Token byl úspěšně smazán',
+    'API_TOKEN_ALREADY_EXISTS' => 'Uživatel má již přidělený token',
 
     'REGISTRATION_SUCCESS' => 'Registrace byla úspěšná',
     'REGISTRATION_SUCCESS_ADMIN_ACTIVATION' => 'Registrace byla úspěšná. O aktivaci účtu budete informováni emailem',
@@ -115,4 +122,4 @@ return array(
 
     'SEND_FEEDBACK_SUCCESS' => 'Děkujeme za Vaše nápady a návrhy',
     'SEND_FEEDBACK_FAIL' => 'Nepodařilo se odeslat zprávu s Vašimy nápady',
-);
+];

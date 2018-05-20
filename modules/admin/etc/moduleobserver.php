@@ -5,7 +5,6 @@ namespace Admin\Etc;
 use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\SubscriberInterface;
-use THCFrame\Security\Model\SecLogModel;
 use THCFrame\Core\Core;
 
 /**
@@ -13,15 +12,16 @@ use THCFrame\Core\Core;
  */
 class ModuleObserver implements SubscriberInterface
 {
+
     /**
-     * @return type
+     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
+        return [
             'admin.log' => 'adminLog',
-            'sec.log' => 'secLog',
-        );
+            'app.log' => 'adminLog',
+        ];
     }
 
     /**
@@ -39,7 +39,7 @@ class ModuleObserver implements SubscriberInterface
         if ($user === null) {
             $userId = 'annonymous';
         } else {
-            $userId = $user->getWholeName().':'.$user->getId();
+            $userId = $user->getWholeName() . ':' . $user->getId();
         }
 
         $module = $route->getModule();
@@ -58,7 +58,7 @@ class ModuleObserver implements SubscriberInterface
             $paramStr = '';
         }
 
-        $log = new \Admin\Model\AdminLogModel(array(
+        $log = new \Admin\Model\AdminLogModel([
             'userId' => $userId,
             'module' => $module,
             'controller' => $controller,
@@ -66,72 +66,20 @@ class ModuleObserver implements SubscriberInterface
             'result' => $result,
             'httpreferer' => RequestMethods::getHttpReferer(),
             'params' => $paramStr,
-        ));
-
-        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
-            'type' => 'adminLog',
-            'result' => $result,
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'params' => $paramStr)
-        );
+        ]);
 
         if ($log->validate()) {
             $log->save();
+        } else {
+            Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', [
+                'type' => 'adminLog',
+                'result' => $result,
+                'module' => $module,
+                'controller' => $controller,
+                'action' => $action,
+                'params' => $paramStr]
+            );
         }
     }
 
-    /**
-     *
-     */
-    public function secLog()
-    {
-        $params = func_get_args();
-
-        $uip = RequestMethods::getClientIpAddress();
-        $ubrowser = RequestMethods::getBrowser();
-
-        $router = Registry::get('router');
-        $route = $router->getLastRoute();
-        $security = Registry::get('security');
-
-        if ($security->getUser() === null) {
-            $userId = 'annonymous';
-        } else {
-            $userId = $security->getUser()->getWholeName().':'.$security->getUser()->getId();
-        }
-
-        $module = $route->getModule();
-        $controller = $route->getController();
-        $action = $route->getAction();
-
-        if (!empty($params)) {
-            $paramStr = implode(', ', $params);
-        } else {
-            $paramStr = '';
-        }
-
-        $log = new SecLogModel(array(
-            'userId' => $userId,
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'userAgent' => $ubrowser,
-            'userIp' => $uip,
-            'params' => $paramStr,
-        ));
-
-        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
-            'type' => 'secLog',
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'params' => $paramStr)
-        );
-
-        if ($log->validate()) {
-            $log->save();
-        }
-    }
 }

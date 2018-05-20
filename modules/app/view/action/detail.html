@@ -1,6 +1,7 @@
 
 <section class="wrapper singlePage">
   <div class="row container">
+    <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
     <header>
       <h1>{echo $action->getTitle()}</h1>{if $isMember && $action->getStartDate() > date("Y-m-d")}
       <div class="buttonWrapper">
@@ -11,10 +12,10 @@
           {if $authuseratt == \App\Model\AttendanceModel::ACCEPT || $authuseratt == \App\Model\AttendanceModel::MAYBE}
           <li><a href="/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::REJECT}" class="fi-x ajaxChangestate">Nezúčastním se</a></li>{/if}
         </ul>
-      </div>{/if}<span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span>{if $isMember && !empty($attendance)}<br/><strong>Zúčastní se: </strong>{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}<br/><strong>Ještě neví: </strong>{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
+      </div>{/if}<span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span>{if $isMember && !empty($attendance)}<br/><strong>Zúčastní se:</strong>{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}<br/><strong>Ještě neví:</strong>{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
       {/if}
       <hr/>{if !empty($action->getStartDate())}<span>Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->getStartDate())}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->getEndDate())}</strong></span><br/>{/if}
-      {if !empty($action->getStartTime())}<span>Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/></span>{/if}
+      {if !empty($action->getStartTime())}<span>Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/></span>{/if}<br/>
     </header>{echo html_entity_decode($action->getBody())}
   </div>
 </section>

@@ -17,7 +17,7 @@ class HTMLPurifier_AttrDef_HTML_Class extends HTMLPurifier_AttrDef_HTML_Nmtokens
     protected function filter($tokens, $config, $context) {
         $allowed = $config->get('Attr.AllowedClasses');
         $forbidden = $config->get('Attr.ForbiddenClasses');
-        $ret = array();
+        $ret = [];
         foreach ($tokens as $token) {
             if (
                 ($allowed === null || isset($allowed[$token])) &&

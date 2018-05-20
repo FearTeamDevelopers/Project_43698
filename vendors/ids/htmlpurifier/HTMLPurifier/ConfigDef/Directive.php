@@ -49,7 +49,7 @@ class HTMLPurifier_ConfigDef_Directive extends HTMLPurifier_ConfigDef
     /**
      * Hash of value aliases, i.e. values that are equivalent.
      */
-    public $aliases = array();
+    public $aliases = [];
     
 }
 

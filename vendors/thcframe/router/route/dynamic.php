@@ -3,6 +3,8 @@
 namespace THCFrame\Router\Route;
 
 use THCFrame\Router as Router;
+use THCFrame\Router\Exception;
+use THCFrame\Request\RequestMethods;
 
 /**
  * Dynamic route class
@@ -12,68 +14,69 @@ class Dynamic extends Router\Route
 
     /**
      * Stores any set dynamic elements
-     * 
+     *
      * @var array
      * @readwrite
      */
-    protected $_dynamicElements = array();
+    protected $dynamicElements = [];
 
     /**
      * Stores any arguments found when mapping
-     * 
-     * @var array 
+     *
+     * @var array
      * @readwrite
      */
-    protected $_mapArguments = array();
+    protected $mapArguments = [];
 
     /**
      * Adds a found argument to the _mapArguments array
-     * 
+     *
      * @param string $key
      * @param mixed $value
      */
-    private function _addMapArguments($key, $value)
+    private function addMapArguments($key, $value)
     {
-        $this->_mapArguments[$key] = $value;
+        $this->mapArguments[$key] = $value;
     }
 
     /**
      * Adds a dynamic element to the Route
-     * 
+     *
      * @param string $key
      * @param mixed $value
      * @return \THCFrame\Router\Route\Dynamic
      */
     public function addDynamicElement($key, $value)
     {
-        $this->_dynamicElements[$key] = $value;
+        $key = str_replace('?', '', $key);
+        $this->dynamicElements[$key] = $value;
 
         return $this;
     }
 
     /**
      * Get the dynamic elements array
-     * 
+     *
      * @return array
      */
     public function getDynamicElements()
     {
-        return $this->_dynamicElements;
+        return $this->dynamicElements;
     }
 
     /**
      * Gets the _mapArguments array
-     * 
+     *
      * @return array
      */
     public function getMapArguments()
     {
-        return $this->_mapArguments;
+        return $this->mapArguments;
     }
 
     /**
      * Attempt to match this route to a supplied path
-     * 
+     *
      * @param string $pathToMatch
      * @return boolean
      */
@@ -82,47 +85,71 @@ class Dynamic extends Router\Route
         $foundDynamicModule = NULL;
         $foundDynamicClass = NULL;
         $foundDynamicMethod = NULL;
-        $foundDynamicArgs = array();
+        $foundDynamicArgs = [];
+
+        $httpMethod = RequestMethods::server('REQUEST_METHOD');
+        if ($httpMethod == 'POST' && RequestMethods::issetserver('HTTP_X_HTTP_METHOD')) {
+            if (RequestMethods::server('HTTP_X_HTTP_METHOD') == 'DELETE') {
+                $httpMethod = 'DELETE';
+            } else if (RequestMethods::server('HTTP_X_HTTP_METHOD') == 'PUT') {
+                $httpMethod = 'PUT';
+            } else {
+                throw new Exception('Unexpected Header');
+            }
+        }
 
         //Ignore query parameters during matching
         $parsed = parse_url($pathToMatch);
         $pathToMatch = $parsed['path'];
 
         //The process of matching is easier if there are no preceding slashes
-        $tempThisPath = preg_replace('/^\//', '', $this->pattern);
+        $tempThisPath = preg_replace('/^\//', '', $this->getPattern());
         $tempPathToMatch = preg_replace('/^\//', '', $pathToMatch);
 
         //Get the path elements used for matching later
         $thisPathElements = explode('/', $tempThisPath);
         $matchPathElements = explode('/', $tempPathToMatch);
 
-        //If the number of elements in each path is not the same, there is no
-        // way this could be it.
-        if (count($thisPathElements) !== count($matchPathElements)) {
+        //Check if request method and route method match
+        if ($this->getMethod() !== null && $this->getMethod() !== $httpMethod) {
+            return false;
+        }
+
+        if (count($thisPathElements) < count($matchPathElements)) {
             return false;
         }
 
         //Construct a path string that will be used for matching
         $possibleMatchString = '';
         foreach ($thisPathElements as $i => $thisPathElement) {
+            $isOptional = stripos($thisPathElement, '?') !== false;
+
+            if ($isOptional) {
+                $thisPathElement = str_replace('?', '', $thisPathElement);
+            }
+
             // ':'s are never allowed at the beginning of the path element
-            if (preg_match('/^:/', $matchPathElements[$i])) {
+            if (isset($matchPathElements[$i]) && preg_match('/^:/', $matchPathElements[$i])) {
                 return false;
             }
 
             //This element may simply be static, if so the direct comparison
             // will discover it.
-            if ($thisPathElement === $matchPathElements[$i]) {
+            if (isset($matchPathElements[$i]) && $thisPathElement === $matchPathElements[$i]) {
                 $possibleMatchString .= "/{$matchPathElements[$i]}";
                 continue;
             }
 
             //Consult the dynamic array for help in matching
-            if (isset($this->_dynamicElements[$thisPathElement])) {
+            if (isset($this->dynamicElements[$thisPathElement])) {
+                if($isOptional && !isset($matchPathElements[$i])){
+                    continue;
+                }
+
                 //The dynamic array either contains a key like ':id' or a
                 // regular expression. In the case of a key, the key matches
                 // anything
-                if ($this->_dynamicElements[$thisPathElement] === $thisPathElement) {
+                if (str_replace('?', '', $this->dynamicElements[$thisPathElement]) === $thisPathElement) {
                     $possibleMatchString .= "/{$matchPathElements[$i]}";
 
                     //The class and/or method may be getting set dynamically. If so
@@ -141,7 +168,7 @@ class Dynamic extends Router\Route
                 }
 
                 //Attempt a regular expression match
-                $regexp = '/' . $this->_dynamicElements[$thisPathElement] . '/';
+                $regexp = '/' . $this->dynamicElements[$thisPathElement] . '/';
                 if (preg_match($regexp, $matchPathElements[$i]) > 0) {
                     //The class and/or method may be getting set dynamically. If so
                     // extract them and set them
@@ -182,8 +209,8 @@ class Dynamic extends Router\Route
                 $this->setAction($foundDynamicMethod);
             }
 
-            foreach ($foundDynamicArgs as $key => $found_dynamic_arg) {
-                $this->_addMapArguments($key, $found_dynamic_arg);
+            foreach ($foundDynamicArgs as $key => $foundDynamicArg) {
+                $this->addMapArguments($key, $foundDynamicArg);
             }
         }
 

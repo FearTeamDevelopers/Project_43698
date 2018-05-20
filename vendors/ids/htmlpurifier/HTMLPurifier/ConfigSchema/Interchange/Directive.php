@@ -41,7 +41,7 @@ class HTMLPurifier_ConfigSchema_Interchange_Directive
      * List of aliases for the directive,
      * e.g. array(new HTMLPurifier_ConfigSchema_Interchange_Id('Ns', 'Dir'))).
      */
-    public $aliases = array();
+    public $aliases = [];
 
     /**
      * Hash of value aliases, e.g. array('alt' => 'real'). Null if value
@@ -70,7 +70,7 @@ class HTMLPurifier_ConfigSchema_Interchange_Directive
     /**
      * List of external projects this directive depends on, e.g. array('CSSTidy').
      */
-    public $external = array();
+    public $external = [];
 
 }
 

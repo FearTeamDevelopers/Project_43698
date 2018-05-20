@@ -6,11 +6,12 @@ use App\Model\Basic\BasicReportModel;
 use THCFrame\Core\StringMethods;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Core\Lang;
+use Search\Model\IndexableInterface;
 
 /**
  *
  */
-class ReportModel extends BasicReportModel
+class ReportModel extends BasicReportModel implements IndexableInterface
 {
 
     const STATE_WAITING = 0;
@@ -20,11 +21,11 @@ class ReportModel extends BasicReportModel
     /**
      * @var type
      */
-    private static $_statesConv = array(
+    private static $_statesConv = [
         self::STATE_WAITING => 'Čeká na shválení',
         self::STATE_APPROVED => 'Schváleno',
         self::STATE_REJECTED => 'Zamítnuto',
-    );
+    ];
 
     /**
      * @readwrite
@@ -45,7 +46,7 @@ class ReportModel extends BasicReportModel
      */
     private static function checkUrlKey($key)
     {
-        $status = self::first(array('urlKey = ?' => $key));
+        $status = self::first(['urlKey = ?' => $key]);
 
         if (null === $status) {
             return true;
@@ -99,8 +100,8 @@ class ReportModel extends BasicReportModel
      */
     public static function fetchAll()
     {
-        $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'));
+        $query = self::getQuery(['rp.*'])
+                ->join('tb_user', 'rp.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
         return self::initialize($query);
     }
@@ -112,8 +113,8 @@ class ReportModel extends BasicReportModel
      */
     public static function fetchWithLimit($limit = 10)
     {
-        $query = self::getQuery(array('rp.*'))
-                ->join('tb_user', 'rp.userId = us.id', 'us', array('us.firstname', 'us.lastname'))
+        $query = self::getQuery(['rp.*'])
+                ->join('tb_user', 'rp.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
                 ->order('rp.created', 'desc')
                 ->limit((int) $limit);
 
@@ -129,8 +130,9 @@ class ReportModel extends BasicReportModel
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false), array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
-                    'imgMain', 'imgThumb', 'photoName',), array('rank' => 'desc', 'created' => 'desc'), $limit, $page
+        $reports = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false],
+                ['urlKey', 'userAlias', 'title', 'shortBody', 'created', 'imgMain', 'imgThumb', 'photoName',],
+                ['rank' => 'desc', 'created' => 'desc'], $limit, $page
         );
 
         return $reports;
@@ -145,8 +147,9 @@ class ReportModel extends BasicReportModel
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
-        $reports = self::all(array('active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true), array('urlKey', 'userAlias', 'title', 'shortBody', 'created',
-                    'imgMain', 'imgThumb', 'photoName',), array('rank' => 'desc', 'created' => 'desc'), $limit, $page
+        $reports = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => true],
+                ['urlKey', 'userAlias', 'title', 'shortBody', 'created', 'imgMain', 'imgThumb', 'photoName',],
+                ['rank' => 'desc', 'created' => 'desc'], $limit, $page
         );
 
         return $reports;
@@ -161,7 +164,7 @@ class ReportModel extends BasicReportModel
      */
     public static function fetchByUrlKey($urlKey)
     {
-        return self::first(array('active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey));
+        return self::first(['active = ?' => true, 'approved' => 1, 'urlKey = ?' => $urlKey]);
     }
 
     /**
@@ -210,15 +213,24 @@ class ReportModel extends BasicReportModel
         return self::$_statesConv;
     }
 
-    public static function createFromPost(\THCFrame\Bag\BagInterface $post,
-            array $options = array())
+    /**
+     *
+     * @param \THCFrame\Bag\BagInterface $post
+     * @param array $options
+     * @return type
+     */
+    public static function createFromPost(\THCFrame\Bag\BagInterface $post, array $options = [])
     {
         $urlKey = $urlKeyCh = StringMethods::createUrlKey($post->get('title'));
-        $errors = array();
+        $errors = [];
         $user = $options['user'];
         $config = $options['config'];
 
-        for ($i = 1; $i <= 100; $i+=1) {
+        if (empty($user) || empty($config)) {
+            throw new \THCFrame\Core\Exception\Argument('Not all of required options are available');
+        }
+
+        for ($i = 1; $i <= 100; $i += 1) {
             if (self::checkUrlKey($urlKeyCh)) {
                 break;
             } else {
@@ -226,7 +238,7 @@ class ReportModel extends BasicReportModel
             }
 
             if ($i == 100) {
-                $errors['title'] = array(Lang::get('ARTICLE_UNIQUE_ID'));
+                $errors['title'] = [Lang::get('ARTICLE_UNIQUE_ID')];
                 break;
             }
         }
@@ -234,13 +246,13 @@ class ReportModel extends BasicReportModel
         $imgMain = $imgThumb = '';
 
         if (!empty($post->get('croppedimage'))) {
-            $fileManager = new FileManager(array(
+            $fileManager = new FileManager([
                 'thumbWidth' => $config->thumb_width,
                 'thumbHeight' => $config->thumb_height,
                 'thumbResizeBy' => $config->thumb_resizeby,
                 'maxImageWidth' => $config->photo_maxwidth,
                 'maxImageHeight' => $config->photo_maxheight,
-            ));
+            ]);
 
             $fileErrors = $fileManager->uploadBase64Image($post->get('croppedimage'), $urlKeyCh, 'report', time() . '_')
                     ->getUploadErrors();
@@ -260,47 +272,58 @@ class ReportModel extends BasicReportModel
                 }
             }
         } else {
-            $errors['croppedimage'] = array(Lang::get('FIELD_REQUIRED'));
+            $errors['croppedimage'] = [Lang::get('FIELD_REQUIRED')];
         }
 
         $shortText = str_replace(
-                array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKeyCh, '[Celý článek]'), $post->get('shorttext')
+                ['(!read_more_link!)', '(!read_more_title!)'], ['/reportaz/r/' . $urlKeyCh, '[Celý článek]'], $post->get('shorttext')
         );
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks($post->get('keywords')));
+        $metaDesc = StringMethods::removeMultipleSpaces(strip_tags($post->get('metadescription', $shortText)));
 
-        $report = new static(array(
+        $report = new static([
             'title' => $post->get('title'),
-            'userId' => $user()->getId(),
-            'userAlias' => $user()->getWholeName(),
+            'userId' => $user->getId(),
+            'userAlias' => $user->getWholeName(),
             'urlKey' => $urlKeyCh,
-            'approved' => $config()->report_autopublish,
+            'approved' => $config->report_autopublish,
             'archive' => 0,
             'shortBody' => $shortText,
             'body' => $post->get('text'),
             'rank' => $post->get('rank', 1),
             'keywords' => $keywords,
             'metaTitle' => $post->get('metatitle', $post->get('title')),
-            'metaDescription' => strip_tags($post->get('metadescription', $shortText)),
+            'metaDescription' => $metaDesc,
             'metaImage' => $imgMain,
             'photoName' => $urlKey,
             'imgMain' => $imgMain,
             'imgThumb' => $imgThumb,
-        ));
+        ]);
 
-        return array($report, $errors);
+        return [$report, $errors];
     }
 
-    public static function editFromPost(\THCFrame\Bag\BagInterface $post,
-            \App\Model\ReportModel $report, array $options = array())
+    /**
+     *
+     * @param \THCFrame\Bag\BagInterface $post
+     * @param \App\Model\ReportModel $report
+     * @param array $options
+     * @return type
+     */
+    public static function editFromPost(\THCFrame\Bag\BagInterface $post, \App\Model\ReportModel $report, array $options = [])
     {
         $urlKey = $urlKeyCh = StringMethods::createUrlKey($post->get('title'));
-        $errors = array();
+        $errors = [];
         $user = $options['user'];
         $config = $options['config'];
 
+        if (empty($user) || empty($config)) {
+            throw new \THCFrame\Core\Exception\Argument('Not all of required options are available');
+        }
+
         if ($report->urlKey != $urlKey && !self::checkUrlKey($urlKey)) {
-            for ($i = 1; $i <= 100; $i+=1) {
+            for ($i = 1; $i <= 100; $i += 1) {
                 if (self::checkUrlKey($urlKeyCh)) {
                     break;
                 } else {
@@ -308,19 +331,19 @@ class ReportModel extends BasicReportModel
                 }
 
                 if ($i == 100) {
-                    $errors['title'] = array(Lang::get('ARTICLE_TITLE_IS_USED'));
+                    $errors['title'] = [Lang::get('ARTICLE_TITLE_IS_USED')];
                     break;
                 }
             }
         }
 
-        $fileManager = new FileManager(array(
+        $fileManager = new FileManager([
             'thumbWidth' => $config->thumb_width,
             'thumbHeight' => $config->thumb_height,
             'thumbResizeBy' => $config->thumb_resizeby,
             'maxImageWidth' => $config->photo_maxwidth,
             'maxImageHeight' => $config->photo_maxheight,
-        ));
+        ]);
 
         $imgMain = $imgThumb = '';
         if ($report->imgMain == '' && !empty($post->get('croppedimage'))) {
@@ -341,7 +364,7 @@ class ReportModel extends BasicReportModel
                     }
                 }
             } else {
-                $errors['croppedimage'] = array(Lang::get('FIELD_REQUIRED'));
+                $errors['croppedimage'] = [Lang::get('FIELD_REQUIRED')];
             }
         } else {
             $imgMain = $report->imgMain;
@@ -354,15 +377,16 @@ class ReportModel extends BasicReportModel
         }
 
         $shortText = str_replace(
-                array('(!read_more_link!)', '(!read_more_title!)'), array('/reportaz/r/' . $urlKeyCh, '[Celý článek]'), $post->get('shorttext')
+                ['(!read_more_link!)', '(!read_more_title!)'], ['/reportaz/r/' . $urlKeyCh, '[Celý článek]'], $post->get('shorttext')
         );
 
         $keywords = strtolower(StringMethods::removeDiacriticalMarks($post->get('keywords')));
+        $metaDesc = StringMethods::removeMultipleSpaces(strip_tags($post->get('metadescription', $shortText)));
 
-        if (!$this->isAdmin()) {
-            $report->approved = $config->report_autopublish;
-        } else {
+        if ($options['isAdmin']) {
             $report->approved = $post->get('approve');
+        } else {
+            $report->approved = $config->report_autopublish;
         }
 
         $report->title = $post->get('title');
@@ -374,13 +398,13 @@ class ReportModel extends BasicReportModel
         $report->archive = $post->get('archive');
         $report->keywords = $keywords;
         $report->metaTitle = $post->get('metatitle', $post->get('title'));
-        $report->metaDescription = strip_tags($post->get('metadescription', $shortText));
+        $report->metaDescription = $metaDesc;
         $report->metaImage = $imgMain;
         $report->photoName = $urlKey;
         $report->imgMain = $imgMain;
         $report->imgThumb = $imgThumb;
 
-        return array($report, $errors);
+        return [$report, $errors];
     }
 
 }

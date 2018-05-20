@@ -12,70 +12,70 @@ class Standard extends Template\Implementation
 
     /**
      * Grammar/language map
-     * It is a list of language tags for our template dialect, so that the 
-     * parser can know what the different types of template tags are, 
+     * It is a list of language tags for our template dialect, so that the
+     * parser can know what the different types of template tags are,
      * and how to parse them
-     * 
-     * @var type 
+     *
+     * @var type
      */
-    protected $_map = array(
-        "echo" => array(
+    protected $_map = [
+        "echo" => [
             "opener" => "{echo",
             "closer" => "}",
             "handler" => "_echo"
-        ),
-        "script" => array(
+        ],
+        "script" => [
             "opener" => "{script",
             "closer" => "}",
             "handler" => "_script"
-        ),
-        "statement" => array(
+        ],
+        "statement" => [
             "opener" => "{",
             "closer" => "}",
-            "tags" => array(
-                "foreach" => array(
+            "tags" => [
+                "foreach" => [
                     "isolated" => false,
                     "arguments" => "{element} in {object}",
                     "handler" => "_each"
-                ),
-                "for" => array(
+                ],
+                "for" => [
                     "isolated" => false,
                     "arguments" => "{initialization} {condition} {incrementation}",
                     "handler" => "_for"
-                ),
-                "if" => array(
+                ],
+                "if" => [
                     "isolated" => false,
                     "arguments" => null,
                     "handler" => "_if"
-                ),
-                "elseif" => array(
+                ],
+                "elseif" => [
                     "isolated" => true,
                     "arguments" => null,
                     "handler" => "_elif"
-                ),
-                "else" => array(
+                ],
+                "else" => [
                     "isolated" => true,
                     "arguments" => null,
                     "handler" => "_else"
-                ),
-                "macro" => array(
+                ],
+                "macro" => [
                     "isolated" => false,
                     "arguments" => "{name}({args})",
                     "handler" => "_macro"
-                ),
-                "literal" => array(
+                ],
+                "literal" => [
                     "isolated" => false,
                     "arguments" => null,
                     "handler" => "_literal"
-                )
-            )
-        )
-    );
+                ]
+            ]
+        ]
+    ];
 
     /**
-     * The _echo() method converts the string “{echo $hello}” to “$_text[] = $hello”, 
+     * The _echo() method converts the string “{echo $hello}” to “$_text[] = $hello”,
      * so that it is already optimized for our final evaluated function
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return array
@@ -88,7 +88,7 @@ class Standard extends Template\Implementation
 
     /**
      * The _script() method converts the string “{:$foo + = 1}” to “$foo + = 1”
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -101,7 +101,7 @@ class Standard extends Template\Implementation
 
     /**
      * The _each() method returns the code to perform a foreach loop through an array
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -118,7 +118,7 @@ class Standard extends Template\Implementation
 
     /**
      * The _for() method produces the code to perform a for loop through an array
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -135,7 +135,7 @@ class Standard extends Template\Implementation
     }
 
     /**
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -147,7 +147,7 @@ class Standard extends Template\Implementation
     }
 
     /**
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -159,7 +159,7 @@ class Standard extends Template\Implementation
     }
 
     /**
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -170,11 +170,11 @@ class Standard extends Template\Implementation
     }
 
     /**
-     * The _macro() method creates the string representation of a function, 
-     * based on the contents of a {macro...}...{/macro} tag set. 
-     * It is possible, using the {macro} tag, to define functions, 
+     * The _macro() method creates the string representation of a function,
+     * based on the contents of a {macro...}...{/macro} tag set.
+     * It is possible, using the {macro} tag, to define functions,
      * which we then use within our templates
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -194,7 +194,7 @@ class Standard extends Template\Implementation
 
     /**
      * The _literal() method directly quotes any content within it
-     * 
+     *
      * @param array $tree
      * @param type $content
      * @return mixed
@@ -206,7 +206,7 @@ class Standard extends Template\Implementation
     }
 
     /**
-     * 
+     *
      * @param array $tree
      * @param type $inner
      * @return mixed

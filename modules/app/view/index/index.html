@@ -1,10 +1,11 @@
 
 <div class="homepage">
+  <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
   <section class="wrapper">
     <div class="row container">
       <header>
         <h3 class="fi-compass">Akce</h3>{if !empty($actions)}
-        <div class="actions-wrapper clearfix">{foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" class="large-6 medium-6 small-12 clearfix">
+        <div class="actions-wrapper clearfix">{foreach $action in $actions}<a href="/akce/r/{echo $action->getUrlKey()}" data-id="{echo $action->getId()}" data-startdate="{echo $action->getStartDate()}" class="large-4 medium-6 small-12 clearfix">
             <div class="article-item">
               <header>
                 <div class="date">
@@ -15,7 +16,6 @@
                   <h4>{echo $action->getTitle()}</h4>
                 </div>
               </header>
-              <div>{echo html_entity_decode($action->getShortBody())}</div>
             </div></a>{/foreach}</div>{/if}{else}
         <h4>Nejsou naplánované žádné akce</h4>{/else}
       </header>
@@ -29,13 +29,13 @@
         <h3 class="fi-list">Reportáže</h3>
       </header>
       <div class="container-box">{foreach $report in $reports}<a href="/reportaze/r/{echo $report->getUrlKey()}">{if $report_i == 0}
-          <article class="report large-9 medium-12 small-12"><img src="{echo $report->getImgMain()}"/>
+          <article class="report large-9 medium-12 small-12"><img src="{echo $report->getImgMain()}" alt="{echo $report->getPhotoName()}"/>
             <div class="info">
               <h2>{echo $report->getTitle()}</h2>
               <div>{echo html_entity_decode($report->getShortBody())}</div>
             </div>
           </article>{/if}{else}
-          <article class="report large-3 medium-4 small-6"><img src="{echo $report->imgThumb}"/>
+          <article class="report large-3 medium-4 small-6"><img src="{echo $report->getImgThumb()}" alt="{echo $report->getPhotoName()}"/>
             <div class="info">
               <h3>{echo $report->getTitle()}</h3>
               <div>{echo html_entity_decode($report->getShortBody())}</div>
@@ -72,8 +72,8 @@
       </header>
       <div class="container-box partneri">
         <div id="carousel2">{foreach $partner in $partners}
-          <article class="partner"><img src="{echo $partner->getLogo()}"/>
-            <div class="info"><a href="{echo $partner->web}" target="_blank">{echo $partner->getTitle()}</a></div>
+          <article class="partner"><img src="{echo $partner->getLogo()}" alt="{echo $partner->getTitle()}"/>
+            <div class="info"><a href="{echo $partner->getWeb()}" target="_blank">{echo $partner->getTitle()}</a></div>
           </article>{/foreach}
         </div>
       </div>

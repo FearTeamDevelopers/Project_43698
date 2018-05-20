@@ -12,7 +12,7 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
      * List of supported levels. Index zero is a special case "no fixes"
      * level.
      */
-    public $levels = array(0 => 'none', 'light', 'medium', 'heavy');
+    public $levels = [0 => 'none', 'light', 'medium', 'heavy'];
 
     /**
      * Default level to place all fixes in. Disabled by default
@@ -23,11 +23,11 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
      * Lists of fixes used by getFixesForLevel(). Format is:
      *      HTMLModule_Tidy->fixesForLevel[$level] = array('fix-1', 'fix-2');
      */
-    public $fixesForLevel = array(
-        'light'  => array(),
-        'medium' => array(),
-        'heavy'  => array()
-    );
+    public $fixesForLevel = [
+        'light'  => [],
+        'medium' => [],
+        'heavy'  => []
+    ];
 
     /**
      * Lazy load constructs the module by determining the necessary
@@ -72,9 +72,9 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
      */
     public function getFixesForLevel($level) {
         if ($level == $this->levels[0]) {
-            return array();
+            return [];
         }
-        $activated_levels = array();
+        $activated_levels = [];
         for ($i = 1, $c = count($this->levels); $i < $c; $i++) {
             $activated_levels[] = $this->levels[$i];
             if ($this->levels[$i] == $level) break;
@@ -84,9 +84,9 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
                 'Tidy level ' . htmlspecialchars($level) . ' not recognized',
                 E_USER_WARNING
             );
-            return array();
+            return [];
         }
-        $ret = array();
+        $ret = [];
         foreach ($activated_levels as $level) {
             foreach ($this->fixesForLevel[$level] as $fix) {
                 $ret[$fix] = true;
@@ -176,7 +176,7 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
         if (strpos($name, '@') !== false) list($name, $attr)     = explode('@', $name);
 
         // figure out the parameters
-        $params = array();
+        $params = [];
         if ($name !== '')    $params['element'] = $name;
         if (!is_null($attr)) $params['attr'] = $attr;
 
@@ -184,15 +184,15 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
         if (!is_null($attr)) {
             if (is_null($property)) $property = 'pre';
             $type = 'attr_transform_' . $property;
-            return array($type, $params);
+            return [$type, $params];
         }
 
         // special case: tag transform
         if (is_null($property)) {
-            return array('tag_transform', $params);
+            return ['tag_transform', $params];
         }
 
-        return array($property, $params);
+        return [$property, $params];
 
     }
 

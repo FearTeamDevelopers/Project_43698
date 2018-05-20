@@ -3,20 +3,24 @@ jQuery.noConflict();
 jQuery(document).ready(function () {
     jQuery('a.ajaxLoadTemplate').click(function (event) {
         event.preventDefault();
-        
+
+        jQuery("#loader, .loader").show();
+
         var template = jQuery('select[name=template] option:selected').val();
         var lang = jQuery('select[name=lang] option:selected').val();
-        var url = jQuery(this).attr('href')+template+'/'+lang;
+        var csrf = jQuery('#csrf').val();
+        var url = jQuery(this).attr('href') + template + '/' + lang;
 
-        jQuery.post(url, function (message) {
-            if (message == 'notfound') {
-                jQuery('#dialog p').text('Error while loading template');
-                jQuery('#dialog').dialog();
+        jQuery.post(url, {csrf: csrf}, function (data) {
+            if (data.error == false) {
+                jQuery('#csrf').val(data.csrf);
+                CKEDITOR.instances['ckeditor'].setData(data.text);
+                jQuery('input[name=subject]').val(data.subject);
+                jQuery("#loader, .loader").hide();
             } else {
-                var template = jQuery.parseJSON(message);
-
-                CKEDITOR.instances['ckeditor'].setData(template.text);
-                jQuery('input[name=subject]').val(template.subject);
+                jQuery("#loader, .loader").hide();
+                jQuery('#dialog p').text(data.message);
+                jQuery('#dialog').dialog();
             }
         });
     });
@@ -223,7 +227,7 @@ jQuery(document).ready(function () {
         });
         return false;
     });
-    
+
     jQuery('select[name=type]').change(function () {
         var type = jQuery(this).children('option:selected').val();
 

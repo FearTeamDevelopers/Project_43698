@@ -42,9 +42,9 @@ class HTMLPurifier_Printer
      * @param $tag Tag name
      * @param $attr Attribute array
      */
-    protected function start($tag, $attr = array()) {
+    protected function start($tag, $attr = []) {
         return $this->generator->generateFromToken(
-                    new HTMLPurifier_Token_Start($tag, $attr ? $attr : array())
+                    new HTMLPurifier_Token_Start($tag, $attr ? $attr : [])
                );
     }
 
@@ -65,13 +65,13 @@ class HTMLPurifier_Printer
      * @param $attr Tag attributes
      * @param $escape Bool whether or not to escape contents
      */
-    protected function element($tag, $contents, $attr = array(), $escape = true) {
+    protected function element($tag, $contents, $attr = [], $escape = true) {
         return $this->start($tag, $attr) .
                ($escape ? $this->escape($contents) : $contents) .
                $this->end($tag);
     }
 
-    protected function elementEmpty($tag, $attr = array()) {
+    protected function elementEmpty($tag, $attr = []) {
         return $this->generator->generateFromToken(
             new HTMLPurifier_Token_Empty($tag, $attr)
         );
@@ -141,14 +141,14 @@ class HTMLPurifier_Printer
         $class .= '(';
         switch ($lclass) {
             case 'enum':
-                $values = array();
+                $values = [];
                 foreach ($obj->valid_values as $value => $bool) {
                     $values[] = $value;
                 }
                 $class .= implode(', ', $values);
                 break;
             case 'css_composite':
-                $values = array();
+                $values = [];
                 foreach ($obj->defs as $def) {
                     $values[] = $this->getClass($def, $sec_prefix);
                 }

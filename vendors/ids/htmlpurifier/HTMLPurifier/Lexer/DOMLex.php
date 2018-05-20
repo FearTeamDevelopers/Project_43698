@@ -44,12 +44,12 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
         if ($config->get('Core.AggressivelyFixLt')) {
             $char = '[^a-z!\/]';
             $comment = "/<!--(.*?)(-->|\z)/is";
-            $html = preg_replace_callback($comment, array($this, 'callbackArmorCommentEntities'), $html);
+            $html = preg_replace_callback($comment, [$this, 'callbackArmorCommentEntities'], $html);
             do {
                 $old = $html;
                 $html = preg_replace("/<($char)/i", '&lt;\\1', $html);
             } while ($html !== $old);
-            $html = preg_replace_callback($comment, array($this, 'callbackUndoCommentSubst'), $html); // fix comments
+            $html = preg_replace_callback($comment, [$this, 'callbackUndoCommentSubst'], $html); // fix comments
         }
 
         // preprocess html, essential for UTF-8
@@ -58,11 +58,11 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
         $doc = new DOMDocument();
         $doc->encoding = 'UTF-8'; // theoretically, the above has this covered
 
-        set_error_handler(array($this, 'muteErrorHandler'));
+        set_error_handler([$this, 'muteErrorHandler']);
         $doc->loadHTML($html);
         restore_error_handler();
 
-        $tokens = array();
+        $tokens = [];
         $this->tokenizeDOM(
             $doc->getElementsByTagName('html')->item(0)-> // <html>
                   getElementsByTagName('body')->item(0)-> //   <body>
@@ -81,8 +81,8 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
     protected function tokenizeDOM($node, &$tokens) {
 
         $level = 0;
-        $nodes = array($level => array($node));
-        $closingNodes = array();
+        $nodes = [$level => [$node]];
+        $closingNodes = [];
         do {
             while (!empty($nodes[$level])) {
                 $node = array_shift($nodes[$level]); // FIFO
@@ -93,7 +93,7 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
                 }
                 if ($node->childNodes && $node->childNodes->length) {
                     $level++;
-                    $nodes[$level] = array();
+                    $nodes[$level] = [];
                     foreach ($node->childNodes as $childNode) {
                         array_push($nodes[$level], $childNode);
                     }
@@ -154,7 +154,7 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
             return false;
         }
 
-        $attr = $node->hasAttributes() ? $this->transformAttrToAssoc($node->attributes) : array();
+        $attr = $node->hasAttributes() ? $this->transformAttrToAssoc($node->attributes) : [];
 
         // We still have to make sure that the element actually IS empty
         if (!$node->childNodes->length) {
@@ -188,8 +188,8 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
         // NamedNodeMap is documented very well, so we're using undocumented
         // features, namely, the fact that it implements Iterator and
         // has a ->length attribute
-        if ($node_map->length === 0) return array();
-        $array = array();
+        if ($node_map->length === 0) return [];
+        $array = [];
         foreach ($node_map as $attr) {
             $array[$attr->name] = $attr->value;
         }
@@ -206,7 +206,7 @@ class HTMLPurifier_Lexer_DOMLex extends HTMLPurifier_Lexer
      * in comments
      */
     public function callbackUndoCommentSubst($matches) {
-        return '<!--' . strtr($matches[1], array('&amp;'=>'&','&lt;'=>'<')) . $matches[2];
+        return '<!--' . strtr($matches[1], ['&amp;'=>'&','&lt;'=>'<']) . $matches[2];
     }
 
     /**

@@ -41,7 +41,7 @@ class AttendanceModel extends BasicAttendanceModel
      */
     public static function getAttendanceReturnArray()
     {
-        return array(self::ACCEPT => array(), self::REJECT => array(), self::MAYBE => array());
+        return [self::ACCEPT => [], self::REJECT => [], self::MAYBE => []];
     }
 
     /**
@@ -51,8 +51,8 @@ class AttendanceModel extends BasicAttendanceModel
      */
     public static function fetchActionsByUserId($userId, $future = false)
     {
-        $query = self::getQuery(array('at.id', 'at.type', 'at.comment'))
-                ->join('tb_action', 'at.actionId = ac.id', 'ac', array('ac.id' => 'acId', 'ac.title', 'ac.urlKey', 'ac.startDate', 'ac.endDate'))
+        $query = self::getQuery(['at.id', 'at.type', 'at.comment'])
+                ->join('tb_action', 'at.actionId = ac.id', 'ac', ['ac.id' => 'acId', 'ac.title', 'ac.urlKey', 'ac.startDate', 'ac.endDate'])
                 ->where('at.userId = ?', (int) $userId)
                 ->order('ac.startDate', 'ASC');
 
@@ -69,8 +69,8 @@ class AttendanceModel extends BasicAttendanceModel
      */
     public static function fetchUsersByActionId($actionId)
     {
-        $query = self::getQuery(array('at.id', 'at.type', 'at.comment'))
-                ->join('tb_user', 'at.userId = us.id', 'us', array('us.id' => 'usId', 'us.firstname', 'us.lastname', 'us.email'))
+        $query = self::getQuery(['at.id', 'at.type', 'at.comment'])
+                ->join('tb_user', 'at.userId = us.id', 'us', ['us.id' => 'usId', 'us.firstname', 'us.lastname', 'us.email'])
                 ->where('at.actionId = ?', (int) $actionId)
                 ->order('us.lastname', 'ASC');
 
@@ -84,14 +84,14 @@ class AttendanceModel extends BasicAttendanceModel
      */
     public static function fetchUsersByActionIdSimpleArr($actionId)
     {
-        $query = self::getQuery(array('at.id', 'at.type', 'at.comment'))
-                ->join('tb_user', 'at.userId = us.id', 'us', array('us.id' => 'usId', 'us.firstname', 'us.lastname', 'us.email'))
+        $query = self::getQuery(['at.id', 'at.type', 'at.comment'])
+                ->join('tb_user', 'at.userId = us.id', 'us', ['us.id' => 'usId', 'us.firstname', 'us.lastname', 'us.email'])
                 ->where('at.actionId = ?', (int) $actionId)
                 ->order('us.lastname', 'ASC');
 
         $result = self::initialize($query);
 
-        $returnArr = array(self::ACCEPT => array(), self::REJECT => array(), self::MAYBE => array());
+        $returnArr = [self::ACCEPT => [], self::REJECT => [], self::MAYBE => []];
         if (!empty($result)) {
             foreach ($result as $att) {
                 if ($att->type == self::ACCEPT) {
@@ -114,7 +114,7 @@ class AttendanceModel extends BasicAttendanceModel
      */
     public static function fetchTypeByUserAndAction($userId, $actionId)
     {
-        $result = self::first(array('userId = ?' => (int) $userId, 'actionId = ?' => (int) $actionId), array('type'));
+        $result = self::first(['userId = ?' => (int) $userId, 'actionId = ?' => (int) $actionId], ['type']);
         
         if(!empty($result)){
             return $result->getType();
@@ -132,11 +132,11 @@ class AttendanceModel extends BasicAttendanceModel
             return;
         }
 
-        $totalCount = ActionModel::count(array('active = ?' => true, 'startDate <= ?' => date('Y-m-d'), 'actionType' => $type));
+        $totalCount = ActionModel::count(['active = ?' => true, 'startDate <= ?' => date('Y-m-d'), 'actionType' => $type]);
 
-        $query = self::getQuery(array('at.*', 'COUNT(at.id)' => 'cnt'))
-                ->join('tb_user', 'us.id = at.userId', 'us', array('us.firstname', 'us.lastname'))
-                ->join('tb_action', 'at.actionId = ac.id', 'ac', array('ac.startDate'))
+        $query = self::getQuery(['at.*', 'COUNT(at.id)' => 'cnt'])
+                ->join('tb_user', 'us.id = at.userId', 'us', ['us.firstname', 'us.lastname'])
+                ->join('tb_action', 'at.actionId = ac.id', 'ac', ['ac.startDate'])
                 ->where('at.type = ?', self::ACCEPT)
                 ->where('ac.actionType = ?', $type)
                 ->where('ac.startDate <= ?', date('Y-m-d'))
@@ -145,7 +145,7 @@ class AttendanceModel extends BasicAttendanceModel
 
         $attend = self::initialize($query);
 
-        $returnArr = array();
+        $returnArr = [];
 
         if ($attend !== null) {
             foreach ($attend as $value) {
@@ -164,17 +164,17 @@ class AttendanceModel extends BasicAttendanceModel
     {
         $firstDay = Date::getInstance()->getFirstDayOfMonth($month, $year);
         $lastDay = Date::getInstance()->getLastDayOfMonth($month, $year);
-        $returnArr = array();
+        $returnArr = [];
 
-        $usersQ = self::getQuery(array('distinct userId'))
-                ->join('tb_user', 'us.id = at.userId', 'us', array('us.firstname', 'us.lastname'));
+        $usersQ = self::getQuery(['distinct userId'])
+                ->join('tb_user', 'us.id = at.userId', 'us', ['us.firstname', 'us.lastname']);
 
         $users = self::initialize($usersQ);
 
         if (!empty($users)) {
             foreach ($users as $user) {
-                $attQ = self::getQuery(array('at.actionId', 'at.type', 'at.comment'))
-                        ->join('tb_action', 'at.actionId = ac.id', 'ac', array('ac.actionType', 'ac.startDate', 'ac.endDate'))
+                $attQ = self::getQuery(['at.actionId', 'at.type', 'at.comment'])
+                        ->join('tb_action', 'at.actionId = ac.id', 'ac', ['ac.actionType', 'ac.startDate', 'ac.endDate'])
                         ->where('at.userId = ?', $user->getUserId())
                         ->where('ac.startDate >= ?', $firstDay)
                         ->where('ac.startDate <= ?', $lastDay)
@@ -184,12 +184,12 @@ class AttendanceModel extends BasicAttendanceModel
 
                 if (!empty($attendance)) {
                     foreach ($attendance as $attend) {
-                        $rec = array('type' => $attend->getType(),
-                            'comment' => $attend->getComment(),);
+                        $rec = ['type' => $attend->getType(),
+                            'comment' => $attend->getComment(),];
                         $returnArr[$user->getUserId() . '|' . $user->getFirstname() . ' ' . $user->getLastname()][$attend->getActionType() . '|' . $attend->getStartDate()] = $rec;
                     }
                 } else {
-                    $returnArr[$user->getUserId() . '|' . $user->getFirstname() . ' ' . $user->getLastname()] = array();
+                    $returnArr[$user->getUserId() . '|' . $user->getFirstname() . ' ' . $user->getLastname()] = [];
                 }
             }
         }

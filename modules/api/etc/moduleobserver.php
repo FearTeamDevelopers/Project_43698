@@ -12,14 +12,15 @@ use THCFrame\Core\Core;
  */
 class ModuleObserver implements SubscriberInterface
 {
+
     /**
      * @return type
      */
     public function getSubscribedEvents()
     {
-        return array(
+        return [
             'api.log' => 'apiLog',
-        );
+        ];
     }
 
     /**
@@ -50,7 +51,7 @@ class ModuleObserver implements SubscriberInterface
             $paramStr = '';
         }
 
-        $log = new \Admin\Model\AdminLogModel(array(
+        $log = new \Admin\Model\AdminLogModel([
             'userId' => $userId,
             'module' => $module,
             'controller' => $controller,
@@ -58,19 +59,19 @@ class ModuleObserver implements SubscriberInterface
             'result' => $result,
             'httpreferer' => RequestMethods::getHttpReferer(),
             'params' => $paramStr,
-        ));
-
-        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
-            'type' => 'apiLog',
-            'result' => $result,
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'params' => $paramStr)
-        );
+        ]);
 
         if ($log->validate()) {
             $log->save();
+        } else {
+            Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', [
+                'type' => 'apiLog',
+                'result' => $result,
+                'module' => $module,
+                'controller' => $controller,
+                'action' => $action,
+                'params' => $paramStr]
+            );
         }
     }
 

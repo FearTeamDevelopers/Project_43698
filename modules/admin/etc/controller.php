@@ -18,14 +18,14 @@ class Controller extends BaseController
      */
     protected function disableView()
     {
-        $this->_willRenderActionView = false;
-        $this->_willRenderLayoutView = false;
+        $this->willRenderActionView = false;
+        $this->willRenderLayoutView = false;
     }
 
     /**
      * @param type $options
      */
-    public function __construct($options = array())
+    public function __construct($options = [])
     {
         parent::__construct($options);
 
@@ -48,8 +48,8 @@ class Controller extends BaseController
         $user = $this->getSecurity()->getUser();
 
         if (!$user) {
-            $this->_willRenderActionView = false;
-            $this->_willRenderLayoutView = false;
+            $this->willRenderActionView = false;
+            $this->willRenderLayoutView = false;
             self::redirect('/admin/login');
         }
 
@@ -224,7 +224,7 @@ class Controller extends BaseController
      *
      * @return type
      */
-    public function lang($key, $args = array())
+    public function lang($key, $args = [])
     {
         return $this->getLang()->_get($key, $args);
     }

@@ -22,10 +22,6 @@ class File extends Logger\Driver
      */
     public function __construct($options = null)
     {
-        $options = array(
-            'path' => 'application' . DIRECTORY_SEPARATOR . 'logs',
-        );
-
         parent::__construct($options);
 
         $this->path = APP_PATH . DIRECTORY_SEPARATOR . trim($this->path, DIRECTORY_SEPARATOR);
@@ -33,8 +29,6 @@ class File extends Logger\Driver
         if (!is_dir($this->path)) {
             @mkdir($this->path, self::DIR_CHMOD, true);
         }
-
-        $this->deleteOldLogs();
     }
 
     private function prepareLogPath($level = self::INFO)
@@ -51,20 +45,24 @@ class File extends Logger\Driver
 
     private function putContents($file, $message)
     {
-        if (!file_exists($file)) {
-            file_put_contents($file, $message, FILE_APPEND);
-        } elseif (file_exists($file) && filesize($file) < self::MAX_FILE_SIZE) {
-            file_put_contents($file, $message, FILE_APPEND);
-        } elseif (file_exists($file) && filesize($file) > self::MAX_FILE_SIZE) {
-            for ($i = 1; $i < 100; $i+=1) {
-                if (!file_exists($file . $i)) {
-                    file_put_contents($file . $i, $message, FILE_APPEND);
-                } elseif (file_exists($file . $i) && filesize($file . $i) < self::MAX_FILE_SIZE) {
-                    file_put_contents($file . $i, $message, FILE_APPEND);
-                } else {
-                    continue;
+        if (file_exists($file)) {
+            $fileSize = filesize($file);
+
+            if ($fileSize < self::MAX_FILE_SIZE) {
+                file_put_contents($file, $message, FILE_APPEND);
+            } elseif ($fileSize > self::MAX_FILE_SIZE) {
+                for ($i = 1; $i < 100; $i += 1) {
+                    if (!file_exists($file . $i)) {
+                        file_put_contents($file . $i, $message, FILE_APPEND);
+                    } elseif (filesize($file . $i) < self::MAX_FILE_SIZE) {
+                        file_put_contents($file . $i, $message, FILE_APPEND);
+                    } else {
+                        continue;
+                    }
                 }
             }
+        } else {
+            file_put_contents($file, $message, FILE_APPEND);
         }
     }
 
@@ -76,81 +74,55 @@ class File extends Logger\Driver
         $this->putContents($path, $message);
     }
 
-    /**
-     * Delete old log files
-     *
-     * @param string $olderThan   date yyyy-mm-dd
-     */
-    private function deleteOldLogs($olderThan = null)
-    {
-        if (!is_dir($this->path)) {
-            return;
-        }
-
-        if(null === $olderThan){
-            $olderThan = strtotime('-90 days');
-        }
-
-        $objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->path), \RecursiveIteratorIterator::LEAVES_ONLY);
-
-        foreach ($objects as $path => $item) {
-            if ($item->isFile()) {
-                if (time() - $item->getMTime() > time() - $olderThan) {
-                    @unlink($path);
-                }
-            }
-        }
-    }
-
-    public function emergency($message, array $context = array())
+    public function emergency($message, array $context = [])
     {
         $this->appendLine(self::EMERGENCY, $message, $context);
         return $this;
     }
 
-    public function alert($message, array $context = array())
+    public function alert($message, array $context = [])
     {
         $this->appendLine(self::ALERT, $message, $context);
         return $this;
     }
 
-    public function critical($message, array $context = array())
+    public function critical($message, array $context = [])
     {
         $this->appendLine(self::CRITICAL, $message, $context);
         return $this;
     }
 
-    public function error($message, array $context = array())
+    public function error($message, array $context = [])
     {
         $this->appendLine(self::ERROR, $message, $context);
         return $this;
     }
 
-    public function warning($message, array $context = array())
+    public function warning($message, array $context = [])
     {
         $this->appendLine(self::WARNING, $message, $context);
         return $this;
     }
 
-    public function notice($message, array $context = array())
+    public function notice($message, array $context = [])
     {
         $this->appendLine(self::NOTICE, $message, $context);
         return $this;
     }
 
-    public function info($message, array $context = array())
+    public function info($message, array $context = [])
     {
         $this->appendLine(self::INFO, $message, $context);
         return $this;
     }
 
-    public function debug($message, array $context = array())
+    public function debug($message, array $context = [])
     {
         $this->appendLine(self::DEBUG, $message, $context);
         return $this;
     }
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         switch ($level) {
             case self::EMERGENCY:
@@ -166,7 +138,7 @@ class File extends Logger\Driver
                 $this->error($message, $context);
                 break;
             case self::WARNING:
-                $this->error($message, $context);
+                $this->warning($message, $context);
                 break;
             case self::NOTICE:
                 $this->notice($message, $context);

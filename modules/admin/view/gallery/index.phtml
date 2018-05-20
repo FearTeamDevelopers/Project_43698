@@ -8,6 +8,8 @@
         <h2 class="image"><span>Galerie</span></h2>
     </div><!--contenttitle-->
 
+    <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+
     <table class="stdtable">
         <colgroup>
             <col class="con0" /> <col class="con1" />
@@ -22,30 +24,32 @@
                 <td class="head1">Vytvořeno</td>
                 <td class="head0">Stav</td>
                 <td class="head1">&nbsp;</td>
-            </tr> 
+            </tr>
         </thead>
 
         <tbody>
             {if !empty($galleries)}
-                {foreach $gallery in $galleries}
-                    <tr>
-                        <td>{echo $gallery->getTitle()}</td>
-                        <td>
-                            {if $gallery->isPublic == 0}Soukromá{/if}
-                            {else}Veřejná{/else}
-                        </td>
-                        <td>{echo $gallery->getUserAlias()}</td>
-                        <td>{echo $gallery->getCreated()}</td>
-                        <td>
-                            {if ($gallery->active)}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}
-                            {if ($gallery->getUserId() == $authUser->getId())}<span class="infoLabel infoLabelGray">Moje</span>{/if}
-                        </td>
-                        <td>
-                            <a href="/admin/gallery/detail/{echo $gallery->id}" class="btn btn3 btn_image2" title="Vstoupit do galerie"></a>
-                            <a href="/admin/gallery/delete/{echo $gallery->id}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>
-                        </td>
-                    </tr>
-                {/foreach}
+            {foreach $gallery in $galleries}
+            <tr>
+                <td>{echo $gallery->getTitle()}</td>
+                <td>
+                    {if $gallery->isPublic == 0}Soukromá{/if}
+                    {else}Veřejná{/else}
+                </td>
+                <td>{echo $gallery->getUserAlias()}</td>
+                <td>{echo $gallery->getCreated()}</td>
+                <td>
+                    {if ($gallery->active)}<span class="infoLabel infoLabelGreen">Aktivní</span>{/if}
+                    {if ($gallery->getUserId() == $authUser->getId())}<span class="infoLabel infoLabelGray">Moje</span>{/if}
+                </td>
+                <td>
+                    <a href="/admin/gallery/detail/{echo $gallery->id}" class="btn btn3 btn_image2" title="Vstoupit do galerie"></a>
+                    {if ($gallery->getUserId() == $authUser->getId()) || $isAdmin}
+                    <a href="/admin/gallery/delete/{echo $gallery->id}" class="btn btn3 btn_trash ajaxDelete" title="Smazat"></a>
+                    {/if}
+                </td>
+            </tr>
+            {/foreach}
             {/if}
         </tbody>
     </table>

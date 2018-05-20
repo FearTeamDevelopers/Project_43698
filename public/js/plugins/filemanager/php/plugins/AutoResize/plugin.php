@@ -46,16 +46,16 @@
  */
 class elFinderPluginAutoResize {
 
-	private $opts = array();
+	private $opts = [];
 
 	public function __construct($opts) {
-		$defaults = array(
+		$defaults = [
 			'enable'         => true,       // For control by volume driver
 			'maxWidth'       => 1024,       // Path to Water mark image
 			'maxHeight'      => 1024,       // Margin right pixel
 			'quality'        => 95,         // JPEG image save quality
 			'targetType'     => IMG_GIF|IMG_JPG|IMG_PNG|IMG_WBMP // Target image formats ( bit-field )
-		);
+		];
 
 		$this->opts = array_merge($defaults, $opts);
 
@@ -78,12 +78,12 @@ class elFinderPluginAutoResize {
 		}
 		
 		// check target image type
-		$imgTypes = array(
+		$imgTypes = [
 				IMAGETYPE_GIF => IMG_GIF,
 				IMAGETYPE_JPEG => IMG_JPEG,
 				IMAGETYPE_PNG => IMG_PNG,
 				IMAGETYPE_WBMP => IMG_WBMP,
-		);
+		];
 		if (! ($opts['targetType'] & $imgTypes[$srcImgInfo[2]])) {
 			return false;
 		}

@@ -16,7 +16,7 @@
 class Swift_Mime_Attachment extends Swift_Mime_SimpleMimeEntity
 {
     /** Recognized MIME types */
-    private $_mimeTypes = array();
+    private $_mimeTypes = [];
 
     /**
      * Create a new Attachment with $headers, $encoder and $cache.
@@ -27,7 +27,7 @@ class Swift_Mime_Attachment extends Swift_Mime_SimpleMimeEntity
      * @param Swift_Mime_Grammar        $grammar
      * @param array                     $mimeTypes optional
      */
-    public function __construct(Swift_Mime_HeaderSet $headers, Swift_Mime_ContentEncoder $encoder, Swift_KeyCache $cache, Swift_Mime_Grammar $grammar, $mimeTypes = array())
+    public function __construct(Swift_Mime_HeaderSet $headers, Swift_Mime_ContentEncoder $encoder, Swift_KeyCache $cache, Swift_Mime_Grammar $grammar, $mimeTypes = [])
     {
         parent::__construct($headers, $encoder, $cache, $grammar);
         $this->setDisposition('attachment');

@@ -5,7 +5,7 @@ namespace THCFrame\Filesystem;
 use THCFrame\Core\Base as Base;
 
 /**
- * 
+ *
  */
 class File extends Base
 {
@@ -51,7 +51,7 @@ class File extends Base
     protected $_isWritable;
 
     /**
-     * 
+     *
      * @param type $options
      */
     public function __construct($file)
@@ -63,7 +63,7 @@ class File extends Base
     }
 
     /**
-     * 
+     *
      */
     protected function _loadMetaData()
     {

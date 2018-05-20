@@ -37,7 +37,7 @@ class HTMLPurifier_URIParser
             '(#([^"<>]*))?'.     // 8. Fragment
             '!';
 
-        $matches = array();
+        $matches = [];
         $result = preg_match($r_URI, $uri, $matches);
 
         if (!$result) return false; // *really* invalid URI
@@ -52,7 +52,7 @@ class HTMLPurifier_URIParser
         // further parse authority
         if ($authority !== null) {
             $r_authority = "/^((.+?)@)?(\[[^\]]+\]|[^:]*)(:(\d*))?/";
-            $matches = array();
+            $matches = [];
             preg_match($r_authority, $authority, $matches);
             $userinfo   = !empty($matches[1]) ? $matches[2] : null;
             $host       = !empty($matches[3]) ? $matches[3] : '';

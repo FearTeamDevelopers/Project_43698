@@ -18,7 +18,7 @@ class elFinderConnector {
 	 *
 	 * @var aray
 	 **/
-	protected $options = array();
+	protected $options = [];
 	
 	/**
 	 * undocumented class variable
@@ -62,25 +62,25 @@ class elFinderConnector {
 			$_REQUEST = array_merge_recursive($src, $_REQUEST);
 		}
 		$cmd    = isset($src['cmd']) ? $src['cmd'] : '';
-		$args   = array();
+		$args   = [];
 		
 		if (!function_exists('json_encode')) {
 			$error = $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_JSON);
-			$this->output(array('error' => '{"error":["'.implode('","', $error).'"]}', 'raw' => true));
+			$this->output(['error' => '{"error":["'.implode('","', $error).'"]}', 'raw' => true]);
 		}
 		
 		if (!$this->elFinder->loaded()) {
-			$this->output(array('error' => $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_VOL), 'debug' => $this->elFinder->mountErrors));
+			$this->output(['error' => $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_VOL), 'debug' => $this->elFinder->mountErrors]);
 		}
 		
 		// telepat_mode: on
 		if (!$cmd && $isPost) {
-			$this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UPLOAD, elFinder::ERROR_UPLOAD_TOTAL_SIZE), 'header' => 'Content-Type: text/html'));
+			$this->output(['error' => $this->elFinder->error(elFinder::ERROR_UPLOAD, elFinder::ERROR_UPLOAD_TOTAL_SIZE), 'header' => 'Content-Type: text/html']);
 		}
 		// telepat_mode: off
 		
 		if (!$this->elFinder->commandExists($cmd)) {
-			$this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UNKNOWN_CMD)));
+			$this->output(['error' => $this->elFinder->error(elFinder::ERROR_UNKNOWN_CMD)]);
 		}
 		
 		// collect required arguments to exec command
@@ -93,7 +93,7 @@ class elFinderConnector {
 				$arg = trim($arg);
 			}
 			if ($req && (!isset($arg) || $arg === '')) {
-				$this->output(array('error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)));
+				$this->output(['error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)]);
 			}
 			$args[$name] = $arg;
 		}
@@ -154,7 +154,7 @@ class elFinderConnector {
 			$magic_quotes_gpc = (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc());
 		
 		if (is_array($args)) {
-			return array_map(array(& $this, 'input_filter'), $args);
+			return array_map([& $this, 'input_filter'], $args);
 		}
 		$res = str_replace("\0", '', $args);
 		$magic_quotes_gpc && ($res = stripslashes($res));

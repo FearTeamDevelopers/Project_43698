@@ -62,7 +62,7 @@ class Filter
      *
      * @var string[]|array
      */
-    protected $tags = array();
+    protected $tags = [];
 
     /**
      * Filter impact level

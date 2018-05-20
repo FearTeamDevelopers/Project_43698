@@ -147,7 +147,7 @@ class HTMLPurifier_Lexer
      * Most common entity to raw value conversion table for special entities.
      */
     protected $_special_entity2str =
-            array(
+            [
                     '&quot;' => '"',
                     '&amp;'  => '&',
                     '&lt;'   => '<',
@@ -155,7 +155,7 @@ class HTMLPurifier_Lexer
                     '&#39;'  => "'",
                     '&#039;' => "'",
                     '&#x27;' => "'"
-            );
+            ];
 
     /**
      * Parses special entities into the proper characters.
@@ -214,7 +214,7 @@ class HTMLPurifier_Lexer
     protected static function escapeCDATA($string) {
         return preg_replace_callback(
             '/<!\[CDATA\[(.+?)\]\]>/s',
-            array('HTMLPurifier_Lexer', 'CDATACallback'),
+            ['HTMLPurifier_Lexer', 'CDATACallback'],
             $string
         );
     }
@@ -225,7 +225,7 @@ class HTMLPurifier_Lexer
     protected static function escapeCommentedCDATA($string) {
         return preg_replace_callback(
             '#<!--//--><!\[CDATA\[//><!--(.+?)//--><!\]\]>#s',
-            array('HTMLPurifier_Lexer', 'CDATACallback'),
+            ['HTMLPurifier_Lexer', 'CDATACallback'],
             $string
         );
     }
@@ -312,7 +312,7 @@ class HTMLPurifier_Lexer
      * @todo Consider making protected
      */
     public function extractBody($html) {
-        $matches = array();
+        $matches = [];
         $result = preg_match('!<body[^>]*>(.*)</body>!is', $html, $matches);
         if ($result) {
             return $matches[1];

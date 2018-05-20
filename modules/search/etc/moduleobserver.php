@@ -12,15 +12,15 @@ use THCFrame\Core\Core;
  */
 class ModuleObserver implements SubscriberInterface
 {
+
     /**
      * @return type
      */
     public function getSubscribedEvents()
     {
-        return array(
+        return [
             'search.log' => 'searchLog',
-            'search.log.user' => 'searchUserLog',
-        );
+        ];
     }
 
     /**
@@ -30,66 +30,16 @@ class ModuleObserver implements SubscriberInterface
     {
         $params = func_get_args();
 
-        $router = Registry::get('router');
-        $route = $router->getLastRoute();
-
-        $module = $route->getModule();
-        $controller = $route->getController();
-        $action = $route->getAction();
-
-        if (!empty($params)) {
-            $result = array_shift($params);
-
-            $paramStr = '';
-            if (!empty($params)) {
-                $paramStr = implode(', ', $params);
-            }
-        } else {
-            $result = 'fail';
-            $paramStr = '';
-        }
-
-        $log = new \Search\Model\AdminLogModel(array(
-            'userId' => 'searchjob',
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'result' => $result,
-            'httpreferer' => RequestMethods::getHttpReferer(),
-            'params' => $paramStr,
-        ));
-
-        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
-            'type' => 'searchLog',
-            'result' => $result,
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'params' => $paramStr)
-        );
-
-        if ($log->validate()) {
-            $log->save();
-        }
-    }
-
-    /**
-     * @param array $params
-     */
-    public function searchUserLog()
-    {
-        $params = func_get_args();
-
-        $router = Registry::get('router');
-        $route = $router->getLastRoute();
-
         $security = Registry::get('security');
         $user = $security->getUser();
         if ($user === null) {
-            $userId = 'annonymous';
+            $userId = 'searchjob';
         } else {
-            $userId = $user->getWholeName().':'.$user->getId();
+            $userId = $user->getWholeName() . ':' . $user->getId();
         }
+
+        $router = Registry::get('router');
+        $route = $router->getLastRoute();
 
         $module = $route->getModule();
         $controller = $route->getController();
@@ -107,7 +57,7 @@ class ModuleObserver implements SubscriberInterface
             $paramStr = '';
         }
 
-        $log = new \Search\Model\AdminLogModel(array(
+        $log = new \Search\Model\AdminLogModel([
             'userId' => $userId,
             'module' => $module,
             'controller' => $controller,
@@ -115,19 +65,20 @@ class ModuleObserver implements SubscriberInterface
             'result' => $result,
             'httpreferer' => RequestMethods::getHttpReferer(),
             'params' => $paramStr,
-        ));
-
-        Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', array(
-            'type' => 'searchLog',
-            'result' => $result,
-            'module' => $module,
-            'controller' => $controller,
-            'action' => $action,
-            'params' => $paramStr)
-        );
+        ]);
 
         if ($log->validate()) {
             $log->save();
+        }else{
+            Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', [
+                'type' => 'searchLog',
+                'result' => $result,
+                'module' => $module,
+                'controller' => $controller,
+                'action' => $action,
+                'params' => $paramStr]
+            );
         }
     }
+
 }

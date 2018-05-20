@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'CREATE_SUCCESS' => 'Everything has been successfully saved',
     'CREATE_FAIL' => 'An unknown error occurred during saving',
     'ACTIVATE_SUCCESS' => 'Everything has been successfully activated',
@@ -43,6 +43,7 @@ return array(
     'EMAIL_NO_RECIPIENTS' => 'No recipient is selected',
 
     'LOGIN_COMMON_ERROR' => 'E-mail or password is not correct',
+    'LOGIN_API_TOKEN_NOT_ASSIGN' => 'User has not assign api token',
     'LOGIN_EMAIL_ERROR' => 'E-mail is required',
     'LOGIN_PASS_ERROR' => 'Password is required',
     'LOGIN_TIMEOUT' => 'You has been logged out for long inactivity',
@@ -52,6 +53,12 @@ return array(
     'ACCOUNT_EXPIRED' => 'The account has expired',
     'ACCOUNT_PASS_EXPIRED' => 'The password has expired. For setting new password contanct system administrator.',
     'ACCOUNT_ACTIVATED' => 'The account has been activated',
+    'ACCOUNT_DELETED' => 'The account has been deleted',
+    'ACCOUNT_PROCESSING_DISABLED' => 'User has limited personal data processing',
+
+    'API_TOKEN_CREATED' => 'Token has been successfully created',
+    'API_TOKEN_DELETED' => 'Token has been successfully deleted',
+    'API_TOKEN_ALREADY_EXISTS' => 'User already have assigned token',
 
     'REGISTRATION_SUCCESS' => 'Registration has been successfull',
     'REGISTRATION_SUCCESS_ADMIN_ACTIVATION' => 'Registration has been successfull. You will be notified about account activation via email',
@@ -115,4 +122,4 @@ return array(
 
     'SEND_FEEDBACK_SUCCESS' => 'Thank you for your help',
     'SEND_FEEDBACK_FAIL' => 'An error occured while sending message',
-);
+];
