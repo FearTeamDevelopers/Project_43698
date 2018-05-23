@@ -169,9 +169,9 @@ class Controller extends BaseController
     /**
      * @return bool
      */
-    protected function checkEuCookieLegal()
+    protected function checkCookieConsent()
     {
-        return RequestMethods::issetcookie('cookies-consent');
+        return RequestMethods::issetcookie('cookies-consent-mandatory');
     }
 
     /**
@@ -185,7 +185,7 @@ class Controller extends BaseController
         if ($view) {
             $view->set('authUser', $this->getSecurity()->getUser())
                     ->set('deviceType', $this->getDeviceType())
-                    ->set('euCookieLegal', $this->checkEuCookieLegal())
+                    ->set('cookieConsent', $this->checkCookieConsent())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())
@@ -196,7 +196,7 @@ class Controller extends BaseController
         if ($layoutView) {
             $layoutView->set('authUser', $this->getSecurity()->getUser())
                     ->set('deviceType', $this->getDeviceType())
-                    ->set('euCookieLegal', $this->checkEuCookieLegal())
+                    ->set('cookieConsent', $this->checkCookieConsent())
                     ->set('env', ENV)
                     ->set('isMember', $this->isMember())
                     ->set('isParticipant', $this->isParticipant())

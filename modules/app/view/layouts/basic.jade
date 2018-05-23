@@ -70,6 +70,11 @@ html
                         p Klub sportovních potápěčů HASTRMAN<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: klub@hastrman.cz<br/>Jiří Nový - 603 482 708<br/>novy@hastrman.cz<br/>Bohumír Kuhn - 603 161 417<br/>Jaromír Dítě - 608 550 606
                     .large-4.columns
                         p HASTRMAN APNEA tým<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: apnea@hastrman.cz<br/>Jan Tichý - 721 863 728
+                .large-12.small-12.medium-12.columns.policy
+                    |hastrman.cz 2018&nbsp;|&nbsp;
+                    a(href="/ochrana-soukromi") Zásady ochrany soukromí&nbsp;|&nbsp;
+                    a(href="/zasady-cookies") Zásady Cookies&nbsp;|&nbsp;
+                    a(href="/nastaveni-soukromi") Nastavení soukromí
         include ../components/cookies
         #dialog(title='Chcete pokračovat?')
             p
@@ -83,6 +88,7 @@ html
         script(type='text/javascript', src='/public/js/foundation.min.js')
         script(type='text/javascript', src='/public/js/custom/build/system.js')
         script(type='text/javascript', src='/public/js/custom/build/cookies.js')
+        
         |{if isset($includecarousel)}
         script(type='text/javascript', src='/public/js/plugins/jquery.carouFredSel-6.1.0-packed.js')
         script(type='text/javascript', src='/public/js/custom/build/homeCarousel.js')
@@ -99,7 +105,7 @@ html
         script(type='text/javascript').
             if(navigator.doNotTrack != 1){
                 var _paq = _paq || [];
-                var consent = getCookie("cookies-consent");
+                var consent = getCookie("cookies-consent-analytics");
 
                 if(consent === ""){
                     _paq.push(["requireConsent"]);

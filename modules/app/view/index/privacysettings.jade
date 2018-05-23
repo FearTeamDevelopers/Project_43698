@@ -1,0 +1,17 @@
+section.wrapper.singlePage.privacysettings
+    .row
+        .container.large-10.medium-10.small-12.centerBlock.mv30
+            header.row
+                h2.fi-wrench &nbsp;Nastavení soukromí
+            div Vaše nastavení cookies
+                br
+                br
+                label(for='cookies-mandatory') Nezbytné
+                    input(type='checkbox', disabled, checked id='cookies-mandatory')
+                label(for='cookies-analytics') Statistické
+                    input(type='checkbox', id='cookies-analytics', data-shortcut='analytics')
+                label(for='cookies-functional') Funkcionální
+                    input(type='checkbox', id='cookies-functional', data-shortcut='functional')
+             
+script(type='text/javascript', src='/public/js/plugins/jquery-1.11.1.min.js')
+script(type='text/javascript', src='/public/js/custom/build/privacySettings.js')

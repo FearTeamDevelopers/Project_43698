@@ -142,17 +142,23 @@
             <p>HASTRMAN APNEA tým<br/>Mládežnická 1275<br/>293 01 Mladá Boleslav<br/><br/>E-mail: apnea@hastrman.cz<br/>Jan Tichý - 721 863 728</p>
           </div>
         </div>
+        <div class="large-12 small-12 medium-12 columns policy">hastrman.cz 2018&nbsp;|&nbsp;<a href="/ochrana-soukromi">Zásady ochrany soukromí&nbsp;|&nbsp;</a><a href="/zasady-cookies">Zásady Cookies&nbsp;|&nbsp;</a><a href="/nastaveni-soukromi">Nastavení soukromí</a></div>
       </footer>
-    </div>{if $euCookieLegal == false}
+    </div>{if $cookieConsent == false}
     <div class="cookies-consent">
       <div class="cookies-consent-text">Tento web používá k poskytování služeb a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.</div>
       <div class="cookies-consent-types">
-        <label for="cookies-mandatory">Nezbytné</label>
-        <input type="checkbox" disabled checked id="cookies-mandatory">
-        <label for="cookies-analytics">Statistické</label>
-        <input type="checkbox" checked id="cookies-analytics">
+        <label for="cookies-mandatory">Nezbytné
+          <input type="checkbox" disabled checked id="cookies-mandatory">
+        </label>
+        <label for="cookies-analytics">Statistické
+          <input type="checkbox" checked id="cookies-analytics">
+        </label>
+        <label for="cookies-functional">Funkcionální
+          <input type="checkbox" checked id="cookies-functional">
+        </label>
       </div>
-      <div class="cookies-consent-buttons"><a id="cookie-ok" href="#">Rozumím</a><a href="/ochrana-soukromi">Více informací</a></div>
+      <div class="cookies-consent-buttons"><a id="cookie-ok" href="#">Rozumím</a><a href="/zasady-cookies">Více informací</a></div>
     </div>
     <noscript>
       <style type="text/css"></style>
@@ -178,7 +184,7 @@
     <script type="text/javascript">
       if(navigator.doNotTrack != 1){
           var _paq = _paq || [];
-          var consent = getCookie("cookies-consent");
+          var consent = getCookie("cookies-consent-analytics");
       
           if(consent === ""){
               _paq.push(["requireConsent"]);

@@ -19,10 +19,17 @@ SetEnvIf user-agent "TurnitinBot" stayout=1
 deny from env=stayout
 ########## End - Common hacking tools and bandwidth hoggers block
 
+########## MAINTENANCE REDIRECT
+#RewriteCond %{REMOTE_ADDR} !^89\.24\.50\.93
+#RewriteCond %{REQUEST_URI} !/maintenance.phtml$ [NC]
+#RewriteCond %{REQUEST_URI} !\.(jpe?g?|png|gif|css) [NC]
+#RewriteRule .* /maintenance.phtml [R=302,L]
+########## END - MAINTENANCE REDIRECT
+
 ########## HTTPS
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP_HOST} !.*\.dev.*$
-RewriteCond %{REQUEST_URI} ^/(admin|login|prihlasit).*$
+RewriteCond %{REQUEST_URI} ^.*$
 RewriteRule (.*) https://%{HTTP_HOST}/$1 [R=301,L,NC]
 ########## End - HTTPS
 

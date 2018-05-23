@@ -1,14 +1,10 @@
 <?php
-
 namespace App\Controller;
 
 use App\Etc\Controller;
-use THCFrame\Core\Rand;
-use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Model\Model;
 use THCFrame\Request\Request;
-use THCFrame\Security\PasswordManager;
 use THCFrame\View\View;
 
 /**
@@ -35,8 +31,8 @@ class IndexController extends Controller
         $canonical = "{$this->getServerHost()}{$uri}";
 
         $layoutView->set(View::META_CANONICAL, $canonical)
-                ->set('metaogurl', "{$this->getServerHost()}{$uri}")
-                ->set('metaogtype', 'website');
+            ->set('metaogurl', "{$this->getServerHost()}{$uri}")
+            ->set('metaogtype', 'website');
     }
 
     /**
@@ -73,18 +69,18 @@ class IndexController extends Controller
 
         if (null === $partners) {
             $partners = \App\Model\PartnerModel::all(
-                            ['active = ?' => true], ['*'], ['rank' => 'desc', 'created' => 'desc']
+                    ['active = ?' => true], ['*'], ['rank' => 'desc', 'created' => 'desc']
             );
             $this->getCache()->set('index-partners', $partners);
         }
 
         $view->set('news', $news)
-                ->set('actions', $actions)
-                ->set('partners', $partners)
-                ->set('reports', $reports);
+            ->set('actions', $actions)
+            ->set('partners', $partners)
+            ->set('reports', $reports);
 
         $layoutView->set('includecarousel', 1)
-                ->set(View::META_CANONICAL, $canonical);
+            ->set(View::META_CANONICAL, $canonical);
     }
 
     /**
@@ -120,8 +116,8 @@ class IndexController extends Controller
         $canonical = $this->getServerHost() . '/nenalezeno';
 
         $this->getLayoutView()
-                ->set(View::META_CANONICAL, $canonical)
-                ->set(View::META_TITLE, 'Hastrman - Stránka nenalezena');
+            ->set(View::META_CANONICAL, $canonical)
+            ->set(View::META_TITLE, 'Hastrman - Stránka nenalezena');
     }
 
     /**
@@ -158,26 +154,49 @@ class IndexController extends Controller
             $this->pagerMetaLinks($searchPageCount, $page, '/hledat/p/');
 
             $view->set('results', $searchResult)
-                    ->set('currentpage', $page)
-                    ->set('pagecount', $searchPageCount)
-                    ->set('pagerpathprefix', '/hledat')
-                    ->set('pagerpathpostfix', '?' . http_build_query($parameters));
+                ->set('currentpage', $page)
+                ->set('pagecount', $searchPageCount)
+                ->set('pagerpathprefix', '/hledat')
+                ->set('pagerpathpostfix', '?' . http_build_query($parameters));
         }
 
         $layoutView->set(View::META_CANONICAL, $canonical)
-                ->set(View::META_TITLE, 'Hastrman - Hledat');
+            ->set(View::META_TITLE, 'Hastrman - Hledat');
     }
 
-        /**
+    /**
      *
      */
-    public function privacypolicy()
+    public function privacyPolicy()
     {
         $canonical = $this->getServerHost() . '/ochrana-soukromi';
 
         $this->getLayoutView()
-                ->set(View::META_CANONICAL, $canonical)
-                ->set(View::META_TITLE, 'Hastrman - Ochrana soukromí');
+            ->set(View::META_CANONICAL, $canonical)
+            ->set(View::META_TITLE, 'Hastrman - Ochrana soukromí');
     }
 
+    /**
+     * 
+     */
+    public function privacysettings()
+    {
+        $canonical = $this->getServerHost() . '/nastaveni-soukromi';
+
+        $this->getLayoutView()
+            ->set(View::META_CANONICAL, $canonical)
+            ->set(View::META_TITLE, 'Hastrman - Nastavení soukromí');
+    }
+
+    /**
+     *
+     */
+    public function cookiePolicy()
+    {
+        $canonical = $this->getServerHost() . '/zasady-cookies';
+
+        $this->getLayoutView()
+            ->set(View::META_CANONICAL, $canonical)
+            ->set(View::META_TITLE, 'Hastrman - Zásady cookies');
+    }
 }
