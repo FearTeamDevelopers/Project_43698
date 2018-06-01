@@ -110,7 +110,7 @@ class UserModel extends BasicUserModel
      * @label limit processing personal data
      */
     protected $_pdLimitProcessing;
-    
+
     /**
      * @column
      * @readwrite
@@ -137,7 +137,7 @@ class UserModel extends BasicUserModel
             return false;
         }
     }
-    
+
     /**
      *
      */
@@ -239,6 +239,20 @@ class UserModel extends BasicUserModel
 
     /**
      * 
+     * @param string $type
+     * @return type
+     */
+    public static function getUserEmailsForNotification(string $type)
+    {
+        if(in_array($type, ['getNewActionNotification', 'getNewReportNotification', 'getNewNewsNotification'])){
+            return static::all([$type . ' = ?' => true, 'pdLimitProcessing != ?' => 1], ['email']);
+        }
+        
+        return [];
+    }
+
+    /**
+     * 
      * @param \THCFrame\Bag\BagInterface $post
      * @param array $options
      * @return array
@@ -246,7 +260,7 @@ class UserModel extends BasicUserModel
     public static function createUser(\THCFrame\Bag\BagInterface $post, array $options = []): array
     {
         $errors = [];
-        
+
         if ($post->get('password') !== $post->get('password2')) {
             $errors['password2'] = [Lang::get('PASS_DOESNT_MATCH')];
         }
@@ -302,7 +316,7 @@ class UserModel extends BasicUserModel
                 break;
             }
         }
-        
+
         $user = new static([
             'firstname' => $post->get('firstname'),
             'lastname' => $post->get('lastname'),
@@ -317,12 +331,12 @@ class UserModel extends BasicUserModel
             'getNewActionNotification' => $post->get('actionNotification', 0),
             'getNewReportNotification' => $post->get('reportNotification', 0),
             'getNewNewsNotification' => $post->get('newsNotification', 0),
-            'pdConsentToProcessing'  => $post->get('pdConsentToProcessing', 0),
+            'pdConsentToProcessing' => $post->get('pdConsentToProcessing', 0),
         ]);
 
         return [$user, $errors];
     }
-    
+
     /**
      * 
      * @param \THCFrame\Bag\BagInterface $post
@@ -333,7 +347,7 @@ class UserModel extends BasicUserModel
     public static function editUserProfile(\THCFrame\Bag\BagInterface $post, UserModel $user, array $options = []): array
     {
         $errors = [];
-        
+
         if ($post->get('password') !== $post->get('password2')) {
             $errors['password2'] = [Lang::get('PASS_DOESNT_MATCH')];
         }
@@ -376,7 +390,7 @@ class UserModel extends BasicUserModel
 
         return [$user, $errors];
     }
-    
+
     /**
      * 
      * @param int $userId
@@ -400,13 +414,13 @@ class UserModel extends BasicUserModel
             $user->getNewNewsNotification = 0;
             $user->pdLimitProcessing = 1;
             $user->pdConsentToProcessing = 0;
-            
-            if($user->validate()){
+
+            if ($user->validate()) {
                 $user->save();
                 return true;
-            } 
+            }
         }
-        
+
         return false;
     }
 }

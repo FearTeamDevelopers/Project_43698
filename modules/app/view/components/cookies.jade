@@ -1,14 +1,7 @@
 |{if $cookieConsent == false}
-.cookies-consent
-    .cookies-consent-text Tento web používá k poskytování služeb a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.
-    .cookies-consent-types
-        label(for='cookies-mandatory') Nezbytné
-            input(type='checkbox', disabled, checked, id='cookies-mandatory')
-        label(for='cookies-analytics') Statistické
-            input(type='checkbox', checked, id='cookies-analytics')
-        label(for='cookies-functional') Funkcionální
-            input(type='checkbox', checked, id='cookies-functional')
-    .cookies-consent-buttons
+.cookies-consent.container.large-12.medium-12.small-12.columns
+    .cookies-consent-text.large-8.medium-7.small-12.columns Tento web používá k poskytování služeb a analýze návštěvnosti soubory cookie.
+    .cookies-consent-buttons.large-4.medium-5.small-12.columns
         a#cookie-ok(href='#') Rozumím
         a(href='/zasady-cookies') Více informací
 noscript

@@ -95,7 +95,7 @@ class EmailModel extends BasicEmailModel
             return null;
         }
 
-        $emailText = str_replace('{MAINURL}', '//' . RequestMethods::server('HTTP_HOST'), $email->getBody());
+        $emailText = str_replace('{MAINURL}', 'https://' . RequestMethods::server('HTTP_HOST'), $email->getBody());
 
         if (!empty($data)) {
             foreach ($data as $key => $value) {
@@ -115,7 +115,7 @@ class EmailModel extends BasicEmailModel
      */
     public function populate($data = [])
     {
-        $emailText = str_replace('{MAINURL}', '//' . RequestMethods::server('HTTP_HOST'), $this->getBody());
+        $emailText = str_replace('{MAINURL}', 'https://' . RequestMethods::server('HTTP_HOST'), $this->getBody());
 
         if (!empty($data)) {
             foreach ($data as $key => $value) {

@@ -24,7 +24,7 @@ class Action extends EmailAbstract
 
         if ($action->getApproved() && $this->config->new_action_notification) {
             $emailTpl = $this->getEmailTemplate($this->getCreateTemplateName(), $data, $action->getTitle());
-            $users = UserModel::all(['getNewActionNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewActionNotification');
 
             $this->send($emailTpl, $users);
         }
@@ -42,7 +42,7 @@ class Action extends EmailAbstract
 
         if ($action->getApproved() && $this->config->update_action_notification) {
             $emailTpl = $this->getEmailTemplate($this->getUpdateTemplateName(), $data, $action->getTitle());
-            $users = UserModel::all(['getNewActionNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewActionNotification');
 
             $this->send($emailTpl, $users);
         }
@@ -60,7 +60,7 @@ class Action extends EmailAbstract
 
         if ($action->getApproved() && $this->config->delete_action_notification) {
             $emailTpl = $this->getEmailTemplate($this->getDeleteTemplateName(), $data, $action->getTitle());
-            $users = UserModel::all(['getNewActionNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewActionNotification');
 
             $this->send($emailTpl, $users);
         }

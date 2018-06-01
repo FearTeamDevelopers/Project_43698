@@ -3,6 +3,8 @@
 namespace App\Model;
 
 use App\Model\Basic\BasicGalleryModel;
+use THCFrame\Filesystem\FileManager;
+use THCFrame\Registry\Registry;
 
 /**
  *
@@ -149,6 +151,55 @@ class GalleryModel extends BasicGalleryModel
             return false;
         }
     }
+    
+    /**
+     * 
+     * @param int $id
+     */
+    public static function deleteAllPhotos(int $id, bool $keepGalleryDir = false)
+    {
+        $gallery = static::first(
+                ['id = ?' => $id], ['id', 'title', 'created', 'userId', 'urlKey']
+        );
+        if (null !== $gallery) {
+            $fm = new FileManager();
+            $configuration = Registry::get('configuration');
+
+            if (!empty($configuration->files)) {
+                $pathToImages = trim($configuration->files->pathToImages, '/');
+                $pathToThumbs = trim($configuration->files->pathToThumbs, '/');
+            } else {
+                $pathToImages = PhotoModel::DEFAULT_PATH_TO_IMAGES;
+                $pathToThumbs = PhotoModel::DEFAULT_PATH_TO_THUMBS;
+            }
+
+            $photos = PhotoModel::all(['galleryId = ?' => $id], ['id']);
+
+            if (!empty($photos)) {
+                $ids = [];
+                foreach ($photos as $colPhoto) {
+                    $ids[] = $colPhoto->getId();
+                }
+
+                PhotoModel::deleteAll(['id IN ?' => $ids]);
+
+                $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getUrlKey();
+                $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getUrlKey();
+
+                if ($path === $pathThumbs) {
+                    $fm->remove($path);
+                } else {
+                    $fm->remove($path);
+                    $fm->remove($pathThumbs);
+                }
+                
+                if($keepGalleryDir === true){
+                    $fm->mkdir($path);
+                    $fm->mkdir($pathThumbs);
+                }
+            }
+        }
+    }
 
     /**
      * @return \App\Model\GalleryModel
@@ -203,5 +254,5 @@ class GalleryModel extends BasicGalleryModel
 
         return $this;
     }
-
+    
 }

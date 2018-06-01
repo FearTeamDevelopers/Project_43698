@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Model;
 
 use App\Model\Basic\BasicPhotoModel;
@@ -9,6 +8,9 @@ use App\Model\Basic\BasicPhotoModel;
  */
 class PhotoModel extends BasicPhotoModel
 {
+
+    const DEFAULT_PATH_TO_THUMBS = 'public/uploads/images';
+    const DEFAULT_PATH_TO_IMAGES = 'public/uploads/images';
 
     /**
      * @readwrite
@@ -116,10 +118,7 @@ class PhotoModel extends BasicPhotoModel
     public static function fetchPhotosByGalleryIdPaged($galleryId, $limit = 30, $page = 1)
     {
         return self::all(
-                ['active = ?' => true, 'galleryId = ?' => (int) $galleryId],
-                ['*'],
-                ['rank' => 'desc', 'created' => 'desc'], $limit, $page
+                ['active = ?' => true, 'galleryId = ?' => (int) $galleryId], ['*'], ['rank' => 'desc', 'created' => 'desc'], $limit, $page
         );
     }
-
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
@@ -7,7 +6,9 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Registry\Registry;
+use THCFrame\Core\Core;
 use THCFrame\Core\StringMethods;
+use THCFrame\Core\ArrayMethods;
 use App\Model\GalleryModel;
 
 /**
@@ -109,7 +110,7 @@ class GalleryController extends Controller
     {
         $view = $this->getActionView();
 
-        $gallery = GalleryModel::fetchGalleryById((int)$id);
+        $gallery = GalleryModel::fetchGalleryById((int) $id);
 
         if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -117,7 +118,8 @@ class GalleryController extends Controller
             self::redirect('/admin/gallery/');
         }
 
-        $view->set('gallery', $gallery);
+        $view->set('gallery', $gallery)
+            ->set('video', null);
     }
 
     /**
@@ -131,7 +133,7 @@ class GalleryController extends Controller
     {
         $view = $this->getActionView();
 
-        $gallery = GalleryModel::fetchGalleryById((int)$id);
+        $gallery = GalleryModel::fetchGalleryById((int) $id);
 
         if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -205,44 +207,14 @@ class GalleryController extends Controller
         }
 
         $gallery = GalleryModel::first(
-            ['id = ?' => (int)$id], ['id', 'title', 'created', 'userId', 'urlKey']
+                ['id = ?' => (int) $id], ['id', 'title', 'created', 'userId', 'urlKey']
         );
 
         if (null === $gallery) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             if ($this->_checkAccess($gallery)) {
-                $fm = new FileManager();
-                $configuration = Registry::get('configuration');
-
-                if (!empty($configuration->files)) {
-                    $pathToImages = trim($configuration->files->pathToImages, '/');
-                    $pathToThumbs = trim($configuration->files->pathToThumbs, '/');
-                } else {
-                    $pathToImages = 'public/uploads/images';
-                    $pathToThumbs = 'public/uploads/images';
-                }
-
-                $photos = \App\Model\PhotoModel::all(['galleryId = ?' => (int)$id], ['id']);
-
-                if (!empty($photos)) {
-                    $ids = [];
-                    foreach ($photos as $colPhoto) {
-                        $ids[] = $colPhoto->getId();
-                    }
-
-                    \App\Model\PhotoModel::deleteAll(['id IN ?' => $ids]);
-
-                    $path = APP_PATH . '/' . $pathToImages . '/gallery/' . $gallery->getUrlKey();
-                    $pathThumbs = APP_PATH . '/' . $pathToThumbs . '/gallery/' . $gallery->getUrlKey();
-
-                    if ($path == $pathThumbs) {
-                        $fm->remove($path);
-                    } else {
-                        $fm->remove($path);
-                        $fm->remove($pathThumbs);
-                    }
-                }
+                GalleryModel::deleteAllPhotos($gallery->getId());
 
                 if ($gallery->delete()) {
                     $this->getCache()->erase('gallery');
@@ -253,6 +225,49 @@ class GalleryController extends Controller
                         'fail',
                         'Gallery id: ' . $id,
                         'Errors: ' . json_encode($gallery->getErrors())
+                    ]);
+                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
+                }
+            } else {
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+            }
+        }
+    }
+
+    /**
+     * Delete all photos (files and db) in gallery
+     *
+     * @before _secured, _participant
+     * @param int $id gallery id
+     */
+    public function deleteAllPhotos($id)
+    {
+        $this->disableView();
+        $view = $this->getActionView();
+
+        if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
+            $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
+        }
+
+        $gallery = GalleryModel::first(
+                ['id = ?' => (int) $id], ['id', 'title', 'created', 'userId', 'urlKey']
+        );
+
+        if (null === $gallery) {
+            $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
+        } else {
+            if ($this->_checkAccess($gallery)) {
+                try {
+                    GalleryModel::deleteAllPhotos($gallery->getId(), true);
+
+                    Event::fire('admin.log', ['success', 'Delete all photos in gallery id: ' . $id]);
+                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
+                } catch (\Exception $ex) {
+                    Event::fire('admin.log', [
+                        'fail',
+                        'Gallery id: ' . $id,
+                        'Errors: ' . json_encode($gallery->getErrors()),
+                        'Exception: ' . $ex->getMessage(),
                     ]);
                     $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
@@ -291,10 +306,10 @@ class GalleryController extends Controller
         if (RequestMethods::post('submitUpload')) {
             $galleryId = RequestMethods::post('galleryid');
             $gallery = GalleryModel::first(
-                [
-                    'id = ?' => (int)$galleryId,
+                    [
+                    'id = ?' => (int) $galleryId,
                     'active = ?' => true,
-                ], ['id', 'title', 'userId', 'urlKey']
+                    ], ['id', 'title', 'userId', 'urlKey']
             );
 
             if (null === $gallery) {
@@ -359,7 +374,7 @@ class GalleryController extends Controller
                                 'Errors: ' . json_encode($photo->getErrors())
                             ]);
                             Core::getLogger()->error('Gallery image create db record fail: {error}', ['error' => print_r($photo->getErrors(), true)]);
-                            $error = \THCFrame\Core\ArrayMethods::flatten($photo->getErrors());
+                            $error = ArrayMethods::flatten($photo->getErrors());
 
                             header('HTTP/1.0 400 Bad Request');
                             echo implode('<br/>', $error);
@@ -400,14 +415,14 @@ class GalleryController extends Controller
         }
 
         $photo = \App\Model\PhotoModel::first(
-            ['id = ?' => $id], ['id', 'imgMain', 'imgThumb', 'galleryId']
+                ['id = ?' => $id], ['id', 'imgMain', 'imgThumb', 'galleryId']
         );
 
         if (null === $photo) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                ['id = ?' => (int)$photo->getGalleryId()], ['id', 'userId']
+                    ['id = ?' => (int) $photo->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
@@ -448,13 +463,13 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $photo = \App\Model\PhotoModel::first(['id = ?' => (int)$id]);
+        $photo = \App\Model\PhotoModel::first(['id = ?' => (int) $id]);
 
         if (null === $photo) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                ['id = ?' => (int)$photo->getGalleryId()], ['id', 'userId']
+                    ['id = ?' => (int) $photo->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
@@ -505,7 +520,7 @@ class GalleryController extends Controller
      */
     public function changePhotoPosition($id)
     {
-
+        
     }
 
     /**
@@ -531,7 +546,7 @@ class GalleryController extends Controller
             }
 
             list($video, $errors) = \App\Model\VideoModel::createFromPost(
-                RequestMethods::getPostDataBag(), ['user' => $this->getUser()]
+                    RequestMethods::getPostDataBag(), ['user' => $this->getUser()]
             );
 
             if (empty($errors) && $video->validate()) {
@@ -564,13 +579,13 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $video = \App\Model\VideoModel::first(['id = ?' => (int)$id]);
+        $video = \App\Model\VideoModel::first(['id = ?' => (int) $id]);
 
         if (null === $video) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                ['id = ?' => (int)$video->getGalleryId()], ['id', 'userId']
+                    ['id = ?' => (int) $video->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
@@ -629,13 +644,13 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $video = \App\Model\VideoModel::first(['id = ?' => (int)$id]);
+        $video = \App\Model\VideoModel::first(['id = ?' => (int) $id]);
 
         if (null === $video) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                ['id = ?' => (int)$video->getGalleryId()], ['id', 'userId']
+                    ['id = ?' => (int) $video->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
@@ -660,5 +675,4 @@ class GalleryController extends Controller
             }
         }
     }
-
 }

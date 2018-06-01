@@ -831,7 +831,7 @@ jQuery(document).ready(function () {
         return false;
     });
 
-    jQuery('.ajaxReload').click(function () {
+    jQuery('.ajaxReload').click(function (event) {
         event.preventDefault();
         var url = jQuery(this).attr('href');
         var csrf = jQuery('#csrf').val();
@@ -851,11 +851,13 @@ jQuery(document).ready(function () {
                             jQuery('#csrf').val(data.csrf);
                             location.reload();
                         } else {
+                            jQuery("#loader, .loader").hide();
                             jQuery('#dialog p').text(data.message);
                         }
                     });
                 },
                 "Ne": function () {
+                    jQuery("#loader, .loader").hide();
                     jQuery('#dialog p').text('');
                     jQuery(this).dialog("close");
                 }

@@ -7,6 +7,8 @@
 
 {if isset($gallery)}
 <div class="content">
+    <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+    
     <div class="grid_4">
         <div class="contenttitle radiusbottom0">
             <h2 class="table"><span>{echo $gallery->title}</span></h2>
@@ -22,7 +24,7 @@
     </div>
     <div class="grid_4">
         <div class="contenttitle radiusbottom0">
-            <h2 class="table"><span>Avatar</span></h2>
+            <h2 class="image"><span>Avatar</span></h2>
         </div><!--contenttitle-->
         <br/>
         <div>
@@ -33,13 +35,22 @@
             {/else}
         </div>
     </div>
+    <div class="grid_4">
+        <div class="contenttitle radiusbottom0">
+            <h2 class="image"><span>Smazat</span></h2>
+        </div><!--contenttitle-->
+        <br/>
+        <div>
+            <a href="/admin/gallery/deleteallphotos/{echo $gallery->id}" class="btn btn_trash ajaxReload"><span>Smazat všechny fotky v gallerii</span></a>
+        </div>
+    </div>
     <div class="clear"></div>
     <div class="grid_7">
         <div class="contenttitle radiusbottom0">
-            <h2 class="table"><span>Připojit video z youtube.com</span></h2>
+            <h2 class="image"><span>Připojit video z youtube.com</span></h2>
         </div><!--contenttitle-->
         <form class="stdform stdform2" method="post" action="/admin/gallery/connectvideo/">
-            <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
+            
             <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
             <input type="hidden" name="galleryid"  value="{echo $gallery->getId()}"/>
             <p>
@@ -59,11 +70,10 @@
     </div>
     <div class="grid_9">
         <div class="contenttitle radiusbottom0">
-            <h2 class="table"><span>Nahrát fotky<button class="stdbtn marginleft15" id="dropzoneProcess">Nahrát</button></span></h2>
+            <h2 class="image"><span>Nahrát fotky<button class="stdbtn marginleft15" id="dropzoneProcess">Nahrát</button></span></h2>
         </div><!--contenttitle-->
         <form action="/admin/gallery/upload/" class="dropzone">
             <input type="hidden" name="MAX_FILE_SIZE" value="18000000"/>
-            <input type="hidden" name="csrf" id="csrf" value="{echo $token}" />
             <input type="hidden" name="galleryid"  value="{echo $gallery->getId()}"/>
             <input type="hidden" name="submitUpload" value="Upload" />
 

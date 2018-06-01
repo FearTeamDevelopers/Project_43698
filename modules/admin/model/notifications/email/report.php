@@ -24,7 +24,7 @@ class Report extends EmailAbstract
 
         if ($report->getApproved() && $this->config->new_report_notification) {
             $emailTpl = $this->getEmailTemplate($this->getCreateTemplateName(), $data, $report->getTitle());
-            $users = UserModel::all(['getNewReportNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewReportNotification');
 
             $this->send($emailTpl, $users);
         }
@@ -42,7 +42,7 @@ class Report extends EmailAbstract
 
         if ($report->getApproved() && $this->config->update_report_notification) {
             $emailTpl = $this->getEmailTemplate($this->getUpdateTemplateName(), $data, $report->getTitle());
-            $users = UserModel::all(['getNewReportNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewReportNotification');
 
             $this->send($emailTpl, $users);
         }
@@ -60,7 +60,7 @@ class Report extends EmailAbstract
 
         if ($report->getApproved() && $this->config->delete_report_notification) {
             $emailTpl = $this->getEmailTemplate($this->getDeleteTemplateName(), $data, $report->getTitle());
-            $users = UserModel::all(['getNewReportNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewReportNotification');
 
             $this->send($emailTpl, $users);
         }

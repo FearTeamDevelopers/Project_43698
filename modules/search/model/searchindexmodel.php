@@ -108,6 +108,8 @@ class SearchIndexModel extends BasicSearchIndexModel
     {
         $cleanStr = StringMethods::cleanString($text);
         $body = [];
+        $whereCond = '';
+        $totalCount = 0;
 
         $words = explode(' ', $cleanStr);
         $searchQuery = self::getQuery(
@@ -128,6 +130,7 @@ class SearchIndexModel extends BasicSearchIndexModel
             if ($bazarOnly === true) {
                 $whereCond = "si.sourceModel = 'Bazar' AND ";
             }
+            
             $whereCondArr = array_fill(0, count($words), "si.sword LIKE '%%?%%'");
             $whereCond .= '(' . implode(' OR ', $whereCondArr) . ')';
 

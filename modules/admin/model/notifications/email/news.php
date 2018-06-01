@@ -24,7 +24,7 @@ class News extends EmailAbstract
 
         if ($news->getApproved() && $this->config->new_news_notification) {
             $emailTpl = $this->getEmailTemplate($this->getCreateTemplateName(), $data, $news->getTitle());
-            $users = UserModel::all(['getNewNewsNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewNewsNotification');
 
             $this->send($emailTpl, $users);
         }
@@ -42,7 +42,7 @@ class News extends EmailAbstract
 
         if ($news->getApproved() && $this->config->update_news_notification) {
             $emailTpl = $this->getEmailTemplate($this->getUpdateTemplateName(), $data, $news->getTitle());
-            $users = UserModel::all(['getNewNewsNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewNewsNotification');
 
             $this->send($emailTpl, $users);
         }
@@ -60,7 +60,7 @@ class News extends EmailAbstract
 
         if ($news->getApproved() && $this->config->delete_news_notification) {
             $emailTpl = $this->getEmailTemplate($this->getDeleteTemplateName(), $data, $news->getTitle());
-            $users = UserModel::all(['getNewNewsNotification = ?' => true], ['email']);
+            $users = UserModel::getUserEmailsForNotification('getNewNewsNotification');
 
             $this->send($emailTpl, $users);
         }

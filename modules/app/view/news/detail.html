@@ -1,9 +1,12 @@
 
-<section class="wrapper singlePage">
+<section class="wrapper singlePage newsDetail">
   <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
-  <div class="row container">
-    <header>
-      <h1>{echo $news->getTitle()}</h1><span>{echo "Vytvořil: ".$news->getUserAlias().", ".\App\Helper\DateFormater::t2d($news->getCreated())}</span>
-    </header>{echo html_entity_decode($news->getBody())}
+  <div class="row">
+    <div class="container large-12 medium-12 small-12 centerBlock">
+      <header class="row">
+        <h2>{echo $news->getTitle()}</h2>
+      </header><span>{echo "Vytvořil: ".$news->getUserAlias().", ".\App\Helper\DateFormater::t2d($news->getCreated())}</span>
+    </div>
+    <div class="newsContent large-12 medium-12 small-12 centerBlock">{echo html_entity_decode($news->getBody())}</div>
   </div>
 </section>

@@ -1,40 +1,39 @@
-section.wrapper.singlePage
-    .row.container
-        input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
-        header
-            h1 {echo $action->getTitle()}
+section.wrapper.singlePage.actionDetail
+    .row
+        .container.large-12.medium-12.small-12.centerBlock
+            input(type="hidden", name="csrf", id="csrf", value!="{echo $token}")
+            header.row
+                h2 {echo $action->getTitle()}<hr/>{echo \App\Helper\DateFormater::t2d($action->getStartDate())} - {echo \App\Helper\DateFormater::t2d($action->getEndDate())}
+            
             |{if $isMember && $action->getStartDate() > date("Y-m-d")}
-            .buttonWrapper
-                ul
+            .buttonWrapper.center
+                ul.large-12.medium-12.small-12
                     |{if $authuseratt != \App\Model\AttendanceModel::ACCEPT}
-                    li
-                        a(href!="/akce/ucast/{echo $action->getId().'/'.\\App\\Model\\AttendanceModel::ACCEPT}").fi-check.ajaxChangestate Zúčastním se
+                    li.large-6.medium-6.small-12
+                        a(href!="/akce/ucast/{echo $action->getId().'/'.\\App\\Model\\AttendanceModel::ACCEPT}").fi-like.ajaxChangestate Zúčastním se
                     |{/if}
                     |{if $authuseratt != \App\Model\AttendanceModel::MAYBE}
-                    li
+                    li.large-6.medium-6.small-12
                         a(href!="/akce/ucast/{echo $action->getId().'/'.\\App\\Model\\AttendanceModel::MAYBE}").fi-info.ajaxChangestate Přemýšlím o tom
                     |{/if}
                     |{if $authuseratt == \App\Model\AttendanceModel::ACCEPT || $authuseratt == \App\Model\AttendanceModel::MAYBE}
-                    li
-                        a(href!="/akce/ucast/{echo $action->getId().'/'.\\App\\Model\\AttendanceModel::REJECT}").fi-x.ajaxChangestate Nezúčastním se
+                    li.large-6.medium-6.small-12
+                        a(href!="/akce/ucast/{echo $action->getId().'/'.\\App\\Model\\AttendanceModel::REJECT}").fi-dislike.ajaxChangestate Nezúčastním se
                     |{/if}
             |{/if}
-            span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
-            |{if $isMember && !empty($attendance)}
-            br
-            strong Zúčastní se:
-            |{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}
-            br
-            strong Ještě neví:
-            |{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
-            |{/if}
-            hr
-            |{if !empty($action->getStartDate())}
-            span Datum: <strong>{echo \App\Helper\DateFormater::t2d($action->getStartDate())}</strong> - <strong>{echo \App\Helper\DateFormater::t2d($action->getEndDate())}</strong>
-            br
-            |{/if}
-            |{if !empty($action->getStartTime())}
-            span Čas: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/>
-            |{/if}
-            br
-        |{echo html_entity_decode($action->getBody())}
+            .large-12.medium-12.small-12
+                span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
+                |{if $isMember && !empty($attendance)}
+                br
+                strong Zúčastní se:
+                |{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}
+                br
+                strong Ještě neví:
+                |{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
+                |{/if}
+                |{if !empty($action->getStartTime())}
+                span Začátek a konec akce: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/>
+                |{/if}
+                hr
+            .actionContent.large-12.medium-12.small-12.centerBlock
+                |{echo html_entity_decode($action->getBody())}
