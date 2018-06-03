@@ -3,7 +3,7 @@
   <input type="hidden" name="csrf" id="csrf" value="{echo $token}"/>
   <header class="row">
     <div class="reportInfo large-12 column">
-      <h2>{echo $report->getTitle()}</h2><small><span>Autor:</span></small><span>{echo " ".$report->getUserAlias()}</span><br/><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}</span>
+      <h2>{echo $report->getTitle()}</h2><small><span>Autor: {echo " ".$report->getUserAlias()}</span></small><br/><small><span>{echo \App\Helper\DateFormater::t2d($report->getCreated())}</span></small>
     </div>
     <div class="imgWrapper large-12 column"><img src="{echo $report->getImgMain()}" alt="{echo $report->getPhotoName()}" class="centerBlock"/></div>
   </header>

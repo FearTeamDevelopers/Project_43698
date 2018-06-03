@@ -22,7 +22,8 @@ section.wrapper.singlePage.actionDetail
                     |{/if}
             |{/if}
             .large-12.medium-12.small-12
-                span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
+                small
+                    span {echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}
                 |{if $isMember && !empty($attendance)}
                 br
                 strong Zúčastní se:

@@ -1,5 +1,4 @@
 <?php
-
 namespace Admin\Model;
 
 use THCFrame\Request\RequestMethods;
@@ -72,13 +71,13 @@ class EmailModel extends BasicEmailModel
     public static function fetchCommonActiveByIdAndLang($id, $fieldName)
     {
         return \Admin\Model\EmailModel::first(
-                        ['id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1], [$fieldName, 'subject']);
+                ['id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1], [$fieldName, 'subject']);
     }
 
     public static function fetchActiveByIdAndLang($id, $fieldName)
     {
         return \Admin\Model\EmailModel::first(
-                        ['id = ?' => (int) $id, 'active = ?' => true], [$fieldName, 'subject']);
+                ['id = ?' => (int) $id, 'active = ?' => true], [$fieldName, 'subject']);
     }
 
     /**
@@ -103,7 +102,7 @@ class EmailModel extends BasicEmailModel
             }
         }
 
-        $email->body = $emailText;
+        $email->body = \THCFrame\Core\StringMethods::prepareEmailText($emailText);
 
         return $email;
     }
@@ -122,10 +121,8 @@ class EmailModel extends BasicEmailModel
                 $emailText = str_replace($key, $value, $emailText);
             }
         }
-
-        $this->_body = $emailText;
+        $this->_body = \THCFrame\Core\StringMethods::prepareEmailText($emailText);
 
         return $this;
     }
-
 }

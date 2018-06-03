@@ -15,7 +15,7 @@
           <li class="large-6 medium-6 small-12"><a href="/akce/ucast/{echo $action->getId().'/'.\App\Model\AttendanceModel::REJECT}" class="fi-dislike ajaxChangestate">Nezúčastním se</a></li>{/if}
         </ul>
       </div>{/if}
-      <div class="large-12 medium-12 small-12"><span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span>{if $isMember && !empty($attendance)}<br/><strong>Zúčastní se:</strong>{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}<br/><strong>Ještě neví:</strong>{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
+      <div class="large-12 medium-12 small-12"><small><span>{echo "Vytvořil: ".$action->getUserAlias().", ".\App\Helper\DateFormater::t2d($action->getCreated())}</span></small>{if $isMember && !empty($attendance)}<br/><strong>Zúčastní se:</strong>{script $acceptStr = implode(", ", $attendance[\App\Model\AttendanceModel::ACCEPT])}{echo $acceptStr}<br/><strong>Ještě neví:</strong>{script $maybeStr = implode(", ", $attendance[\App\Model\AttendanceModel::MAYBE])}{echo $maybeStr}
         {/if}
         {if !empty($action->getStartTime())}<span>Začátek a konec akce: <strong>{echo $action->getStartTime()}</strong> - <strong>{echo $action->getEndTime()}</strong><br/></span>{/if}
         <hr/>

@@ -696,6 +696,8 @@ class StringMethods
     {
         $prepared = str_replace(['</p>', '</div>'], '<br/>', $text);
         $prepared = strip_tags($prepared, '<br/><br><a><img/><img><table><tr><td><tbody><meta/><meta>');
+        $prepared = preg_replace('/\t+/', ' ', $prepared);
+        $prepared = preg_replace('/\s+/', ' ', $prepared);
 
         return $prepared;
     }

@@ -4,10 +4,10 @@ section.wrapper.report
         .reportInfo.large-12.column
             h2 {echo $report->getTitle()}
             small
-                span Autor:
-            span {echo " ".$report->getUserAlias()}
+                span Autor: {echo " ".$report->getUserAlias()}
             br
-            span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
+            small
+                span {echo \App\Helper\DateFormater::t2d($report->getCreated())}
         .imgWrapper.large-12.column
             img.centerBlock(src!='{echo $report->getImgMain()}' alt!='{echo $report->getPhotoName()}')
     .page.row

@@ -65,6 +65,8 @@ class Mailer extends Base
             $this->mailer = \Swift_Mailer::newInstance($this->transporter);
             $this->message = \Swift_Message::newInstance(null);
             $this->config = Registry::get('configuration');
+            
+            $this->message->setEncoder(new \Swift_Mime_ContentEncoder_PlainContentEncoder('8bit'));            
         } catch (\Exception $e) {
             Core::getLogger()->error('Exception while initializing mailer: {exception}', ['exception' => $e]);
         }
