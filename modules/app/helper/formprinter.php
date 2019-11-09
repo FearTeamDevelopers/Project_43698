@@ -5,10 +5,11 @@ namespace App\Helper;
 class FormPrinter
 {
     /**
-     * @param type $object
-     * @param type $atribute
+     * @param mixed $object
+     * @param string $atribute
      *
-     * @return type
+     * @param string $default
+     * @return string
      */
     public static function iset($object, $atribute, $default = '')
     {
@@ -16,12 +17,12 @@ class FormPrinter
     }
 
     /**
-     * @param type $type
-     * @param type $name
-     * @param type $value
-     * @param type $options
+     * @param string $type
+     * @param string $name
+     * @param array $value
+     * @param array $options
      *
-     * @return type
+     * @return string
      */
     public static function input($type, $name, $value = [], $options = [])
     {
@@ -40,9 +41,9 @@ class FormPrinter
 
         foreach ($options as $key => $value) {
             if ($value === true) {
-                $htmlTag .= ' '.$key.' ';
+                $htmlTag .= ' ' . $key . ' ';
             } else {
-                $htmlTag .= ' '.$key.'="'.$value.'" ';
+                $htmlTag .= ' ' . $key . '="' . $value . '" ';
             }
         }
 

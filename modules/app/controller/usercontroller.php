@@ -1,10 +1,26 @@
 <?php
+
 namespace App\Controller;
 
-use App\Etc\Controller as Controller;
-use THCFrame\Request\RequestMethods;
+use Admin\Model\EmailModel;
+use App\Etc\Controller;
+use App\Model\AttendanceModel;
+use App\Model\CommentModel;
+use App\Model\FeedbackModel;
+use App\Model\UserModel;
+use Exception;
 use THCFrame\Events\Events as Event;
+use THCFrame\Mailer\Mailer;
+use THCFrame\Model\Exception\Connector;
+use THCFrame\Model\Exception\Implementation;
 use THCFrame\Registry\Registry;
+use THCFrame\Request\RequestMethods;
+use THCFrame\Security\Exception\UserBlocked;
+use THCFrame\Security\Exception\UserExpired;
+use THCFrame\Security\Exception\UserInactive;
+use THCFrame\Security\Exception\UserNotExists;
+use THCFrame\Security\Exception\UserPassExpired;
+use THCFrame\Security\Exception\WrongPassword;
 use THCFrame\View\View;
 
 /**
@@ -63,25 +79,25 @@ class UserController extends Controller
                     }
 
                     self::redirect('/muj-profil');
-                } catch (\THCFrame\Security\Exception\UserBlocked $ex) {
+                } catch (UserBlocked $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', ['fail', sprintf('Account locked for %s', $email)]);
-                } catch (\THCFrame\Security\Exception\UserInactive $ex) {
+                } catch (UserInactive $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', ['fail', sprintf('Account inactive for %s', $email)]);
-                } catch (\THCFrame\Security\Exception\UserExpired $ex) {
+                } catch (UserExpired $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', ['fail', sprintf('Account expired for %s', $email)]);
-                } catch (\THCFrame\Security\Exception\UserNotExists $ex) {
+                } catch (UserNotExists $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', ['fail', sprintf('User %s does not exists', $email)]);
-                } catch (\THCFrame\Security\Exception\WrongPassword $ex) {
+                } catch (WrongPassword $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', ['fail', sprintf('Wrong password provided for user %s', $email)]);
-                } catch (\THCFrame\Security\Exception\UserPassExpired $ex) {
+                } catch (UserPassExpired $ex) {
                     $view->set('account_error', $this->lang('LOGIN_COMMON_ERROR'));
                     Event::fire('app.log', ['fail', sprintf('Password has expired for user %s', $email)]);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Event::fire('app.log', ['fail', 'Exception: ' . $e->getMessage()]);
 
                     if (ENV == 'dev') {
@@ -146,22 +162,23 @@ class UserController extends Controller
                 return;
             }
 
-            list($user, $errors) = \App\Model\UserModel::createUser(RequestMethods::getPostDataBag(), [
+            list($user, $errors) = UserModel::createUser(RequestMethods::getPostDataBag(), [
                     'verifyEmail' => $this->getConfig()->registration_verif_email,
-                    'adminAccountActivation' => $this->getConfig()->registration_admin_activate]
+                    'adminAccountActivation' => $this->getConfig()->registration_admin_activate,
+                ]
             );
 
             if (empty($errors) && $user->validate()) {
                 $uid = $user->save();
 
-                $mailer = new \THCFrame\Mailer\Mailer();
+                $mailer = new Mailer();
 
                 //odeslani notifikace administratorum, ze byl zaregistrovan novy uzivatel
                 if ($this->getConfig()->registration_admin_activate) {
-                    $admins = \App\Model\UserModel::fetchAdminsEmail();
+                    $admins = UserModel::fetchAdminsEmail();
 
                     $data = ['{USERNAME}' => $user->getWholeName(), '{USEREMAIL}' => $user->getEmail()];
-                    $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('new-registration-notification', $data);
+                    $emailTpl = EmailModel::loadAndPrepare('new-registration-notification', $data);
                     if ($emailTpl !== null) {
                         $mailer->setBody($emailTpl->getBody())
                             ->setSubject($emailTpl->getSubject())
@@ -171,7 +188,8 @@ class UserController extends Controller
                         if ($mailer->send()) {
                             Event::fire('app.log', ['success', 'Notification email about new registration to admin']);
                         } else {
-                            Event::fire('app.log', ['fail', 'Notification email about new registration to admin failed']);
+                            Event::fire('app.log',
+                                ['fail', 'Notification email about new registration to admin failed']);
                         }
 
                         $view->successMessage($this->lang('REGISTRATION_SUCCESS_ADMIN_ACTIVATION'));
@@ -181,7 +199,7 @@ class UserController extends Controller
                     }
                 } elseif ($this->getConfig()->registration_verif_email) { //odeslani overovaciho emailu
                     $data = ['{TOKEN}' => $actToken];
-                    $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('email-verification', $data);
+                    $emailTpl = EmailModel::loadAndPrepare('email-verification', $data);
                     if ($emailTpl !== null) {
                         $mailer->setBody($emailTpl->getBody())
                             ->setSubject($emailTpl->getSubject())
@@ -208,8 +226,11 @@ class UserController extends Controller
 
                 self::redirect('/');
             } else {
-                Event::fire('app.log', ['fail', 'User id: ' . $id,
-                    'Errors: ' . json_encode($errors + $user->getErrors()),]);
+                Event::fire('app.log', [
+                    'fail',
+                    'User id: ',
+                    'Errors: ' . json_encode($errors + $user->getErrors()),
+                ]);
                 $view->set('errors', $errors + $user->getErrors())
                     ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
                     ->set('user', $user);
@@ -228,16 +249,17 @@ class UserController extends Controller
 
         $canonical = $this->getServerHost() . '/muj-profil';
 
-        $user = \App\Model\UserModel::first(['id = ?' => $this->getUser()->getId()]);
-        $myActions = \App\Model\AttendanceModel::fetchActionsByUserId($this->getUser()->getId(), true);
+        $user = UserModel::first(['id = ?' => $this->getUser()->getId()]);
+        $myActions = AttendanceModel::fetchActionsByUserId($this->getUser()->getId(), true);
 
         if (!empty($myActions)) {
             foreach ($myActions as &$action) {
-                $action->latestComments = \App\Model\CommentModel::fetchByTypeAndCreated(
-                        \App\Model\CommentModel::RESOURCE_ACTION, $action->getId(), Registry::get('session')->get('userLastLogin')
+                $action->latestComments = CommentModel::fetchByTypeAndCreated(
+                    CommentModel::RESOURCE_ACTION, $action->getId(),
+                    Registry::get('session')->get('userLastLogin')
                 );
-                unset($action);
             }
+            unset($action);
         }
 
         $this->getLayoutView()
@@ -251,7 +273,7 @@ class UserController extends Controller
                 self::redirect('/muj-profil');
             }
 
-            list($user, $errors) = \App\Model\UserModel::editUserProfile(RequestMethods::getPostDataBag(), $user);
+            list($user, $errors) = UserModel::editUserProfile(RequestMethods::getPostDataBag(), $user);
 
             if (empty($errors) && $user->validate()) {
                 $user->save();
@@ -260,8 +282,11 @@ class UserController extends Controller
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/muj-profil');
             } else {
-                Event::fire('app.log', ['fail', 'User id: ' . $user->getId(),
-                    'Errors: ' . json_encode($errors + $user->getErrors()),]);
+                Event::fire('app.log', [
+                    'fail',
+                    'User id: ' . $user->getId(),
+                    'Errors: ' . json_encode($errors + $user->getErrors()),
+                ]);
                 $view->set('errors', $errors + $user->getErrors());
             }
         }
@@ -271,12 +296,14 @@ class UserController extends Controller
      * Activate account via activation link send by email.
      *
      * @param string $key activation token
+     * @throws Connector
+     * @throws Implementation
      */
     public function activateAccount($key)
     {
         $view = $this->getActionView();
 
-        $user = \App\Model\UserModel::first(['active = ?' => false, 'emailActivationToken = ?' => $key]);
+        $user = UserModel::first(['active = ?' => false, 'emailActivationToken = ?' => $key]);
         $adminAccountActivation = $this->getConfig()->registration_admin_activate;
 
         if (null === $user) {
@@ -294,8 +321,11 @@ class UserController extends Controller
             $view->successMessage($this->lang('ACCOUNT_ACTIVATED'));
             self::redirect('/');
         } else {
-            Event::fire('app.log', ['fail', 'User Id: ' . $user->getId(),
-                'Errors: ' . json_encode($user->getErrors()),]);
+            Event::fire('app.log', [
+                'fail',
+                'User Id: ' . $user->getId(),
+                'Errors: ' . json_encode($user->getErrors()),
+            ]);
             $view->warningMessage($this->lang('COMMON_FAIL'));
             self::redirect('/');
         }
@@ -328,19 +358,24 @@ class UserController extends Controller
             }
 
             $userAlias = $this->getUser() !== null ? $this->getUser()->getWholeName() : 'annonymous';
-            $feedback = new \App\Model\FeedbackModel([
+            $feedback = new FeedbackModel([
                 'userAlias' => $userAlias,
                 'message' => RequestMethods::post('message'),
+                'created' => date('Y-m-d H:i'),
+                'modified' => date('Y-m-d H:i'),
             ]);
 
             if ($feedback->validate()) {
                 $id = $feedback->save();
 
-                $data = ['{TITLE}' => 'Hastrman feedback', '{TEXT}' => 'User: ' . $feedback->getUserAlias() . '<br/>Message: ' . $feedback->getMessage()];
-                $emailTpl = \Admin\Model\EmailModel::loadAndPrepare('default-email', $data);
+                $data = [
+                    '{TITLE}' => 'Hastrman feedback',
+                    '{TEXT}' => 'User: ' . $feedback->getUserAlias() . '<br/>Message: ' . $feedback->getMessage(),
+                ];
+                $emailTpl = EmailModel::loadAndPrepare('default-email', $data);
 
                 if ($emailTpl !== null) {
-                    $mailer = new \THCFrame\Mailer\Mailer();
+                    $mailer = new Mailer();
                     $mailer->setBody($emailTpl->getBody())
                         ->setSubject($emailTpl->getSubject() . ' - Feedback')
                         ->send();
@@ -362,7 +397,7 @@ class UserController extends Controller
     }
 
     /**
-     * 
+     *
      */
     public function deleteAccount()
     {
@@ -371,7 +406,7 @@ class UserController extends Controller
         $this->disableView();
 
         $userId = $this->getUser()->getId();
-        $res = \App\Model\UserModel::deleteUser($userId);
+        $res = UserModel::deleteUser($userId);
 
         if ($res === true) {
             Event::fire('app.log', ['success', 'User account deleted: ' . $userId]);

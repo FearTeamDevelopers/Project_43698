@@ -1,15 +1,24 @@
 <?php
+
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Request\RequestMethods;
+use Admin\Model\AdminLogModel;
+use Admin\Model\SitemapModel;
+use Exception;
+use PHPWee\Minify;
+use THCFrame\Configuration\Model\ConfigModel;
+use THCFrame\Core\Core;
 use THCFrame\Database\Mysqldump;
 use THCFrame\Events\Events as Event;
-use THCFrame\Configuration\Model\ConfigModel;
-use THCFrame\Profiler\Profiler;
-use THCFrame\Router\Model\RedirectModel;
 use THCFrame\Filesystem\LineCounter;
-use THCFrame\Core\Core;
+use THCFrame\Model\Exception\Connector;
+use THCFrame\Model\Exception\Implementation;
+use THCFrame\Model\Generator;
+use THCFrame\Profiler\Profiler;
+use THCFrame\Registry\Registry;
+use THCFrame\Request\RequestMethods;
+use THCFrame\View\Exception\Data;
 
 /**
  *
@@ -20,7 +29,7 @@ class SystemController extends Controller
     /**
      * @before _secured, _admin
      */
-    public function index()
+    public function index(): void
     {
 
     }
@@ -30,7 +39,7 @@ class SystemController extends Controller
      *
      * @before _secured, _admin
      */
-    public function common()
+    public function common(): void
     {
         $this->disableView();
         $view = $this->getActionView();
@@ -53,7 +62,7 @@ class SystemController extends Controller
             foreach (glob($jsPath . '/*.js') as $file) {
                 $content = file_get_contents($file);
                 $fileName = basename($file, '.js');
-                $minified = \PHPWee\Minify::js($content);
+                $minified = Minify::js($content);
                 file_put_contents($jsPath . '/build/' . $fileName . '.js', $minified);
             }
 
@@ -67,7 +76,7 @@ class SystemController extends Controller
      *
      * @before _secured, _admin
      */
-    public function createDatabaseBackup()
+    public function createDatabaseBackup(): void
     {
         $view = $this->getActionView();
         $dump = new Mysqldump();
@@ -86,8 +95,11 @@ class SystemController extends Controller
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
             $view->errorMessage($ex->getMessage());
-            Event::fire('admin.log', ['fail', 'Database backup',
-                'Error: ' . $ex->getMessage(),]);
+            Event::fire('admin.log', [
+                'fail',
+                'Database backup',
+                'Error: ' . $ex->getMessage(),
+            ]);
         }
 
         self::redirect('/admin/system/');
@@ -97,27 +109,32 @@ class SystemController extends Controller
      * Get admin log.
      *
      * @before _secured, _superadmin
+     * @throws Connector
+     * @throws Implementation
+     * @throws Data
      */
-    public function showLog()
+    public function showLog(): void
     {
         $view = $this->getActionView();
-        $log = \Admin\Model\AdminLogModel::all([], ['*'], ['created' => 'DESC'], 500);
+        $log = AdminLogModel::all([], ['*'], ['created' => 'DESC'], 500);
         $view->set('adminlog', $log);
     }
 
     /**
      *
-     * @param type $id
+     * @param int $id
+     * @throws Connector
+     * @throws Implementation
      * @before _secured, _superadmin
      */
-    public function showLogDetail($id)
+    public function showLogDetail($id): void
     {
         $this->disableView();
 
-        $log = \Admin\Model\AdminLogModel::first(['id = ?' => (int) $id]);
+        $log = AdminLogModel::first(['id = ?' => (int)$id]);
 
         if (!empty($log)) {
-            $params = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+            $params = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', static function ($match) {
                 return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UTF-16BE');
             }, $log->getParams());
 
@@ -134,8 +151,11 @@ class SystemController extends Controller
      * Edit application settings.
      *
      * @before _secured, _admin
+     * @throws Connector
+     * @throws Implementation
+     * @throws Data
      */
-    public function settings()
+    public function settings(): void
     {
         $view = $this->getActionView();
         $config = ConfigModel::all([], ['*'], ['title' => 'ASC']);
@@ -152,7 +172,8 @@ class SystemController extends Controller
                 $conf->value = RequestMethods::post($conf->getXkey());
 
                 if ($conf->validate()) {
-                    Event::fire('admin.log', ['success', $conf->getXkey() . ': ' . $oldVal . ' - ' . $conf->getValue()]);
+                    Event::fire('admin.log',
+                        ['success', $conf->getXkey() . ': ' . $oldVal . ' - ' . $conf->getValue()]);
                     $conf->save();
                 } else {
                     Event::fire('admin.log', ['fail', $conf->getXkey() . ': ' . json_encode($conf->getErrors())]);
@@ -175,7 +196,7 @@ class SystemController extends Controller
      *
      * @before _secured
      */
-    public function showProfiler()
+    public function showProfiler(): void
     {
         $this->disableView();
 
@@ -187,11 +208,11 @@ class SystemController extends Controller
      *
      * @before _secured, _admin
      */
-    public function generateSitemap()
+    public function generateSitemap(): void
     {
         $view = $this->getActionView();
 
-        \Admin\Model\SitemapModel::generateSitemap();
+        $linkCounter = SitemapModel::generateSitemap();
 
         Event::fire('admin.log', ['success', 'Links count: ' . $linkCounter]);
         $view->successMessage('Soubor sitemap.xml byl aktualizován');
@@ -200,8 +221,10 @@ class SystemController extends Controller
 
     /**
      * @before _secured, _superadmin
+     * @throws Data
+     * @throws Data
      */
-    public function linecounter()
+    public function linecounter(): void
     {
         if (ENV !== 'dev') {
             exit;
@@ -219,20 +242,21 @@ class SystemController extends Controller
 
     /**
      * @before _secured, _superadmin
+     * @param string $dbIdent
      */
-    public function generator($dbIdent = 'main')
+    public function generator($dbIdent = 'main'): void
     {
         $this->disableView();
         $view = $this->getActionView();
 
         try {
-            $generator = new \THCFrame\Model\Generator(['dbIdent' => $dbIdent]);
+            $generator = new Generator(['dbIdent' => $dbIdent]);
             $generator->createModels();
 
             Event::fire('admin.log', ['success', 'Generate model classes']);
             $view->successMessage('New models were generated');
             self::redirect('/admin/system/');
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             Event::fire('admin.log', ['fail', 'An error occured while creating model classes: ' . $ex->getMessage()]);
             $view->errorMessage('An error occured while creating model classes: ' . $ex->getMessage());
             self::redirect('/admin/system/');
@@ -241,40 +265,19 @@ class SystemController extends Controller
 
     /**
      * @before _secured, _superadmin
+     * @param int $type
+     * @throws \THCFrame\Database\Exception\Mysqldump
      */
-    public function sync($type = 1)
+    public function sync($type = 1): void
     {
         //set_time_limit(0);
         $this->disableView();
         $view = $this->getActionView();
 
-        $models = [
-            '\App\Model\Basic\BasicActionModel',
-            '\App\Model\Basic\BasicAdimageModel',
-            '\App\Model\Basic\BasicAdmessageModel',
-            '\App\Model\Basic\BasicAdsectionModel',
-            '\App\Model\Basic\BasicAdvertisementModel',
-            '\App\Model\Basic\BasicAdvertisementhistoryModel',
-            '\App\Model\Basic\BasicAttendanceModel',
-            '\App\Model\Basic\BasicCommentModel',
-            '\App\Model\Basic\BasicFeedbackModel',
-            '\App\Model\Basic\BasicGalleryModel',
-            '\App\Model\Basic\BasicNewsModel',
-            '\App\Model\Basic\BasicPagecontentModel',
-            '\App\Model\Basic\BasicPartnerModel',
-            '\App\Model\Basic\BasicPhotoModel',
-            '\App\Model\Basic\BasicReportModel',
-            '\Admin\Model\Basic\BasicActionhistoryModel',
-            '\Admin\Model\Basic\BasicAdminlogModel',
-            '\Admin\Model\Basic\BasicConceptModel',
-            '\Admin\Model\Basic\BasicEmailModel',
-            '\Admin\Model\Basic\BasicImessageModel',
-            '\Admin\Model\Basic\BasicNewshistoryModel',
-            '\Admin\Model\Basic\BasicPagecontentHistoryModel',
-            '\Admin\Model\Basic\BasicReporthistoryModel',
-        ];
+        //TODO: get registered modules and go throught module\model\basic directory
+        $models = [];
 
-        $db = \THCFrame\Registry\Registry::get('database')->get();
+        $db = Registry::get('database')->get();
         $error = false;
         $executeQuery = false;
 

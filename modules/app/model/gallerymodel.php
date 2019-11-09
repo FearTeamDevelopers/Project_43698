@@ -44,6 +44,8 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -56,7 +58,10 @@ class GalleryModel extends BasicGalleryModel
     /**
      * Called from admin module.
      *
+     * @param int $limit
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchWithLimit($limit = 10)
     {
@@ -69,11 +74,10 @@ class GalleryModel extends BasicGalleryModel
     }
 
     /**
-     * Called from admin module.
-     *
-     * @param type $id
-     *
-     * @return type
+     * @param $id
+     * @return |null |null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchGalleryById($id)
     {
@@ -93,11 +97,10 @@ class GalleryModel extends BasicGalleryModel
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $urlkey
-     *
-     * @return type
+     * @param $urlkey
+     * @return mixed|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchPublicActiveGalleryByUrlkey($urlkey)
     {
@@ -109,9 +112,7 @@ class GalleryModel extends BasicGalleryModel
         $galleryArr = self::initialize($galleryQuery);
 
         if (!empty($galleryArr)) {
-            $gallery = array_shift($galleryArr);
-
-            return $gallery;
+            return array_shift($galleryArr);
         } else {
             return null;
         }
@@ -120,7 +121,11 @@ class GalleryModel extends BasicGalleryModel
     /**
      * Called from app module.
      *
-     * @param type $year
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchPublicActiveGalleries($limit = 30, $page = 1)
     {
@@ -140,21 +145,23 @@ class GalleryModel extends BasicGalleryModel
      *
      * @param type $urlKey
      * @return boolean
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function checkUrlKey($urlKey)
     {
         $status = self::first(['urlKey = ?' => $urlKey]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
-    
+
     /**
-     * 
+     *
      * @param int $id
+     * @param bool $keepGalleryDir
+     * @throws \THCFrame\Filesystem\Exception\IO
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function deleteAllPhotos(int $id, bool $keepGalleryDir = false)
     {
@@ -203,6 +210,8 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * @return \App\Model\GalleryModel
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function getAllPhotosForGallery()
     {
@@ -215,6 +224,8 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * @return \App\Model\GalleryModel
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function getActPhotosForGallery()
     {
@@ -229,6 +240,8 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * @return \App\Model\GalleryModel
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function getAllVideosForGallery()
     {
@@ -243,6 +256,8 @@ class GalleryModel extends BasicGalleryModel
 
     /**
      * @return \App\Model\GalleryModel
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function getActVideosForGallery()
     {

@@ -14,7 +14,7 @@ class ModuleObserver implements SubscriberInterface
 {
 
     /**
-     * @return type
+     * @return array
      */
     public function getSubscribedEvents()
     {
@@ -24,7 +24,9 @@ class ModuleObserver implements SubscriberInterface
     }
 
     /**
-     * @param array $params
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
+     * @throws \THCFrame\Model\Exception\Validation
      */
     public function searchLog()
     {

@@ -2,8 +2,6 @@
 
 namespace THCFrame\Bag;
 
-use THCFrame\Bag\BagInterface;
-
 /**
  * Description of abstractbag
  *
@@ -62,10 +60,9 @@ abstract class AbstractBag implements BagInterface
     }
 
     /**
-     *
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param $key
+     * @param null $default
+     * @return mixed|null
      */
     public function get($key, $default = null)
     {
@@ -113,8 +110,7 @@ abstract class AbstractBag implements BagInterface
     }
 
     /**
-     *
-     * @return type
+     * @return mixed
      */
     public function getName()
     {

@@ -41,7 +41,7 @@ class ArchiveController extends Controller
     {
         $this->disableView();
 
-        $articles = \App\Model\NewsModel::all(['created <= ?' => date('Y-m-d H:i:s', strtotime('-2 year')), 'archive = ?' => false], ['id', 'archive']);
+        $articles = \App\Model\NewsModel::all(['created <= ?' => date('Y-m-d H:i:s', strtotime('-1 year')), 'archive = ?' => false], ['id', 'archive']);
 
         if (!empty($articles)) {
             foreach ($articles as $article) {
@@ -64,7 +64,7 @@ class ArchiveController extends Controller
     {
         $this->disableView();
 
-        $articles = \App\Model\ReportModel::all(['created <= ?' => date('Y-m-d H:i:s', strtotime('-2 year')), 'archive = ?' => false], ['id', 'archive']);
+        $articles = \App\Model\ReportModel::all(['created <= ?' => date('Y-m-d H:i:s', strtotime('-1 year')), 'archive = ?' => false], ['id', 'archive']);
 
         if (!empty($articles)) {
             foreach ($articles as $article) {

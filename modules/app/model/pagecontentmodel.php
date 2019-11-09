@@ -33,6 +33,9 @@ class PageContentModel extends BasicPagecontentModel implements IndexableInterfa
 
     /**
      * @param type $urlKey
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchByUrlKey($urlKey)
     {
@@ -44,16 +47,14 @@ class PageContentModel extends BasicPagecontentModel implements IndexableInterfa
      *
      * @param type $urlKey
      * @return boolean
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function checkUrlKey($urlKey)
     {
         $status = self::first(['urlKey = ?' => $urlKey]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
 
 }

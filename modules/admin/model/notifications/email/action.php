@@ -2,9 +2,9 @@
 namespace Admin\Model\Notifications\Email;
 
 use THCFrame\Core\StringMethods;
-use Admin\Model\Notifications\Email\EmailAbstract;
 use Admin\Model\Notifications\Email\EmailTplNotificationConstants as TplNames;
 use App\Model\UserModel;
+use THCFrame\Model\Model;
 
 /**
  *
@@ -14,9 +14,9 @@ class Action extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $action
+     * @param Model $action
      */
-    public function onCreate(\THCFrame\Model\Model $action)
+    public function onCreate(Model $action)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/akce/r/' . $action->getUrlKey() . '">' . $action->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody()),
@@ -32,9 +32,9 @@ class Action extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $action
+     * @param Model $action
      */
-    public function onUpdate(\THCFrame\Model\Model $action)
+    public function onUpdate(Model $action)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/akce/r/' . $action->getUrlKey() . '">' . $action->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody()),
@@ -50,9 +50,9 @@ class Action extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $action
+     * @param Model $action
      */
-    public function onDelete(\THCFrame\Model\Model $action)
+    public function onDelete(Model $action)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/akce/r/' . $action->getUrlKey() . '">' . $action->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($action->getShortBody()),

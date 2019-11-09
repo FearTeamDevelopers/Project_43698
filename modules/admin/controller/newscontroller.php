@@ -3,11 +3,19 @@
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Request\RequestMethods;
-use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry;
-use Admin\Model\Notifications\Email\News as NewsNotification;
+use Admin\Model\ConceptModel;
+use Admin\Model\NewsHistoryModel;
 use App\Model\NewsModel;
+use ReflectionException;
+use THCFrame\Core\Exception\Argument;
+use THCFrame\Core\Exception\Lang;
+use THCFrame\Events\Events as Event;
+use THCFrame\Model\Exception\Connector;
+use THCFrame\Model\Exception\Implementation;
+use THCFrame\Model\Exception\Validation;
+use THCFrame\Registry\Registry;
+use THCFrame\Request\RequestMethods;
+use THCFrame\View\Exception\Data;
 
 /**
  *
@@ -16,28 +24,105 @@ class NewsController extends Controller
 {
 
     /**
-     * Check whether user has access to news or not.
+     * Get list of all news. Loaded via datatables ajax.
+     * For more check load function.
      *
-     * @param NewsModel $news
-     *
-     * @return bool
+     * @before _secured, _participant
      */
-    private function checkAccess(NewsModel $news)
+    public function index(): void
     {
-        if ($this->isAdmin() === true ||
-                $news->getUserId() == $this->getUser()->getId()) {
-            return true;
-        } else {
-            return false;
+
+    }
+
+    /**
+     * Create new news.
+     *
+     * @before _secured, _participant
+     * @throws Argument
+     * @throws Data
+     * @throws Lang
+     * @throws Connector
+     * @throws Implementation
+     */
+    public function add(): void
+    {
+        $view = $this->getActionView();
+        $news = $this->checkForObject();
+
+        $newsConcepts = ConceptModel::all([
+            'userId = ?' => $this->getUser()->getId(),
+            'type = ?' => ConceptModel::CONCEPT_TYPE_NEWS,
+        ], ['id', 'created', 'modified'], ['created' => 'DESC'], 10);
+
+        $view->set('news', $news)
+            ->set('concepts', $newsConcepts);
+
+        if (RequestMethods::post('submitAddNews')) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
+                $this->checkMultiSubmissionProtectionToken() !== true) {
+                self::redirect('/admin/news/');
+            }
+
+            [$news, $errors] = NewsModel::createFromPost(
+                RequestMethods::getPostDataBag(),
+                ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->news_autopublish]
+            );
+
+            if (empty($errors) && $news->validate()) {
+                $id = $news->save();
+
+//                NewsNotification::getInstance()->onCreate($news);
+
+                $this->getCache()->erase('news');
+                ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
+
+                Event::fire('admin.log', ['success', 'News id: ' . $id]);
+                $view->successMessage($this->lang('CREATE_SUCCESS'));
+                self::redirect('/admin/news/');
+            } else {
+                Event::fire('admin.log', [
+                    'fail',
+                    'Errors: ' . json_encode($errors + $news->getErrors()),
+                ]);
+                $view->set('errors', $errors + $news->getErrors())
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
+                    ->set('news', $news)
+                    ->set('conceptid', RequestMethods::post('conceptid'));
+            }
+        }
+
+        if (RequestMethods::post('submitPreviewNews')) {
+            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
+                $this->checkMultiSubmissionProtectionToken() !== true) {
+                self::redirect('/admin/news/');
+            }
+
+            [$news, $errors] = NewsModel::createFromPost(
+                RequestMethods::getPostDataBag(),
+                ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->news_autopublish]
+            );
+
+            if (empty($errors) && $news->validate()) {
+                $session = Registry::get('session');
+                $session->set('newsPreview', $news);
+                ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
+
+                self::redirect('/news/preview?action=add');
+            } else {
+                $view->set('errors', $errors + $news->getErrors())
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
+                    ->set('news', $news)
+                    ->set('conceptid', RequestMethods::post('conceptid'));
+            }
         }
     }
 
     /**
      * Check if there is object used for preview saved in session.
      *
-     * @return NewsModel
+     * @return NewsModel|null
      */
-    private function checkForObject()
+    private function checkForObject(): ?NewsModel
     {
         $session = Registry::get('session');
         $news = $session->get('newsPreview');
@@ -47,104 +132,27 @@ class NewsController extends Controller
     }
 
     /**
-     * Get list of all news. Loaded via datatables ajax.
-     * For more check load function.
-     *
-     * @before _secured, _participant
-     */
-    public function index()
-    {
-
-    }
-
-    /**
-     * Create new news.
-     *
-     * @before _secured, _participant
-     */
-    public function add()
-    {
-        $view = $this->getActionView();
-        $news = $this->checkForObject();
-
-        $newsConcepts = \Admin\Model\ConceptModel::all([
-                    'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS,], ['id', 'created', 'modified'], ['created' => 'DESC'], 10);
-
-        $view->set('news', $news)
-                ->set('concepts', $newsConcepts);
-
-        if (RequestMethods::post('submitAddNews')) {
-            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMultiSubmissionProtectionToken() !== true) {
-                self::redirect('/admin/news/');
-            }
-
-            list($news, $errors) = NewsModel::createFromPost(
-                            RequestMethods::getPostDataBag(), ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->news_autopublish]
-            );
-
-            if (empty($errors) && $news->validate()) {
-                $id = $news->save();
-                
-//                NewsNotification::getInstance()->onCreate($news);
-                
-                $this->getCache()->erase('news');
-                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
-
-                Event::fire('admin.log', ['success', 'News id: ' . $id]);
-                $view->successMessage($this->lang('CREATE_SUCCESS'));
-                self::redirect('/admin/news/');
-            } else {
-                Event::fire('admin.log', ['fail',
-                    'Errors: ' . json_encode($errors + $news->getErrors()),]);
-                $view->set('errors', $errors + $news->getErrors())
-                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
-                        ->set('news', $news)
-                        ->set('conceptid', RequestMethods::post('conceptid'));
-            }
-        }
-
-        if (RequestMethods::post('submitPreviewNews')) {
-            if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMultiSubmissionProtectionToken() !== true) {
-                self::redirect('/admin/news/');
-            }
-
-            list($news, $errors) = NewsModel::createFromPost(
-                            RequestMethods::getPostDataBag(), ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->news_autopublish]
-            );
-
-            if (empty($errors) && $news->validate()) {
-                $session = Registry::get('session');
-                $session->set('newsPreview', $news);
-                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
-
-                self::redirect('/news/preview?action=add');
-            } else {
-                $view->set('errors', $errors + $news->getErrors())
-                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
-                        ->set('news', $news)
-                        ->set('conceptid', RequestMethods::post('conceptid'));
-            }
-        }
-    }
-
-    /**
      * Edit existing news.
      *
      * @before _secured, _participant
      *
      * @param int $id news id
+     * @throws Argument
+     * @throws Data
+     * @throws Lang
+     * @throws ReflectionException
+     * @throws Validation
+     * @throws Connector
+     * @throws Implementation
      */
-    public function edit($id)
+    public function edit($id): void
     {
         $view = $this->getActionView();
 
         $news = $this->checkForObject();
 
         if (null === $news) {
-            $news = NewsModel::first(['id = ?' => (int) $id]);
+            $news = NewsModel::first(['id = ?' => (int)$id]);
 
             if (null === $news) {
                 $view->warningMessage($this->lang('NOT_FOUND'));
@@ -159,12 +167,13 @@ class NewsController extends Controller
             }
         }
 
-        $newsConcepts = \Admin\Model\ConceptModel::all([
-                    'userId = ?' => $this->getUser()->getId(),
-                    'type = ?' => \Admin\Model\ConceptModel::CONCEPT_TYPE_NEWS,], ['id', 'created', 'modified'], ['created' => 'DESC'], 10);
+        $newsConcepts = ConceptModel::all([
+            'userId = ?' => $this->getUser()->getId(),
+            'type = ?' => ConceptModel::CONCEPT_TYPE_NEWS,
+        ], ['id', 'created', 'modified'], ['created' => 'DESC'], 10);
 
         $view->set('news', $news)
-                ->set('concepts', $newsConcepts);
+            ->set('concepts', $newsConcepts);
 
         if (RequestMethods::post('submitEditNews')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
@@ -173,31 +182,34 @@ class NewsController extends Controller
 
             $originalNews = clone $news;
 
-            list($news, $errors) = NewsModel::editFromPost(
-                            RequestMethods::getPostDataBag(), $news, [
-                        'user' => $this->getUser(),
-                        'isAdmin' => $this->isAdmin(),
-                        'autoPublish' => $this->getConfig()->news_autopublish
-                            ]
+            [$news, $errors] = NewsModel::editFromPost(
+                RequestMethods::getPostDataBag(), $news, [
+                    'user' => $this->getUser(),
+                    'isAdmin' => $this->isAdmin(),
+                    'autoPublish' => $this->getConfig()->news_autopublish,
+                ]
             );
 
             if (empty($errors) && $news->validate()) {
                 $news->save();
-                
+
 //                NewsNotification::getInstance()->onUpdate($news);
-                
-                \Admin\Model\NewsHistoryModel::logChanges($originalNews, $news);
+
+                NewsHistoryModel::logChanges($originalNews, $news);
                 $this->getCache()->erase('news');
-                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
+                ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
 
                 Event::fire('admin.log', ['success', 'News id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/news/');
             } else {
-                Event::fire('admin.log', ['fail', 'News id: ' . $id,
-                    'Errors: ' . json_encode($errors + $news->getErrors()),]);
+                Event::fire('admin.log', [
+                    'fail',
+                    'News id: ' . $id,
+                    'Errors: ' . json_encode($errors + $news->getErrors()),
+                ]);
                 $view->set('errors', $errors + $news->getErrors())
-                        ->set('conceptid', RequestMethods::post('conceptid'));
+                    ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
 
@@ -206,12 +218,12 @@ class NewsController extends Controller
                 self::redirect('/admin/news/');
             }
 
-            list($news, $errors) = NewsModel::editFromPost(
-                            RequestMethods::getPostDataBag(), $news, [
-                        'user' => $this->getUser(),
-                        'isAdmin' => $this->isAdmin(),
-                        'autoPublish' => $this->getConfig()->news_autopublish
-                            ]
+            [$news, $errors] = NewsModel::editFromPost(
+                RequestMethods::getPostDataBag(), $news, [
+                    'user' => $this->getUser(),
+                    'isAdmin' => $this->isAdmin(),
+                    'autoPublish' => $this->getConfig()->news_autopublish,
+                ]
             );
 
             if (empty($errors) && $news->validate()) {
@@ -221,9 +233,22 @@ class NewsController extends Controller
                 self::redirect('/news/preview?action=edit');
             } else {
                 $view->set('errors', $errors + $news->getErrors())
-                        ->set('conceptid', RequestMethods::post('conceptid'));
+                    ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
+    }
+
+    /**
+     * Check whether user has access to news or not.
+     *
+     * @param NewsModel $news
+     *
+     * @return bool
+     */
+    private function checkAccess(NewsModel $news): ?bool
+    {
+        return $this->isAdmin() === true ||
+            $news->getUserId() == $this->getUser()->getId();
     }
 
     /**
@@ -232,8 +257,10 @@ class NewsController extends Controller
      * @before _secured, _participant
      *
      * @param int $id news id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function delete($id)
+    public function delete($id): void
     {
         $this->disableView();
 
@@ -242,26 +269,24 @@ class NewsController extends Controller
         }
 
         $news = NewsModel::first(
-                        ['id = ?' => (int) $id], ['id', 'userId']
+            ['id = ?' => (int)$id], ['id', 'userId']
         );
 
         if (null === $news) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-        } else {
-            if ($this->checkAccess($news)) {
-                if ($news->delete()) {
+        } elseif ($this->checkAccess($news)) {
+            if ($news->delete()) {
 //                    NewsNotification::getInstance()->onDelete($news);
-                    
-                    $this->getCache()->erase('news');
-                    Event::fire('admin.log', ['success', 'News id: ' . $id]);
-                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
-                } else {
-                    Event::fire('admin.log', ['fail', 'News id: ' . $id]);
-                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
-                }
+
+                $this->getCache()->erase('news');
+                Event::fire('admin.log', ['success', 'News id: ' . $id]);
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                Event::fire('admin.log', ['fail', 'News id: ' . $id]);
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
+        } else {
+            $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
         }
     }
 
@@ -271,8 +296,10 @@ class NewsController extends Controller
      * @before _secured, _admin
      *
      * @param int $id news id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function approveNews($id)
+    public function approveNews($id): void
     {
         $this->disableView();
 
@@ -280,7 +307,7 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $news = NewsModel::first(['id = ?' => (int) $id]);
+        $news = NewsModel::first(['id = ?' => (int)$id]);
 
         if (null === $news) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -294,16 +321,19 @@ class NewsController extends Controller
 
             if ($news->validate()) {
                 $news->save();
-                
+
 //                NewsNotification::getInstance()->onCreate($news);
-                
+
                 $this->getCache()->erase('news');
 
                 Event::fire('admin.log', ['success', 'News id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', ['fail', 'News id: ' . $id,
-                    'Errors: ' . json_encode($news->getErrors()),]);
+                Event::fire('admin.log', [
+                    'fail',
+                    'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors()),
+                ]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -315,8 +345,10 @@ class NewsController extends Controller
      * @before _secured, _admin
      *
      * @param int $id news id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function rejectNews($id)
+    public function rejectNews($id): void
     {
         $this->disableView();
 
@@ -324,7 +356,7 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $news = NewsModel::first(['id = ?' => (int) $id]);
+        $news = NewsModel::first(['id = ?' => (int)$id]);
 
         if (null === $news) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -342,8 +374,11 @@ class NewsController extends Controller
                 Event::fire('admin.log', ['success', 'News id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', ['fail', 'News id: ' . $id,
-                    'Errors: ' . json_encode($news->getErrors()),]);
+                Event::fire('admin.log', [
+                    'fail',
+                    'News id: ' . $id,
+                    'Errors: ' . json_encode($news->getErrors()),
+                ]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -353,8 +388,11 @@ class NewsController extends Controller
      * Return list of news to insert news link to content.
      *
      * @before _secured, _participant
+     * @throws Data
+     * @throws Connector
+     * @throws Implementation
      */
-    public function insertToContent()
+    public function insertToContent(): void
     {
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
@@ -369,7 +407,7 @@ class NewsController extends Controller
      *
      * @before _secured, _admin
      */
-    public function massAction()
+    public function massAction(): void
     {
         $this->disableView();
 
@@ -389,7 +427,7 @@ class NewsController extends Controller
         switch ($action) {
             case 'delete':
                 $news = NewsModel::all([
-                            'id IN ?' => $ids,
+                    'id IN ?' => $ids,
                 ]);
                 if (null !== $news) {
                     foreach ($news as $_news) {
@@ -414,8 +452,8 @@ class NewsController extends Controller
                 break;
             case 'activate':
                 $news = NewsModel::all([
-                            'id IN ?' => $ids,
-                            'active = ?' => false,
+                    'id IN ?' => $ids,
+                    'active = ?' => false,
                 ]);
                 if (null !== $news) {
                     foreach ($news as $_news) {
@@ -430,7 +468,7 @@ class NewsController extends Controller
                             $_news->save();
                         } else {
                             $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    . implode(', ', $_news->getErrors());
+                                . implode(', ', $_news->getErrors());
                         }
                     }
                 }
@@ -448,8 +486,8 @@ class NewsController extends Controller
                 break;
             case 'deactivate':
                 $news = NewsModel::all([
-                            'id IN ?' => $ids,
-                            'active = ?' => true,
+                    'id IN ?' => $ids,
+                    'active = ?' => true,
                 ]);
                 if (null !== $news) {
                     foreach ($news as $_news) {
@@ -464,7 +502,7 @@ class NewsController extends Controller
                             $_news->save();
                         } else {
                             $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    . implode(', ', $_news->getErrors());
+                                . implode(', ', $_news->getErrors());
                         }
                     }
                 }
@@ -482,8 +520,8 @@ class NewsController extends Controller
                 break;
             case 'approve':
                 $news = NewsModel::all([
-                            'id IN ?' => $ids,
-                            'approved IN ?' => [0, 2],
+                    'id IN ?' => $ids,
+                    'approved IN ?' => [0, 2],
                 ]);
 
                 if (null !== $news) {
@@ -500,7 +538,7 @@ class NewsController extends Controller
 //                            NewsNotification::getInstance()->onCreate($news);
                         } else {
                             $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    . implode(', ', $_news->getErrors());
+                                . implode(', ', $_news->getErrors());
                         }
                     }
                 }
@@ -518,8 +556,8 @@ class NewsController extends Controller
                 break;
             case 'reject':
                 $news = NewsModel::all([
-                            'id IN ?' => $ids,
-                            'approved IN ?' => [0, 1],
+                    'id IN ?' => $ids,
+                    'approved IN ?' => [0, 1],
                 ]);
 
                 if (null !== $news) {
@@ -535,7 +573,7 @@ class NewsController extends Controller
                             $_news->save();
                         } else {
                             $errors[] = "News id {$_news->getId()} - {$_news->getTitle()} errors: "
-                                    . implode(', ', $_news->getErrors());
+                                . implode(', ', $_news->getErrors());
                         }
                     }
                 }
@@ -562,21 +600,30 @@ class NewsController extends Controller
      *
      * @before _secured, _participant
      */
-    public function load()
+    public function load(): void
     {
         $this->disableView();
 
-        $page = (int) RequestMethods::post('page', 0);
+        $page = (int)RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
 
         if ($search != '') {
             $whereCond = "nw.created LIKE '%%?%%' OR nw.userAlias LIKE '%%?%%' OR nw.title LIKE '%%?%%'";
 
             $query = NewsModel::getQuery(
-                            ['nw.id', 'nw.userId', 'nw.userAlias', 'nw.title',
-                                'nw.active', 'nw.approved', 'nw.archive', 'nw.created', 'nw.modified'])
-                    ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
-                    ->wheresql($whereCond, $search, $search, $search);
+                [
+                    'nw.id',
+                    'nw.userId',
+                    'nw.userAlias',
+                    'nw.title',
+                    'nw.active',
+                    'nw.approved',
+                    'nw.archive',
+                    'nw.created',
+                    'nw.modified',
+                ])
+                ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->wheresql($whereCond, $search, $search, $search);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -597,13 +644,13 @@ class NewsController extends Controller
                 $query->order('nw.id', 'desc');
             }
 
-            $limit = (int) RequestMethods::post('iDisplayLength');
+            $limit = (int)RequestMethods::post('iDisplayLength');
             $query->limit($limit, $page + 1);
             $news = NewsModel::initialize($query);
 
             $countQuery = NewsModel::getQuery(['nw.id'])
-                    ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
-                    ->wheresql($whereCond, $search, $search, $search);
+                ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->wheresql($whereCond, $search, $search, $search);
 
             $newsCount = NewsModel::initialize($countQuery);
             unset($countQuery);
@@ -611,9 +658,18 @@ class NewsController extends Controller
             unset($newsCount);
         } else {
             $query = NewsModel::getQuery(
-                            ['nw.id', 'nw.userId', 'nw.userAlias', 'nw.title',
-                                'nw.active', 'nw.approved', 'nw.archive', 'nw.created', 'nw.modified'])
-                    ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
+                [
+                    'nw.id',
+                    'nw.userId',
+                    'nw.userAlias',
+                    'nw.title',
+                    'nw.active',
+                    'nw.approved',
+                    'nw.archive',
+                    'nw.created',
+                    'nw.modified',
+                ])
+                ->join('tb_user', 'nw.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -634,7 +690,7 @@ class NewsController extends Controller
                 $query->order('nw.id', 'desc');
             }
 
-            $limit = (int) RequestMethods::post('iDisplayLength');
+            $limit = (int)RequestMethods::post('iDisplayLength');
             $query->limit($limit, $page + 1);
             $news = NewsModel::initialize($query);
 
@@ -709,7 +765,7 @@ class NewsController extends Controller
      *
      * @before _secured, _participant
      */
-    public function help()
+    public function help(): void
     {
 
     }
@@ -718,8 +774,11 @@ class NewsController extends Controller
      * Load concept into active form.
      *
      * @before _secured, _participant
+     * @param $id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function loadConcept($id)
+    public function loadConcept($id): void
     {
         $this->disableView();
 
@@ -727,7 +786,7 @@ class NewsController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $concept = \Admin\Model\ConceptModel::first(['id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()]);
+        $concept = ConceptModel::first(['id = ?' => (int)$id, 'userId = ?' => $this->getUser()->getId()]);
 
         if (null !== $concept) {
             $conceptArr = [

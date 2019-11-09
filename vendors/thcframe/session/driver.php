@@ -3,7 +3,6 @@
 namespace THCFrame\Session;
 
 use THCFrame\Core\Base;
-use THCFrame\Session\Exception;
 use THCFrame\Bag\BagInterface;
 
 /**
@@ -34,6 +33,11 @@ abstract class Driver extends Base implements BagInterface
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
+    public function hashKey($key)
+    {
+        return $key;
+    }
+
     public abstract function get($key, $default = null);
 
     public abstract function set($key, $value);
@@ -41,8 +45,6 @@ abstract class Driver extends Base implements BagInterface
     public abstract function remove($key);
 
     public abstract function clear();
-
-    public abstract function hashKey($key);
 
     public abstract function setName($name);
 

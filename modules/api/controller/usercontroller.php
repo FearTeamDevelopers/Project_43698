@@ -34,8 +34,9 @@ class UserController extends Controller
             $error = true;
         }
 
+        $apiToken = \THCFrame\Security\Model\ApiTokenModel::first(['token = ?' => $apiTokenPost]);
+
         if (!empty($apiTokenPost)) {
-            $apiToken = \THCFrame\Security\Model\ApiTokenModel::first(['token = ?' => $apiTokenPost]);
             if (!empty($apiToken)) {
                 $this->ajaxResponse('Authenticated', false, 200, ['apiToken' => $apiToken->getToken()]);
             } else {
@@ -63,7 +64,7 @@ class UserController extends Controller
                 $this->ajaxResponse('Authentication failed: ' . $message, true, 401);
             }
         } else {
-            $this->ajaxResponse('Authentication failed: ' . $message, true, 401);
+            $this->ajaxResponse('Authentication failed', true, 401);
         }
     }
 

@@ -2,6 +2,10 @@
 
 namespace Admin\Model;
 
+use App\Model\PageContentModel;
+use ReflectionClass;
+use ReflectionException;
+use THCFrame\Model\Exception\Validation;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
@@ -31,9 +35,11 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
     }
 
     /**
-     * @return array
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchAll()
+    public static function fetchAll(): ?array
     {
         $query = self::getQuery(['pch.*'])
                 ->join('tb_user', 'pch.editedBy = us.id', 'us',
@@ -44,10 +50,13 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
 
     /**
      * Called from admin module.
-     * 
-     * @return array
+     *
+     * @param int $limit
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchWithLimit($limit = 10)
+    public static function fetchWithLimit($limit = 10): ?array
     {
         $query = self::getQuery(['pch.*'])
                 ->join('tb_user', 'pch.editedBy = us.id', 'us',
@@ -60,11 +69,15 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
 
     /**
      * Check differences between two objects.
-     * 
-     * @param \App\Model\PageContentModel $original
-     * @param \App\Model\PageContentModel $edited
+     *
+     * @param PageContentModel $original
+     * @param PageContentModel $edited
+     * @throws ReflectionException
+     * @throws Validation
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function logChanges(\App\Model\PageContentModel $original, \App\Model\PageContentModel $edited)
+    public static function logChanges(PageContentModel $original, PageContentModel $edited): void
     {
         $sec = Registry::get('security');
         $user = $sec->getUser();
@@ -73,7 +86,7 @@ class PageContentHistoryModel extends BasicPagecontenthistoryModel
         $referer = RequestMethods::server('HTTP_REFERER');
         $changes = [];
 
-        $reflect = new \ReflectionClass($original);
+        $reflect = new ReflectionClass($original);
         $properties = $reflect->getProperties();
         $className = get_class($original);
 

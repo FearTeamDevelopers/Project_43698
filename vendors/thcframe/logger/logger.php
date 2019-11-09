@@ -4,7 +4,6 @@ namespace THCFrame\Logger;
 
 use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
-use THCFrame\Logger\Exception;
 
 /**
  * Logger factory class
@@ -24,8 +23,8 @@ class Logger extends Base
 
     /**
      *
-     * @param type $method
-     * @return \THCFrame\Session\Exception\Implementation
+     * @param string $method
+     * @return Exception\Implementation
      */
     protected function _getImplementationException($method)
     {
@@ -37,7 +36,7 @@ class Logger extends Base
      * It accepts initialization options and selects the type of returned object,
      * based on the internal $_type property.
      *
-     * @return \THCFrame\Configuration\Configuration\Driver\Ini
+     * @return Driver\Db|Driver\Email|Driver\File
      * @throws Exception\Argument
      */
     public function initialize()
@@ -51,20 +50,16 @@ class Logger extends Base
         Event::fire('framework.logger.initialize.after', [$this->_type, $this->_options]);
 
         switch ($this->_type) {
-            case 'file': {
-                    return new Driver\File([
-                        'path' => 'application' . DIRECTORY_SEPARATOR . 'logs',
-                    ]);
-                }
-            case 'email': {
-                    return new Driver\Email();
-                }
-            case 'db': {
-                    return new Driver\Db();
-                }
-            default: {
-                    throw new Exception\Argument('Invalid logger type');
-                }
+            case 'file':
+                return new Driver\File([
+                    'path' => 'application' . DIRECTORY_SEPARATOR . 'logs',
+                ]);
+            case 'email':
+                return new Driver\Email();
+            case 'db':
+                return new Driver\Db();
+            default:
+                throw new Exception\Argument('Invalid logger type');
         }
     }
 

@@ -276,10 +276,10 @@ class StringMethods
      * The split() method will return the results of a call to the preg_split() function,
      * after setting some flags and normalizing the regular expression.
      *
-     * @param type $string
-     * @param type $pattern
-     * @param type $limit
-     * @return type
+     * @param $string
+     * @param $pattern
+     * @param null $limit
+     * @return array[]|false|string[]
      */
     public static function split($string, $pattern, $limit = null)
     {
@@ -457,9 +457,9 @@ class StringMethods
     /**
      * Version of stripos with needles as an array or string
      *
-     * @param type $haystack
-     * @param type $needles
-     * @return type
+     * @param $haystack
+     * @param $needles
+     * @return bool|false|int
      */
     public static function striposArray($haystack, $needles)
     {
@@ -703,9 +703,8 @@ class StringMethods
     }
 
     /**
-     * @param type $string
-     *
-     * @return type
+     * @param $string
+     * @return string
      */
     public static function createUrlKey($string)
     {
@@ -755,10 +754,8 @@ class StringMethods
     }
 
     /**
-     * Removes multiple spaces from string
-     *
-     * @param type $string
-     * @return type
+     * @param $string
+     * @return string|string[]|null
      */
     public static function removeMultipleSpaces($string)
     {

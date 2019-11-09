@@ -105,8 +105,7 @@ class Profiler
     }
 
     /**
-     *
-     * @return type
+     * @return Profiler
      */
     public static function getInstance()
     {
@@ -192,11 +191,9 @@ class Profiler
     }
 
     /**
-     * Merge two results
-     *
-     * @param type $prevResult
-     * @param type $currentResult
-     * @return type
+     * @param $prevResult
+     * @param $currentResult
+     * @return array
      */
     public function mergeResults($prevResult, $currentResult)
     {
@@ -245,8 +242,7 @@ class Profiler
     /**
      * Start of database query profiling
      *
-     * @param string $query
-     * @return type
+     * @param $query
      */
     public function dbQueryStart($query)
     {
@@ -262,7 +258,6 @@ class Profiler
      * End of database query profiling
      *
      * @param mixed $totalRows
-     * @return type
      */
     public function dbQueryStop($totalRows)
     {

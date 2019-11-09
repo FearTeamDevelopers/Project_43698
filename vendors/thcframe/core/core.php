@@ -2,9 +2,22 @@
 
 namespace THCFrame\Core;
 
+use THCFrame\Cache\Cache;
+use THCFrame\Configuration\Configuration;
 use THCFrame\Core\Exception as Exception;
+use THCFrame\Database\Database;
+use THCFrame\Logger\Driver;
+use THCFrame\Logger\Logger;
+use THCFrame\Logger\LoggerComposite;
+use THCFrame\Logger\LoggerInterface;
+use THCFrame\Module\Exception\Multiload;
+use THCFrame\Module\Exception\NoModuleToRegister;
 use THCFrame\Registry\Registry;
-use THCFrame\Core\Autoloader;
+use THCFrame\Router\Dispatcher;
+use THCFrame\Router\Router;
+use THCFrame\Security\Security;
+use THCFrame\Session\Session;
+use Throwable;
 
 /**
  * THCFrame core class
@@ -20,14 +33,14 @@ class Core
     /**
      * Logger instance
      *
-     * @var THCFrame\Logger\Logger
+     * @var Logger
      */
     private static $logger;
 
     /**
      * Autoloader instance
      *
-     * @var THCFrame\Core\Autoloader
+     * @var Autoloader
      */
     private static $autoloader;
 
@@ -147,9 +160,8 @@ class Core
     }
 
     /**
-     *
-     * @param type $array
-     * @return type
+     * @param $array
+     * @return array|string
      */
     private static function clean($array)
     {
@@ -172,18 +184,18 @@ class Core
         switch ($number) {
             case E_WARNING:
             case E_USER_WARNING :
-                $type = \THCFrame\Logger\Driver::WARNING;
+                $type = Driver::WARNING;
                 break;
             case E_NOTICE:
             case E_USER_NOTICE:
-                $type = \THCFrame\Logger\Driver::NOTICE;
+                $type = Driver::NOTICE;
                 break;
             default:
-                $type = \THCFrame\Logger\Driver::ERROR;
+                $type = Driver::ERROR;
                 break;
         }
 
-        if (self::$logger instanceof \THCFrame\Logger\LoggerInterface) {
+        if (self::$logger instanceof LoggerInterface) {
             self::$logger->log($type, '[{file}:{row}] [{text}]', ['file' => $file, 'row' => $row, 'text' => $text]);
         } else {
             file_put_contents(APP_PATH . '/application/logs/error.log', "{$type} ~ {$file} ~ {$row} ~ {$text}" . PHP_EOL, FILE_APPEND);
@@ -198,7 +210,7 @@ class Core
     public static function exceptionHandler($exception)
     {
 
-        if (self::$logger instanceof \THCFrame\Logger\LoggerInterface) {
+        if (self::$logger instanceof LoggerInterface) {
             self::$logger->error('Uncaught exception: {exception}', ['exception' => $exception]);
         } else {
             $type = get_class($exception);
@@ -224,7 +236,7 @@ class Core
     /**
      * Return logger instance
      *
-     * @return THCFrame\Logger\Logger
+     * @return Logger
      */
     public static function getLogger()
     {
@@ -234,8 +246,10 @@ class Core
     /**
      * Main framework initialization method
      *
-     * @return type
-     * @throws Exception
+     * @param array $modules
+     * @param array $autoloaderPrefixes
+     * @return void
+     * @throws \THCFrame\Core\Exception
      */
     public static function initialize(array $modules = [], $autoloaderPrefixes = [])
     {
@@ -265,8 +279,8 @@ class Core
 
         try {
             // Logger
-            $loggerComposite = new \THCFrame\Logger\LoggerComposite();
-            $fileLogger = new \THCFrame\Logger\Logger(['type' => 'file']);
+            $loggerComposite = new LoggerComposite();
+            $fileLogger = new Logger(['type' => 'file']);
             $loggerComposite->addChild($fileLogger->initialize(), 'file');
             self::$logger = $loggerComposite;
 
@@ -281,7 +295,7 @@ class Core
             self::registerModules($modules);
 
             // configuration
-            $configuration = new \THCFrame\Configuration\Configuration(
+            $configuration = new Configuration(
                     ['type' => 'ini', 'options' => ['env' => ENV]]
             );
             $confingInitialized = $configuration->initialize();
@@ -290,7 +304,7 @@ class Core
 
             // database
             if ($parsedConfig->database->main->host != '') {
-                $database = new \THCFrame\Database\Database();
+                $database = new Database();
                 $connectors = $database->initialize($parsedConfig);
                 Registry::set('database', $connectors);
 
@@ -300,15 +314,15 @@ class Core
             }
 
             // cache
-            $cache = new \THCFrame\Cache\Cache();
+            $cache = new Cache();
             Registry::set('cache', $cache->initialize($parsedConfig));
 
             // session
-            $session = new \THCFrame\Session\Session();
+            $session = new Session();
             Registry::set('session', $session->initialize($parsedConfig));
 
             // security
-            $security = new \THCFrame\Security\Security();
+            $security = new Security();
             Registry::set('security', $security->initialize($parsedConfig));
 
             // unset globals
@@ -318,7 +332,7 @@ class Core
             unset($cache);
             unset($session);
             unset($security);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             self::renderFallbackTemplate($e);
         } catch (\Exception $e) {
             self::renderFallbackTemplate($e);
@@ -329,6 +343,7 @@ class Core
      * Load every module in modules dir
      *
      * @return array array of module names
+     * @throws NoModuleToRegister
      */
     public static function loadModules()
     {
@@ -344,7 +359,7 @@ class Core
 
             return $modules;
         } else {
-            throw new \THCFrame\Module\Exception\NoModuleToRegister('No modules to load');
+            throw new NoModuleToRegister('No modules to load');
         }
     }
 
@@ -353,6 +368,8 @@ class Core
      * As parameter is given an array with module names
      *
      * @param array $moduleArray
+     * @throws Multiload
+     * @throws NoModuleToRegister
      */
     public static function registerModules(array $moduleArray = [])
     {
@@ -361,7 +378,7 @@ class Core
                 self::registerModule($moduleName);
             }
         } else {
-            throw new \THCFrame\Module\Exception\NoModuleToRegister('No modules to load');
+            throw new NoModuleToRegister('No modules to load');
         }
     }
 
@@ -369,12 +386,12 @@ class Core
      * Register single module based on provided module name.
      * Module instance is created and stored in _modules array
      *
-     * @throws \THCFrame\Module\Exception\Multiload
+     * @throws Multiload
      */
     public static function registerModule($moduleName)
     {
         if (array_key_exists(ucfirst($moduleName), self::$modules)) {
-            throw new \THCFrame\Module\Exception\Multiload(sprintf('Module %s has been alerady loaded', ucfirst($moduleName)));
+            throw new Multiload(sprintf('Module %s has been alerady loaded', ucfirst($moduleName)));
         } else {
             self::$autoloader->addNamespace(ucfirst($moduleName), MODULES_PATH . DIRECTORY_SEPARATOR . strtolower($moduleName));
             $moduleClass = ucfirst($moduleName) . "\Etc\ModuleConfig";
@@ -448,19 +465,19 @@ class Core
     {
         try {
             //router
-            $router = new \THCFrame\Router\Router([
+            $router = new Router([
                 'url' => urldecode($_SERVER['REQUEST_URI'])
             ]);
             Registry::set('router', $router);
 
             //dispatcher
-            $dispatcher = new \THCFrame\Router\Dispatcher();
+            $dispatcher = new Dispatcher();
             Registry::set('dispatcher', $dispatcher->initialize());
 
             $dispatcher->dispatch($router->getLastRoute());
 
             unset($dispatcher);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $isApi = false;
             if (isset($router) && stripos($router->getUrl(), '/api/') !== false) {
                 $isApi = true;

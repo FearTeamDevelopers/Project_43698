@@ -23,12 +23,13 @@ class AdminLogModel extends BasicAdminlogModel
         }
         $this->setModified(date('Y-m-d H:i:s'));
     }
-    
+
     /**
-     * Get errors from last week
-     * @return array
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchErrorsFromLastWeek()
+    public static function fetchErrorsFromLastWeek(): ?array
     {
         return self::all(['result = ?' => 'fail', 'created between date_sub(now(),INTERVAL 1 WEEK) and now()' => ''], ['*'], ['created' => 'desc']);
     }

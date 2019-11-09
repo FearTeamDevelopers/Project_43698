@@ -74,9 +74,8 @@ class RestController extends Base
     protected $session;
 
     /**
-     *
-     * @param type $data
-     * @return type
+     * @param $data
+     * @return array|string
      */
     private function _cleanInputs($data)
     {
@@ -115,7 +114,7 @@ class RestController extends Base
     /**
      * Return server url with http schema
      *
-     * @return type
+     * @return string
      */
     public function getServerHost()
     {

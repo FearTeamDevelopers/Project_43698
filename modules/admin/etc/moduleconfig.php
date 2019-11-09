@@ -17,7 +17,7 @@ class ModuleConfig extends Module
     /**
      * @read
      */
-    protected $observerClass = 'Admin\Etc\ModuleObserver';
+    protected $observerClass = ModuleObserver::class;
 
     /**
      * @read

@@ -40,8 +40,8 @@ class Inspector
     }
 
     /**
-     *
-     * @return type
+     * @return false|string
+     * @throws \ReflectionException
      */
     protected function _getClassComment()
     {
@@ -50,8 +50,8 @@ class Inspector
     }
 
     /**
-     *
-     * @return type
+     * @return \ReflectionProperty[]
+     * @throws \ReflectionException
      */
     protected function _getClassProperties()
     {
@@ -60,8 +60,8 @@ class Inspector
     }
 
     /**
-     *
-     * @return type
+     * @return \ReflectionMethod[]
+     * @throws \ReflectionException
      */
     protected function _getClassMethods()
     {
@@ -70,9 +70,9 @@ class Inspector
     }
 
     /**
-     *
-     * @param type $property
-     * @return type
+     * @param $property
+     * @return false|string
+     * @throws \ReflectionException
      */
     protected function _getPropertyComment($property)
     {
@@ -81,9 +81,9 @@ class Inspector
     }
 
     /**
-     *
-     * @param type $method
-     * @return type
+     * @param $method
+     * @return false|string
+     * @throws \ReflectionException
      */
     protected function _getMethodComment($method)
     {
@@ -95,8 +95,8 @@ class Inspector
      * The internal _parse() method uses a fairly simple regular expression to match key/value pairs
      * within the Doc Comment string returned by any of our _get…Meta() methods
      *
-     * @param type $comment
-     * @return type
+     * @param $comment
+     * @return array
      */
     protected function _parse($comment)
     {
@@ -128,8 +128,8 @@ class Inspector
     }
 
     /**
-     *
-     * @return null
+     * @return array|mixed|null
+     * @throws \ReflectionException
      */
     public function getClassMeta()
     {
@@ -147,8 +147,8 @@ class Inspector
     }
 
     /**
-     *
-     * @return type
+     * @return array
+     * @throws \ReflectionException
      */
     public function getClassProperties()
     {
@@ -164,8 +164,8 @@ class Inspector
     }
 
     /**
-     *
-     * @return type
+     * @return array
+     * @throws \ReflectionException
      */
     public function getClassMethods()
     {
@@ -181,9 +181,9 @@ class Inspector
     }
 
     /**
-     *
-     * @param type $property
-     * @return null
+     * @param $property
+     * @return mixed
+     * @throws \ReflectionException
      */
     public function getPropertyMeta($property)
     {
@@ -201,9 +201,9 @@ class Inspector
     }
 
     /**
-     *
-     * @param type $method
-     * @return null
+     * @param $method
+     * @return mixed
+     * @throws \ReflectionException
      */
     public function getMethodMeta($method)
     {

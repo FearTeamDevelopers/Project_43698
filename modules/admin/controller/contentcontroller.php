@@ -3,10 +3,16 @@
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Request\RequestMethods;
-use THCFrame\Events\Events as Event;
-use THCFrame\Core\StringMethods;
+use Admin\Model\PageContentHistoryModel;
 use App\Model\PageContentModel;
+use ReflectionException;
+use THCFrame\Core\StringMethods;
+use THCFrame\Events\Events as Event;
+use THCFrame\Model\Exception\Connector;
+use THCFrame\Model\Exception\Implementation;
+use THCFrame\Model\Exception\Validation;
+use THCFrame\Request\RequestMethods;
+use THCFrame\View\Exception\Data;
 
 /**
  *
@@ -18,8 +24,11 @@ class ContentController extends Controller
      * Get list of all content pages.
      *
      * @before _secured, _participant
+     * @throws Data
+     * @throws Connector
+     * @throws Implementation
      */
-    public function index()
+    public function index(): void
     {
         $view = $this->getActionView();
 
@@ -32,8 +41,12 @@ class ContentController extends Controller
      * Create new page.
      *
      * @before _secured, _admin
+     * @throws Data
+     * @throws Validation
+     * @throws Connector
+     * @throws Implementation
      */
-    public function add()
+    public function add(): void
     {
         $view = $this->getActionView();
 
@@ -41,7 +54,7 @@ class ContentController extends Controller
 
         if (RequestMethods::post('submitAddContent')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMultiSubmissionProtectionToken() !== true) {
+                $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/content/');
             }
 
@@ -63,6 +76,8 @@ class ContentController extends Controller
                 'keywords' => $keywords,
                 'metaTitle' => RequestMethods::post('metatitle'),
                 'metaDescription' => RequestMethods::post('metadescription', $metaDesc),
+                'created' => date('Y-m-d H:i'),
+                'modified' => date('Y-m-d H:i'),
             ]);
 
             if (empty($errors) && $content->validate()) {
@@ -75,8 +90,8 @@ class ContentController extends Controller
             } else {
                 Event::fire('admin.log', ['fail', 'Errors: ' . json_encode($errors + $content->getErrors())]);
                 $view->set('errors', $errors + $content->getErrors())
-                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
-                        ->set('content', $content);
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
+                    ->set('content', $content);
             }
         }
     }
@@ -87,12 +102,17 @@ class ContentController extends Controller
      * @before _secured, _admin
      *
      * @param int $id page id
+     * @throws Data
+     * @throws ReflectionException
+     * @throws Validation
+     * @throws Connector
+     * @throws Implementation
      */
-    public function edit($id)
+    public function edit($id): void
     {
         $view = $this->getActionView();
 
-        $content = PageContentModel::first(['id = ?' => (int) $id]);
+        $content = PageContentModel::first(['id = ?' => (int)$id]);
 
         if (null === $content) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -129,17 +149,20 @@ class ContentController extends Controller
 
             if (empty($errors) && $content->validate()) {
                 $content->save();
-                \Admin\Model\PageContentHistoryModel::logChanges($originalContent, $content);
+                PageContentHistoryModel::logChanges($originalContent, $content);
                 $this->getCache()->clearCache();
 
                 Event::fire('admin.log', ['success', 'Content id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/content/');
             } else {
-                Event::fire('admin.log', ['fail', 'Content id: ' . $id,
-                    'Errors: ' . json_encode($errors + $content->getErrors()),]);
+                Event::fire('admin.log', [
+                    'fail',
+                    'Content id: ' . $id,
+                    'Errors: ' . json_encode($errors + $content->getErrors()),
+                ]);
                 $view->set('errors', $content->getErrors())
-                        ->set('content', $content);
+                    ->set('content', $content);
             }
         }
     }
@@ -148,8 +171,11 @@ class ContentController extends Controller
      * Return list of pages to insert page link to content.
      *
      * @before _secured, _participant
+     * @throws Data
+     * @throws Connector
+     * @throws Implementation
      */
-    public function insertToContent()
+    public function insertToContent(): void
     {
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;

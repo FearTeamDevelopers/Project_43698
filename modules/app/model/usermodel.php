@@ -123,19 +123,17 @@ class UserModel extends BasicUserModel
     protected $_pdConsentToProcessing;
 
     /**
-     * 
+     *
      * @param string $token
      * @return bool
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     private static function checkEmailActToken($token): bool
     {
         $exists = static::first(['emailActivationToken = ?' => $token]);
 
-        if ($exists === null) {
-            return true;
-        } else {
-            return false;
-        }
+        return $exists === null;
     }
 
     /**
@@ -166,7 +164,7 @@ class UserModel extends BasicUserModel
 
     /**
      *
-     * @return type
+     * @return array
      */
     public static function getAllRoles()
     {
@@ -174,7 +172,7 @@ class UserModel extends BasicUserModel
     }
 
     /**
-     * @return type
+     * @return string
      */
     public function getWholeName()
     {
@@ -182,17 +180,17 @@ class UserModel extends BasicUserModel
     }
 
     /**
-     * @return type
+     * @return string
      */
     public function __toString()
     {
-        $str = "Id: {$this->_id} <br/>Email: {$this->_email} <br/> Name: {$this->_firstname} {$this->_lastname}";
-
-        return $str;
+        return "Id: {$this->_id} <br/>Email: {$this->_email} <br/> Name: {$this->_firstname} {$this->_lastname}";
     }
 
     /**
-     * @return type
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -205,9 +203,10 @@ class UserModel extends BasicUserModel
     }
 
     /**
-     *
-     * @param type $limit
-     * @return type
+     * @param int $limit
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchLates($limit = 10)
     {
@@ -220,8 +219,9 @@ class UserModel extends BasicUserModel
     }
 
     /**
-     *
-     * @return type
+     * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAdminsEmail()
     {
@@ -238,24 +238,30 @@ class UserModel extends BasicUserModel
     }
 
     /**
-     * 
+     *
      * @param string $type
-     * @return type
+     * @return array|\THCFrame\Model\type
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function getUserEmailsForNotification(string $type)
     {
         if(in_array($type, ['getNewActionNotification', 'getNewReportNotification', 'getNewNewsNotification'])){
-            return static::all([$type . ' = ?' => true, 'pdLimitProcessing != ?' => 1], ['email']);
+            return static::all([$type . ' = ?' => 1, 'active = ?' => 1, 'pdLimitProcessing != ?' => 1], ['email']);
         }
         
         return [];
     }
 
     /**
-     * 
+     *
      * @param \THCFrame\Bag\BagInterface $post
      * @param array $options
      * @return array
+     * @throws \THCFrame\Core\Exception\Lang
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
+     * @throws \THCFrame\Security\Exception
      */
     public static function createUser(\THCFrame\Bag\BagInterface $post, array $options = []): array
     {
@@ -295,12 +301,10 @@ class UserModel extends BasicUserModel
 
         if ($options['adminAccountActivation']) {
             $active = false;
+        } elseif ($options['verifyEmail']) {
+            $active = false;
         } else {
-            if ($options['verifyEmail']) {
-                $active = false;
-            } else {
-                $active = true;
-            }
+            $active = true;
         }
 
         $actToken = Rand::randStr(50);
@@ -332,17 +336,22 @@ class UserModel extends BasicUserModel
             'getNewReportNotification' => $post->get('reportNotification', 0),
             'getNewNewsNotification' => $post->get('newsNotification', 0),
             'pdConsentToProcessing' => $post->get('pdConsentToProcessing', 0),
+            'created' => date('Y-m-d H:i'),
+            'modified' => date('Y-m-d H:i'),
         ]);
 
         return [$user, $errors];
     }
 
     /**
-     * 
+     *
      * @param \THCFrame\Bag\BagInterface $post
      * @param \App\Model\UserModel $user
      * @param array $options
      * @return array
+     * @throws \THCFrame\Core\Exception\Lang
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function editUserProfile(\THCFrame\Bag\BagInterface $post, UserModel $user, array $options = []): array
     {
@@ -392,9 +401,11 @@ class UserModel extends BasicUserModel
     }
 
     /**
-     * 
+     *
      * @param int $userId
      * @return boolean
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function deleteUser(int $userId)
     {

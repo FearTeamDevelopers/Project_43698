@@ -8,18 +8,15 @@ use THCFrame\Core\Lang;
 use THCFrame\Registry\Registry;
 use Search\Model\IndexableInterface;
 
-/**
- *
- */
 class ActionModel extends BasicActionModel implements IndexableInterface
 {
 
-    const STATE_WAITING = 0;
-    const STATE_APPROVED = 1;
-    const STATE_REJECTED = 2;
+    public const STATE_WAITING = 0;
+    public const STATE_APPROVED = 1;
+    public const STATE_REJECTED = 2;
 
     /**
-     * @var type
+     * @var array
      */
     private static $_statesConv = [
         self::STATE_WAITING => 'Čeká na shválení',
@@ -36,18 +33,15 @@ class ActionModel extends BasicActionModel implements IndexableInterface
      * Check whether action unique identifier already exist or not.
      *
      * @param string $key
-     *
      * @return bool
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     private static function checkUrlKey($key)
     {
         $status = self::first(['urlKey = ?' => $key]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
 
     /**
@@ -71,9 +65,11 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * @return array
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchAll()
+    public static function fetchAll(): ?array
     {
         $query = self::getQuery(['ac.*'])
                 ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
@@ -82,11 +78,12 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Called from admin module.
-     *
-     * @return array
+     * @param int $limit
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchWithLimit($limit = 10)
+    public static function fetchWithLimit($limit = 10): ?array
     {
         $query = self::getQuery(['ac.*'])
                 ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
@@ -97,21 +94,21 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $limit
-     * @param type $page
-     * @return type
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchActiveWithLimit($limit = 10, $page = 1)
+    public static function fetchActiveWithLimit($limit = 10, $page = 1): ?array
     {
         if ($limit === 0) {
-            $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())],
+            $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d')],
                     ['id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'],
                     ['rank' => 'desc', 'startDate' => 'asc']
             );
         } else {
-            $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d', time())],
+            $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate >= ?' => date('Y-m-d')],
                     ['id', 'urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'],
                     ['rank' => 'desc', 'startDate' => 'asc'], $limit, $page
             );
@@ -121,13 +118,13 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param int $lastId
-     * @param date $lastStartDate
+     * @param $lastId
+     * @param $lastStartDate
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchMoreActionsToHomepage($lastId, $lastStartDate)
+    public static function fetchMoreActionsToHomepage($lastId, $lastStartDate): array
     {
         if(empty($lastId) || empty($lastStartDate)){
             return [];
@@ -162,15 +159,15 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $limit
-     * @param type $page
-     * @return type
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchOldWithLimit($limit = 10, $page = 1)
+    public static function fetchOldWithLimit($limit = 10, $page = 1): ?array
     {
-        $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d', time())],
+        $actions = self::all(['active = ?' => true, 'approved = ?' => 1, 'archive = ?' => false, 'startDate <= ?' => date('Y-m-d')],
                 ['urlKey', 'userAlias', 'title', 'shortBody', 'created', 'startDate'],
                 ['rank' => 'desc', 'startDate' => 'desc'], $limit, $page
         );
@@ -179,14 +176,14 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param int $year
+     * @param $year
      * @param int $page
      * @param int $limit
-     * @return type
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchArchivatedWithLimit($year, $page = 1, $limit = 10)
+    public static function fetchArchivatedWithLimit($year, $page = 1, $limit = 10): ?array
     {
         $actions = self::all(
                 ['active = ?' => true, 'approved = ?' => 1, 'startDate < ?' => date('Y-m-d'), 'startDate >= ?' => $year . '-01-01', 'endDate <= ?' => $year . '-12-31'],
@@ -198,10 +195,10 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $urlKey
-     * @return type
+     * @param $urlKey
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchByUrlKey($urlKey)
     {
@@ -209,20 +206,21 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Return action states.
-     *
      * @return array
      */
-    public static function getStates()
+    public static function getStates(): array
     {
         return self::$_statesConv;
     }
 
     /**
-     *
      * @param \THCFrame\Bag\BagInterface $post
      * @param array $options
      * @return array
+     * @throws \THCFrame\Core\Exception\Argument
+     * @throws \THCFrame\Core\Exception\Lang
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function createFromPost(\THCFrame\Bag\BagInterface $post, array $options = []): array
     {
@@ -237,9 +235,9 @@ class ActionModel extends BasicActionModel implements IndexableInterface
         for ($i = 1; $i <= 100; $i+=1) {
             if (self::checkUrlKey($urlKeyCh)) {
                 break;
-            } else {
-                $urlKeyCh = $urlKey . '-' . $i;
             }
+
+            $urlKeyCh = $urlKey . '-' . $i;
 
             if ($i == 100) {
                 $errors['title'] = [Lang::get('ARTICLE_UNIQUE_ID')];
@@ -274,17 +272,22 @@ class ActionModel extends BasicActionModel implements IndexableInterface
             'keywords' => $keywords,
             'metaTitle' => $post->get('metatitle', $post->get('title')),
             'metaDescription' => $metaDesc,
+            'created' => date('Y-m-d H:i'),
+            'modified' => date('Y-m-d H:i'),
         ]);
 
         return [$action, $errors];
     }
 
     /**
-     *
      * @param \THCFrame\Bag\BagInterface $post
-     * @param \App\Model\ActionModel $action
+     * @param ActionModel $action
      * @param array $options
-     * @return type
+     * @return array
+     * @throws \THCFrame\Core\Exception\Argument
+     * @throws \THCFrame\Core\Exception\Lang
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function editFromPost(\THCFrame\Bag\BagInterface $post, ActionModel $action, array $options = [])
     {
@@ -300,9 +303,9 @@ class ActionModel extends BasicActionModel implements IndexableInterface
             for ($i = 1; $i <= 100; $i+=1) {
                 if (self::checkUrlKey($urlKeyCh)) {
                     break;
-                } else {
-                    $urlKeyCh = $urlKey . '-' . $i;
                 }
+
+                $urlKeyCh = $urlKey . '-' . $i;
 
                 if ($i == 100) {
                     $errors['title'] = [Lang::get('ARTICLE_TITLE_IS_USED')];
@@ -352,17 +355,15 @@ class ActionModel extends BasicActionModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
      * @return array
      */
-    public static function fetchActionYears()
+    public static function fetchActionYears(): array
     {
         $db = Registry::get('database')->get('main');
-        $result = $db->execute("SELECT DISTINCT YEAR(startDate) as a_years "
-                . "FROM tb_action "
+        $result = $db->execute('SELECT DISTINCT YEAR(startDate) as a_years '
+                . 'FROM tb_action '
                 . "WHERE (startDate is not null or startDate != '') and YEAR(startDate) <= YEAR(curdate()) "
-                . "ORDER BY 1 DESC");
+                . 'ORDER BY 1 DESC');
 
         $returnArr = [];
         if (!empty($result)) {

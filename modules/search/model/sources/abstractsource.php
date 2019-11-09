@@ -2,7 +2,6 @@
 
 namespace Search\Model\Sources;
 
-use Search\Model\Sources\SourceInterface;
 use THCFrame\Core\StringMethods;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
@@ -16,15 +15,15 @@ use Search\Model\IndexableInterface;
 abstract class AbstractSource implements SourceInterface
 {
 
-    CONST INSERT_SQL = 'INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)';
-    CONST INSERT_LOG_SQL = 'INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 0, ?, now(), default)';
-    CONST DELETE_SQL = 'DELETE FROM tb_searchindex WHERE sourceModel=?';
-    CONST PREPARE_ID_SQL = 'ALTER TABLE tb_searchindex auto_increment = 1';
-    CONST TRUNCATE_SQL = 'TRUNCATE tb_searchindex';
-    const RANKER_TERMWEIGHT = 100;
-    const RANKER_TITLEWEIGHT = 1000;
-    const RANKER_URLWEIGHT = 6000;
-    const RANKER_KEYWORDWEIGHT = 2000;
+    public CONST INSERT_SQL = 'INSERT INTO tb_searchindex VALUES (default, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), default)';
+    public CONST INSERT_LOG_SQL = 'INSERT INTO tb_searchindexlog VALUES (default, ?, ?, ?, 0, ?, now(), default)';
+    public CONST DELETE_SQL = 'DELETE FROM tb_searchindex WHERE sourceModel=?';
+    public CONST PREPARE_ID_SQL = 'ALTER TABLE tb_searchindex auto_increment = 1';
+    public CONST TRUNCATE_SQL = 'TRUNCATE tb_searchindex';
+    public const RANKER_TERMWEIGHT = 100;
+    public const RANKER_TITLEWEIGHT = 1000;
+    public const RANKER_URLWEIGHT = 6000;
+    public const RANKER_KEYWORDWEIGHT = 2000;
 
     protected $dbConnectionTimer;
     protected $dbConnMain;
@@ -51,8 +50,9 @@ abstract class AbstractSource implements SourceInterface
      * Get weight for specific term.
      *
      * @param string $term
-     * @param int    $occurence
+     * @param int $occurence
      * @param string $title
+     * @param $keywords
      * @param string $url
      *
      * @return int
@@ -76,9 +76,7 @@ abstract class AbstractSource implements SourceInterface
                 $words_in_keywords * self::RANKER_KEYWORDWEIGHT
                 );
 
-        $newweight = intval($weight);
-
-        return $newweight;
+        return intval($weight);
     }
 
     /**
@@ -98,16 +96,14 @@ abstract class AbstractSource implements SourceInterface
             $this->dbConnSearch = Registry::get('database')->get('search');
             $this->dbConnMain = Registry::get('database')->get('main');
 
-            unset($config);
-            unset($database);
-            unset($connectors);
+            unset($config, $database, $connectors);
         }
     }
 
     /**
      *
      * @param \Exception $ex
-     * @param type $runByUser
+     * @param bool $runByUser
      */
     protected function errorNotification(\Exception $ex, $runByUser = false)
     {
@@ -181,7 +177,8 @@ abstract class AbstractSource implements SourceInterface
     }
 
     /**
-     *
+     * @param $article
+     * @return array
      */
     public function getAdditionalData($article)
     {
@@ -233,7 +230,8 @@ abstract class AbstractSource implements SourceInterface
     }
 
     /**
-     *
+     * @param bool $complete
+     * @param bool $runByUser
      */
     abstract public function buildIndex($complete = false, $runByUser = false);
 }

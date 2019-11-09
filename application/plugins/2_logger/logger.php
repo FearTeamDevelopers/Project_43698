@@ -8,9 +8,8 @@ class Logger {
     protected $_end;
 
     /**
-     * 
-     * @param type $values
-     * @return type
+     * @param $values
+     * @return int|mixed
      */
     protected function _sum($values) {
         $count = 0;
@@ -23,9 +22,8 @@ class Logger {
     }
 
     /**
-     * 
-     * @param type $values
-     * @return type
+     * @param $values
+     * @return float|int
      */
     protected function _average($values) {
         return $this->_sum($values) / count($values);

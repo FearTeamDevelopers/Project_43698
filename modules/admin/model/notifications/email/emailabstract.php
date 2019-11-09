@@ -3,6 +3,7 @@ namespace Admin\Model\Notifications\Email;
 
 use Admin\Model\EmailModel;
 use Admin\Model\Notifications\NotificationInterface;
+use THCFrame\Model\Model;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Mailer\Mailer;
 use THCFrame\Events\Events as Event;
@@ -15,15 +16,15 @@ abstract class EmailAbstract implements NotificationInterface
 {
 
     /** var \Admin\Model\Notifications\NotificationInterface $instance */
-    protected static $instance = null;
+    protected static $instance;
     protected $host;
     protected $config;
 
     /**
      * 
-     * @return \Admin\Model\Notifications\NotificationInterface
+     * @return NotificationInterface
      */
-    public static function getInstance()
+    public static function getInstance(): NotificationInterface
     {
         if (static::$instance === null) {
             static::$instance = new static();
@@ -44,9 +45,9 @@ abstract class EmailAbstract implements NotificationInterface
      * @param string $templateName
      * @param array $data
      * @param string $emailTitle
-     * @return \Admin\Model\EmailModel
+     * @return EmailModel
      */
-    protected function getEmailTemplate(string $templateName, array $data, string $emailTitle)
+    protected function getEmailTemplate(string $templateName, array $data, string $emailTitle): EmailModel
     {
         $emailTpl = EmailModel::loadAndPrepare($templateName, $data);
         $emailTpl->setSubject($emailTpl->getSubject() . ' - ' . $emailTitle);
@@ -73,9 +74,9 @@ abstract class EmailAbstract implements NotificationInterface
                 }
 
                 $mailer->send(true);
-                Event::fire('app.log', ['success', 'Send new ' . $emailTpl->getTitle() . ' notification to ' . count($users) . ' users']);
+                Event::fire('admin.log', ['success', 'Send new ' . $emailTpl->getTitle() . ' notification to ' . count($users) . ' users']);
             } else {
-                Event::fire('app.log', ['fail', 'Email template not found']);
+                Event::fire('admin.log', ['fail', 'Email template not found']);
             }
         }
     }
@@ -86,9 +87,9 @@ abstract class EmailAbstract implements NotificationInterface
 
     abstract public function getDeleteTemplateName();
 
-    abstract public function onCreate(\THCFrame\Model\Model $object);
+    abstract public function onCreate(Model $object);
 
-    abstract public function onUpdate(\THCFrame\Model\Model $object);
+    abstract public function onUpdate(Model $object);
 
-    abstract public function onDelete(\THCFrame\Model\Model $object);
+    abstract public function onDelete(Model $object);
 }

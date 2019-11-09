@@ -33,6 +33,8 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
 
     /**
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -44,8 +46,11 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
 
     /**
      * Called from admin module.
-     * 
+     *
+     * @param int $limit
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchWithLimit($limit = 10)
     {
@@ -59,9 +64,13 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
 
     /**
      * Check differences between two objects.
-     * 
-     * @param \App\Model\ActionModel $original
-     * @param \App\Model\ActionModel $edited
+     *
+     * @param AdvertisementModel $original
+     * @param AdvertisementModel $edited
+     * @throws \ReflectionException
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
+     * @throws \THCFrame\Model\Exception\Validation
      */
     public static function logChanges(\App\Model\AdvertisementModel $original, \App\Model\AdvertisementModel $edited)
     {
@@ -74,39 +83,42 @@ class AdvertisementHistoryModel extends BasicAdvertisementhistoryModel
 
         $reflect = new \ReflectionClass($original);
         $properties = $reflect->getProperties();
-        $className = get_class($original);
 
         if (empty($properties)) {
             return;
         }
 
         foreach ($properties as $key => $value) {
-            if (!preg_match('#.*@column.*#s', $value->getDocComment())) {
+            if (!preg_match('#@column#s', $value->getDocComment())) {
                 continue;
             }
-            if ($value->class == $className) {
+
+            if (stripos($value->class, 'basic') !== false) {
                 $propertyName = $value->getName();
                 $getProperty = 'get' . ucfirst(str_replace('_', '', $value->getName()));
 
-                if (trim((string) $original->$getProperty()) !== trim((string) $edited->$getProperty())) {
+                if (trim((string)$original->$getProperty()) !== trim((string)$edited->$getProperty())) {
                     $changes[$propertyName] = $original->$getProperty();
                 }
             }
         }
 
-        $historyRecord = new self([
-            'originId' => $original->getId(),
-            'editedBy' => $user->getId(),
-            'remoteAddr' => $remoteAddr,
-            'referer' => $referer,
-            'changedData' => json_encode($changes),
-        ]);
+        if (\count($changes)) {
+            $historyRecord = new self([
+                'originId' => $original->getId(),
+                'editedBy' => $user->getId(),
+                'remoteAddr' => $remoteAddr,
+                'referer' => $referer,
+                'changedData' => json_encode($changes),
+            ]);
 
-        if ($historyRecord->validate()) {
-            $historyRecord->save();
-            Event::fire('app.log', ['success', 'Advertisement ' . $original->getId() . ' changes saved']);
-        } else {
-            Event::fire('app.log', ['fail', 'Advertisement history errors: ' . json_encode($historyRecord->getErrors())]);
+            if ($historyRecord->validate()) {
+                $historyRecord->save();
+                Event::fire('app.log', ['success', 'Advertisement ' . $original->getId() . ' changes saved']);
+            } else {
+                Event::fire('app.log',
+                    ['fail', 'Advertisement history errors: ' . json_encode($historyRecord->getErrors())]);
+            }
         }
     }
 

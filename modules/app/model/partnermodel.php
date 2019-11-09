@@ -31,9 +31,9 @@ class PartnerModel extends BasicPartnerModel
     }
 
     /**
-     * Delete record and logo image
-     * 
-     * @return type
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function delete()
     {
@@ -47,9 +47,10 @@ class PartnerModel extends BasicPartnerModel
 
         return $state;
     }
-    
+
     /**
-     * @return type
+     * @param bool $type
+     * @return string
      */
     public function getUnlinkLogoPath($type = true)
     {
@@ -61,9 +62,9 @@ class PartnerModel extends BasicPartnerModel
             } elseif (file_exists($this->_logo)) {
                 return $this->_logo;
             }
-        } else {
-            return $this->_logo;
         }
+
+        return $this->_logo;
     }
 
 }

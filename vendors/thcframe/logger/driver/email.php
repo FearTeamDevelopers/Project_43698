@@ -56,7 +56,10 @@ class Email extends Logger\Driver
 
     /**
      *
-     * @param type $message
+     * @param string $level
+     * @param string $message
+     * @param array $context
+     * @return Email
      */
     public function log($level, $message, array $context = [])
     {

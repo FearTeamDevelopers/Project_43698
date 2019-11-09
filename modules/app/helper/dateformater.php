@@ -11,9 +11,9 @@ class DateFormater
 {
 
     /**
-     * @param type $texttime
+     * @param string $texttime
      *
-     * @return type
+     * @return string
      */
     public static function t2dt($texttime)
     {
@@ -22,9 +22,8 @@ class DateFormater
     }
 
     /**
-     * @param type $texttime
-     *
-     * @return type
+     * @param $texttime
+     * @return false|string
      */
     public static function t2d($texttime)
     {
@@ -33,9 +32,8 @@ class DateFormater
     }
 
     /**
-     * @param type $texttime
-     *
-     * @return type
+     * @param $texttime
+     * @return false|string
      */
     public static function t2t($texttime)
     {
@@ -45,6 +43,7 @@ class DateFormater
 
     /**
      * @param type $date
+     * @return false|string
      */
     public static function g2dn($date)
     {
@@ -54,6 +53,7 @@ class DateFormater
 
     /**
      * @param type $date
+     * @return false|string
      */
     public static function g2yy($date)
     {
@@ -63,6 +63,7 @@ class DateFormater
 
     /**
      * @param type $date
+     * @return mixed
      */
     public static function g2mn($date)
     {

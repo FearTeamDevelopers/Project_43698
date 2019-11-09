@@ -1,0 +1,62 @@
+version: '3.3'
+
+services:
+  nginx:
+    security_opt:
+      - seccomp:unconfined
+    image: nginx:alpine
+    volumes:
+      - ./docker/nginx/hastrman.local.cert:/etc/ssl/certs/hastrman.cert
+      - ./docker/nginx/hastrman.local.key:/etc/ssl/private/hastrman.key
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - .:/var/www/html
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php
+    links:
+      - php
+    networks:
+      netw:
+        aliases:
+          - hastrman.local
+          - hastrman
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php-fpm/Dockerfile
+    ports:
+      - "9000:9000"
+    networks:
+      - netw
+    volumes:
+      - .:/var/www/html
+    links:
+      - mysql
+
+  mysql:
+    security_opt:
+      - seccomp:unconfined
+    image: mariadb:10.3
+    networks:
+      - netw
+    environment:
+      - MYSQL_DATABASE=hastrmancz_001
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=hastrmandb
+      - MYSQL_PASSWORD=hastrmandb
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/custom.cnf:/etc/mysql/conf.d/custom.cnf
+      - dbvolume:/var/lib/mysql
+      - ./docker/mysql/hastrmancz_001.sql:/docker-entrypoint-initdb.d/hastrmancz_001.sql:ro
+      - ./docker/mysql/hastrmancz_003.sql:/docker-entrypoint-initdb.d/hastrmancz_003.sql:ro
+
+volumes:
+  dbvolume:
+networks:
+  netw:

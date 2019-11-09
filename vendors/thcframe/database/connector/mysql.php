@@ -2,6 +2,7 @@
 
 namespace THCFrame\Database\Connector;
 
+use Mysqli;
 use THCFrame\Database as Database;
 use THCFrame\Database\Exception as Exception;
 use THCFrame\Profiler\Profiler;
@@ -17,7 +18,7 @@ class Mysql extends Database\Connector
 {
 
     /**
-     * @var null|MySQLi
+     * @var null|MySQL
      */
     protected $service;
 
@@ -147,18 +148,18 @@ class Mysql extends Database\Connector
     /**
      * Method attempts to connect to the MySQL server at the specified host/port
      *
-     * @return \THCFrame\Database\Connector\Mysql
+     * @return Mysql
      * @throws Exception\Service
      */
     public function connect()
     {
         if (!$this->isValidService()) {
-            $this->service = new \MySQLi(
-                    $this->host, $this->username, $this->password, $this->schema, $this->port
+            $this->service = new MySQLi(
+                $this->host, $this->username, $this->password, $this->schema, $this->port
             );
 
             if ($this->service->connect_error) {
-                throw new Exception\Service('Unable to connect to database service');
+                throw new Exception\Service('Unable to connect to database service: ' . $this->service->connect_error);
             }
 
             $this->service->set_charset('utf8');
@@ -173,7 +174,7 @@ class Mysql extends Database\Connector
     /**
      * Method attempts to disconnect the $service instance from the MySQL service
      *
-     * @return \THCFrame\Database\Connector\Mysql
+     * @return Mysql
      */
     public function disconnect()
     {
@@ -193,7 +194,7 @@ class Mysql extends Database\Connector
     public function query()
     {
         return new Database\Query\Mysql([
-            'connector' => $this
+            'connector' => $this,
         ]);
     }
 
@@ -364,7 +365,7 @@ class Mysql extends Database\Connector
      */
     public function beginTransaction()
     {
-        $this->service->autocommit(FALSE);
+        $this->service->autocommit(false);
     }
 
     /**
@@ -373,7 +374,7 @@ class Mysql extends Database\Connector
     public function commitTransaction()
     {
         $this->service->commit();
-        $this->service->autocommit(TRUE);
+        $this->service->autocommit(true);
     }
 
     /**
@@ -382,7 +383,7 @@ class Mysql extends Database\Connector
     public function rollbackTransaction()
     {
         $this->service->rollback();
-        $this->service->autocommit(TRUE);
+        $this->service->autocommit(true);
     }
 
     /**
@@ -440,7 +441,7 @@ class Mysql extends Database\Connector
     protected function dropForeignKeys($table)
     {
         $fkResult = $this->execute(
-                "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME
+            "select i.TABLE_NAME,i.COLUMN_NAME,i.CONSTRAINT_NAME,i.REFERENCED_TABLE_NAME,i.REFERENCED_COLUMN_NAME
                         from INFORMATION_SCHEMA.KEY_COLUMN_USAGE i
                         where i.TABLE_SCHEMA = '{$this->getSchema()}' and i.TABLE_NAME = '{$table}'
                         and i.referenced_column_name is not NULL;");
@@ -499,9 +500,10 @@ class Mysql extends Database\Connector
             if ($column['default'] !== false) {
                 if ($column['default'] == 'null') {
                     $default = "DEFAULT NULL";
-                } elseif ((int) $column['default'] === 0 && in_array($type, ['int', 'integer', 'tinyint', 'smallint', 'mediumint'])) {
+                } elseif ((int)$column['default'] === 0 && in_array($type,
+                        ['int', 'integer', 'tinyint', 'smallint', 'mediumint'])) {
                     $default = 'DEFAULT 0';
-                } elseif ((int) $column['default'] === 0 && in_array($type, ['float', 'double', 'decimal'])) {
+                } elseif ((int)$column['default'] === 0 && in_array($type, ['float', 'double', 'decimal'])) {
                     $default = 'DEFAULT 0.0';
                 } elseif (is_numeric($column['default'])) {
                     $default = "DEFAULT {$column['default']}";
@@ -520,15 +522,19 @@ class Mysql extends Database\Connector
             $comment = $cmStr === '' ? '' : "COMMENT '{$cmStr}'";
 
             switch ($type) {
-                case 'auto_increment': {
+                case 'auto_increment':
+                    {
                         $lines[] = "{$alterType} `{$name}` int(11) UNSIGNED NOT NULL AUTO_INCREMENT";
                         break;
                     }
-                default: {
+                default:
+                    {
                         if ($length !== null) {
-                            $lines[] = preg_replace('/\s+/', ' ', "{$alterType} `{$name}` {$type}({$length}) {$unsigned} {$null} {$default} {$comment}");
+                            $lines[] = preg_replace('/\s+/', ' ',
+                                "{$alterType} `{$name}` {$type}({$length}) {$unsigned} {$null} {$default} {$comment}");
                         } else {
-                            $lines[] = preg_replace('/\s+/', ' ', "{$alterType} `{$name}` {$type} {$unsigned} {$null} {$default} {$comment}");
+                            $lines[] = preg_replace('/\s+/', ' ',
+                                "{$alterType} `{$name}` {$type} {$unsigned} {$null} {$default} {$comment}");
                         }
                         break;
                     }
@@ -544,18 +550,21 @@ class Mysql extends Database\Connector
                 $createConstraints[] = "UNIQUE KEY (`{$name}`)";
             }
             if (!empty($column['foreign'])) {
-                preg_match('/^([a-zA-Z_-]*)\s?REFERENCES ([a-zA-Z_-]*) \(([a-zA-Z_,-]*)\) (.*)$/i', $column['foreign'], $fkParts);
+                preg_match('/^([a-zA-Z_-]*)\s?REFERENCES ([a-zA-Z_-]*) \(([a-zA-Z_,-]*)\) (.*)$/i', $column['foreign'],
+                    $fkParts);
 
                 $fkName = !empty($fkParts[1]) ? "`{$fkParts[1]}`" : '';
                 $referencedTable = $fkParts[2];
                 $referencedColumn = $fkParts[3];
                 $referenceDefinition = $fkParts[4];
 
-                $createConstraints[] = preg_replace('/\s+/', ' ', "FOREIGN KEY {$fkName} (`{$name}`) REFERENCES `{$referencedTable}` (`{$referencedColumn}`) {$referenceDefinition}");
+                $createConstraints[] = preg_replace('/\s+/', ' ',
+                    "FOREIGN KEY {$fkName} (`{$name}`) REFERENCES `{$referencedTable}` (`{$referencedColumn}`) {$referenceDefinition}");
                 unset($fkParts);
             }
             if (!empty($column['foreign']) && $queryType == 'alter') {
-                $lines[] = preg_replace('/\s+/', ' ', "ADD FOREIGN KEY {$fkName} (`{$name}`) REFERENCES `{$referencedTable}` (`{$referencedColumn}`) {$referenceDefinition}");
+                $lines[] = preg_replace('/\s+/', ' ',
+                    "ADD FOREIGN KEY {$fkName} (`{$name}`) REFERENCES `{$referencedTable}` (`{$referencedColumn}`) {$referenceDefinition}");
             }
         }
 
@@ -564,7 +573,8 @@ class Mysql extends Database\Connector
                 $queries[] = "DROP TABLE IF EXISTS {$table};";
             }
             $queries[] = sprintf(
-                    $templateCreate, $table, implode(",\n", $lines), implode(",\n", $createConstraints), $this->engine, $this->charset, $tableComment
+                $templateCreate, $table, implode(",\n", $lines), implode(",\n", $createConstraints), $this->engine,
+                $this->charset, $tableComment
             );
         } elseif ($queryType == 'alter') {
             if (!empty($lines)) {
@@ -605,12 +615,13 @@ class Mysql extends Database\Connector
      * and applied to the CREATE TABLE or ALTER TABLE $template string.
      *
      * @param Model $model
-     * @return \THCFrame\Database\Connector\Mysql
+     * @return Mysql
      * @throws Exception\Sql
      */
     public function sync(Model $model, $runQuery = true, $queryType = 'alter', $dropIfExists = true)
     {
-        Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync Start ----------', 'sync', true, 'DbModelSync.log');
+        Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync Start ----------', 'sync', true,
+            'DbModelSync.log');
 
         $queries = $this->prepareQueries($model, $queryType, $dropIfExists);
 
@@ -628,13 +639,15 @@ class Mysql extends Database\Connector
             $this->execute('SET foreign_key_checks = 1;');
         } catch (\Exception $ex) {
             Core::getLogger()->log($ex->getMessage(), 'sync', true, 'DbModelSync.log');
-            Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync was finished with errors ----------', 'sync', true, 'DbModelSync.log');
+            Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync was finished with errors ----------',
+                'sync', true, 'DbModelSync.log');
             $this->rollbackTransaction();
             return false;
         }
 
         $this->commitTransaction();
-        Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync was finished without errors ----------', 'sync', true, 'DbModelSync.log');
+        Core::getLogger()->log('---------- ' . get_class($model) . ' - Sync was finished without errors ----------',
+            'sync', true, 'DbModelSync.log');
 
         return true;
     }

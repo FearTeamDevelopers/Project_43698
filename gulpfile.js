@@ -62,7 +62,7 @@ gulp.task('styles', function(){
  **********/
 gulp.task('browser-sync', function() {
     browserSync({
-        proxy: "hastrman.dev"
+        proxy: "https://hastrman.local"
     });
 });
 

@@ -9,9 +9,9 @@ use Admin\Model\Basic\BasicImessageModel;
  */
 class ImessageModel extends BasicImessageModel
 {
-    const TYPE_INFO = 1;
-    const TYPE_WARNING = 2;
-    const TYPE_ERROR = 3;
+    public const TYPE_INFO = 1;
+    public const TYPE_WARNING = 2;
+    public const TYPE_ERROR = 3;
 
     /**
      * @var array
@@ -43,9 +43,11 @@ class ImessageModel extends BasicImessageModel
     }
 
     /**
-     * @return array
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchAll()
+    public static function fetchAll(): ?array
     {
         $query = self::getQuery(['ims.*'])
                 ->join('tb_user', 'ims.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
@@ -54,11 +56,13 @@ class ImessageModel extends BasicImessageModel
     }
 
     /**
-     * @return array
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchActive()
+    public static function fetchActive(): ?array
     {
-        return self::all(['displayFrom <= ?' => date('Y-m-d', time()), 'displayTo >= ?' => date('Y-m-d', time()), 'active = ?' => true]);
+        return self::all(['displayFrom <= ?' => date('Y-m-d'), 'displayTo >= ?' => date('Y-m-d'), 'active = ?' => true]);
     }
 
     /**
@@ -66,7 +70,7 @@ class ImessageModel extends BasicImessageModel
      * 
      * @return array
      */
-    public static function getTypes()
+    public static function getTypes(): array
     {
         return self::$_typesConv;
     }

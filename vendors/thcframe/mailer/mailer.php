@@ -3,15 +3,9 @@
 namespace THCFrame\Mailer;
 
 use THCFrame\Core\Base;
-use THCFrame\Mailer\Exception;
 use THCFrame\Core\Core;
 use THCFrame\Registry\Registry;
 
-/**
- * Class for sending emails
- *
- * @author Tomy
- */
 class Mailer extends Base
 {
 
@@ -53,7 +47,7 @@ class Mailer extends Base
 
     /**
      *
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -72,6 +66,9 @@ class Mailer extends Base
         }
     }
 
+    /**
+     * @return string
+     */
     public function getSubject()
     {
         if (ENV != 'live') {
@@ -80,16 +77,25 @@ class Mailer extends Base
         return $this->subject;
     }
 
+    /**
+     * @return string
+     */
     public function getBody()
     {
         return $this->body;
     }
 
+    /**
+     * @return string
+     */
     public function getFrom()
     {
         return $this->from;
     }
 
+    /**
+     * @return array
+     */
     public function getSendTo()
     {
         return $this->sendTo;
@@ -97,7 +103,7 @@ class Mailer extends Base
 
     /**
      *
-     * @param type $glue
+     * @param string $glue
      * @return string
      */
     public function getSendToAsString($glue = ';')
@@ -111,8 +117,8 @@ class Mailer extends Base
 
     /**
      *
-     * @param type $subject
-     * @return \THCFrame\Mailer\Mailer
+     * @param string $subject
+     * @return Mailer
      */
     public function setSubject($subject)
     {
@@ -122,8 +128,8 @@ class Mailer extends Base
 
     /**
      *
-     * @param type $body
-     * @return \THCFrame\Mailer\Mailer
+     * @param string $body
+     * @return Mailer
      */
     public function setBody($body)
     {
@@ -133,8 +139,8 @@ class Mailer extends Base
 
     /**
      *
-     * @param type $from
-     * @return \THCFrame\Mailer\Mailer
+     * @param string $from
+     * @return Mailer
      */
     public function setFrom($from)
     {
@@ -144,8 +150,8 @@ class Mailer extends Base
 
     /**
      *
-     * @param type $sendTo
-     * @return \THCFrame\Mailer\Mailer
+     * @param array|string $sendTo
+     * @return Mailer
      */
     public function setSendTo($sendTo)
     {
@@ -210,7 +216,7 @@ class Mailer extends Base
                     return false;
                 }
             }
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             Core::getLogger()->error('Send email failed. Exception: {exception}', ['exception' => serialize($ex)]);
             return false;
         }

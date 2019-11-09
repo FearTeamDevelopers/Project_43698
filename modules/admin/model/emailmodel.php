@@ -1,6 +1,7 @@
 <?php
 namespace Admin\Model;
 
+use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
 use Admin\Model\Basic\BasicEmailModel;
 
@@ -31,16 +32,14 @@ class EmailModel extends BasicEmailModel
      * @param string $key
      *
      * @return bool
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function checkUrlKey($key)
+    public static function checkUrlKey($key): ?bool
     {
         $status = self::first(['urlKey = ?' => $key]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
 
     public static function fetchAll()
@@ -55,7 +54,7 @@ class EmailModel extends BasicEmailModel
 
     public static function fetchById($id)
     {
-        return \Admin\Model\EmailModel::first(['id = ?' => (int) $id]);
+        return self::first(['id = ?' => (int) $id]);
     }
 
     public static function fetchAllActive()
@@ -70,13 +69,13 @@ class EmailModel extends BasicEmailModel
 
     public static function fetchCommonActiveByIdAndLang($id, $fieldName)
     {
-        return \Admin\Model\EmailModel::first(
+        return self::first(
                 ['id = ?' => (int) $id, 'active = ?' => true, 'type = ?' => 1], [$fieldName, 'subject']);
     }
 
     public static function fetchActiveByIdAndLang($id, $fieldName)
     {
-        return \Admin\Model\EmailModel::first(
+        return self::first(
                 ['id = ?' => (int) $id, 'active = ?' => true], [$fieldName, 'subject']);
     }
 
@@ -84,9 +83,11 @@ class EmailModel extends BasicEmailModel
      * @param string $urlKey
      * @param array $data
      *
-     * @return null|\Admin\Model\EmailModel
+     * @return null|EmailModel
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function loadAndPrepare($urlKey, $data = [])
+    public static function loadAndPrepare($urlKey, $data = []): ?EmailModel
     {
         $email = self::first(['urlKey = ?' => $urlKey]);
 
@@ -102,7 +103,7 @@ class EmailModel extends BasicEmailModel
             }
         }
 
-        $email->body = \THCFrame\Core\StringMethods::prepareEmailText($emailText);
+        $email->body = StringMethods::prepareEmailText($emailText);
 
         return $email;
     }
@@ -110,9 +111,9 @@ class EmailModel extends BasicEmailModel
     /**
      * @param array $data
      *
-     * @return \Admin\Model\EmailModel
+     * @return EmailModel
      */
-    public function populate($data = [])
+    public function populate($data = []): EmailModel
     {
         $emailText = str_replace('{MAINURL}', 'https://' . RequestMethods::server('HTTP_HOST'), $this->getBody());
 
@@ -121,7 +122,7 @@ class EmailModel extends BasicEmailModel
                 $emailText = str_replace($key, $value, $emailText);
             }
         }
-        $this->_body = \THCFrame\Core\StringMethods::prepareEmailText($emailText);
+        $this->_body = StringMethods::prepareEmailText($emailText);
 
         return $this;
     }

@@ -30,7 +30,8 @@ class AdImageModel extends BasicAdimageModel
     }
 
     /**
-     * @return type
+     * @param bool $type
+     * @return string
      */
     public function getUnlinkPath($type = true)
     {
@@ -42,13 +43,13 @@ class AdImageModel extends BasicAdimageModel
             } elseif (file_exists('./' . $this->_imgMain)) {
                 return './' . $this->_imgMain;
             }
-        } else {
-            return $this->_imgMain;
         }
+        return $this->_imgMain;
     }
 
     /**
-     * @return type
+     * @param bool $type
+     * @return string
      */
     public function getUnlinkThumbPath($type = true)
     {
@@ -60,15 +61,17 @@ class AdImageModel extends BasicAdimageModel
             } elseif (file_exists('./' . $this->_imgThumb)) {
                 return './' . $this->_imgThumb;
             }
-        } else {
-            return $this->_imgThumb;
         }
+
+        return $this->_imgThumb;
     }
 
     /**
      * Delete ad record and connected images
-     * 
-     * @return type
+     *
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function delete()
     {

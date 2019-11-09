@@ -157,11 +157,10 @@ class Mysqldump extends Base
     }
 
     /**
-     *
-     * @param Connector $dbc
-     * @param type $dbid
-     * @param type $tablename
-     * @return type
+     * @param \THCFrame\Database\Connector $dbc
+     * @param $dbid
+     * @param $tablename
+     * @throws \Exception
      */
     private function getTableValues(Connector $dbc, $dbid, $tablename)
     {
@@ -288,11 +287,9 @@ class Mysqldump extends Base
     }
 
     /**
-     * Write data into file
-     *
-     * @param string $str
-     * @return type
-     * @throws \Exception
+     * @param $str
+     * @return false|int
+     * @throws Exception\Mysqldump
      */
     private function write($str)
     {
@@ -304,9 +301,7 @@ class Mysqldump extends Base
     }
 
     /**
-     * Close file
-     *
-     * @return type
+     * @return bool
      */
     private function close()
     {
@@ -431,9 +426,8 @@ class Mysqldump extends Base
     }
 
     /**
-     *
-     * @param type $id
-     * @return type
+     * @param null $id
+     * @return array|mixed|null
      */
     public function getDumpFile($id = null)
     {

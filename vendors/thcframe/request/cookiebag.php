@@ -25,8 +25,7 @@ class CookieBag extends AbstractBag
     private $_prefix = 'THCF_';
 
     /**
-     *
-     * @return type
+     * @return CookieBag|static
      */
     public static function getInstance()
     {

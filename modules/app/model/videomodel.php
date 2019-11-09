@@ -2,7 +2,6 @@
 
 namespace App\Model;
 
-use THCFrame\Request\RequestMethods;
 use App\Model\Basic\BasicVideoModel;
 
 /**
@@ -32,16 +31,14 @@ class VideoModel extends BasicVideoModel
      * @param string $key
      *
      * @return bool
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function checkUrlKey($key)
     {
         $status = self::first(['urlKey = ?' => $key]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
 
     public static function fetchAll()
@@ -73,6 +70,7 @@ class VideoModel extends BasicVideoModel
     {
         $errors = [];
         $urlParts = parse_url($post->get('url'));
+        $youTubeVideoCode = '';
 
         if (isset($urlParts['host']) && $urlParts['host'] === 'www.youtube.com') {
             if (isset($urlParts['query']) && !empty($urlParts['query'])) {
@@ -90,6 +88,8 @@ class VideoModel extends BasicVideoModel
             'active' => 1,
             'url' => $post->get('url'),
             'videoCode' => $youTubeVideoCode,
+            'created' => date('Y-m-d H:i'),
+            'modified' => date('Y-m-d H:i'),
         ]);
 
         return [$video, $errors];

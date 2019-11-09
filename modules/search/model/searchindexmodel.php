@@ -65,13 +65,13 @@ class SearchIndexModel extends BasicSearchIndexModel
 
     /**
      *
-     * @param type $complete
-     * @param type $runByUser
+     * @param bool $complete
+     * @param bool|string $runByUser
      */
     public function indexAllDataSources($complete, $runByUser)
     {
         if (count($this->dataSources)) {
-            /* @var $source Search\Model\Sources\SourceInterface */
+            /* @var $source \Search\Model\Sources\SourceInterface */
             foreach ($this->dataSources as $source) {
                 try {
                     $source->buildIndex($complete, $runByUser);
@@ -102,7 +102,10 @@ class SearchIndexModel extends BasicSearchIndexModel
      * @param string $text
      * @param int $page
      * @param int $limit
+     * @param bool $bazarOnly
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function search($text, $page = 1, $limit = 10, $bazarOnly = false)
     {

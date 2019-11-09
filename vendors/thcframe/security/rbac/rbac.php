@@ -36,8 +36,7 @@ class Rbac
     }
 
     /**
-     *
-     * @return type
+     * @return Rbac|null
      */
     public static function getInstance()
     {
@@ -47,6 +46,9 @@ class Rbac
         return self::$_instance;
     }
 
+    /**
+     * @param $permission
+     */
     public function hasPermission($permission)
     {
         /*
@@ -61,6 +63,12 @@ class Rbac
          */
     }
 
+    /**
+     * @param $module
+     * @param $controller
+     * @param $action
+     * @return bool
+     */
     public function checkResource($module, $controller, $action)
     {
         if ($this->isValidResource($module, $controller, $action)) {

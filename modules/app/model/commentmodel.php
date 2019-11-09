@@ -10,9 +10,9 @@ use App\Model\Basic\BasicCommentModel;
 class CommentModel extends BasicCommentModel
 {
 
-    const RESOURCE_ACTION = 1;
-    const RESOURCE_NEWS = 2;
-    const RESOURCE_REPORT = 3;
+    public const RESOURCE_ACTION = 1;
+    public const RESOURCE_NEWS = 2;
+    public const RESOURCE_REPORT = 3;
 
     private static $_resourceConv = [
         'action' => self::RESOURCE_ACTION,
@@ -50,6 +50,8 @@ class CommentModel extends BasicCommentModel
 
     /**
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -62,7 +64,10 @@ class CommentModel extends BasicCommentModel
     /**
      * Called from admin module.
      *
+     * @param int $limit
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchWithLimit($limit = 10)
     {
@@ -75,9 +80,10 @@ class CommentModel extends BasicCommentModel
     }
 
     /**
-     * @param type $userId
-     *
-     * @return type
+     * @param $userId
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchByUserId($userId)
     {
@@ -85,10 +91,12 @@ class CommentModel extends BasicCommentModel
     }
 
     /**
-     * @param type $resourceId
-     * @param type $type
-     *
-     * @return type
+     * @param int $resourceId
+     * @param int $type
+     * @param int $limit
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchCommentsByResourceAndType($resourceId, $type, $limit = 20)
     {
@@ -112,8 +120,13 @@ class CommentModel extends BasicCommentModel
     }
 
     /**
-     * @param type $actionId
-     * @param type $created
+     * @param $type
+     * @param $resourceId
+     * @param $created
+     * @param int $limit
+     * @return array|void|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchByTypeAndCreated($type, $resourceId, $created, $limit = 20)
     {
@@ -131,15 +144,12 @@ class CommentModel extends BasicCommentModel
                 ->order('cm.created', 'desc')
                 ->limit((int) $limit);
 
-        $comments = self::initialize($query);
-
-        return $comments;
+        return self::initialize($query);
     }
 
     /**
-     * @param type $id
-     *
-     * @return type
+     * @param $id
+     * @return array|null
      */
     public static function fetchReplies($id)
     {
@@ -157,7 +167,9 @@ class CommentModel extends BasicCommentModel
     }
 
     /**
-     * @return type
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function getReplies()
     {

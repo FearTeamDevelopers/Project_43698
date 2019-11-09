@@ -1,15 +1,24 @@
 <?php
+
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Request\RequestMethods;
-use THCFrame\Events\Events as Event;
-use THCFrame\Filesystem\FileManager;
-use THCFrame\Registry\Registry;
+use App\Model\GalleryModel;
+use App\Model\PhotoModel;
+use App\Model\VideoModel;
+use Exception;
+use THCFrame\Core\ArrayMethods;
 use THCFrame\Core\Core;
 use THCFrame\Core\StringMethods;
-use THCFrame\Core\ArrayMethods;
-use App\Model\GalleryModel;
+use THCFrame\Events\Events as Event;
+use THCFrame\Filesystem\Exception\IO;
+use THCFrame\Filesystem\FileManager;
+use THCFrame\Filesystem\Image;
+use THCFrame\Model\Exception\Connector;
+use THCFrame\Model\Exception\Implementation;
+use THCFrame\Model\Exception\Validation;
+use THCFrame\Request\RequestMethods;
+use THCFrame\View\Exception\Data;
 
 /**
  *
@@ -18,28 +27,14 @@ class GalleryController extends Controller
 {
 
     /**
-     * Check whether user has access to gallery or not.
-     *
-     * @param GalleryModel $gallery
-     *
-     * @return bool
-     */
-    private function _checkAccess(GalleryModel $gallery)
-    {
-        if ($this->isAdmin() === true ||
-            $gallery->getUserId() == $this->getUser()->getId()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Get list of all gelleries.
      *
      * @before _secured, _participant
+     * @throws Data
+     * @throws Connector
+     * @throws Implementation
      */
-    public function index()
+    public function index(): void
     {
         $view = $this->getActionView();
 
@@ -52,8 +47,12 @@ class GalleryController extends Controller
      * Create new gallery.
      *
      * @before _secured, _participant
+     * @throws Data
+     * @throws Validation
+     * @throws Connector
+     * @throws Implementation
      */
-    public function add()
+    public function add(): void
     {
         $view = $this->getActionView();
 
@@ -81,6 +80,8 @@ class GalleryController extends Controller
                 'avatarPhotoId' => 0,
                 'description' => RequestMethods::post('description'),
                 'rank' => RequestMethods::post('rank', 1),
+                'created' => date('Y-m-d H:i'),
+                'modified' => date('Y-m-d H:i'),
             ]);
 
             if (empty($errors) && $gallery->validate()) {
@@ -105,12 +106,13 @@ class GalleryController extends Controller
      * @before _secured, _participant
      *
      * @param int $id gallery id
+     * @throws Data
      */
-    public function detail($id)
+    public function detail($id): void
     {
         $view = $this->getActionView();
 
-        $gallery = GalleryModel::fetchGalleryById((int) $id);
+        $gallery = GalleryModel::fetchGalleryById((int)$id);
 
         if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -128,12 +130,13 @@ class GalleryController extends Controller
      * @before _secured, _participant
      *
      * @param int $id gallery id
+     * @throws Data
      */
-    public function edit($id)
+    public function edit($id): void
     {
         $view = $this->getActionView();
 
-        $gallery = GalleryModel::fetchGalleryById((int) $id);
+        $gallery = GalleryModel::fetchGalleryById((int)$id);
 
         if (null === $gallery) {
             $view->warningMessage($this->lang('NOT_FOUND'));
@@ -185,7 +188,7 @@ class GalleryController extends Controller
                 Event::fire('admin.log', [
                     'fail',
                     'Gallery id: ' . $id,
-                    'Errors: ' . json_encode($errors + $gallery->getErrors())
+                    'Errors: ' . json_encode($errors + $gallery->getErrors()),
                 ]);
                 $view->set('errors', $gallery->getErrors());
             }
@@ -193,12 +196,28 @@ class GalleryController extends Controller
     }
 
     /**
+     * Check whether user has access to gallery or not.
+     *
+     * @param GalleryModel $gallery
+     *
+     * @return bool
+     */
+    private function _checkAccess(GalleryModel $gallery): ?bool
+    {
+        return $this->isAdmin() === true ||
+            $gallery->getUserId() == $this->getUser()->getId();
+    }
+
+    /**
      * Delete existing gallery and all photos (files and db)
      *
      * @before _secured, _participant
      * @param int $id gallery id
+     * @throws IO
+     * @throws Connector
+     * @throws Implementation
      */
-    public function delete($id)
+    public function delete($id): void
     {
         $this->disableView();
 
@@ -207,30 +226,28 @@ class GalleryController extends Controller
         }
 
         $gallery = GalleryModel::first(
-                ['id = ?' => (int) $id], ['id', 'title', 'created', 'userId', 'urlKey']
+            ['id = ?' => (int)$id], ['id', 'title', 'created', 'userId', 'urlKey']
         );
 
         if (null === $gallery) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-        } else {
-            if ($this->_checkAccess($gallery)) {
-                GalleryModel::deleteAllPhotos($gallery->getId());
+        } elseif ($this->_checkAccess($gallery)) {
+            GalleryModel::deleteAllPhotos($gallery->getId());
 
-                if ($gallery->delete()) {
-                    $this->getCache()->erase('gallery');
-                    Event::fire('admin.log', ['success', 'Gallery id: ' . $id]);
-                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
-                } else {
-                    Event::fire('admin.log', [
-                        'fail',
-                        'Gallery id: ' . $id,
-                        'Errors: ' . json_encode($gallery->getErrors())
-                    ]);
-                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
-                }
+            if ($gallery->delete()) {
+                $this->getCache()->erase('gallery');
+                Event::fire('admin.log', ['success', 'Gallery id: ' . $id]);
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                Event::fire('admin.log', [
+                    'fail',
+                    'Gallery id: ' . $id,
+                    'Errors: ' . json_encode($gallery->getErrors()),
+                ]);
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
+        } else {
+            $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
         }
     }
 
@@ -239,41 +256,40 @@ class GalleryController extends Controller
      *
      * @before _secured, _participant
      * @param int $id gallery id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function deleteAllPhotos($id)
+    public function deleteAllPhotos($id): void
     {
         $this->disableView();
-        $view = $this->getActionView();
 
         if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
         $gallery = GalleryModel::first(
-                ['id = ?' => (int) $id], ['id', 'title', 'created', 'userId', 'urlKey']
+            ['id = ?' => (int)$id], ['id', 'title', 'created', 'userId', 'urlKey']
         );
 
         if (null === $gallery) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-        } else {
-            if ($this->_checkAccess($gallery)) {
-                try {
-                    GalleryModel::deleteAllPhotos($gallery->getId(), true);
+        } elseif ($this->_checkAccess($gallery)) {
+            try {
+                GalleryModel::deleteAllPhotos($gallery->getId(), true);
 
-                    Event::fire('admin.log', ['success', 'Delete all photos in gallery id: ' . $id]);
-                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
-                } catch (\Exception $ex) {
-                    Event::fire('admin.log', [
-                        'fail',
-                        'Gallery id: ' . $id,
-                        'Errors: ' . json_encode($gallery->getErrors()),
-                        'Exception: ' . $ex->getMessage(),
-                    ]);
-                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
-                }
-            } else {
-                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                Event::fire('admin.log', ['success', 'Delete all photos in gallery id: ' . $id]);
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
+            } catch (Exception $ex) {
+                Event::fire('admin.log', [
+                    'fail',
+                    'Gallery id: ' . $id,
+                    'Errors: ' . json_encode($gallery->getErrors()),
+                    'Exception: ' . $ex->getMessage(),
+                ]);
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
+        } else {
+            $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
         }
     }
 
@@ -281,8 +297,11 @@ class GalleryController extends Controller
      * Return list of galleries to insert gallery link to content.
      *
      * @before _secured, _participant
+     * @throws Data
+     * @throws Connector
+     * @throws Implementation
      */
-    public function insertToContent()
+    public function insertToContent(): void
     {
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
@@ -297,19 +316,20 @@ class GalleryController extends Controller
      *
      * @before _secured, _participant
      *
-     * @param int $id gallery id
+     * @throws Validation
+     * @throws Exception
      */
-    public function upload()
+    public function upload(): void
     {
         $this->disableView();
 
         if (RequestMethods::post('submitUpload')) {
             $galleryId = RequestMethods::post('galleryid');
             $gallery = GalleryModel::first(
-                    [
-                    'id = ?' => (int) $galleryId,
+                [
+                    'id = ?' => (int)$galleryId,
                     'active = ?' => true,
-                    ], ['id', 'title', 'userId', 'urlKey']
+                ], ['id', 'title', 'userId', 'urlKey']
             );
 
             if (null === $gallery) {
@@ -334,7 +354,8 @@ class GalleryController extends Controller
                 'maxImageHeight' => $this->getConfig()->photo_maxheight,
             ]);
 
-            $fileErrors = $fileManager->uploadImage('file', 'gallery/' . $gallery->getUrlKey(), time() . '_')->getUploadErrors();
+            $fileErrors = $fileManager->uploadImage('file', 'gallery/' . $gallery->getUrlKey(),
+                time() . '_')->getUploadErrors();
             $files = $fileManager->getUploadedFiles();
 
             if (!empty($fileErrors)) {
@@ -346,10 +367,10 @@ class GalleryController extends Controller
 
             if (!empty($files)) {
                 foreach ($files as $i => $file) {
-                    if ($file instanceof \THCFrame\Filesystem\Image) {
+                    if ($file instanceof Image) {
                         $info = $file->getOriginalInfo();
 
-                        $photo = new \App\Model\PhotoModel([
+                        $photo = new PhotoModel([
                             'galleryId' => $gallery->getId(),
                             'imgMain' => trim($file->getFilename(), '.'),
                             'imgThumb' => trim($file->getThumbname(), '.'),
@@ -361,19 +382,23 @@ class GalleryController extends Controller
                             'width' => $file->getWidth(),
                             'height' => $file->getHeight(),
                             'size' => $file->getSize(),
+                            'created' => date('Y-m-d H:i'),
+                            'modified' => date('Y-m-d H:i'),
                         ]);
 
                         if ($photo->validate()) {
                             $aid = $photo->save();
 
-                            Event::fire('admin.log', ['success', 'Photo id: ' . $aid . ' in gallery ' . $gallery->getUrlKey()]);
+                            Event::fire('admin.log',
+                                ['success', 'Photo id: ' . $aid . ' in gallery ' . $gallery->getUrlKey()]);
                         } else {
                             Event::fire('admin.log', [
                                 'fail',
                                 'Photo in gallery ' . $gallery->getUrlKey(),
-                                'Errors: ' . json_encode($photo->getErrors())
+                                'Errors: ' . json_encode($photo->getErrors()),
                             ]);
-                            Core::getLogger()->error('Gallery image create db record fail: {error}', ['error' => print_r($photo->getErrors(), true)]);
+                            Core::getLogger()->error('Gallery image create db record fail: {error}',
+                                ['error' => print_r($photo->getErrors(), true)]);
                             $error = ArrayMethods::flatten($photo->getErrors());
 
                             header('HTTP/1.0 400 Bad Request');
@@ -391,11 +416,11 @@ class GalleryController extends Controller
                 header('HTTP/1.0 200 OK');
                 echo $this->lang('UPLOAD_SUCCESS');
                 exit;
-            } else {
-                header('HTTP/1.0 400 Bad Request');
-                echo $this->lang('UPLOAD_FAIL');
-                exit;
             }
+
+            header('HTTP/1.0 400 Bad Request');
+            echo $this->lang('UPLOAD_FAIL');
+            exit;
         }
     }
 
@@ -405,8 +430,10 @@ class GalleryController extends Controller
      * @before _secured, _participant
      *
      * @param int $id photo id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function deletePhoto($id)
+    public function deletePhoto($id): void
     {
         $this->disableView();
 
@@ -414,36 +441,34 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $photo = \App\Model\PhotoModel::first(
-                ['id = ?' => $id], ['id', 'imgMain', 'imgThumb', 'galleryId']
+        $photo = PhotoModel::first(
+            ['id = ?' => $id], ['id', 'imgMain', 'imgThumb', 'galleryId']
         );
 
         if (null === $photo) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                    ['id = ?' => (int) $photo->getGalleryId()], ['id', 'userId']
+                ['id = ?' => (int)$photo->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
                 $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-            } else {
-                if ($this->_checkAccess($gallery)) {
-                    if ($photo->delete()) {
-                        $this->getCache()->erase('gallery');
-                        Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
-                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
-                    } else {
-                        Event::fire('admin.log', [
-                            'fail',
-                            'Photo id: ' . $id,
-                            'Errors: ' . json_encode($photo->getErrors())
-                        ]);
-                        $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
-                    }
+            } elseif ($this->_checkAccess($gallery)) {
+                if ($photo->delete()) {
+                    $this->getCache()->erase('gallery');
+                    Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
+                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                 } else {
-                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                    Event::fire('admin.log', [
+                        'fail',
+                        'Photo id: ' . $id,
+                        'Errors: ' . json_encode($photo->getErrors()),
+                    ]);
+                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
+            } else {
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
         }
     }
@@ -454,8 +479,10 @@ class GalleryController extends Controller
      * @before _secured, _participant
      *
      * @param int $id photo id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function changePhotoStatus($id)
+    public function changePhotoStatus($id): void
     {
         $this->disableView();
 
@@ -463,52 +490,50 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $photo = \App\Model\PhotoModel::first(['id = ?' => (int) $id]);
+        $photo = PhotoModel::first(['id = ?' => (int)$id]);
 
         if (null === $photo) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                    ['id = ?' => (int) $photo->getGalleryId()], ['id', 'userId']
+                ['id = ?' => (int)$photo->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
                 $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-            } else {
-                if ($this->_checkAccess($gallery)) {
-                    if (!$photo->active) {
-                        $photo->active = true;
+            } elseif ($this->_checkAccess($gallery)) {
+                if (!$photo->active) {
+                    $photo->active = true;
 
-                        if ($photo->validate()) {
-                            $photo->save();
-                            $this->getCache()->erase('gallery');
+                    if ($photo->validate()) {
+                        $photo->save();
+                        $this->getCache()->erase('gallery');
 
-                            Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
-                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'active']);
-                        } else {
-                            $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
-                        }
-                    } elseif ($photo->active) {
-                        $photo->active = false;
-
-                        if ($photo->validate()) {
-                            $photo->save();
-                            $this->getCache()->erase('gallery');
-
-                            Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
-                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'inactive']);
-                        } else {
-                            Event::fire('admin.log', [
-                                'fail',
-                                'Photo id: ' . $id,
-                                'Errors: ' . json_encode($photo->getErrors())
-                            ]);
-                            $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
-                        }
+                        Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
+                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'active']);
+                    } else {
+                        $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
                     }
-                } else {
-                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                } elseif ($photo->active) {
+                    $photo->active = false;
+
+                    if ($photo->validate()) {
+                        $photo->save();
+                        $this->getCache()->erase('gallery');
+
+                        Event::fire('admin.log', ['success', 'Photo id: ' . $id]);
+                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'inactive']);
+                    } else {
+                        Event::fire('admin.log', [
+                            'fail',
+                            'Photo id: ' . $id,
+                            'Errors: ' . json_encode($photo->getErrors()),
+                        ]);
+                        $this->ajaxResponse(implode('<br/>', $photo->getErrors()), true);
+                    }
                 }
+            } else {
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
         }
     }
@@ -518,9 +543,9 @@ class GalleryController extends Controller
      *
      * @param int $id photo id
      */
-    public function changePhotoPosition($id)
+    public function changePhotoPosition($id): void
     {
-        
+
     }
 
     /**
@@ -528,7 +553,7 @@ class GalleryController extends Controller
      *
      * @before _secured, _participant
      */
-    public function connectVideo()
+    public function connectVideo(): void
     {
         $view = $this->getActionView();
 
@@ -545,8 +570,8 @@ class GalleryController extends Controller
                 self::redirect('/admin/gallery/');
             }
 
-            list($video, $errors) = \App\Model\VideoModel::createFromPost(
-                    RequestMethods::getPostDataBag(), ['user' => $this->getUser()]
+            [$video, $errors] = VideoModel::createFromPost(
+                RequestMethods::getPostDataBag(), ['user' => $this->getUser()]
             );
 
             if (empty($errors) && $video->validate()) {
@@ -570,8 +595,10 @@ class GalleryController extends Controller
      * @before _secured, _participant
      *
      * @param int $id photo id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function changeVideoStatus($id)
+    public function changeVideoStatus($id): void
     {
         $this->disableView();
 
@@ -579,52 +606,50 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $video = \App\Model\VideoModel::first(['id = ?' => (int) $id]);
+        $video = VideoModel::first(['id = ?' => (int)$id]);
 
         if (null === $video) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                    ['id = ?' => (int) $video->getGalleryId()], ['id', 'userId']
+                ['id = ?' => (int)$video->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
                 $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-            } else {
-                if ($this->_checkAccess($gallery)) {
-                    if (!$video->active) {
-                        $video->active = true;
+            } elseif ($this->_checkAccess($gallery)) {
+                if (!$video->active) {
+                    $video->active = true;
 
-                        if ($video->validate()) {
-                            $video->save();
-                            $this->getCache()->erase('gallery');
+                    if ($video->validate()) {
+                        $video->save();
+                        $this->getCache()->erase('gallery');
 
-                            Event::fire('admin.log', ['success', 'Video id: ' . $id]);
-                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'active']);
-                        } else {
-                            $this->ajaxResponse(implode('<br/>', $video->getErrors()), true);
-                        }
-                    } elseif ($video->active) {
-                        $video->active = false;
-
-                        if ($video->validate()) {
-                            $video->save();
-                            $this->getCache()->erase('gallery');
-
-                            Event::fire('admin.log', ['success', 'Video id: ' . $id]);
-                            $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'inactive']);
-                        } else {
-                            Event::fire('admin.log', [
-                                'fail',
-                                'Video id: ' . $id,
-                                'Errors: ' . json_encode($video->getErrors())
-                            ]);
-                            $this->ajaxResponse(implode('<br/>', $video->getErrors()), true);
-                        }
+                        Event::fire('admin.log', ['success', 'Video id: ' . $id]);
+                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'active']);
+                    } else {
+                        $this->ajaxResponse(implode('<br/>', $video->getErrors()), true);
                     }
-                } else {
-                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                } elseif ($video->active) {
+                    $video->active = false;
+
+                    if ($video->validate()) {
+                        $video->save();
+                        $this->getCache()->erase('gallery');
+
+                        Event::fire('admin.log', ['success', 'Video id: ' . $id]);
+                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'), false, 200, ['status' => 'inactive']);
+                    } else {
+                        Event::fire('admin.log', [
+                            'fail',
+                            'Video id: ' . $id,
+                            'Errors: ' . json_encode($video->getErrors()),
+                        ]);
+                        $this->ajaxResponse(implode('<br/>', $video->getErrors()), true);
+                    }
                 }
+            } else {
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
         }
     }
@@ -635,8 +660,10 @@ class GalleryController extends Controller
      * @before _secured, _participant
      *
      * @param int $id video id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function deleteVideo($id)
+    public function deleteVideo($id): void
     {
         $this->disableView();
 
@@ -644,34 +671,32 @@ class GalleryController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $video = \App\Model\VideoModel::first(['id = ?' => (int) $id]);
+        $video = VideoModel::first(['id = ?' => (int)$id]);
 
         if (null === $video) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
         } else {
             $gallery = GalleryModel::first(
-                    ['id = ?' => (int) $video->getGalleryId()], ['id', 'userId']
+                ['id = ?' => (int)$video->getGalleryId()], ['id', 'userId']
             );
 
             if (null === $gallery) {
                 $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-            } else {
-                if ($this->_checkAccess($gallery)) {
-                    if ($video->delete()) {
-                        $this->getCache()->erase('gallery');
-                        Event::fire('admin.log', ['success', 'Video id: ' . $id]);
-                        $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
-                    } else {
-                        Event::fire('admin.log', [
-                            'fail',
-                            'Video id: ' . $id,
-                            'Errors: ' . json_encode($video->getErrors())
-                        ]);
-                        $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
-                    }
+            } elseif ($this->_checkAccess($gallery)) {
+                if ($video->delete()) {
+                    $this->getCache()->erase('gallery');
+                    Event::fire('admin.log', ['success', 'Video id: ' . $id]);
+                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
                 } else {
-                    $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                    Event::fire('admin.log', [
+                        'fail',
+                        'Video id: ' . $id,
+                        'Errors: ' . json_encode($video->getErrors()),
+                    ]);
+                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
                 }
+            } else {
+                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
             }
         }
     }

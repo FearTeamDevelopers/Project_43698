@@ -13,12 +13,12 @@ use Search\Model\IndexableInterface;
 class NewsModel extends BasicNewsModel implements IndexableInterface
 {
 
-    const STATE_WAITING = 0;
-    const STATE_APPROVED = 1;
-    const STATE_REJECTED = 2;
+    public const STATE_WAITING = 0;
+    public const STATE_APPROVED = 1;
+    public const STATE_REJECTED = 2;
 
     /**
-     * @var type
+     * @var array
      */
     private static $_statesConv = [
         self::STATE_WAITING => 'Čeká na shválení',
@@ -58,6 +58,8 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
 
     /**
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -70,7 +72,11 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
     /**
      * Called from admin module.
      *
+     * @param int $limit
+     * @param int $page
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchWithLimit($limit = 10, $page = 1)
     {
@@ -85,9 +91,11 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
     /**
      * Called from app module.
      *
-     * @param type $limit
-     *
-     * @return type
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
@@ -102,9 +110,11 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
     /**
      * Called from app module.
      *
-     * @param type $limit
-     *
-     * @return type
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
@@ -117,11 +127,10 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $urlKey
-     *
-     * @return type
+     * @param $urlKey
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchByUrlKey($urlKey)
     {
@@ -143,16 +152,14 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
      *
      * @param type $urlKey
      * @return boolean
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function checkUrlKey($urlKey)
     {
         $status = self::first(['urlKey = ?' => $urlKey]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
 
     /**
@@ -160,6 +167,8 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
      * @param \THCFrame\Bag\BagInterface $post
      * @param array $options
      * @return array
+     * @throws \THCFrame\Core\Exception\Argument
+     * @throws \THCFrame\Core\Exception\Lang
      */
     public static function createFromPost(\THCFrame\Bag\BagInterface $post, array $options = [])
     {
@@ -203,6 +212,8 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
             'keywords' => $keywords,
             'metaTitle' => $post->get('metatitle', $post->get('title')),
             'metaDescription' => $metaDesc,
+            'created' => date('Y-m-d H:i'),
+            'modified' => date('Y-m-d H:i'),
         ]);
 
         return [$news, $errors];
@@ -214,6 +225,8 @@ class NewsModel extends BasicNewsModel implements IndexableInterface
      * @param \App\Model\NewsModel $news
      * @param array $options
      * @return array
+     * @throws \THCFrame\Core\Exception\Argument
+     * @throws \THCFrame\Core\Exception\Lang
      */
     public static function editFromPost(\THCFrame\Bag\BagInterface $post, NewsModel $news, array $options = [])
     {

@@ -2,7 +2,10 @@
 
 namespace Search\Controller;
 
+use Exception;
 use Search\Etc\Controller;
+use Search\Model\SearchIndexLogModel;
+use Search\Model\SearchIndexModel;
 use THCFrame\Events\Events as Event;
 
 /**
@@ -19,11 +22,11 @@ class IndexController extends Controller
     public function index()
     {
         $view = $this->getActionView();
-        $searchIndexLog = \Search\Model\SearchIndexLogModel::all([], ['*'], ['created' => 'desc'], 100);
-        $indexModel = new \Search\Model\SearchIndexModel();
+        $searchIndexLog = SearchIndexLogModel::all([], ['*'], ['created' => 'desc'], 100);
+        $indexModel = new SearchIndexModel();
 
         $view->set('tables', $indexModel->getDataSourceAliases())
-                ->set('indexLog', $searchIndexLog);
+            ->set('indexLog', $searchIndexLog);
     }
 
     /**
@@ -36,7 +39,7 @@ class IndexController extends Controller
         $this->disableView();
         //ini_set('max_execution_time', 1800);
 
-        $indexModel = new \Search\Model\SearchIndexModel();
+        $indexModel = new SearchIndexModel();
         $indexModel->indexAllDataSources(true, false);
     }
 
@@ -50,9 +53,9 @@ class IndexController extends Controller
     public function updateIndex($dataSource)
     {
         $view = $this->getActionView();
-        $indexModel = new \Search\Model\SearchIndexModel();
+        $indexModel = new SearchIndexModel();
 
-        try{
+        try {
             $dataSourceClass = '\Search\Model\Sources\Source\\' . ucfirst($dataSource);
             $dataSourceObject = new $dataSourceClass();
         } catch (Exception $ex) {

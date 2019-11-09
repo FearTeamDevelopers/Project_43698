@@ -14,13 +14,15 @@
         <p>
             <label>Modul</label>
             <span class="field">
-                <select class="width80" name="module">
-                    {if !empty($modules)}
-                        {foreach $module in $modules}
-                            <option value="{echo strtolower($module)}">{echo $module}</option>
-                        {/foreach}
-                    {/if}
-                </select>
+                <label>
+<select class="width80" name="module">
+    {if !empty($modules)}
+        {foreach $module in $modules}
+            <option value="{echo strtolower($module)}">{echo $module}</option>
+        {/foreach}
+    {/if}
+</select>
+</label>
             </span>
         </p>
         <p>

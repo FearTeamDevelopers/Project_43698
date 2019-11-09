@@ -5,10 +5,10 @@ namespace Admin\Helper;
 class FormPrinter
 {
     /**
-     * @param type $object
-     * @param type $atribute
-     *
-     * @return type
+     * @param $object
+     * @param $atribute
+     * @param string $default
+     * @return string
      */
     public static function iset($object, $atribute, $default = '')
     {
@@ -16,20 +16,21 @@ class FormPrinter
     }
 
     /**
-     * @param type $name
-     * @param type $value
-     * @param type $class
-     * @param type $required
+     * @param string $name
+     * @param array $value
+     * @param bool $required
      *
-     * @return type
+     * @param string $class
+     * @param string $placeholder
+     * @return string
      */
-    public static function textInput($name, $value = [], $required = false, $class = 'width80', $placeholder = '')
+    public static function textInput($name, $value = [], $required = false, $class = 'width80', $placeholder = ''): string
     {
         $htmlTag = '<input type="text" name="'.$name.'"';
         $htmlTagEnd = '/>';
 
         if (is_array($value) && !empty($value)) {
-            $default = isset($value[2]) ? $value[2] : '';
+            $default = $value[2] ?? '';
             $defaultValue = self::iset($value[0], $value[1], $default);
             $htmlTag .= ' value="'.$defaultValue.'" ';
         }
@@ -50,21 +51,21 @@ class FormPrinter
     }
 
     /**
-     * @param type $name
-     * @param type $value
-     * @param type $required
-     * @param type $class
-     * @param type $placeholder
+     * @param string $name
+     * @param array $value
+     * @param bool $required
+     * @param string $class
+     * @param string $placeholder
      *
-     * @return type
+     * @return string
      */
-    public static function timeInput($name, $value = [], $required = false, $class = 'width80', $placeholder = '')
+    public static function timeInput($name, $value = [], $required = false, $class = 'width80', $placeholder = ''): string
     {
         $htmlTag = '<input type="time" name="'.$name.'"';
         $htmlTagEnd = '/>';
 
         if (is_array($value) && !empty($value)) {
-            $default = isset($value[2]) ? $value[2] : '';
+            $default = $value[2] ?? '';
             $defaultValue = self::iset($value[0], $value[1], $default);
             $htmlTag .= ' value="'.$defaultValue.'" ';
         }
@@ -85,20 +86,20 @@ class FormPrinter
     }
 
     /**
-     * @param type $type
-     * @param type $name
-     * @param type $value
-     * @param type $options
+     * @param string $type
+     * @param string $name
+     * @param array $value
+     * @param array $options
      *
-     * @return type
+     * @return string
      */
-    public static function input($type, $name, $value = [], $options = [])
+    public static function input($type, $name, $value = [], $options = []): string
     {
         $htmlTag = '<input type="%s" name="%s"';
         $htmlTagEnd = '/>';
 
         if (is_array($value) && !empty($value)) {
-            $default = isset($value[2]) ? $value[2] : '';
+            $default = $value[2] ?? '';
             $defaultValue = self::iset($value[0], $value[1], $default);
             $htmlTag .= ' value="'.$defaultValue.'" ';
         }
@@ -109,9 +110,9 @@ class FormPrinter
 
         foreach ($options as $key => $value) {
             if ($value === true) {
-                $htmlTag .= ' '.$key.' ';
+                $htmlTag .= ' ' . $key . ' ';
             } else {
-                $htmlTag .= ' '.$key.'="'.$value.'" ';
+                $htmlTag .= ' ' . $key . '="' . $value . '" ';
             }
         }
 

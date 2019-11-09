@@ -3,10 +3,11 @@
 namespace THCFrame\Model;
 
 use THCFrame\Core\Base;
+use THCFrame\Database\Connector;
+use THCFrame\Database\Query;
 use THCFrame\Registry\Registry;
 use THCFrame\Core\Inspector;
 use THCFrame\Core\StringMethods;
-use THCFrame\Model\Exception;
 
 /**
  * This class allow us to isolate all the direct database communication,
@@ -76,73 +77,73 @@ class Model extends Base
         'required' => [
             'handler' => '_validateRequired',
             'message_en' => 'The {0} field is required',
-            'message_cs' => 'Pole {0} je povinné'
+            'message_cs' => 'Pole {0} je povinné',
         ],
         'alpha' => [
             'handler' => '_validateAlpha',
             'message_en' => 'The {0} field can only contain letters',
-            'message_cs' => 'Pole {0} může obsahovat pouze písmena'
+            'message_cs' => 'Pole {0} může obsahovat pouze písmena',
         ],
         'numeric' => [
             'handler' => '_validateNumeric',
             'message_en' => 'The {0} field can only contain numbers',
-            'message_cs' => 'Pole {0} může obsahovat pouze číslice'
+            'message_cs' => 'Pole {0} může obsahovat pouze číslice',
         ],
         'alphanumeric' => [
             'handler' => '_validateAlphaNumeric',
             'message_en' => 'The {0} field can only contain letters and numbers',
-            'message_cs' => 'Pole {0} může obsahovat pouze písmena a čísla'
+            'message_cs' => 'Pole {0} může obsahovat pouze písmena a čísla',
         ],
         'max' => [
             'handler' => '_validateMax',
             'message_en' => 'The {0} field must contain less than {2} characters',
-            'message_cs' => 'Pole {0} musí obsahovat méně než {2} znaků'
+            'message_cs' => 'Pole {0} musí obsahovat méně než {2} znaků',
         ],
         'min' => [
             'handler' => '_validateMin',
             'message_en' => 'The {0} field must contain more than {2} characters',
-            'message_cs' => 'Pole {0} musí obsahovat více než {2} znaků'
+            'message_cs' => 'Pole {0} musí obsahovat více než {2} znaků',
         ],
         'email' => [
             'handler' => '_validateEmail',
             'message_en' => 'The {0} field must contain valid email address',
-            'message_cs' => 'Pole {0} musí obsahovat validní emailovou adresu'
+            'message_cs' => 'Pole {0} musí obsahovat validní emailovou adresu',
         ],
         'url' => [
             'handler' => '_validateUrl',
             'message_en' => 'The {0} field must contain valid url',
-            'message_cs' => 'Pole {0} musí obsahovat validní url adresu'
+            'message_cs' => 'Pole {0} musí obsahovat validní url adresu',
         ],
         'datetime' => [
             'handler' => '_validateDatetime',
             'message_en' => 'The {0} field must contain valid date and time (yyyy-mm-dd hh:mm)',
-            'message_cs' => 'Pole {0} musí obsahovat datum a čas ve formátu (yyyy-mm-dd hh:mm)'
+            'message_cs' => 'Pole {0} musí obsahovat datum a čas ve formátu (yyyy-mm-dd hh:mm)',
         ],
         'date' => [
             'handler' => '_validateDate',
             'message_en' => 'The {0} field must contain valid date (yyyy-mm-dd)',
-            'message_cs' => 'Pole {0} musí obsahovat datum ve formátu (yyyy-mm-dd)'
+            'message_cs' => 'Pole {0} musí obsahovat datum ve formátu (yyyy-mm-dd)',
         ],
         'time' => [
             'handler' => '_validateTime',
             'message_en' => 'The {0} field must contain valid time (hh:mm / hh:mm:ss)',
-            'message_cs' => 'Pole {0} musí obsahovat čas ve formátu (hh:mm / hh:mm:ss)'
+            'message_cs' => 'Pole {0} musí obsahovat čas ve formátu (hh:mm / hh:mm:ss)',
         ],
         'html' => [
             'handler' => '_validateHtml',
             'message_en' => 'The {0} field can contain these tags only (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td,br,hr)',
-            'message_cs' => 'Pole {0} může obsahovat následující html tagy (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td,br,hr)'
+            'message_cs' => 'Pole {0} může obsahovat následující html tagy (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td,br,hr)',
         ],
         'json' => [
             'handler' => '_validateJson',
             'message_en' => 'The {0} must contain valid JSON string',
-            'message_cs' => 'Pole {0} musí obsahovat řetězec v JSON formátu'
+            'message_cs' => 'Pole {0} musí obsahovat řetězec v JSON formátu',
         ],
         'path' => [
             'handler' => '_validatePath',
             'message_en' => 'The {0} field must contain filesystem path',
             'message_cs' => 'Pole {0} musí obsahovat validní cestu',
-        ]
+        ],
     ];
 
     /**
@@ -154,7 +155,7 @@ class Model extends Base
 
     /**
      *
-     * @param type $method
+     * @param $method
      * @return \THCFrame\Model\Exception\Implementation
      */
     protected function _getImplementationException($method)
@@ -163,9 +164,8 @@ class Model extends Base
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool
      */
     protected function _validateRequired($value)
     {
@@ -173,155 +173,145 @@ class Model extends Base
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validateAlpha($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
-            return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž{$pattern}]+)#");
         }
+
+        $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
+        return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž{$pattern}]+)#");
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validateNumeric($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            $pattern = preg_quote('-,.\s', '#');
-            return StringMethods::match($value, "#([0-9{$pattern}]+)#");
         }
+
+        $pattern = preg_quote('-,.\s', '#');
+        return StringMethods::match($value, "#([0-9{$pattern}]+)#");
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validateAlphaNumeric($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
-            return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž0-9{$pattern}]+)#");
         }
+
+        $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
+        return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž0-9{$pattern}]+)#");
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validateJson($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_{}', '#');
-            return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž0-9{$pattern}]+)#");
         }
+
+        $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_{}', '#');
+        return StringMethods::match($value, "#([a-zá-žA-ZÁ-Ž0-9{$pattern}]+)#");
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validateHtml($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
-            return StringMethods::match($value, '#((<|&lt;)(strong|em|s|p|div|a|img|table|tr|td|thead|tbody|ol|li|ul|caption|span|br|hr)(\/)?(>|&gt;)'
-                            . "[a-zá-žA-ZÁ-Ž0-9{$pattern}]+)*"
-                            . "[a-zá-žA-ZÁ-Ž0-9{$pattern}]+#");
         }
+
+        $pattern = preg_quote('#$%^&*()+=-[]\',./|\":?~_', '#');
+        return StringMethods::match($value,
+            '#((<|&lt;)(strong|em|s|p|div|a|img|table|tr|td|thead|tbody|ol|li|ul|caption|span|br|hr)(\/)?(>|&gt;)'
+            . "[a-zá-žA-ZÁ-Ž0-9{$pattern}]+)*"
+            . "[a-zá-žA-ZÁ-Ž0-9{$pattern}]+#");
     }
 
     /**
-     *
-     * @param type $value
-     * @return boolean
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validatePath($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            $pattern = preg_quote('()-./:_', '#');
-            return StringMethods::match($value, "#^([a-zA-Z0-9{$pattern}]+)$#");
         }
+
+        $pattern = preg_quote('()-./:_', '#');
+        return StringMethods::match($value, "#^([a-zA-Z0-9{$pattern}]+)$#");
     }
 
     /**
-     *
-     * @param type $value
-     * @param type $number
-     * @return type
+     * @param $value
+     * @param $number
+     * @return bool
      */
     protected function _validateMax($value, $number)
     {
-        return mb_strlen($value) <= (int) $number;
+        return mb_strlen($value) <= (int)$number;
     }
 
     /**
-     *
-     * @param type $value
-     * @param type $number
-     * @return type
+     * @param $value
+     * @param $number
+     * @return bool
      */
     protected function _validateMin($value, $number)
     {
-        return mb_strlen($value) >= (int) $number;
+        return mb_strlen($value) >= (int)$number;
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validateEmail($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            return filter_var($value, FILTER_VALIDATE_EMAIL);
         }
+
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|mixed
      */
     protected function _validateUrl($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
-        } else {
-            return filter_var($value, FILTER_VALIDATE_URL);
         }
+
+        return filter_var($value, FILTER_VALIDATE_URL);
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool
      */
     protected function _validateDatetime($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
         }
 
@@ -330,21 +320,16 @@ class Model extends Base
         $validDate = $this->_validateDate($date);
         $validTime = $this->_validateTime($time);
 
-        if ($validDate && $validTime) {
-            return true;
-        } else {
-            return false;
-        }
+        return $validDate && $validTime;
     }
 
     /**
-     *
-     * @param type $value
-     * @return boolean
+     * @param $value
+     * @return bool
      */
     protected function _validateDate($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
         }
 
@@ -378,13 +363,12 @@ class Model extends Base
     }
 
     /**
-     *
-     * @param type $value
-     * @return type
+     * @param $value
+     * @return bool|false|int
      */
     protected function _validateTime($value)
     {
-        if ($value == '') {
+        if ($value === '') {
             return true;
         }
 
@@ -392,8 +376,7 @@ class Model extends Base
     }
 
     /**
-     *
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -428,6 +411,8 @@ class Model extends Base
      * Finally we loop over the loaded record’s data and only set property
      * values that were not set in the __construct() method.
      *
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      * @throws Exception\Primary
      */
     public function load()
@@ -438,12 +423,12 @@ class Model extends Base
         $name = $primary['name'];
 
         if (!empty($this->$raw)) {
-            $previous = $this->connector
-                    ->query()
-                    ->from($this->table)
-                    ->setTableAlias($this->alias)
-                    ->where("{$name} = ?", $this->$raw)
-                    ->first();
+            $previous = $this->getConnector()
+                ->query()
+                ->from($this->getTable())
+                ->setTableAlias($this->alias)
+                ->where("{$name} = ?", $this->$raw)
+                ->first();
 
             if ($previous == null) {
                 throw new Exception\Primary('Primary key value invalid');
@@ -459,9 +444,9 @@ class Model extends Base
     }
 
     /**
-     * Method removes records from the database
-     *
-     * @return type
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     public function delete()
     {
@@ -471,91 +456,92 @@ class Model extends Base
         $name = $primary['name'];
 
         if (!empty($this->$raw)) {
-            $this->connector->beginTransaction();
+            $this->getConnector()->beginTransaction();
 
-            $query = $this->connector
-                    ->query()
-                    ->from($this->table)
-                    ->where("{$name} = ?", $this->$raw);
+            $query = $this->getConnector()
+                ->query()
+                ->from($this->getTable())
+                ->where("{$name} = ?", $this->$raw);
 
             $state = $query->delete();
 
             unset($query);
 
-            if ($state != -1) {
-                $this->connector->commitTransaction();
-                return $state;
-            } else {
-                $this->connector->rollbackTransaction();
+            if ($state !== -1) {
+                $this->getConnector()->commitTransaction();
                 return $state;
             }
+
+            $this->getConnector()->rollbackTransaction();
+            return $state;
         }
     }
 
     /**
-     * Method removes records from the database
-     *
-     * @param type $where
-     * @return type
+     * @param array $where
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     public static function deleteAll($where = [])
     {
         $instance = new static();
 
-        $query = $instance->connector
-                ->query()
-                ->from($instance->table);
+        $query = $instance->getConnector()
+            ->query()
+            ->from($instance->getTable());
 
         foreach ($where as $clause => $value) {
             $query->where($clause, $value);
         }
 
-        $instance->connector->beginTransaction();
+        $instance->getConnector()->beginTransaction();
 
         $state = $query->delete();
 
         unset($query);
 
         if ($state != -1) {
-            $instance->connector->commitTransaction();
+            $instance->getConnector()->commitTransaction();
             return $state;
         } else {
-            $instance->connector->rollbackTransaction();
+            $instance->getConnector()->rollbackTransaction();
             return $state;
         }
     }
 
     /**
-     *
-     * @param type $where
-     * @param type $data
-     * @return type
+     * @param array $where
+     * @param array $data
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     public static function updateAll($where = [], $data = [])
     {
         $instance = new static();
 
-        $query = $instance->connector
-                ->query()
-                ->from($instance->table);
+        $query = $instance->getConnector()
+            ->query()
+            ->from($instance->getTable());
 
         foreach ($where as $clause => $value) {
             $query->where($clause, $value);
         }
 
-        $instance->connector->beginTransaction();
+        $instance->getConnector()->beginTransaction();
 
         $state = $query->update($data);
 
         unset($query);
 
-        if ($state != -1) {
-            $instance->connector->commitTransaction();
-            return $state;
-        } else {
-            $instance->connector->rollbackTransaction();
+        if ($state !== -1) {
+            $instance->getConnector()->commitTransaction();
             return $state;
         }
+
+        $instance->getConnector()->rollbackTransaction();
+        return $state;
     }
 
     /**
@@ -585,7 +571,9 @@ class Model extends Base
      * this method will either insert a new record, or update an existing record,
      * depending on whether the primary key property has a value or not.
      *
-     * @return type
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     public function save()
     {
@@ -596,9 +584,9 @@ class Model extends Base
         $raw = $primary['raw'];
         $name = $primary['name'];
 
-        $query = $this->connector
-                ->query()
-                ->from($this->table);
+        $query = $this->getConnector()
+            ->query()
+            ->from($this->getTable());
 
         if (!empty($this->$raw)) {
             $query->where("{$name} = ?", $this->$raw);
@@ -657,7 +645,9 @@ class Model extends Base
      * data to the database. This method will update an existing record,
      * depending on whether the primary key property has a value.
      *
-     * @return type
+     * @return bool
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      * @throws Exception\Primary
      */
     public function update()
@@ -669,9 +659,9 @@ class Model extends Base
         $raw = $primary['raw'];
         $name = $primary['name'];
 
-        $query = $this->connector
-                ->query()
-                ->from($this->table);
+        $query = $this->getConnector()
+            ->query()
+            ->from($this->getTable());
 
         if (!empty($this->$raw)) {
             $query->where("{$name} = ?", $this->$raw);
@@ -702,18 +692,15 @@ class Model extends Base
         $this->postUpdate();
         unset($query);
 
-        if ($result > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return $result > 0;
     }
 
     /**
      * Method returns a user-defined table name based on the current
      * Model’s class name (using PHP’s get_class() method
      *
-     * @return type
+     * @return string
+     * @throws Exception\Implementation
      */
     public function getTable()
     {
@@ -726,7 +713,8 @@ class Model extends Base
 
             if (preg_match('#model#i', get_class($this))) {
                 $parts = array_reverse(explode('\\', get_class($this)));
-                $this->_table = str_replace(['Basic', 'basic'], '', strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0])));
+                $this->_table = str_replace(['Basic', 'basic'], '',
+                    strtolower($tablePrefix . mb_eregi_replace('model', '', $parts[0])));
             } else {
                 throw new Exception\Implementation('Model has not valid name used for THCFrame\Model\Model');
             }
@@ -739,7 +727,7 @@ class Model extends Base
      * Method so that we can return the contents of the $_connector property,
      * a connector instance stored in the Registry class, or raise a Model\Exception\Connector
      *
-     * @return type
+     * @return Connector
      * @throws Exception\Connector
      */
     public function getConnector()
@@ -777,16 +765,12 @@ class Model extends Base
      * Method creates an Inspector instance and a utility function ($first) to return the
      * first item in a metadata array. Next, it loops through all the properties in the model,
      * and sifts out all that have an @column flag. Any other properties are ignored at this point.
-     * The column’s @type flag is checked to make sure it is valid, raising a
-     * Model\Exception\Type in the event that it is not. If the column’s type is valid,
-     * it is added to the $_columns property. Every valid $primary column leads to the
-     * incrementing of the $primaries variable, which is checked at the end
-     * of the method to make sure that exactly one primary column has been defined.
-     * In essence, this method takes the User model definition and returns an associative array of column data
+     * The column’s
      *
      * @return array
-     * @throws Exception\Type
      * @throws Exception\Primary
+     * @throws Exception\Type
+     * @throws \ReflectionException
      */
     public function getColumns()
     {
@@ -799,8 +783,8 @@ class Model extends Base
             $inspector = new Inspector($this);
             $properties = $inspector->getClassProperties();
 
-            $first = function($array, $key) {
-                if(!empty($array[$key]) && !is_array($array[$key])){
+            $first = function ($array, $key) {
+                if (!empty($array[$key]) && !is_array($array[$key])) {
                     return $array[$key];
                 }
                 if (!empty($array[$key]) && count($array[$key]) == 1) {
@@ -853,7 +837,7 @@ class Model extends Base
                         'read' => $read,
                         'write' => $write,
                         'validate' => $validate,
-                        'label' => $label
+                        'label' => $label,
                     ];
 
                 }
@@ -877,8 +861,8 @@ class Model extends Base
      * but referenced by any public getters/setters/methods,
      * they will look like setFirstName/firstName.
      *
-     * @param type $name
-     * @return null
+     * @param string $name
+     * @return mixed
      */
     public function getColumn($name)
     {
@@ -891,7 +875,7 @@ class Model extends Base
     /**
      * Method loops through the columns, returning the one marked as primary
      *
-     * @return type
+     * @return mixed
      */
     public function getPrimaryColumn()
     {
@@ -914,10 +898,12 @@ class Model extends Base
     /**
      * Method is a simple, static wrapper method for the protected _first() method
      *
-     * @param type $where
-     * @param type $fields
-     * @param type $order
-     * @return type
+     * @param array $where
+     * @param array $fields
+     * @param array $order
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     public static function first($where = [], $fields = ['*'], $order = [])
     {
@@ -928,17 +914,19 @@ class Model extends Base
     /**
      * Method returns the first matched record
      *
-     * @param type $where
-     * @param type $fields
-     * @param type $order
-     * @return \THCFrame\class|null
+     * @param array $where
+     * @param array $fields
+     * @param array $order
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     protected function _first($where = [], $fields = ['*'], $order = [])
     {
-        $query = $this->connector
-                ->query()
-                ->from($this->table, $fields)
-                ->setTableAlias($this->alias);
+        $query = $this->getConnector()
+            ->query()
+            ->from($this->getTable(), $fields)
+            ->setTableAlias($this->alias);
 
         foreach ($where as $clause => $value) {
             $query->where($clause, $value);
@@ -965,16 +953,26 @@ class Model extends Base
     /**
      * Method is a simple, static wrapper method for the protected _all() method
      *
-     * @param type $where
-     * @param type $fields
-     * @param type $order
-     * @param type $direction
-     * @param type $limit
-     * @param type $page
-     * @return type
+     * @param array $where
+     * @param array $fields
+     * @param array $order
+     * @param int $limit
+     * @param int $page
+     * @param null $group
+     * @param array $having
+     * @return array|null
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
-    public static function all($where = [], $fields = ['*'], $order = [], $limit = null, $page = null, $group = null, $having = [])
-    {
+    public static function all(
+        $where = [],
+        $fields = ['*'],
+        $order = [],
+        $limit = null,
+        $page = null,
+        $group = null,
+        $having = []
+    ) {
         $model = new static();
         return $model->_all($where, $fields, $order, $limit, $page, $group, $having);
     }
@@ -986,20 +984,30 @@ class Model extends Base
      * created a context wherein a model instance is equal to a database record.
      * Multirecord operations make more sense as class methods, in this context.
      *
-     * @param type $where
-     * @param type $fields
-     * @param type $order
-     * @param type $direction
-     * @param type $limit
-     * @param type $page
-     * @return \THCFrame\class
+     * @param array $where
+     * @param array $fields
+     * @param array $order
+     * @param null|int $limit
+     * @param null|int $page
+     * @param null $group
+     * @param array $having
+     * @return array|null
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
-    protected function _all($where = [], $fields = ['*'], $order = [], $limit = null, $page = null, $group = null, $having = [])
-    {
-        $query = $this->connector
-                ->query()
-                ->from($this->table, $fields)
-                ->setTableAlias($this->alias);
+    protected function _all(
+        $where = [],
+        $fields = ['*'],
+        $order = [],
+        $limit = null,
+        $page = null,
+        $group = null,
+        $having = []
+    ) {
+        $query = $this->getConnector()
+            ->query()
+            ->from($this->getTable(), $fields)
+            ->setTableAlias($this->alias);
 
         foreach ($where as $clause => $value) {
             $query->where($clause, $value);
@@ -1044,7 +1052,10 @@ class Model extends Base
     /**
      * Method is a simple, static wrapper method for the protected _getQuery() method
      *
-     * @return type
+     * @param $fields
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     public static function getQuery($fields)
     {
@@ -1055,22 +1066,25 @@ class Model extends Base
     /**
      * Method return new query instance for current model
      *
-     * @return type
+     * @param $fields
+     * @return mixed
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     protected function _getQuery($fields)
     {
-        return $this->connector
-                        ->query()
-                        ->from($this->table, $fields)
-                        ->setTableAlias($this->alias);
+        return $this->getConnector()
+            ->query()
+            ->from($this->getTable(), $fields)
+            ->setTableAlias($this->alias);
     }
 
     /**
      *
-     * @param \THCFrame\Database\Query $query
-     * @return \THCFrame\Model\class
+     * @param Query $query
+     * @return null|array
      */
-    public static function initialize(\THCFrame\Database\Query $query)
+    public static function initialize(Query $query)
     {
         $model = new static();
         $rows = [];
@@ -1092,8 +1106,10 @@ class Model extends Base
     /**
      * Method is a simple, static wrapper method for the protected _count() method
      *
-     * @param type $where
-     * @return type
+     * @param array $where
+     * @return int
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     public static function count($where = [])
     {
@@ -1104,15 +1120,17 @@ class Model extends Base
     /**
      * Method returns a count of the matched records
      *
-     * @param type $where
-     * @return type
+     * @param array $where
+     * @return int
+     * @throws Exception\Connector
+     * @throws Exception\Implementation
      */
     protected function _count($where = [])
     {
         $query = $this
-                ->connector
-                ->query()
-                ->from($this->table);
+            ->getConnector()
+            ->query()
+            ->from($this->getTable());
 
         foreach ($where as $clause => $value) {
             $query->where($clause, $value);
@@ -1130,7 +1148,7 @@ class Model extends Base
      * messages for those validation conditions that failed.
      * We return a final true/false to indicate whether the complete validation passed or failed.
      *
-     * @return type
+     * @return bool
      * @throws Exception\Validation
      */
     public function validate()
@@ -1153,7 +1171,7 @@ class Model extends Base
                 foreach ($validators as $validator) {
                     $function = $validator;
                     $arguments = [
-                        $this->$raw
+                        $this->$raw,
                     ];
 
                     $match = StringMethods::match($validator, $pattern);
@@ -1173,8 +1191,8 @@ class Model extends Base
 
                     if (!call_user_func_array([$this, $template['handler']], $arguments)) {
                         $replacements = array_merge([
-                            $label ? $label : $raw
-                                ], $arguments);
+                            $label ? $label : $raw,
+                        ], $arguments);
 
                         $message = $template['message_' . $errLang];
 

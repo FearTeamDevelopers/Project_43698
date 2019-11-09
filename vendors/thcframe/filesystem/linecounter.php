@@ -12,7 +12,7 @@ class LineCounter extends Base
 
     /**
      * @readwrite
-     * @var type
+     * @var array
      */
     protected $_fileCounter = ['gen' => ['commentedLines' => 0,
                                                     'functions' => 0,
@@ -29,7 +29,7 @@ class LineCounter extends Base
 
     /**
      *
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -37,8 +37,7 @@ class LineCounter extends Base
     }
 
     /**
-     *
-     * @return type
+     * @return array
      */
     public function getFileCounter()
     {
@@ -46,9 +45,8 @@ class LineCounter extends Base
     }
 
     /**
-     *
-     * @param type $dir
-     * @return type
+     * @param $dir
+     * @return int
      */
     public function countLines($dir)
     {

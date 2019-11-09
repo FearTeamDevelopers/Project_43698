@@ -9,8 +9,8 @@ use App\Model\Basic\BasicPhotoModel;
 class PhotoModel extends BasicPhotoModel
 {
 
-    const DEFAULT_PATH_TO_THUMBS = 'public/uploads/images';
-    const DEFAULT_PATH_TO_IMAGES = 'public/uploads/images';
+    public const DEFAULT_PATH_TO_THUMBS = 'public/uploads/images';
+    public const DEFAULT_PATH_TO_IMAGES = 'public/uploads/images';
 
     /**
      * @readwrite
@@ -35,7 +35,9 @@ class PhotoModel extends BasicPhotoModel
     /**
      * Delete ad record and connected images
      *
-     * @return type
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function delete()
     {
@@ -53,7 +55,8 @@ class PhotoModel extends BasicPhotoModel
     }
 
     /**
-     * @return type
+     * @param string $unit
+     * @return float|int|string
      */
     public function getFormatedSize($unit = 'kb')
     {
@@ -73,7 +76,8 @@ class PhotoModel extends BasicPhotoModel
     }
 
     /**
-     * @return type
+     * @param bool $type
+     * @return string
      */
     public function getUnlinkPath($type = true)
     {
@@ -85,13 +89,14 @@ class PhotoModel extends BasicPhotoModel
             } elseif (file_exists('./' . $this->_imgMain)) {
                 return './' . $this->_imgMain;
             }
-        } else {
-            return $this->_imgMain;
         }
+
+        return $this->_imgMain;
     }
 
     /**
-     * @return type
+     * @param bool $type
+     * @return string
      */
     public function getUnlinkThumbPath($type = true)
     {
@@ -103,17 +108,18 @@ class PhotoModel extends BasicPhotoModel
             } elseif (file_exists('./' . $this->_imgThumb)) {
                 return './' . $this->_imgThumb;
             }
-        } else {
-            return $this->_imgThumb;
         }
+
+        return $this->_imgThumb;
     }
 
     /**
-     * @param type $galleryId
-     * @param type $limit
-     * @param type $page
-     *
-     * @return type
+     * @param $galleryId
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchPhotosByGalleryIdPaged($galleryId, $limit = 30, $page = 1)
     {

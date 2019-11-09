@@ -87,8 +87,7 @@ class Response extends Base
     }
 
     /**
-     *
-     * @return type
+     * @return false|string|null
      */
     public function __toString()
     {

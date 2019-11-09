@@ -4,6 +4,7 @@ namespace Search\Model\Sources\Source;
 
 use Search\Model\Sources\AbstractSource;
 use THCFrame\Events\Events as Event;
+use Search\Model\Exception;
 
 /**
  * Description of PageContent
@@ -22,7 +23,6 @@ class Pagecontent extends AbstractSource
      *
      * @param bool $complete
      * @param bool|string $runByUser
-     * @throws Exception\Indexer
      */
     public function buildIndex($complete = false, $runByUser = false)
     {
@@ -48,7 +48,7 @@ class Pagecontent extends AbstractSource
             unset($articles);
 
             $time = round(microtime(true) - $starttime, 2);
-            $this->resertConnections();
+            //$this->resertConnections();
             $this->dbConnSearch->execute(self::INSERT_LOG_SQL, $this->alias, $this->table, $runByUser, $wordsCount);
 
             Event::fire('search.log', ['success', sprintf('Search index for %s built in %s sec', $this->alias, $time)]);

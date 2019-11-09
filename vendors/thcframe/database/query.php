@@ -98,8 +98,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $value
+     * @param mixed $value
      * @return string
+     * @throws Exception\Connector
      */
     protected function _quote($value)
     {
@@ -140,7 +141,7 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @return string
      */
     protected function buildSelect()
     {
@@ -217,8 +218,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $data
-     * @return type
+     * @param array $data
+     * @return string
+     * @throws Exception\Connector
      */
     protected function _buildInsert($data)
     {
@@ -246,8 +248,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $data
-     * @return type
+     * @param array $data
+     * @return string
+     * @throws Exception\Connector
      */
     protected function _buildUpdate($data)
     {
@@ -290,7 +293,7 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @return string
      */
     protected function _buildDelete()
     {
@@ -326,7 +329,7 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @return Connector
      * @throws Exception\Connector
      */
     public function getConnector()
@@ -352,7 +355,7 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @return string
      */
     public function getTableAlias()
     {
@@ -361,7 +364,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $alias
+     * @param string $alias
+     * @return Query
+     * @throws \THCFrame\Database\Exception
      */
     public function setTableAlias($alias)
     {
@@ -376,8 +381,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $alias
-     * @return \THCFrame\Database\Query
+     * @param string $alias
+     * @return Query
+     * @throws \THCFrame\Database\Exception
      */
     public function setAlias($alias)
     {
@@ -388,8 +394,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $data
+     * @param array $data
      * @return int
+     * @throws Exception\Connector
      * @throws Exception\Sql
      */
     public function save($data)
@@ -424,7 +431,7 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @return int
      * @throws Exception\Sql
      */
     public function delete()
@@ -448,7 +455,9 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @param array $data
+     * @return int
+     * @throws Exception\Connector
      * @throws Exception\Sql
      */
     public function update($data)
@@ -472,9 +481,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $from
-     * @param type $fields
-     * @return \THCFrame\Database\Query
+     * @param string $from
+     * @param array $fields
+     * @return Query
      * @throws Exception\Argument
      */
     public function from($from, $fields = ['*'])
@@ -494,10 +503,11 @@ class Query extends Base
 
     /**
      *
-     * @param type $join
-     * @param type $on
-     * @param type $fields
-     * @return \THCFrame\Database\Query
+     * @param string $join
+     * @param string $on
+     * @param null|string $alias
+     * @param array $fields
+     * @return Query
      * @throws Exception\Argument
      */
     public function join($join, $on, $alias = null, $fields = ['*'])
@@ -519,10 +529,11 @@ class Query extends Base
 
     /**
      *
-     * @param type $join
-     * @param type $on
-     * @param type $fields
-     * @return \THCFrame\Database\Query
+     * @param string $join
+     * @param string $on
+     * @param null|string $alias
+     * @param array $fields
+     * @return Query
      * @throws Exception\Argument
      */
     public function leftjoin($join, $on, $alias = null, $fields = ['*'])
@@ -544,10 +555,11 @@ class Query extends Base
 
     /**
      *
-     * @param type $join
-     * @param type $on
-     * @param type $fields
-     * @return \THCFrame\Database\Query
+     * @param string $join
+     * @param string $on
+     * @param null|string $alias
+     * @param array $fields
+     * @return Query
      * @throws Exception\Argument
      */
     public function rightjoin($join, $on, $alias = null, $fields = ['*'])
@@ -569,10 +581,11 @@ class Query extends Base
 
     /**
      *
-     * @param type $limit
-     * @param type $page
-     * @return \THCFrame\Database\Query
+     * @param int $limit
+     * @param int $page
+     * @return Query
      * @throws Exception\Argument
+     * @throws Exception\Connector
      */
     public function limit($limit, $page = 1)
     {
@@ -594,9 +607,9 @@ class Query extends Base
 
     /**
      *
-     * @param type $order
-     * @param type $direction
-     * @return \THCFrame\Database\Query
+     * @param string $order
+     * @param string $direction
+     * @return Query
      * @throws Exception\Argument
      */
     public function order($order, $direction = 'asc')
@@ -612,8 +625,10 @@ class Query extends Base
 
     /**
      *
-     * @return \THCFrame\Database\Query
+     * @return Query
      * @throws Exception\Argument
+     * @throws Exception\Connector
+     * @throws Exception\Sql
      */
     public function where()
     {
@@ -640,7 +655,9 @@ class Query extends Base
 
     /**
      *
-     * @return \THCFrame\Database\Query
+     * @return Query
+     * @throws Exception\Argument
+     * @throws Exception\Connector
      * @throws Exception\Sql
      */
     public function wheresql()
@@ -669,8 +686,9 @@ class Query extends Base
 
     /**
      *
-     * @return \THCFrame\Database\Query
+     * @return Query
      * @throws Exception\Argument
+     * @throws Exception\Connector
      */
     public function having()
     {
@@ -693,8 +711,8 @@ class Query extends Base
 
     /**
      *
-     * @param type $field
-     * @return \THCFrame\Database\Query
+     * @param string $field
+     * @return Query
      * @throws Exception\Argument
      */
     public function groupby($field)
@@ -710,7 +728,9 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @return mixed
+     * @throws Exception\Argument
+     * @throws Exception\Connector
      */
     public function first()
     {
@@ -734,7 +754,9 @@ class Query extends Base
 
     /**
      *
-     * @return type
+     * @return int
+     * @throws Exception\Argument
+     * @throws Exception\Connector
      */
     public function count()
     {
@@ -742,7 +764,7 @@ class Query extends Base
         $offset = $this->offset;
         $fields = $this->fields;
 
-        $this->_fields = [$this->from => ['COUNT(1)' => 'rows']];
+        $this->_fields = [$this->from => ['COUNT(1)' => 'cnt']];
 
         $this->limit(1);
         $row = $this->first();
@@ -759,12 +781,12 @@ class Query extends Base
             $this->_offset = $offset;
         }
 
-        return $row['rows'];
+        return $row['cnt'];
     }
 
     /**
      *
-     * @return type
+     * @return string
      */
     public function assemble()
     {

@@ -50,7 +50,7 @@ class Request extends Base
 
     /**
      *
-     * @param type $method
+     * @param string $method
      * @return \THCFrame\Request\Exception\Implementation
      */
     protected function _getImplementationException($method)
@@ -59,10 +59,9 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $key
-     * @param type $value
-     * @return \THCFrame\Request\Request
+     * @param $key
+     * @param $value
+     * @return $this
      */
     protected function _setOption($key, $value)
     {
@@ -71,9 +70,8 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $key
-     * @return type
+     * @param $key
+     * @return string
      */
     protected function _normalize($key)
     {
@@ -85,7 +83,7 @@ class Request extends Base
      * Some request methods need additional parameters set (such as GET and POST),
      * while others need things excluded from the response (such as HEAD)
      *
-     * @param type $method
+     * @param $method
      * @return \THCFrame\Request\Request
      */
     protected function _setRequestMethod($method)
@@ -113,8 +111,8 @@ class Request extends Base
      * This includes the URL, the user agent, whether the request should follow redirects, and so on.
      * It even adds any options specified by the use of the setOptions() setter method (or construction option)
      *
-     * @param type $url
-     * @param type $parameters
+     * @param $url
+     * @param $parameters
      * @return \THCFrame\Request\Request
      */
     protected function _setRequestOptions($url, $parameters)
@@ -166,8 +164,7 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -176,10 +173,10 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $url
-     * @param type $parameters
-     * @return type
+     * @param $url
+     * @param array $parameters
+     * @return Request\Response
+     * @throws Exception\Response
      */
     public function delete($url, $parameters = [])
     {
@@ -187,10 +184,10 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $url
-     * @param type $parameters
-     * @return type
+     * @param $url
+     * @param array $parameters
+     * @return Request\Response
+     * @throws Exception\Response
      */
     public function get($url, $parameters = [])
     {
@@ -202,10 +199,10 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $url
-     * @param type $parameters
-     * @return type
+     * @param $url
+     * @param array $parameters
+     * @return Request\Response
+     * @throws Exception\Response
      */
     public function head($url, $parameters = [])
     {
@@ -213,10 +210,10 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $url
-     * @param type $parameters
-     * @return type
+     * @param $url
+     * @param array $parameters
+     * @return Request\Response
+     * @throws Exception\Response
      */
     public function post($url, $parameters = [])
     {
@@ -224,10 +221,10 @@ class Request extends Base
     }
 
     /**
-     *
-     * @param type $url
-     * @param type $parameters
-     * @return type
+     * @param $url
+     * @param array $parameters
+     * @return Request\Response
+     * @throws Exception\Response
      */
     public function put($url, $parameters = [])
     {
@@ -241,10 +238,10 @@ class Request extends Base
      * Request\Response class instance. If the request fails, an exception will be raised.
      * Finally, the curl resource is destroyed and the response is returned.
      *
-     * @param type $method
-     * @param type $url
-     * @param type $parameters
-     * @return \THCFrame\Request\Request\Response
+     * @param $method
+     * @param $url
+     * @param array $parameters
+     * @return bool|string|Response
      * @throws Exception\Response
      */
     public function request($method, $url, $parameters = [])
@@ -262,6 +259,10 @@ class Request extends Base
         $this->_setRequestMethod($method)
                 ->_setRequestOptions($url, $parameters)
                 ->_setRequestHeaders();
+
+        if(ENV === 'dev'){
+            curl_setopt($request, CURLOPT_SSL_VERIFYPEER, false);
+        }
 
         $response = curl_exec($request);
 

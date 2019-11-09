@@ -112,9 +112,7 @@ class Security extends Base implements SecurityInterface
     }
 
     /**
-     *
      * @param BasicUserModel $user
-     * @return type
      */
     public function setUser(BasicUserModel $user)
     {
@@ -126,12 +124,10 @@ class Security extends Base implements SecurityInterface
             ->set('lastActive', time());
 
         $this->_user = $user;
-        return;
     }
 
     /**
-     *
-     * @return type
+     * @return BasicUserModel
      */
     public function getUser()
     {
@@ -180,6 +176,7 @@ class Security extends Base implements SecurityInterface
      * @param string $name
      * @param string $pass
      * @return true or re-throw exception
+     * @throws \THCFrame\Security\Exception
      */
     public function authenticate($name, $pass)
     {

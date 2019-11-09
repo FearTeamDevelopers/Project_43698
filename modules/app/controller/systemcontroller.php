@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Etc\Controller;
-use THCFrame\Profiler\Profiler;
 use THCFrame\Core\Core;
+use THCFrame\Profiler\Profiler;
 use THCFrame\Request\RequestMethods;
 
 /**

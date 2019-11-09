@@ -45,11 +45,10 @@ class HtmlMin
 {
 
     /**
-     *
-     * @param type $html
-     * @param type $js
-     * @param type $css
-     * @return type
+     * @param $html
+     * @param bool $js
+     * @param bool $css
+     * @return string
      */
     public static function minify($html, $js = true, $css = true)
     {

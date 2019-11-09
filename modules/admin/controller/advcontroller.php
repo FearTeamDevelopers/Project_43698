@@ -18,22 +18,30 @@ class AdvController extends Controller
      *
      * @before _secured, _participant
      */
-    public function load()
+    public function load(): void
     {
         $this->disableView();
         $maxRows = 100;
 
-        $page = (int) RequestMethods::post('page', 0);
+        $page = (int)RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
 
         if ($search != '') {
             $whereCond = "adv.created LIKE '%%?%%' OR adv.userAlias LIKE '%%?%%' OR adv.title LIKE '%%?%%'";
 
             $query = AdvertisementModel::getQuery(
-                            ['adv.id', 'adv.userId', 'adv.userAlias', 'adv.title',
-                                'adv.active', 'adv.state', 'adv.expirationDate', 'adv.created',])
-                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
-                    ->wheresql($whereCond, $search, $search, $search);
+                [
+                    'adv.id',
+                    'adv.userId',
+                    'adv.userAlias',
+                    'adv.title',
+                    'adv.active',
+                    'adv.state',
+                    'adv.expirationDate',
+                    'adv.created',
+                ])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->wheresql($whereCond, $search, $search, $search);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -52,13 +60,13 @@ class AdvController extends Controller
                 $query->order('adv.id', 'desc');
             }
 
-            $limit = min((int) RequestMethods::post('iDisplayLength'), $maxRows);
+            $limit = min((int)RequestMethods::post('iDisplayLength'), $maxRows);
             $query->limit($limit, $page + 1);
             $ads = AdvertisementModel::initialize($query);
 
             $countQuery = AdvertisementModel::getQuery(['adv.id'])
-                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
-                    ->wheresql($whereCond, $search, $search, $search);
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->wheresql($whereCond, $search, $search, $search);
 
             $adsCount = AdvertisementModel::initialize($countQuery);
             unset($countQuery);
@@ -66,9 +74,17 @@ class AdvController extends Controller
             unset($adsCount);
         } else {
             $query = AdvertisementModel::getQuery(
-                            ['adv.id', 'adv.userId', 'adv.userAlias', 'adv.title',
-                                'adv.active', 'adv.state', 'adv.expirationDate', 'adv.created',])
-                    ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
+                [
+                    'adv.id',
+                    'adv.userId',
+                    'adv.userAlias',
+                    'adv.title',
+                    'adv.active',
+                    'adv.state',
+                    'adv.expirationDate',
+                    'adv.created',
+                ])
+                ->join('tb_user', 'adv.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -87,7 +103,7 @@ class AdvController extends Controller
                 $query->order('adv.id', 'desc');
             }
 
-            $limit = min((int) RequestMethods::post('iDisplayLength'), $maxRows);
+            $limit = min((int)RequestMethods::post('iDisplayLength'), $maxRows);
             $query->limit($limit, $page + 1);
             $ads = AdvertisementModel::initialize($query);
             $count = AdvertisementModel::count();

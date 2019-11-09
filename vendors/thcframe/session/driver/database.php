@@ -3,7 +3,7 @@
 namespace THCFrame\Session\Driver;
 
 use THCFrame\Session;
-use THCFrame\Session\Model\Session;
+use THCFrame\Session\Model\Session as SessionModel;
 
 /**
  * Database session class
@@ -28,7 +28,7 @@ class Database extends Session\Driver
 
     /**
      *
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -46,22 +46,11 @@ class Database extends Session\Driver
         @session_start();
     }
 
-    /**
-     * Session keys are hashed with sha512 algo
-     *
-     * @param string $key
-     * @return hash
-     */
-    public function hashKey($key)
-    {
-        return hash_hmac('sha512', $key, $this->getSecret());
-    }
-
     public function open()
     {
         try{
-            $model = new Session();
-        } catch (Exception $ex) {
+            $model = new SessionModel();
+        } catch (\Exception $ex) {
 
         }
     }
@@ -78,12 +67,12 @@ class Database extends Session\Driver
 
     /**
      *
-     * @param type $key
+     * @param string $key
+     * @return bool
      */
     public function erase($key)
     {
-        $key = $this->hashKey($key);
-        $state = Session::deleteAll(['id = ?' => $key]);
+        $state = SessionModel::deleteAll(['id = ?' => $key]);
 
         if($state != -1){
             return true;
@@ -94,14 +83,13 @@ class Database extends Session\Driver
 
     /**
      *
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param string $key
+     * @param mixed$default
+     * @return mixed
      */
     public function get($key, $default = '')
     {
-        $key = $this->hashKey($key);
-        $ses = Session::first(['id = ?' => $key]);
+        $ses = SessionModel::first(['id = ?' => $key]);
 
         if($ses !== null){
             return $ses->getData();
@@ -112,14 +100,14 @@ class Database extends Session\Driver
 
     /**
      *
-     * @param type $key
-     * @param type $value
+     * @param string $key
+     * @param mixed $value
      * @return boolean
+     * @throws \THCFrame\Model\Exception\Validation
      */
     public function set($key, $value)
     {
-        $key = $this->hashKey($key);
-        $ses = new Session([
+        $ses = new SessionModel([
             'id' => $key,
             'expires' => time(),
             'data' => $value
@@ -143,7 +131,7 @@ class Database extends Session\Driver
         $max = $this->getTtl();
         $old = time() - $max;
 
-        $state = Session::deleteAll(['expires < ?' => $old]);
+        $state = SessionModel::deleteAll(['expires < ?' => $old]);
 
         if($state != -1){
             return true;

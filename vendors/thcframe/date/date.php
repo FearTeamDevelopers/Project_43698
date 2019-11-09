@@ -26,8 +26,7 @@ class Date
     }
 
     /**
-     * 
-     * @return type
+     * @return Date|null
      */
     public static function getInstance()
     {
@@ -39,9 +38,9 @@ class Date
     }
 
     /**
-     * 
-     * @param type $datetime
-     * @return type
+     * @param $datetime
+     * @return int
+     * @throws \Exception
      */
     public function getTimestamp($datetime)
     {
@@ -77,10 +76,9 @@ class Date
     }
 
     /**
-     * 
-     * @param type $datetime
-     * @param type $format
-     * @return \DateTime
+     * @param $datetime
+     * @param string $format
+     * @return false|string
      */
     public function format($datetime, $format = 'Y-m-d H:i:s')
     {
@@ -92,10 +90,9 @@ class Date
     }
 
     /**
-     * 
-     * @param type $format
-     * @return type
-     * @throws \THCFrame\Date\Exception\Argument
+     * @param string $format
+     * @return false|string
+     * @throws Exception\Argument
      */
     public function getFormatedCurDate($format = 'cz')
     {
@@ -109,10 +106,9 @@ class Date
     }
 
     /**
-     * 
-     * @param type $format
-     * @return type
-     * @throws \THCFrame\Date\Exception\Argument
+     * @param string $format
+     * @return false|string
+     * @throws Exception\Argument
      */
     public function getFormatedCurDatetime($format = 'cz')
     {
@@ -126,9 +122,10 @@ class Date
     }
 
     /**
-     * 
-     * @param type $date
-     * @return string
+     * @param $date
+     * @param string $lang
+     * @param int $type
+     * @return mixed
      */
     public function getMonthName($date, $lang = 'cz', $type = 1)
     {
@@ -148,10 +145,9 @@ class Date
     }
 
     /**
-     * 
-     * @param type $datetime
-     * @param type $part
-     * @return \DateTime
+     * @param $datetime
+     * @param $part
+     * @return false|string
      */
     public function getDatePart($datetime, $part)
     {
@@ -175,10 +171,11 @@ class Date
     }
 
     /**
-     * 
-     * @param type $startDate
-     * @param type $endDate
-     * @return type
+     * @param $startDate
+     * @param $endDate
+     * @param bool $useSign
+     * @return int
+     * @throws \Exception
      */
     public function datediff($startDate, $endDate, $useSign = true)
     {
@@ -194,16 +191,16 @@ class Date
     }
 
     /**
-     * 
-     * @param string $originalDate
+     * @param $originalDate
      * @param string $format
-     * @param integer $years
-     * @param integer $months
-     * @param integer $days
-     * @param integer $hours
-     * @param integer $minutes
-     * @param integer $seconds
+     * @param int $years
+     * @param int $months
+     * @param int $days
+     * @param int $hours
+     * @param int $minutes
+     * @param int $seconds
      * @return string
+     * @throws \Exception
      */
     public function dateAdd($originalDate, $format = 'Y-m-d', $years = 0, $months = 0, $days = 0, $hours = 0, $minutes = 0, $seconds = 0)
     {

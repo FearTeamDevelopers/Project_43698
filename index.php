@@ -1,7 +1,7 @@
 <?php
 
 //define environment
-if (preg_match('#^.*\.dev$#i', $_SERVER['SERVER_NAME'])) {
+if (preg_match('#^.*\.local$#i', $_SERVER['SERVER_NAME'])) {
     defined('ENV') ? null : define('ENV', 'dev');
 } elseif (preg_match('#^.*\.fear-team\.cz$#i', $_SERVER['SERVER_NAME'])) {
     defined('ENV') ? null : define('ENV', 'qa');

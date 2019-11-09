@@ -4,9 +4,6 @@ namespace THCFrame\Logger\Driver;
 
 use THCFrame\Logger;
 
-/**
- * File logger class
- */
 class File extends Logger\Driver
 {
 
@@ -33,14 +30,7 @@ class File extends Logger\Driver
 
     private function prepareLogPath($level = self::INFO)
     {
-        $pathTypeSuffix = date('Y') . DIRECTORY_SEPARATOR . date('m') . DIRECTORY_SEPARATOR . date('d');
-        $path = $this->path . DIRECTORY_SEPARATOR . $level . DIRECTORY_SEPARATOR . $pathTypeSuffix;
-
-        if (!is_dir($path)) {
-            @mkdir($path, self::DIR_CHMOD, true);
-        }
-
-        return $path . DIRECTORY_SEPARATOR . 'app.log';
+        return $this->path . DIRECTORY_SEPARATOR . date('Y-m-d') . '-' . $level . '.log';
     }
 
     private function putContents($file, $message)

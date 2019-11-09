@@ -2,9 +2,9 @@
 namespace Admin\Model\Notifications\Email;
 
 use THCFrame\Core\StringMethods;
-use Admin\Model\Notifications\Email\EmailAbstract;
 use Admin\Model\Notifications\Email\EmailTplNotificationConstants as TplNames;
 use App\Model\UserModel;
+use THCFrame\Model\Model;
 
 /**
  *
@@ -14,9 +14,9 @@ class Report extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $report
+     * @param Model $report
      */
-    public function onCreate(\THCFrame\Model\Model $report)
+    public function onCreate(Model $report)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/reportaze/r/' . $report->getUrlKey() . '">' . $report->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody()),
@@ -32,9 +32,9 @@ class Report extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $report
+     * @param Model $report
      */
-    public function onUpdate(\THCFrame\Model\Model $report)
+    public function onUpdate(Model $report)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/reportaze/r/' . $report->getUrlKey() . '">' . $report->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody()),
@@ -50,9 +50,9 @@ class Report extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $report
+     * @param Model $report
      */
-    public function onDelete(\THCFrame\Model\Model $report)
+    public function onDelete(Model $report)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/reportaze/r/' . $report->getUrlKey() . '">' . $report->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($report->getShortBody()),

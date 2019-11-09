@@ -3,7 +3,7 @@
 namespace Search\Etc;
 
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry as Registry;
+use THCFrame\Registry\Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Request\RequestMethods;
 
@@ -14,14 +14,15 @@ class Controller extends BaseController
 {
 
     /**
-     * @param type $options
+     * @param array $options
+     * @throws \Exception
      */
     public function __construct($options = [])
     {
         parent::__construct($options);
 
         // schedule disconnect from database
-        Event::add('framework.controller.destruct.after', function ($name) {
+        Event::add('framework.controller.destruct.after', function () {
             Registry::get('database')->disconnectAll();
         });
     }
@@ -74,11 +75,7 @@ class Controller extends BaseController
      */
     protected function isAdmin()
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_admin') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_admin') === true;
     }
 
     /**
@@ -97,12 +94,8 @@ class Controller extends BaseController
      */
     protected function isCron()
     {
-        if (preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
-                '95.168.206.203' == RequestMethods::server('REMOTE_ADDR')) {
-            return true;
-        } else {
-            return false;
-        }
+        return preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
+            '95.168.206.203' == RequestMethods::server('REMOTE_ADDR');
     }
 
     /**
@@ -120,11 +113,7 @@ class Controller extends BaseController
      */
     protected function isSuperAdmin()
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_superadmin') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_superadmin') === true;
     }
 
     /**
@@ -136,10 +125,10 @@ class Controller extends BaseController
     }
 
     /**
-     * @param type $key
-     * @param type $args
+     * @param string $key
+     * @param array $args
      *
-     * @return type
+     * @return string
      */
     public function lang($key, $args = [])
     {

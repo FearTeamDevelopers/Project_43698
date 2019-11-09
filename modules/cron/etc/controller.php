@@ -3,7 +3,7 @@
 namespace Cron\Etc;
 
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry as Registry;
+use THCFrame\Registry\Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Request\RequestMethods;
 
@@ -14,7 +14,8 @@ class Controller extends BaseController
 {
 
     /**
-     * @param type $options
+     * @param array $options
+     * @throws \Exception
      */
     public function __construct($options = [])
     {
@@ -24,7 +25,7 @@ class Controller extends BaseController
         $this->willRenderLayoutView = false;
 
         // schedule disconnect from database
-        Event::add('framework.controller.destruct.after', function ($name) {
+        Event::add('framework.controller.destruct.after', function () {
             Registry::get('database')->disconnectAll();
         });
     }
@@ -45,27 +46,14 @@ class Controller extends BaseController
      */
     protected function isCron()
     {
-        if (preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
-                '95.168.206.203' == RequestMethods::server('REMOTE_ADDR')) {
-            return true;
-        } else {
-            return false;
-        }
+        return preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
+            '95.168.206.203' == RequestMethods::server('REMOTE_ADDR');
     }
 
     /**
-     *
-     */
-    public function render()
-    {
-        parent::render();
-    }
-
-    /**
-     * @param type $key
-     * @param type $args
-     *
-     * @return type
+     * @param $key
+     * @param array $args
+     * @return mixed|string
      */
     public function lang($key, $args = [])
     {

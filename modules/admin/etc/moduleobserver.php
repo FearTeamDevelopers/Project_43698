@@ -2,6 +2,8 @@
 
 namespace Admin\Etc;
 
+use Admin\Model\AdminLogModel;
+use THCFrame\Model\Exception\Validation;
 use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\SubscriberInterface;
@@ -20,14 +22,15 @@ class ModuleObserver implements SubscriberInterface
     {
         return [
             'admin.log' => 'adminLog',
-            'app.log' => 'adminLog',
         ];
     }
 
     /**
-     * @param array $params
+     * @throws Validation
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public function adminLog()
+    public function adminLog(): void
     {
         $params = func_get_args();
 
@@ -58,7 +61,7 @@ class ModuleObserver implements SubscriberInterface
             $paramStr = '';
         }
 
-        $log = new \Admin\Model\AdminLogModel([
+        $log = new AdminLogModel([
             'userId' => $userId,
             'module' => $module,
             'controller' => $controller,

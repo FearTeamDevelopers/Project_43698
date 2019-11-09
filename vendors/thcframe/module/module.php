@@ -4,7 +4,6 @@ namespace THCFrame\Module;
 
 use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
-use THCFrame\Module\Exception;
 use THCFrame\Events\SubscriberInterface;
 use THCFrame\Router\Model\RedirectModel;
 use THCFrame\Registry\Registry;
@@ -53,7 +52,7 @@ class Module extends Base
 
         $this->_addModuleEvents();
 
-        Event::add('framework.router.construct.after', function($router) {
+        Event::add('framework.router.construct.after', function ($router) {
             $router->addRedirects($this->getRedirects());
             $router->addRoutes($this->getRoutes());
         });
@@ -73,13 +72,15 @@ class Module extends Base
             if ($moduleObserver instanceof SubscriberInterface) {
                 $events = $moduleObserver->getSubscribedEvents();
 
-                foreach ($events as $name => $callback) {
-                    if (is_array($callback)) {
-                        foreach ($callback as $call) {
-                            Event::add($name, [$moduleObserver, $call]);
+                if (count($events)) {
+                    foreach ($events as $name => $callback) {
+                        if (is_array($callback)) {
+                            foreach ($callback as $call) {
+                                Event::add($name, [$moduleObserver, $call]);
+                            }
+                        } else {
+                            Event::add($name, [$moduleObserver, $callback]);
                         }
-                    } else {
-                        Event::add($name, [$moduleObserver, $callback]);
                     }
                 }
             }
@@ -124,7 +125,7 @@ class Module extends Base
                 $redirects = $cachedRedirects;
             } else {
                 $redirects = RedirectModel::all(
-                                ['module = ?' => strtolower($this->getModuleName())], ['fromPath', 'toPath']
+                    ['module = ?' => strtolower($this->getModuleName())], ['fromPath', 'toPath']
                 );
 
                 if (!empty($redirects)) {
@@ -170,5 +171,4 @@ class Module extends Base
         $this->observerClass = $observerClass;
         return $this;
     }
-
 }

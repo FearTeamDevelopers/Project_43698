@@ -3,7 +3,6 @@
 namespace THCFrame\Database;
 
 use THCFrame\Core\Base;
-use THCFrame\Database\Exception;
 use THCFrame\Model\Model;
 
 /**
@@ -15,7 +14,7 @@ abstract class Connector extends Base
 
     /**
      *
-     * @return \THCFrame\Database\Connector
+     * @return Connector
      */
     public function initialize()
     {
@@ -24,8 +23,8 @@ abstract class Connector extends Base
 
     /**
      *
-     * @param type $method
-     * @return \THCFrame\Session\Exception\Implementation
+     * @param string $method
+     * @return Exception\Implementation
      */
     protected function _getImplementationException($method)
     {

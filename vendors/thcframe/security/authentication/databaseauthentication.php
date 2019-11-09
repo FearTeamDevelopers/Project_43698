@@ -74,9 +74,8 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
 
 
     /**
-     *
-     * @param type $user
-     * @return type
+     * @param $user
+     * @return mixed
      */
     private function _successfullLogin($user)
     {

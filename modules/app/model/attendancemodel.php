@@ -11,9 +11,9 @@ use App\Model\Basic\BasicAttendanceModel;
 class AttendanceModel extends BasicAttendanceModel
 {
 
-    const ACCEPT = 1;
-    const REJECT = 2;
-    const MAYBE = 3;
+    public const ACCEPT = 1;
+    public const REJECT = 2;
+    public const MAYBE = 3;
 
     /**
      * @readwrite
@@ -45,9 +45,12 @@ class AttendanceModel extends BasicAttendanceModel
     }
 
     /**
-     * 
+     *
      * @param integer $userId
+     * @param bool $future
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActionsByUserId($userId, $future = false)
     {
@@ -66,6 +69,8 @@ class AttendanceModel extends BasicAttendanceModel
     /**
      * @param integer $actionId
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchUsersByActionId($actionId)
     {
@@ -78,9 +83,11 @@ class AttendanceModel extends BasicAttendanceModel
     }
 
     /**
-     * 
+     *
      * @param integer $actionId
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchUsersByActionIdSimpleArr($actionId)
     {
@@ -107,10 +114,12 @@ class AttendanceModel extends BasicAttendanceModel
     }
 
     /**
-     * 
+     *
      * @param integer $userId
      * @param integer $actionId
-     * @return array
+     * @return int
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchTypeByUserAndAction($userId, $actionId)
     {
@@ -124,7 +133,10 @@ class AttendanceModel extends BasicAttendanceModel
     }
 
     /**
-     * @return type
+     * @param $type
+     * @return array|void
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchPercentAttendance($type)
     {
@@ -157,8 +169,11 @@ class AttendanceModel extends BasicAttendanceModel
     }
 
     /**
-     * @param type $month
-     * @param type $year
+     * @param null $month
+     * @param null $year
+     * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchMonthAttendance($month = null, $year = null)
     {

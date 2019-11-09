@@ -27,7 +27,7 @@ class Server extends Session\Driver
 
     /**
      *
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -37,30 +37,13 @@ class Server extends Session\Driver
     }
 
     /**
-     * Session keys are hashed with sha512 algo
      *
      * @param string $key
-     * @return hash
-     */
-    public function hashKey($key)
-    {
-        if (ENV === \THCFrame\Core\Core::ENV_LIVE) {
-            return hash_hmac('sha512', $key, $this->getSecret());
-        } else {
-            return $key;
-        }
-    }
-
-    /**
-     *
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param mixed $default
+     * @return mixed
      */
     public function get($key, $default = null)
     {
-        $key = $this->hashKey($key);
-
         if (isset($_SESSION[$this->prefix . $key])) {
             return $_SESSION[$this->prefix . $key];
         }
@@ -70,26 +53,23 @@ class Server extends Session\Driver
 
     /**
      *
-     * @param type $key
-     * @param type $value
+     * @param string $key
+     * @param mixed $value
      * @return \THCFrame\Session\Driver\Server
      */
     public function set($key, $value)
     {
-        $key = $this->hashKey($key);
-
         $_SESSION[$this->prefix . $key] = $value;
         return $this;
     }
 
     /**
      *
-     * @param type $key
+     * @param string $key
      * @return \THCFrame\Session\Driver\Server
      */
     public function remove($key)
     {
-        $key = $this->hashKey($key);
         unset($_SESSION[$this->prefix . $key]);
         return $this;
     }

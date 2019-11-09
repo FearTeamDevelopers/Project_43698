@@ -2,9 +2,9 @@
 namespace Admin\Model\Notifications\Email;
 
 use THCFrame\Core\StringMethods;
-use Admin\Model\Notifications\Email\EmailAbstract;
 use Admin\Model\Notifications\Email\EmailTplNotificationConstants as TplNames;
 use App\Model\UserModel;
+use THCFrame\Model\Model;
 
 /**
  *
@@ -14,9 +14,11 @@ class User extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $news
+     * @param Model $news
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public function onCreate(\THCFrame\Model\Model $news)
+    public function onCreate(Model $news)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/novinky/r/' . $news->getUrlKey() . '">' . $news->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($news->getShortBody()),
@@ -32,9 +34,11 @@ class User extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $news
+     * @param Model $news
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public function onUpdate(\THCFrame\Model\Model $news)
+    public function onUpdate(Model $news)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/novinky/r/' . $news->getUrlKey() . '">' . $news->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($news->getShortBody()),
@@ -50,9 +54,11 @@ class User extends EmailAbstract
 
     /**
      *
-     * @param \THCFrame\Model\Model $news
+     * @param Model $news
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public function onDelete(\THCFrame\Model\Model $news)
+    public function onDelete(Model $news)
     {
         $data = ['{TITLE}' => '<a href="' . $this->host . '/novinky/r/' . $news->getUrlKey() . '">' . $news->getTitle() . '</a>',
             '{TEXT}' => StringMethods::prepareEmailText($news->getShortBody()),

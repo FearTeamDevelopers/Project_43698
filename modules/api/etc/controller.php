@@ -3,7 +3,7 @@
 namespace Api\Etc;
 
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry as Registry;
+use THCFrame\Registry\Registry;
 use THCFrame\Controller\RestController;
 
 /**
@@ -13,23 +13,23 @@ class Controller extends RestController
 {
 
     /**
-     * @param type $options
+     * @param array $options
+     * @throws \THCFrame\Controller\Exception\Header
      */
     public function __construct($options = [])
     {
         parent::__construct($options);
 
         // schedule disconnect from database
-        Event::add('framework.controller.destruct.after', function ($name) {
+        Event::add('framework.controller.destruct.after', function () {
             Registry::get('database')->disconnectAll();
         });
     }
 
     /**
-     * @param type $key
-     * @param type $args
-     *
-     * @return type
+     * @param $key
+     * @param array $args
+     * @return mixed|string
      */
     public function lang($key, $args = [])
     {

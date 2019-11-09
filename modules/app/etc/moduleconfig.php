@@ -1,7 +1,7 @@
 <?php
 namespace App\Etc;
 
-use THCFrame\Module\Module as Module;
+use THCFrame\Module\Module;
 
 /**
  * Class for module specific settings.

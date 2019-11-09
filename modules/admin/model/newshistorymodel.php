@@ -2,6 +2,10 @@
 
 namespace Admin\Model;
 
+use App\Model\NewsModel;
+use ReflectionClass;
+use ReflectionException;
+use THCFrame\Model\Exception\Validation;
 use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 use THCFrame\Request\RequestMethods;
@@ -31,9 +35,11 @@ class NewsHistoryModel extends BasicNewshistoryModel
     }
 
     /**
-     * @return array
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchAll()
+    public static function fetchAll(): ?array
     {
         $query = self::getQuery(['nwh.*'])
                 ->join('tb_user', 'nwh.editedBy = us.id', 'us',
@@ -45,9 +51,13 @@ class NewsHistoryModel extends BasicNewshistoryModel
     /**
      * Called from admin module.
      *
-     * @return array
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function fetchWithLimit($limit = 10, $page = 1)
+    public static function fetchWithLimit($limit = 10, $page = 1): ?array
     {
         $query = self::getQuery(['nwh.*'])
                 ->join('tb_user', 'nwh.editedBy = us.id', 'us',
@@ -60,11 +70,15 @@ class NewsHistoryModel extends BasicNewshistoryModel
 
     /**
      * Check differences between two objects.
-     * 
-     * @param \App\Model\NewsModel $original
-     * @param \App\Model\NewsModel $edited
+     *
+     * @param NewsModel $original
+     * @param NewsModel $edited
+     * @throws ReflectionException
+     * @throws Validation
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
-    public static function logChanges(\App\Model\NewsModel $original, \App\Model\NewsModel $edited)
+    public static function logChanges(NewsModel $original, NewsModel $edited): void
     {
         $sec = Registry::get('security');
         $user = $sec->getUser();
@@ -73,7 +87,7 @@ class NewsHistoryModel extends BasicNewshistoryModel
         $referer = RequestMethods::server('HTTP_REFERER');
         $changes = [];
 
-        $reflect = new \ReflectionClass($original);
+        $reflect = new ReflectionClass($original);
         $properties = $reflect->getProperties();
         $className = get_class($original);
 

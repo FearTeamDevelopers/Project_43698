@@ -11,10 +11,9 @@ class Test
     private static $_tests = [];
 
     /**
-     *
-     * @param type $callback
-     * @param type $title
-     * @param type $set
+     * @param $callback
+     * @param string $title
+     * @param string $set
      */
     public static function add($callback, $title = 'Unnamed Test', $set = 'General')
     {
@@ -26,10 +25,9 @@ class Test
     }
 
     /**
-     *
-     * @param type $before
-     * @param type $after
-     * @return type
+     * @param null $before
+     * @param null $after
+     * @return array
      */
     public static function run($before = null, $after = null)
     {

@@ -244,14 +244,13 @@ class Controller extends Base
      */
     public static function redirect($url = null)
     {
-        $schema = 'http';
         $host = RequestMethods::server('HTTP_HOST');
 
         if ($url === null) {
-            header("Location: {$schema}://{$host}");
+            header("Location: https://{$host}");
             exit;
         } else {
-            header("Location: {$schema}://{$host}{$url}");
+            header("Location: https://{$host}{$url}");
             exit;
         }
     }

@@ -1,8 +1,16 @@
 <?php
+
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Core\StringMethods;
+use App\Model\ActionModel;
+use App\Model\NewsModel;
+use App\Model\PageContentModel;
+use App\Model\ReportModel;
+use DateInterval;
+use DateTime;
+use Exception;
+use THCFrame\Mailer\Mailer;
 
 /**
  *
@@ -18,8 +26,10 @@ class DevController extends Controller
      *      /admin/dev/filldatabase/3    - for tb_report.
      *
      * @before _secured, _superadmin
+     * @param $type
+     * @throws Exception
      */
-    public function fillDatabase($type)
+    public function fillDatabase($type): void
     {
         if (ENV !== 'dev') {
             exit;
@@ -32,7 +42,7 @@ class DevController extends Controller
 
         $ROW_COUNT = 50;
 
-        $content = \App\Model\PageContentModel::first(['urlKey = ?' => 'kurzy-sdi'], ['body']);
+        $content = PageContentModel::first(['urlKey = ?' => 'kurzy-sdi'], ['body']);
 
         $SHORT_TEXT = 'Vedle používání zdravého rozumu, dostatečné kvalifikace i praxe je kvalitní a spolehlivá
             potápěčská technika jednou z podmínek dosažení nejvyšší míry bezpečnosti vašich ponorů.
@@ -42,9 +52,9 @@ class DevController extends Controller
         $LARGE_TEXT = str_replace('h1', 'h2', $content->getBody());
         unset($content);
 
-        if ((int) $type == 1) {
+        if ((int)$type == 1) {
             for ($i = 0; $i < $ROW_COUNT; $i += 1) {
-                $news = new \App\Model\NewsModel([
+                $news = new NewsModel([
                     'title' => 'News-' . $i . '-' . time(),
                     'userId' => 1,
                     'userAlias' => 'System',
@@ -57,6 +67,8 @@ class DevController extends Controller
                     'keywords' => 'news',
                     'metaTitle' => 'News-' . $i . '-' . time(),
                     'metaDescription' => $SHORT_TEXT,
+                    'created' => date('Y-m-d H:i'),
+                    'modified' => date('Y-m-d H:i'),
                 ]);
 
                 $news->save();
@@ -65,13 +77,13 @@ class DevController extends Controller
             self::redirect('/admin/system/');
         }
 
-        if ((int) $type == 2) {
+        if ((int)$type == 2) {
             for ($i = 0; $i < $ROW_COUNT; $i += 1) {
-                $date = new \DateTime();
-                $date->add(new \DateInterval('P' . (int) $i . 'D'));
+                $date = new DateTime();
+                $date->add(new DateInterval('P' . $i . 'D'));
                 $startDate = $date->format('Y-m-d');
 
-                $action = new \App\Model\ActionModel([
+                $action = new ActionModel([
                     'title' => 'Action-' . $i . '-' . time(),
                     'userId' => 1,
                     'userAlias' => 'System',
@@ -88,6 +100,8 @@ class DevController extends Controller
                     'keywords' => 'action',
                     'metaTitle' => 'Action-' . $i . '-' . time(),
                     'metaDescription' => $SHORT_TEXT,
+                    'created' => date('Y-m-d H:i'),
+                    'modified' => date('Y-m-d H:i'),
                 ]);
 
                 $action->save();
@@ -96,9 +110,9 @@ class DevController extends Controller
             self::redirect('/admin/system/');
         }
 
-        if ((int) $type == 3) {
+        if ((int)$type == 3) {
             for ($i = 0; $i < $ROW_COUNT; $i += 1) {
-                $report = new \App\Model\ReportModel([
+                $report = new ReportModel([
                     'title' => 'Report-' . $i . '-' . time(),
                     'userId' => 1,
                     'userAlias' => 'System',
@@ -115,6 +129,8 @@ class DevController extends Controller
                     'photoName' => '',
                     'imgMain' => '',
                     'imgThumb' => '',
+                    'created' => date('Y-m-d H:i'),
+                    'modified' => date('Y-m-d H:i'),
                 ]);
 
                 $report->save();
@@ -124,174 +140,14 @@ class DevController extends Controller
         }
     }
 
-    protected function checkUrlKey($key, $keys, $type)
-    {
-        if (in_array($key, $keys)) {
-            return true;
-        } else {
-            if ($type == 'action') {
-                $action = \App\Model\ActionModel::first(['urlKey = ?' => $key]);
-
-                if (null !== $action) {
-                    return 5;
-                }
-            } elseif ($type == 'report') {
-                $report = \App\Model\ReportModel::first(['urlKey = ?' => $key]);
-
-                if (null !== $report) {
-                    return 5;
-                }
-            } elseif ($type == 'news') {
-                $news = \App\Model\NewsModel::first(['urlKey = ?' => $key]);
-
-                if (null !== $news) {
-                    return 5;
-                }
-            }
-
-            return false;
-        }
-    }
-
     /**
      * @before _secured, _superadmin
      */
-    public function migrateOldData()
-    {
-        if (ENV !== 'dev') {
-            exit;
-        }
-
-        $this->disableView();
-
-        $oldDb = new \THCFrame\Database\Database();
-        $db = $oldDb->initializeDirectly([
-            'type' => 'mysql',
-            'host' => 'localhost',
-            'username' => 'root',
-            'password' => '',
-            'schema' => 'hastrman_old',
-        ]);
-
-        $insertReportSql = "INSERT INTO `tb_report` VALUES (default, 2, 1, 1, 1, '%s', 'Bohumír Kuhn', '%s', '%s', '%s', default, default, default, default, default, '%s', '%s', default, '%s', '%s');";
-        $insertActionSql = "INSERT INTO `tb_action` VALUES (default, 2, 1, 1, 1, '%s', 'Bohumír Kuhn', '%s', '%s', '%s', default, default, default, default, default, default, '%s', '%s', '%s', '%s');";
-        $insertNewsSql = "INSERT INTO `tb_news` VALUES (default, 2, 1, 1, 1, '%s', 'Bohumír Kuhn', '%s', '%s', '%s', default, default, '%s', '%s', '%s', '%s');";
-
-        $reports = $db->execute('SELECT * FROM `jos_content` where catid IN (37,46) and state = 1');
-        $actions = $db->execute('SELECT * FROM `jos_content` where catid IN (41,42) and state = 1');
-        $news = $db->execute('SELECT * FROM `jos_content` where catid IN (36) and state = 1');
-
-        $patterns = ['/https:/i', '/images\/stories\//i', '/\'/'];
-        $replaces = ['', '/public/uploads/images/stories/', "\'"];
-        $contentCount = 0;
-
-        if (!empty($reports)) {
-            $urlKeys = [];
-            foreach ($reports as $obj) {
-                $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
-                $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
-                $title = trim(StringMethods::fastClean($obj['title'], [], '', true));
-                $urlKey = StringMethods::createUrlKey($title);
-
-                $urlKeyCheck = $this->checkUrlKey($urlKey, $urlKeys, 'report');
-                if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i += 1) {
-                        if (!$this->checkUrlKey($urlKey, $urlKeys, 'report')) {
-                            break;
-                        } else {
-                            $urlKey = $urlKey . '-' . $i;
-                        }
-                    }
-                } elseif ($urlKeyCheck === 5) {
-                    continue;
-                }
-
-                $urlKeys[] = $urlKey;
-
-                $sql = sprintf($insertReportSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->debug($sql);
-                $contentCount += 1;
-            }
-        }
-
-        if (!empty($actions)) {
-            $urlKeys = [];
-            foreach ($actions as $obj) {
-                $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
-                $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
-                $title = trim(StringMethods::fastClean($obj['title'], [], '', true));
-                $urlKey = StringMethods::createUrlKey($title);
-
-                $urlKeyCheck = $this->checkUrlKey($urlKey, $urlKeys, 'action');
-                if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i += 1) {
-                        if (!$this->checkUrlKey($urlKey, $urlKeys, 'action')) {
-                            break;
-                        } else {
-                            $urlKey = $urlKey . '-' . $i;
-                        }
-                    }
-                } elseif ($urlKeyCheck === 5) {
-                    continue;
-                }
-
-                $urlKeys[] = $urlKey;
-
-                $sql = sprintf($insertActionSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->debug($sql);
-                $contentCount += 1;
-            }
-        }
-
-        if (!empty($news)) {
-            $urlKeys = [];
-            foreach ($news as $obj) {
-                $shortText = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $shortText = trim(substr(strip_tags($shortText, '<br><br/>'), 0, 1500));
-                $text = trim(preg_replace($patterns, $replaces, $obj['introtext']));
-                $metaDesc = trim(substr(strip_tags($shortText), 0, 1000)) . '...';
-                $title = trim(StringMethods::fastClean($obj['title'], [], '', true));
-                $urlKey = StringMethods::createUrlKey($title);
-
-                $urlKeyCheck = $this->checkUrlKey($urlKey, $urlKeys, 'news');
-                if ($urlKeyCheck === true) {
-                    for ($i = 1; $i <= 50; $i += 1) {
-                        if (!$this->checkUrlKey($urlKey, $urlKeys, 'news')) {
-                            break;
-                        } else {
-                            $urlKey = $urlKey . '-' . $i;
-                        }
-                    }
-                } elseif ($urlKeyCheck === 5) {
-                    continue;
-                }
-
-                $urlKeys[] = $urlKey;
-
-                $sql = sprintf($insertNewsSql, $urlKey, $title, $shortText, $text, $title, $metaDesc, $obj['created'], $obj['modified']);
-                \THCFrame\Core\Core::getLogger()->debug($sql);
-                $contentCount += 1;
-            }
-        }
-
-        $db->disconnect();
-
-        print('<pre>' . print_r($contentCount, true) . '</pre>');
-        die;
-    }
-
-    /**
-     * @before _secured, _superadmin
-     */
-    public function testSendEmail()
+    public function testSendEmail(): void
     {
         $this->disableView();
 
-        $mailer = new \THCFrame\Mailer\Mailer();
+        $mailer = new Mailer();
         $mailer->setBody('Test message')
             ->setSubject('Hastrman test email');
 
@@ -299,5 +155,34 @@ class DevController extends Controller
 
         print('<pre>' . print_r('Send', true) . '</pre>');
         die;
+    }
+
+    protected function checkUrlKey($key, $keys, $type)
+    {
+        if (in_array($key, $keys)) {
+            return true;
+        }
+
+        if ($type == 'action') {
+            $action = ActionModel::first(['urlKey = ?' => $key]);
+
+            if (null !== $action) {
+                return 5;
+            }
+        } elseif ($type == 'report') {
+            $report = ReportModel::first(['urlKey = ?' => $key]);
+
+            if (null !== $report) {
+                return 5;
+            }
+        } elseif ($type == 'news') {
+            $news = NewsModel::first(['urlKey = ?' => $key]);
+
+            if (null !== $news) {
+                return 5;
+            }
+        }
+
+        return false;
     }
 }

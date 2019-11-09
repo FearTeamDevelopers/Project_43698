@@ -23,7 +23,7 @@ abstract class Driver extends Base implements LoggerInterface
     const DEBUG = 'debug';
 
     /**
-     * @return \THCFrame\Logger\Driver
+     * @return Driver
      */
     public function initialize()
     {
@@ -32,8 +32,8 @@ abstract class Driver extends Base implements LoggerInterface
 
     /**
      *
-     * @param type $method
-     * @return \THCFrame\Session\Exception\Implementation
+     * @param string $method
+     * @return Exception\Implementation
      */
     protected function _getImplementationException($method)
     {
@@ -42,9 +42,9 @@ abstract class Driver extends Base implements LoggerInterface
 
     /**
      *
-     * @param type $message
+     * @param string $message
      * @param array $context
-     * @return type
+     * @return string
      */
     protected function interpolate($message, array $context = [])
     {

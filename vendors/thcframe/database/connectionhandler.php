@@ -11,11 +11,12 @@ use THCFrame\Database\Exception;
 class ConnectionHandler extends Base
 {
 
+    /** @var Connector[] */
     private $connectors = [];
 
     /**
      *
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = [])
     {
@@ -24,8 +25,9 @@ class ConnectionHandler extends Base
 
     /**
      *
-     * @param type $id
-     * @param \THCFrame\Database\Connector $connector
+     * @param string $id
+     * @param Connector $connector
+     * @return ConnectionHandler
      * @throws Exception\Argument
      */
     public function add($id, $connector)
@@ -42,7 +44,9 @@ class ConnectionHandler extends Base
 
     /**
      *
-     * @param type $id
+     * @param string $id
+     * @return Connector
+     * @throws Exception\Argument
      */
     public function get($id = 'main')
     {
@@ -56,7 +60,8 @@ class ConnectionHandler extends Base
 
     /**
      *
-     * @param type $id
+     * @param string $id
+     * @return ConnectionHandler
      */
     public function erase($id)
     {
@@ -71,7 +76,7 @@ class ConnectionHandler extends Base
 
     /**
      *
-     * @return type
+     * @return array
      */
     public function getIdentifications()
     {
@@ -84,7 +89,8 @@ class ConnectionHandler extends Base
 
     /**
      *
-     * @param type $id
+     * @param string $id
+     * @return ConnectionHandler
      */
     public function disconnectById($id)
     {

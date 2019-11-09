@@ -2,7 +2,7 @@
 
 namespace Search\Model\Exception;
 
-use THCFrame\Core as Core;
+use THCFrame\Core;
 
 class Indexer extends Core\Exception {
 

@@ -1,6 +1,13 @@
 <?php
 namespace Admin\Model;
 
+use App\Model\ActionModel;
+use App\Model\NewsModel;
+use App\Model\PageContentModel;
+use App\Model\ReportModel;
+use THCFrame\Request\RequestMethods;
+use THCFrame\Router\Model\RedirectModel;
+
 /**
  * 
  */
@@ -10,7 +17,7 @@ class SitemapModel
     /**
      *
      */
-    public static function generateSitemap()
+    public static function generateSitemap(): int
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
         <urlset
@@ -23,11 +30,11 @@ class SitemapModel
 
         $host = RequestMethods::server('HTTP_HOST');
 
-        $pageContent = \App\Model\PageContentModel::all(['active = ?' => true]);
+        $pageContent = PageContentModel::all(['active = ?' => true]);
         $redirects = RedirectModel::all(['module = ?' => 'app']);
-        $news = \App\Model\NewsModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
-        $reports = \App\Model\ReportModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
-        $actions = \App\Model\ActionModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
+        $news = NewsModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
+        $reports = ReportModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
+        $actions = ActionModel::all(['active = ?' => true, 'approved = ?' => 1], ['urlKey']);
 
         $redirectArr = [];
         if (null !== $redirects) {
@@ -83,5 +90,7 @@ class SitemapModel
         }
 
         file_put_contents('./sitemap.xml', $xml . $pageContentXml . $articlesXml . $xmlEnd);
+
+        return $linkCounter;
     }
 }

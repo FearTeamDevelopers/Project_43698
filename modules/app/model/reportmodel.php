@@ -14,12 +14,12 @@ use Search\Model\IndexableInterface;
 class ReportModel extends BasicReportModel implements IndexableInterface
 {
 
-    const STATE_WAITING = 0;
-    const STATE_APPROVED = 1;
-    const STATE_REJECTED = 2;
+    public const STATE_WAITING = 0;
+    public const STATE_APPROVED = 1;
+    public const STATE_REJECTED = 2;
 
     /**
-     * @var type
+     * @var array
      */
     private static $_statesConv = [
         self::STATE_WAITING => 'Čeká na shválení',
@@ -43,16 +43,14 @@ class ReportModel extends BasicReportModel implements IndexableInterface
      * @param string $key
      *
      * @return bool
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     private static function checkUrlKey($key)
     {
         $status = self::first(['urlKey = ?' => $key]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
 
     /**
@@ -78,7 +76,9 @@ class ReportModel extends BasicReportModel implements IndexableInterface
     /**
      * Delete report and image
      *
-     * @return type
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public function delete()
     {
@@ -97,6 +97,8 @@ class ReportModel extends BasicReportModel implements IndexableInterface
 
     /**
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -109,7 +111,10 @@ class ReportModel extends BasicReportModel implements IndexableInterface
     /**
      * Called from admin module.
      *
+     * @param int $limit
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchWithLimit($limit = 10)
     {
@@ -122,11 +127,11 @@ class ReportModel extends BasicReportModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $limit
-     *
-     * @return type
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActiveWithLimit($limit = 10, $page = 1)
     {
@@ -139,11 +144,11 @@ class ReportModel extends BasicReportModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $limit
-     *
-     * @return type
+     * @param int $limit
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchArchivatedWithLimit($limit = 10, $page = 1)
     {
@@ -156,11 +161,10 @@ class ReportModel extends BasicReportModel implements IndexableInterface
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $urlKey
-     *
-     * @return type
+     * @param $urlKey
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchByUrlKey($urlKey)
     {
@@ -168,7 +172,8 @@ class ReportModel extends BasicReportModel implements IndexableInterface
     }
 
     /**
-     * @return type
+     * @param bool $type
+     * @return string
      */
     public function getUnlinkPath($type = true)
     {
@@ -180,13 +185,14 @@ class ReportModel extends BasicReportModel implements IndexableInterface
             } elseif (file_exists('./' . $this->_imgMain)) {
                 return './' . $this->_imgMain;
             }
-        } else {
-            return $this->_imgMain;
         }
+
+        return $this->_imgMain;
     }
 
     /**
-     * @return type
+     * @param bool $type
+     * @return string
      */
     public function getUnlinkThumbPath($type = true)
     {
@@ -198,9 +204,9 @@ class ReportModel extends BasicReportModel implements IndexableInterface
             } elseif (file_exists('./' . $this->_imgThumb)) {
                 return './' . $this->_imgThumb;
             }
-        } else {
-            return $this->_imgThumb;
         }
+
+        return $this->_imgThumb;
     }
 
     /**
@@ -217,7 +223,9 @@ class ReportModel extends BasicReportModel implements IndexableInterface
      *
      * @param \THCFrame\Bag\BagInterface $post
      * @param array $options
-     * @return type
+     * @return array
+     * @throws \THCFrame\Core\Exception\Argument
+     * @throws \THCFrame\Core\Exception\Lang
      */
     public static function createFromPost(\THCFrame\Bag\BagInterface $post, array $options = [])
     {
@@ -299,6 +307,8 @@ class ReportModel extends BasicReportModel implements IndexableInterface
             'photoName' => $urlKey,
             'imgMain' => $imgMain,
             'imgThumb' => $imgThumb,
+            'created' => date('Y-m-d H:i'),
+            'modified' => date('Y-m-d H:i'),
         ]);
 
         return [$report, $errors];
@@ -309,7 +319,9 @@ class ReportModel extends BasicReportModel implements IndexableInterface
      * @param \THCFrame\Bag\BagInterface $post
      * @param \App\Model\ReportModel $report
      * @param array $options
-     * @return type
+     * @return array
+     * @throws \THCFrame\Core\Exception\Argument
+     * @throws \THCFrame\Core\Exception\Lang
      */
     public static function editFromPost(\THCFrame\Bag\BagInterface $post, \App\Model\ReportModel $report, array $options = [])
     {

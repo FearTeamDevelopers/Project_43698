@@ -45,7 +45,9 @@ class AdSectionModel extends BasicAdsectionModel
     }
 
     /**
-     * @return type
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -59,7 +61,9 @@ class AdSectionModel extends BasicAdsectionModel
     }
 
     /**
-     * @return type
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAllActive()
     {
@@ -79,15 +83,13 @@ class AdSectionModel extends BasicAdsectionModel
      * @param string $key
      *
      * @return bool
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function checkUrlKey($key)
     {
         $status = self::first(['urlKey = ?' => $key]);
 
-        if (null === $status) {
-            return true;
-        } else {
-            return false;
-        }
+        return null === $status;
     }
 }

@@ -59,7 +59,7 @@ class Ini extends Configuration\Driver
      * Method used to merge configuration of specific environment into
      * default configuration
      *
-     * @return type
+     * @return array
      */
     protected function _mergeConfiguration()
     {
@@ -168,8 +168,7 @@ class Ini extends Configuration\Driver
     }
 
     /**
-     *
-     * @return type
+     * @return \stdClass|type
      */
     public function getConfiguration()
     {

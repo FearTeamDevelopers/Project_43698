@@ -276,9 +276,7 @@ class Router extends Base
     }
 
     /**
-     * Return all stored redirects
-     *
-     * @return type
+     * @return array
      */
     public function getRedirects()
     {

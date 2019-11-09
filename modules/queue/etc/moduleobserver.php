@@ -1,6 +1,6 @@
 <?php
 
-namespace Apitester\Etc;
+namespace Queue\Etc;
 
 use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
@@ -14,24 +14,34 @@ class ModuleObserver implements SubscriberInterface
 {
 
     /**
-     * @return type
+     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
         return [
-            'apiTester.log' => 'apiTesterLog',
+            'queue.log' => 'adminLog',
         ];
     }
 
     /**
-     * @param array $params
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
+     * @throws \THCFrame\Model\Exception\Validation
      */
-    public function apiTesterLog()
+    public function adminLog()
     {
         $params = func_get_args();
 
         $router = Registry::get('router');
         $route = $router->getLastRoute();
+
+        $security = Registry::get('security');
+        $user = $security->getUser();
+        if ($user === null) {
+            $userId = 'annonymous';
+        } else {
+            $userId = $user->getWholeName() . ':' . $user->getId();
+        }
 
         $module = $route->getModule();
         $controller = $route->getController();
@@ -39,7 +49,6 @@ class ModuleObserver implements SubscriberInterface
 
         if (!empty($params)) {
             $result = array_shift($params);
-            $userId = (int) array_shift($params);
 
             $paramStr = '';
             if (!empty($params)) {
@@ -47,7 +56,6 @@ class ModuleObserver implements SubscriberInterface
             }
         } else {
             $result = 'fail';
-            $userId = 'annonymous';
             $paramStr = '';
         }
 
@@ -65,14 +73,14 @@ class ModuleObserver implements SubscriberInterface
             $log->save();
         } else {
             Core::getLogger()->info('{type} {result} /{module}/{controller}/{action} {params}', [
-                'type' => 'apiTesterLog',
-                'result' => $result,
-                'module' => $module,
-                'controller' => $controller,
-                'action' => $action,
-                'params' => $paramStr]
+                    'type' => 'adminLog',
+                    'result' => $result,
+                    'module' => $module,
+                    'controller' => $controller,
+                    'action' => $action,
+                    'params' => $paramStr,
+                ]
             );
         }
     }
-
 }

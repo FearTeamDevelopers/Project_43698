@@ -2,10 +2,13 @@
 
 namespace Admin\Etc;
 
+use Exception;
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry as Registry;
+use THCFrame\Registry\Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Security\Exception\Unauthorized;
+use THCFrame\Security\Model\BasicUserModel;
 
 /**
  * Module specific controller class extending framework controller class.
@@ -16,21 +19,22 @@ class Controller extends BaseController
     /**
      * Disable view, used for ajax calls.
      */
-    protected function disableView()
+    protected function disableView(): void
     {
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
     }
 
     /**
-     * @param type $options
+     * @param array $options
+     * @throws Exception
      */
     public function __construct($options = [])
     {
         parent::__construct($options);
 
         // schedule disconnect from database
-        Event::add('framework.controller.destruct.after', function ($name) {
+        Event::add('framework.controller.destruct.after', static function () {
             Registry::get('database')->disconnectAll();
         });
     }
@@ -38,7 +42,7 @@ class Controller extends BaseController
     /**
      * @protected
      */
-    public function _secured()
+    public function _secured(): void
     {
         $session = Registry::get('session');
 
@@ -67,118 +71,104 @@ class Controller extends BaseController
 
     /**
      * @protected
+     * @throws Unauthorized
      */
-    public function _cron()
+    public function _cron(): void
     {
         if (!preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
                 '95.168.206.203' != RequestMethods::server('REMOTE_ADDR')) {
-            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
+            throw new Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
     /**
      * @return bool
      */
-    protected function isCron()
+    protected function isCron(): ?bool
     {
-        if (preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
-                '95.168.206.203' == RequestMethods::server('REMOTE_ADDR')) {
-            return true;
-        } else {
-            return false;
-        }
+        return preg_match('#^Links.*#i', RequestMethods::server('HTTP_USER_AGENT')) &&
+            '95.168.206.203' == RequestMethods::server('REMOTE_ADDR');
     }
 
     /**
      * @protected
+     * @throws Unauthorized
      */
-    public function _member()
+    public function _member(): void
     {
         if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_member') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
+            throw new Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
     /**
      * @return bool
      */
-    protected function isMember()
+    protected function isMember(): ?bool
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_member') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_member') === true;
     }
 
     /**
      * @protected
+     * @throws Unauthorized
      */
-    public function _participant()
+    public function _participant(): void
     {
         if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_participant') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
+            throw new Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
     /**
      * @return bool
      */
-    protected function isParticipant()
+    protected function isParticipant(): ?bool
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_participant') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_participant') === true;
     }
 
     /**
      * @protected
+     * @throws Unauthorized
      */
-    public function _admin()
+    public function _admin(): void
     {
         if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_admin') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
+            throw new Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
     /**
      * @return bool
      */
-    protected function isAdmin()
+    protected function isAdmin(): ?bool
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_admin') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_admin') === true;
     }
 
     /**
      * @protected
+     * @throws Unauthorized
      */
-    public function _superadmin()
+    public function _superadmin(): void
     {
         if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_superadmin') !== true) {
-            throw new \THCFrame\Security\Exception\Unauthorized($this->lang('ACCESS_DENIED'));
+            throw new Unauthorized($this->lang('ACCESS_DENIED'));
         }
     }
 
     /**
      * @return bool
      */
-    protected function isSuperAdmin()
+    protected function isSuperAdmin(): ?bool
     {
-        if ($this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_superadmin') === true) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->getSecurity()->getUser() && $this->getSecurity()->isGranted('role_superadmin') === true;
     }
 
     /**
-     *
+     * @throws \THCFrame\View\Exception\Data
+     * @throws \THCFrame\View\Exception\Renderer
      */
     public function render()
     {
@@ -212,17 +202,17 @@ class Controller extends BaseController
 
     /**
      * Load user from security context.
+     * @return BasicUserModel|null
      */
-    public function getUser()
+    public function getUser(): ?BasicUserModel
     {
         return $this->getSecurity()->getUser();
     }
 
     /**
-     * @param type $key
-     * @param type $args
-     *
-     * @return type
+     * @param $key
+     * @param array $args
+     * @return mixed|string
      */
     public function lang($key, $args = [])
     {

@@ -11,7 +11,7 @@ use Search\Model\IndexableInterface;
 class AdvertisementModel extends BasicAdvertisementModel implements IndexableInterface
 {
 
-    const STATE_SOLD = 2;
+    public const STATE_SOLD = 2;
 
     /**
      * @readwrite
@@ -70,22 +70,22 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
      * @param string $str
      *
      * @return bool
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function checkAdKey($str)
     {
         $ad = self::first(['uniqueKey = ?' => $str]);
 
-        if ($ad === null) {
-            return true;
-        } else {
-            return false;
-        }
+        return $ad === null;
     }
 
     /**
      * Called from admin module.
      *
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAll()
     {
@@ -99,11 +99,10 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
     }
 
     /**
-     * Called from admin module.
-     *
-     * @param type $id
-     *
-     * @return type
+     * @param $id
+     * @return mixed|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchById($id)
     {
@@ -124,9 +123,11 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
     }
 
     /**
-     * Called from app module.
-     *
-     * @return type
+     * @param int $adsPerPage
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAdsActive($adsPerPage = 10, $page = 1)
     {
@@ -141,15 +142,13 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
                 ->order('adv.created', 'desc')
                 ->limit((int) $adsPerPage, (int) $page);
 
-        $ads = self::initialize($query);
-
-        return $ads;
+        return self::initialize($query);
     }
 
     /**
-     * Called from app module.
-     *
-     * @return type
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAdsActiveNoLimit()
     {
@@ -162,18 +161,16 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
                 ->where('adv.active = ?', true)
                 ->where('adv.expirationDate >= ?', date('Y-m-d H:i:s'));
 
-        $ads = self::initialize($query);
-
-        return $ads;
+        return self::initialize($query);
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $type
-     * @param type $page
-     *
-     * @return type
+     * @param $type
+     * @param int $adsPerPage
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActiveByType($type, $adsPerPage = 10, $page = 1)
     {
@@ -189,35 +186,35 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
                     ->order('adv.created', 'desc')
                     ->limit((int) $adsPerPage, (int) $page);
 
-            $ads = self::initialize($query);
-
-            return $ads;
+            return self::initialize($query);
         } else {
             return null;
         }
     }
 
     /**
-     * @param type $type
-     *
-     * @return type
+     * @param $type
+     * @return int|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function countActiveByType($type)
     {
         if ($type == 'tender' || $type == 'demand') {
-            return self::count(['active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'), 'adType = ?' => $type], ['id']);
+            return self::count(['active = ?' => true, 'expirationDate >= ?' => date('Y-m-d H:i:s'), 'adType = ?' => $type]);
         } else {
             return null;
         }
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $type
-     * @param type $page
-     *
-     * @return type
+     * @param $type
+     * @param $section
+     * @param int $adsPerPage
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActiveByTypeSection($type, $section, $adsPerPage = 10, $page = 1)
     {
@@ -234,19 +231,18 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
                     ->order('adv.created', 'desc')
                     ->limit((int) $adsPerPage, (int) $page);
 
-            $ads = self::initialize($query);
-
-            return $ads;
-        } else {
-            return nul;
+            return self::initialize($query);
         }
+
+        return null;
     }
 
     /**
-     * @param type $type
-     * @param type $section
-     *
-     * @return type
+     * @param $type
+     * @param $section
+     * @return int|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function countActiveByTypeSection($type, $section)
     {
@@ -262,18 +258,18 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
             $obj = !empty($arr) ? array_shift($arr) : null;
 
             return (int) $obj->count;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $type
-     * @param type $page
-     *
-     * @return type
+     * @param $section
+     * @param int $adsPerPage
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActiveBySection($section, $adsPerPage = 10, $page = 1)
     {
@@ -288,16 +284,14 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
                 ->order('adv.created', 'desc')
                 ->limit((int) $adsPerPage, (int) $page);
 
-        $ads = self::initialize($query);
-
-        return $ads;
+        return self::initialize($query);
     }
 
     /**
-     * @param type $type
-     * @param type $section
-     *
-     * @return type
+     * @param $section
+     * @return int
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function countActiveBySection($section)
     {
@@ -314,11 +308,10 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $uniquekey
-     *
-     * @return type
+     * @param $uniquekey
+     * @return mixed|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActiveByKey($uniquekey)
     {
@@ -341,11 +334,12 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
     }
 
     /**
-     * Called from app module.
-     *
-     * @param type $userId
-     *
-     * @return type
+     * @param $userId
+     * @param int $adsPerPage
+     * @param int $page
+     * @return array|null
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchActiveByUser($userId, $adsPerPage = 10, $page = 1)
     {
@@ -359,26 +353,26 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
                 ->order('adv.created', 'desc')
                 ->limit((int) $adsPerPage, (int) $page);
 
-        $ads = self::initialize($query);
-
-        return $ads;
+        return self::initialize($query);
     }
 
     /**
-     * @param type $userId
-     *
-     * @return type
+     * @param $userId
+     * @return int
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function countActiveByUser($userId)
     {
-        return self::count(['active = ?' => true, 'userId = ?' => (int) $userId], ['id']);
+        return self::count(['active = ?' => true, 'userId = ?' => (int) $userId]);
     }
 
     /**
-     * @param type $uniqueKey
-     * @param type $userId
-     *
-     * @return type
+     * @param $uniqueKey
+     * @param $userId
+     * @return mixed
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function fetchAdByKeyUserId($uniqueKey, $userId)
     {
@@ -395,9 +389,10 @@ class AdvertisementModel extends BasicAdvertisementModel implements IndexableInt
      * Return advertisements that are going to expire in x days based on parameters
      * Advertisements returned in array are grouped by author email
      *
-     * @param integer $min
      * @param integer $max
      * @return array
+     * @throws \THCFrame\Model\Exception\Connector
+     * @throws \THCFrame\Model\Exception\Implementation
      */
     public static function expireInDays($max = 7)
     {

@@ -9,9 +9,9 @@ use Admin\Model\Basic\BasicConceptModel;
  */
 class ConceptModel extends BasicConceptModel
 {
-    const CONCEPT_TYPE_ACTION = 1;
-    const CONCEPT_TYPE_NEWS = 2;
-    const CONCEPT_TYPE_REPORT = 3;
+    public const CONCEPT_TYPE_ACTION = 1;
+    public const CONCEPT_TYPE_NEWS = 2;
+    public const CONCEPT_TYPE_REPORT = 3;
 
     /**
      *

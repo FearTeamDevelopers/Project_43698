@@ -23,9 +23,9 @@
             </span>
         </p>
         <p>
-            <label>Typ*</label>
+            <label for="field-type">Typ*</label>
             <span class="field">
-                <select name="mtype" class="width80">
+                <select id="field-type" name="mtype" class="width80">
                     {foreach $type in \Admin\Model\ImessageModel::getTypes()}
                         <option value="{echo $type_i}">{echo $type}</option>
                     {/foreach}
@@ -38,9 +38,11 @@
             </span>
         </p>
         <p>
-            <label>Text*</label>
+            <label for="field-text">Text*</label>
             <span class="field">
-                <textarea rows="10" name="text" class="width80">{echo \Admin\Helper\FormPrinter::iset($imessage,'body')}</textarea>
+                <textarea id="field-text" rows="10" name="text" class="width80">
+                    {echo \Admin\Helper\FormPrinter::iset($imessage,'body')}
+                </textarea>
                 {if isset($errors["body"])}
                 <label class="error">
                     {echo implode("<br/>", $errors["body"])}

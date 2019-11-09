@@ -23,7 +23,7 @@ class Controller extends BaseController
         parent::__construct($options);
 
         // schedule disconnect from database
-        Event::add('framework.controller.destruct.after', function ($name) {
+        Event::add('framework.controller.destruct.after', function () {
             Registry::get('database')->disconnectAll();
         });
 
@@ -59,6 +59,7 @@ class Controller extends BaseController
      * @param int $pageCount
      * @param int $page
      * @param string $path
+     * @throws \THCFrame\View\Exception\Data
      */
     protected function pagerMetaLinks($pageCount, $page, $path)
     {
@@ -175,6 +176,7 @@ class Controller extends BaseController
     }
 
     /**
+     * @throws \THCFrame\View\Exception\Data
      * @throws \THCFrame\View\Exception\Renderer
      */
     public function render()

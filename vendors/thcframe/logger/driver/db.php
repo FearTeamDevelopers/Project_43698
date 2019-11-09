@@ -5,9 +5,6 @@ namespace THCFrame\Logger\Driver;
 use THCFrame\Logger;
 use THCFrame\Logger\Model\LoggerModel;
 
-/**
- * Db logger class
- */
 class Db extends Logger\Driver
 {
 

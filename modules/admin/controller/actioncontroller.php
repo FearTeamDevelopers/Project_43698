@@ -3,9 +3,21 @@
 namespace Admin\Controller;
 
 use Admin\Etc\Controller;
-use THCFrame\Request\RequestMethods;
-use THCFrame\Events\Events as Event;
+use Admin\Model\ActionHistoryModel;
+use Admin\Model\ConceptModel;
 use Admin\Model\Notifications\Email\Action as ActionNotification;
+use App\Model\ActionModel;
+use App\Model\AttendanceModel;
+use App\Model\CommentModel;
+use ReflectionException;
+use THCFrame\Core\Exception\Argument;
+use THCFrame\Core\Exception\Lang;
+use THCFrame\Events\Events as Event;
+use THCFrame\Model\Exception\Connector;
+use THCFrame\Model\Exception\Implementation;
+use THCFrame\Model\Exception\Validation;
+use THCFrame\Request\RequestMethods;
+use THCFrame\View\Exception\Data;
 
 /**
  *
@@ -14,42 +26,12 @@ class ActionController extends Controller
 {
 
     /**
-     * Check whether user has access to action or not.
-     *
-     * @param \App\Model\ActionModel $action
-     *
-     * @return bool
-     */
-    private function checkAccess(\App\Model\ActionModel $action)
-    {
-        if ($this->isAdmin() === true ||
-                $action->getUserId() == $this->getUser()->getId()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Check if there is object used for preview saved in session.
-     *
-     * @return \App\Model\ActionModel
-     */
-    private function checkForObject()
-    {
-        $action = $this->getSession()->get('actionPreview');
-        $this->getSession()->remove('actionPreview');
-
-        return $action;
-    }
-
-    /**
      * Get list of all actions. Loaded via datatables ajax.
      * For more check load function.
      *
      * @before _secured, _participant
      */
-    public function index()
+    public function index(): void
     {
 
     }
@@ -58,34 +40,41 @@ class ActionController extends Controller
      * Create new action.
      *
      * @before _secured, _participant
+     * @throws Argument
+     * @throws Data
+     * @throws Lang
+     * @throws Connector
+     * @throws Implementation
      */
-    public function add()
+    public function add(): void
     {
         $view = $this->getActionView();
         $action = $this->checkForObject();
 
-        $actionConcepts = \Admin\Model\ConceptModel::fetchByUserAndType($this->getUser()->getId(), \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION);
+        $actionConcepts = ConceptModel::fetchByUserAndType($this->getUser()->getId(),
+            ConceptModel::CONCEPT_TYPE_ACTION);
 
         $view->set('action', $action)
-                ->set('concepts', $actionConcepts);
+            ->set('concepts', $actionConcepts);
 
         if (RequestMethods::post('submitAddAction')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMultiSubmissionProtectionToken() !== true) {
+                $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
-            list($action, $errors) = \App\Model\ActionModel::createFromPost(
-                            RequestMethods::getPostDataBag(), ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->action_autopublish]
+            [$action, $errors] = ActionModel::createFromPost(
+                RequestMethods::getPostDataBag(),
+                ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->action_autopublish]
             );
 
             if (empty($errors) && $action->validate()) {
                 $id = $action->save();
-                
+
                 ActionNotification::getInstance()->onCreate($action);
-                
+
                 $this->getCache()->erase('actions');
-                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
+                ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
 
                 Event::fire('admin.log', ['success', 'Action id: ' . $id]);
                 $view->successMessage($this->lang('CREATE_SUCCESS'));
@@ -93,34 +82,48 @@ class ActionController extends Controller
             } else {
                 Event::fire('admin.log', ['fail', 'Errors: ' . json_encode($errors + $action->getErrors())]);
                 $view->set('errors', $errors + $action->getErrors())
-                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
-                        ->set('action', $action)
-                        ->set('conceptid', RequestMethods::post('conceptid'));
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
+                    ->set('action', $action)
+                    ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
 
         if (RequestMethods::post('submitPreviewAction')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true &&
-                    $this->checkMultiSubmissionProtectionToken() !== true) {
+                $this->checkMultiSubmissionProtectionToken() !== true) {
                 self::redirect('/admin/action/');
             }
 
-            list($action, $errors) = \App\Model\ActionModel::createFromPost(
-                            RequestMethods::getPostDataBag(), ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->action_autopublish]
+            [$action, $errors] = ActionModel::createFromPost(
+                RequestMethods::getPostDataBag(),
+                ['user' => $this->getUser(), 'autoPublish' => $this->getConfig()->action_autopublish]
             );
 
             if (empty($errors) && $action->validate()) {
                 $this->getSession()->set('actionPreview', $action);
-                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
+                ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
 
                 self::redirect('/action/preview?action=add');
             } else {
                 $view->set('errors', $errors + $action->getErrors())
-                        ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
-                        ->set('action', $action)
-                        ->set('conceptid', RequestMethods::post('conceptid'));
+                    ->set('submstoken', $this->revalidateMultiSubmissionProtectionToken())
+                    ->set('action', $action)
+                    ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
+    }
+
+    /**
+     * Check if there is object used for preview saved in session.
+     *
+     * @return ActionModel|null
+     */
+    private function checkForObject(): ?ActionModel
+    {
+        $action = $this->getSession()->get('actionPreview');
+        $this->getSession()->remove('actionPreview');
+
+        return $action;
     }
 
     /**
@@ -129,15 +132,22 @@ class ActionController extends Controller
      * @before _secured, _participant
      *
      * @param int $id action id
+     * @throws Argument
+     * @throws Data
+     * @throws ReflectionException
+     * @throws Validation
+     * @throws Lang
+     * @throws Connector
+     * @throws Implementation
      */
-    public function edit($id)
+    public function edit($id): void
     {
         $view = $this->getActionView();
 
         $action = $this->checkForObject();
 
         if (null === $action) {
-            $action = \App\Model\ActionModel::first(['id = ?' => (int) $id]);
+            $action = ActionModel::first(['id = ?' => (int)$id]);
 
             if (null === $action) {
                 $view->warningMessage($this->lang('NOT_FOUND'));
@@ -152,15 +162,16 @@ class ActionController extends Controller
             }
         }
 
-        $actionConcepts = \Admin\Model\ConceptModel::fetchByUserAndType($this->getUser()->getId(), \Admin\Model\ConceptModel::CONCEPT_TYPE_ACTION);
-
-        $comments = \App\Model\CommentModel::fetchCommentsByResourceAndType($action->getId(), \App\Model\CommentModel::RESOURCE_ACTION);
-        $attUsers = \App\Model\AttendanceModel::fetchUsersByActionId($action->getId());
+        $actionConcepts = ConceptModel::fetchByUserAndType($this->getUser()->getId(),
+            ConceptModel::CONCEPT_TYPE_ACTION);
+        $comments = CommentModel::fetchCommentsByResourceAndType($action->getId(),
+            CommentModel::RESOURCE_ACTION);
+        $attUsers = AttendanceModel::fetchUsersByActionId($action->getId());
 
         $view->set('action', $action)
-                ->set('comments', $comments)
-                ->set('attendance', $attUsers)
-                ->set('concepts', $actionConcepts);
+            ->set('comments', $comments)
+            ->set('attendance', $attUsers)
+            ->set('concepts', $actionConcepts);
 
         if (RequestMethods::post('submitEditAction')) {
             if ($this->getSecurity()->getCsrf()->verifyRequest() !== true) {
@@ -169,31 +180,39 @@ class ActionController extends Controller
 
             $originalAction = clone $action;
 
-            list($action, $errors) = \App\Model\ActionModel::editFromPost(
-                            RequestMethods::getPostDataBag(), $action, [
-                        'user' => $this->getUser(),
-                        'isAdmin' => $this->isAdmin(),
-                        'autoPublish' => $this->getConfig()->action_autopublish
-                            ]
+            [$action, $errors] = ActionModel::editFromPost(
+                RequestMethods::getPostDataBag(), $action, [
+                    'user' => $this->getUser(),
+                    'isAdmin' => $this->isAdmin(),
+                    'autoPublish' => $this->getConfig()->action_autopublish,
+                ]
             );
 
             if (empty($errors) && $action->validate()) {
                 $action->save();
-                \Admin\Model\ActionHistoryModel::logChanges($originalAction, $action);
-                
+                ActionHistoryModel::logChanges($originalAction, $action);
+
 //                ActionNotification::getInstance()->onUpdate($action);
-                
+
                 $this->getCache()->erase('actions');
-                \Admin\Model\ConceptModel::deleteAll(['id = ?' => RequestMethods::post('conceptid')]);
+
+                $conceptId = RequestMethods::post('conceptid', 0);
+
+                if ($conceptId !== 0) {
+                    ConceptModel::deleteAll(['id = ?' => $conceptId]);
+                }
 
                 Event::fire('admin.log', ['success', 'Action id: ' . $id]);
                 $view->successMessage($this->lang('UPDATE_SUCCESS'));
                 self::redirect('/admin/action/');
             } else {
-                Event::fire('admin.log', ['fail', 'Action id: ' . $id,
-                    'Errors: ' . json_encode($errors + $action->getErrors()),]);
+                Event::fire('admin.log', [
+                    'fail',
+                    'Action id: ' . $id,
+                    'Errors: ' . json_encode($errors + $action->getErrors()),
+                ]);
                 $view->set('errors', $errors + $action->getErrors())
-                        ->set('conceptid', RequestMethods::post('conceptid'));
+                    ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
 
@@ -202,12 +221,12 @@ class ActionController extends Controller
                 self::redirect('/admin/action/');
             }
 
-            list($action, $errors) = \App\Model\ActionModel::editFromPost(
-                            RequestMethods::getPostDataBag(), $action, [
-                        'user' => $this->getUser(),
-                        'isAdmin' => $this->isAdmin(),
-                        'autoPublish' => $this->getConfig()->action_autopublish
-                            ]
+            [$action, $errors] = ActionModel::editFromPost(
+                RequestMethods::getPostDataBag(), $action, [
+                    'user' => $this->getUser(),
+                    'isAdmin' => $this->isAdmin(),
+                    'autoPublish' => $this->getConfig()->action_autopublish,
+                ]
             );
 
             if (empty($errors) && $action->validate()) {
@@ -216,9 +235,22 @@ class ActionController extends Controller
                 self::redirect('/action/preview?action=edit');
             } else {
                 $view->set('errors', $errors + $action->getErrors())
-                        ->set('conceptid', RequestMethods::post('conceptid'));
+                    ->set('conceptid', RequestMethods::post('conceptid'));
             }
         }
+    }
+
+    /**
+     * Check whether user has access to action or not.
+     *
+     * @param ActionModel $action
+     *
+     * @return bool
+     */
+    private function checkAccess(ActionModel $action): ?bool
+    {
+        return $this->isAdmin() === true ||
+            $action->getUserId() == $this->getUser()->getId();
     }
 
     /**
@@ -227,8 +259,10 @@ class ActionController extends Controller
      * @before _secured, _participant
      *
      * @param int $id action id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function delete($id)
+    public function delete($id): void
     {
         $this->disableView();
 
@@ -236,29 +270,30 @@ class ActionController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $action = \App\Model\ActionModel::first(
-                        ['id = ?' => (int) $id], ['id', 'userId']
+        $action = ActionModel::first(
+            ['id = ?' => (int)$id], ['id', 'userId']
         );
 
         if (null === $action) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
-        } else {
-            if ($this->checkAccess($action)) {
-                if ($action->delete()) {
-                    $this->getCache()->erase('actions');
+        } elseif ($this->checkAccess($action)) {
+            if ($action->delete()) {
+                $this->getCache()->erase('actions');
 //                    ActionNotification::getInstance()->onDelete($action);
 
-                    Event::fire('admin.log', ['success', 'Action id: ' . $id]);
-                    $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
-                } else {
-                    Event::fire('admin.log', ['fail', 'Action id: ' . $id,
-                        'Errors: ' . json_encode($action->getErrors()),]);
-
-                    $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
-                }
+                Event::fire('admin.log', ['success', 'Action id: ' . $id]);
+                $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
+                Event::fire('admin.log', [
+                    'fail',
+                    'Action id: ' . $id,
+                    'Errors: ' . json_encode($action->getErrors()),
+                ]);
+
+                $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
+        } else {
+            $this->ajaxResponse($this->lang('LOW_PERMISSIONS'), true, 401);
         }
     }
 
@@ -268,8 +303,10 @@ class ActionController extends Controller
      * @before _secured, _admin
      *
      * @param int $id action id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function approveAction($id)
+    public function approveAction($id): void
     {
         $this->disableView();
 
@@ -277,7 +314,7 @@ class ActionController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $action = \App\Model\ActionModel::first(['id = ?' => (int) $id]);
+        $action = ActionModel::first(['id = ?' => (int)$id]);
 
         if (null === $action) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -297,8 +334,11 @@ class ActionController extends Controller
                 Event::fire('admin.log', ['success', 'Action id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', ['fail', 'Action id: ' . $id,
-                    'Errors: ' . json_encode($action->getErrors()),]);
+                Event::fire('admin.log', [
+                    'fail',
+                    'Action id: ' . $id,
+                    'Errors: ' . json_encode($action->getErrors()),
+                ]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -310,8 +350,10 @@ class ActionController extends Controller
      * @before _secured, _admin
      *
      * @param int $id action id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function rejectAction($id)
+    public function rejectAction($id): void
     {
         $this->disableView();
 
@@ -319,7 +361,7 @@ class ActionController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $action = \App\Model\ActionModel::first(['id = ?' => (int) $id]);
+        $action = ActionModel::first(['id = ?' => (int)$id]);
 
         if (null === $action) {
             $this->ajaxResponse($this->lang('NOT_FOUND'), true, 404);
@@ -337,8 +379,11 @@ class ActionController extends Controller
                 Event::fire('admin.log', ['success', 'Action id: ' . $id]);
                 $this->ajaxResponse($this->lang('COMMON_SUCCESS'));
             } else {
-                Event::fire('admin.log', ['fail', 'Action id: ' . $id,
-                    'Errors: ' . json_encode($action->getErrors()),]);
+                Event::fire('admin.log', [
+                    'fail',
+                    'Action id: ' . $id,
+                    'Errors: ' . json_encode($action->getErrors()),
+                ]);
                 $this->ajaxResponse($this->lang('COMMON_FAIL'), true);
             }
         }
@@ -348,13 +393,16 @@ class ActionController extends Controller
      * Return list of actions to insert action link to content.
      *
      * @before _secured, _participant
+     * @throws Data
+     * @throws Connector
+     * @throws Implementation
      */
-    public function insertToContent()
+    public function insertToContent(): void
     {
         $view = $this->getActionView();
         $this->willRenderLayoutView = false;
 
-        $actions = \App\Model\ActionModel::all([], ['urlKey', 'title']);
+        $actions = ActionModel::all([], ['urlKey', 'title']);
 
         $view->set('actions', $actions);
     }
@@ -364,7 +412,7 @@ class ActionController extends Controller
      *
      * @before _secured, _admin
      */
-    public function massAction()
+    public function massAction(): void
     {
         $this->disableView();
 
@@ -383,8 +431,8 @@ class ActionController extends Controller
 
         switch ($action) {
             case 'delete':
-                $actions = \App\Model\ActionModel::all(
-                                ['id IN ?' => $ids], ['id', 'title']
+                $actions = ActionModel::all(
+                    ['id IN ?' => $ids], ['id', 'title']
                 );
 
                 if (null !== $actions) {
@@ -409,9 +457,9 @@ class ActionController extends Controller
 
                 break;
             case 'activate':
-                $actions = \App\Model\ActionModel::all([
-                            'id IN ?' => $ids,
-                            'active = ?' => false,
+                $actions = ActionModel::all([
+                    'id IN ?' => $ids,
+                    'active = ?' => false,
                 ]);
 
                 if (null !== $actions) {
@@ -427,7 +475,7 @@ class ActionController extends Controller
                             $action->save();
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . implode(', ', $action->getErrors());
+                                . implode(', ', $action->getErrors());
                         }
                     }
                 }
@@ -444,9 +492,9 @@ class ActionController extends Controller
 
                 break;
             case 'deactivate':
-                $actions = \App\Model\ActionModel::all([
-                            'id IN ?' => $ids,
-                            'active = ?' => true,
+                $actions = ActionModel::all([
+                    'id IN ?' => $ids,
+                    'active = ?' => true,
                 ]);
 
                 if (null !== $actions) {
@@ -462,7 +510,7 @@ class ActionController extends Controller
                             $action->save();
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . implode(', ', $action->getErrors());
+                                . implode(', ', $action->getErrors());
                         }
                     }
                 }
@@ -479,9 +527,9 @@ class ActionController extends Controller
 
                 break;
             case 'approve':
-                $actions = \App\Model\ActionModel::all([
-                            'id IN ?' => $ids,
-                            'approved IN ?' => [0, 2],
+                $actions = ActionModel::all([
+                    'id IN ?' => $ids,
+                    'approved IN ?' => [0, 2],
                 ]);
 
                 if (null !== $actions) {
@@ -498,7 +546,7 @@ class ActionController extends Controller
                             ActionNotification::getInstance()->onCreate($action);
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . implode(', ', $action->getErrors());
+                                . implode(', ', $action->getErrors());
                         }
                     }
                 }
@@ -515,9 +563,9 @@ class ActionController extends Controller
 
                 break;
             case 'reject':
-                $actions = \App\Model\ActionModel::all([
-                            'id IN ?' => $ids,
-                            'approved IN ?' => [0, 1],
+                $actions = ActionModel::all([
+                    'id IN ?' => $ids,
+                    'approved IN ?' => [0, 1],
                 ]);
 
                 if (null !== $actions) {
@@ -533,7 +581,7 @@ class ActionController extends Controller
                             $action->save();
                         } else {
                             $errors[] = "Action id {$action->getId()} - {$action->getTitle()} errors: "
-                                    . implode(', ', $action->getErrors());
+                                . implode(', ', $action->getErrors());
                         }
                     }
                 }
@@ -560,22 +608,31 @@ class ActionController extends Controller
      *
      * @before _secured, _participant
      */
-    public function load()
+    public function load(): void
     {
         $this->disableView();
         $maxRows = 100;
 
-        $page = (int) RequestMethods::post('page', 0);
+        $page = (int)RequestMethods::post('page', 0);
         $search = RequestMethods::issetpost('sSearch') ? RequestMethods::post('sSearch') : '';
 
         if ($search != '') {
             $whereCond = "ac.created LIKE '%%?%%' OR ac.userAlias LIKE '%%?%%' OR ac.title LIKE '%%?%%'";
 
-            $query = \App\Model\ActionModel::getQuery(
-                            ['ac.id', 'ac.userId', 'ac.userAlias', 'ac.title', 'ac.startDate',
-                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created',])
-                    ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
-                    ->wheresql($whereCond, $search, $search, $search);
+            $query = ActionModel::getQuery(
+                [
+                    'ac.id',
+                    'ac.userId',
+                    'ac.userAlias',
+                    'ac.title',
+                    'ac.startDate',
+                    'ac.active',
+                    'ac.approved',
+                    'ac.archive',
+                    'ac.created',
+                ])
+                ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->wheresql($whereCond, $search, $search, $search);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -596,23 +653,32 @@ class ActionController extends Controller
                 $query->order('ac.id', 'desc');
             }
 
-            $limit = min((int) RequestMethods::post('iDisplayLength'), $maxRows);
+            $limit = min((int)RequestMethods::post('iDisplayLength'), $maxRows);
             $query->limit($limit, $page + 1);
-            $actions = \App\Model\ActionModel::initialize($query);
+            $actions = ActionModel::initialize($query);
 
-            $countQuery = \App\Model\ActionModel::getQuery(['ac.id'])
-                    ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
-                    ->wheresql($whereCond, $search, $search, $search);
+            $countQuery = ActionModel::getQuery(['ac.id'])
+                ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname'])
+                ->wheresql($whereCond, $search, $search, $search);
 
-            $actionsCount = \App\Model\ActionModel::initialize($countQuery);
+            $actionsCount = ActionModel::initialize($countQuery);
             unset($countQuery);
             $count = count($actionsCount);
             unset($actionsCount);
         } else {
-            $query = \App\Model\ActionModel::getQuery(
-                            ['ac.id', 'ac.userId', 'ac.userAlias', 'ac.title', 'ac.startDate',
-                                'ac.active', 'ac.approved', 'ac.archive', 'ac.created',])
-                    ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
+            $query = ActionModel::getQuery(
+                [
+                    'ac.id',
+                    'ac.userId',
+                    'ac.userAlias',
+                    'ac.title',
+                    'ac.startDate',
+                    'ac.active',
+                    'ac.approved',
+                    'ac.archive',
+                    'ac.created',
+                ])
+                ->join('tb_user', 'ac.userId = us.id', 'us', ['us.firstname', 'us.lastname']);
 
             if (RequestMethods::issetpost('iSortCol_0')) {
                 $dir = RequestMethods::issetpost('sSortDir_0') ? RequestMethods::post('sSortDir_0') : 'asc';
@@ -633,11 +699,11 @@ class ActionController extends Controller
                 $query->order('ac.id', 'desc');
             }
 
-            $limit = min((int) RequestMethods::post('iDisplayLength'), $maxRows);
+            $limit = min((int)RequestMethods::post('iDisplayLength'), $maxRows);
             $query->limit($limit, $page + 1);
-            $actions = \App\Model\ActionModel::initialize($query);
+            $actions = ActionModel::initialize($query);
 
-            $count = \App\Model\ActionModel::count();
+            $count = ActionModel::count();
         }
 
         $draw = $page + 1 + time();
@@ -654,9 +720,9 @@ class ActionController extends Controller
                     $label .= "<span class='infoLabel infoLabelRed'>Neaktivní</span>";
                 }
 
-                if ($action->approved == \App\Model\ActionModel::STATE_APPROVED) {
+                if ($action->approved == ActionModel::STATE_APPROVED) {
                     $label .= "<span class='infoLabel infoLabelGreen'>Schváleno</span>";
-                } elseif ($action->approved == \App\Model\ActionModel::STATE_REJECTED) {
+                } elseif ($action->approved == ActionModel::STATE_REJECTED) {
                     $label .= "<span class='infoLabel infoLabelRed'>Zamítnuto</span>";
                 } else {
                     $label .= "<span class='infoLabel infoLabelOrange'>Čeká na schválení</span>";
@@ -710,7 +776,7 @@ class ActionController extends Controller
      *
      * @before _secured, _participant
      */
-    public function help()
+    public function help(): void
     {
 
     }
@@ -719,8 +785,11 @@ class ActionController extends Controller
      * Load concept into active form.
      *
      * @before _secured, _participant
+     * @param $id
+     * @throws Connector
+     * @throws Implementation
      */
-    public function loadConcept($id)
+    public function loadConcept($id): void
     {
         $this->disableView();
 
@@ -728,7 +797,7 @@ class ActionController extends Controller
             $this->ajaxResponse($this->lang('ACCESS_DENIED'), true, 403);
         }
 
-        $concept = \Admin\Model\ConceptModel::first(['id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()]);
+        $concept = ConceptModel::first(['id = ?' => (int)$id, 'userId = ?' => $this->getUser()->getId()]);
 
         if (null !== $concept) {
             $conceptArr = [

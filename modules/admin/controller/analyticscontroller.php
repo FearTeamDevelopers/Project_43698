@@ -12,7 +12,7 @@ class AnalyticsController extends Controller
     /**
      * @before _secured, _admin
      */
-    public function index()
+    public function index(): void
     {
     }
 }

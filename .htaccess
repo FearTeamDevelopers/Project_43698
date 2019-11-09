@@ -28,7 +28,7 @@ deny from env=stayout
 
 ########## HTTPS
 RewriteCond %{HTTPS} off
-RewriteCond %{HTTP_HOST} !.*\.dev.*$
+#RewriteCond %{HTTP_HOST} !.*\.local.*$
 RewriteCond %{REQUEST_URI} ^.*$
 RewriteRule (.*) https://%{HTTP_HOST}/$1 [R=301,L,NC]
 ########## End - HTTPS
@@ -255,15 +255,8 @@ ExpiresByType video/x-ms-asf "now plus 1 month"
 </IfModule>
 ########## End - Optimal expiration time
 
-########## Begin - Redirect non-www to www
-RewriteCond %{HTTP_HOST} !.*\.(dev|fear-team\.cz).*$
-RewriteCond %{HTTP_HOST} !^dev\..*$
-RewriteCond %{HTTP_HOST} !^www\. [NC]
-RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R,L]
-########## End - Redirect non-www to www
-
 ########## Begin - Preventing Bandwidth Image Theft
-#RewriteCond %{HTTP_REFERER} !^(http(s)?://)?(www|dev\.)?(hastrman|hastrman\.fear-team)\.(cz|dev).* [NC]
+#RewriteCond %{HTTP_REFERER} !^(http(s)?://)?(www|dev\.)?(hastrman|hastrman\.fear-team)\.(cz|local).* [NC]
 #RewriteCond %{HTTP_REFERER} !^$
 #RewriteRule \.(jpe?g|gif|bmp|png|ico|svg)$ - [F]
 ########## End - Preventing Bandwidth Image Theft

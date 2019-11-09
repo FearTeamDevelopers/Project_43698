@@ -24,7 +24,7 @@ class AdvertisementController extends Controller
         $ads = \App\Model\AdvertisementModel::expireInDays();
 
         foreach ($ads as $email => $adverts) {
-            $adsString = '<table cellpadding="0" cellspacing="0" style="border-collapse:collapse; margin:0 auto; font-family:Arial; color:#394c5f; background-color:white;" width="700">'
+            $adsString = '<table style="border-collapse:collapse; margin:0 auto; font-family:Arial; color:#394c5f; background-color:white;" width="700">'
                     . '<tbody>'
                     . '<tr><td>Název</td><td>Vytvořen</td><td>Vyprší během x dní</td><td>Žádost o prodloužení</td></tr>';
 

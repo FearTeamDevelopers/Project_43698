@@ -71,10 +71,10 @@ class Extended extends Standard
     }
 
     /**
-     *
-     * @param type $tree
-     * @param type $content
-     * @return type
+     * @param $tree
+     * @param $content
+     * @return string
+     * @throws \THCFrame\Template\Exception\Implementation
      */
     protected function _include($tree, $content)
     {
@@ -99,10 +99,9 @@ class Extended extends Standard
     }
 
     /**
-     *
-     * @param type $tree
-     * @param type $content
-     * @return type
+     * @param $tree
+     * @param $content
+     * @return string
      */
     protected function _partial($tree, $content)
     {
@@ -134,10 +133,9 @@ class Extended extends Standard
     }
 
     /**
-     *
-     * @param type $tree
-     * @param type $content
-     * @return type
+     * @param $tree
+     * @param $content
+     * @return string
      */
     protected function _yield($tree, $content)
     {

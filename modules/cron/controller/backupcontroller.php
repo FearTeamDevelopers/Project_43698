@@ -17,17 +17,16 @@ class BackupController extends Controller
     /**
      * Remove old files from folder.
      *
-     * @param type $path
-     * @param type $days
+     * @param string $path
+     * @param int $days
+     * @throws \Exception
      */
     private function removeOldFiles($path, $days = 7)
     {
         $fm = new FileManager();
 
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
-
-            return;
+        if (!mkdir($path, 0755, true) && !is_dir($path)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
         }
 
         if ($handle = opendir($path)) {
@@ -73,9 +72,7 @@ class BackupController extends Controller
         $connectors = $database->initialize($config);
         Registry::set('database', $connectors);
 
-        unset($config);
-        unset($database);
-        unset($connectors);
+        unset($config, $database, $connectors);
     }
 
     /**
@@ -149,9 +146,7 @@ class BackupController extends Controller
                         ->send();
             }
         } catch (\THCFrame\Database\Exception\Mysqldump $ex) {
-            Event::fire('cron.log',
-                    ['fail', 'Database backup',
-                'Error: ' . $ex->getMessage(),]);
+            Event::fire('cron.log', ['fail', 'Database backup', 'Error: ' . $ex->getMessage()]);
 
             $message = $ex->getMessage() . PHP_EOL . $ex->getTraceAsString();
             $mailer = new \THCFrame\Mailer\Mailer([

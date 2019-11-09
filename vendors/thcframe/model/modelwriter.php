@@ -6,8 +6,6 @@ use THCFrame\Core\Base;
 
 /**
  * Writer class definition text to the file
- *
- * @author Tomy
  */
 class Modelwriter extends Base
 {
@@ -17,19 +15,19 @@ class Modelwriter extends Base
 
     /**
      * @readwrite
-     * @var type
+     * @var string
      */
     protected $namespace;
 
     /**
      * @readwrite
-     * @var type
+     * @var string
      */
     protected $extends;
 
     /**
      * @readwrite
-     * @var type
+     * @var array
      */
     protected $implements = [];
 
@@ -53,9 +51,9 @@ class Modelwriter extends Base
     /**
      * Add class property
      *
-     * @param type $propertyName
-     * @param type $propertyAnnotations
-     * @return \THCFrame\Model\Modelwriter
+     * @param string $propertyName
+     * @param string|array $propertyAnnotations
+     * @return Modelwriter
      */
     public function addProperty($propertyName, $propertyAnnotations)
     {
@@ -67,8 +65,8 @@ class Modelwriter extends Base
     /**
      * Add implements to the class header
      *
-     * @param type $implements
-     * @return \THCFrame\Model\Modelwriter
+     * @param array $implements
+     * @return Modelwriter
      */
     public function addImplements($implements)
     {
@@ -79,9 +77,9 @@ class Modelwriter extends Base
     /**
      * Add use to the class header
      *
-     * @param type $use
-     * @param type $useAlias
-     * @return \THCFrame\Model\Modelwriter
+     * @param string $use
+     * @param string $useAlias
+     * @return Modelwriter
      */
     public function addUse($use, $useAlias = null)
     {
@@ -100,7 +98,7 @@ class Modelwriter extends Base
     private function _writeHeader()
     {
         $extends = !empty($this->extends) ? 'extends ' . $this->extends : '';
-        $implements = !empty($this->implements) ? implode(',', $this->implements) : '';
+        $implements = !empty($this->implements) ? 'implements ' . implode(',', $this->implements) : '';
         $useStr = '';
 
         foreach ($this->use as $key => $value) {
@@ -229,31 +227,31 @@ END;
         return $this->classname;
     }
 
-    public function setNamespace(type $namespace)
+    public function setNamespace(string $namespace)
     {
         $this->namespace = $namespace;
         return $this;
     }
 
-    public function setExtends(type $extends)
+    public function setExtends(string $extends)
     {
         $this->extends = $extends;
         return $this;
     }
 
-    public function setImplements(type $implements)
+    public function setImplements(array $implements)
     {
         $this->implements = $implements;
         return $this;
     }
 
-    public function setFilename($filename)
+    public function setFilename(string $filename)
     {
         $this->filename = $filename;
         return $this;
     }
 
-    public function setClassname($classname)
+    public function setClassname(string $classname)
     {
         $this->classname = $classname;
         return $this;
